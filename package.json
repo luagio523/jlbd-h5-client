@@ -1,0 +1,10 @@
+{
+  "name": "jlbd-h5-client",
+  "uuid": "b07b07fa-0b05-42cb-844c-c15e3fa1eadf",
+  "creator": {
+    "version": "3.8.2"
+  },
+  "dependencies": {
+    "crypto-es": "^2.1.0"
+  }
+}
