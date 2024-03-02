@@ -1,30 +1,32 @@
-Array.prototype.cpush = function (...items) {
-    this.length = 0;
-    this.push(...items);
-  };
+// Array.prototype.cpush = function (...items) {
+//     this.splice(0, this.length);
+//     this.push(...items);
 
-function observeArray(obj) {
-    if (!Array.isArray(obj)) {
-      throw new Error('Expected an array');
-    }
-    let oldLength = obj.length;
-    return new Proxy(obj, {
-      set: function(target, key, value) {
-        console.log("tttt",target,key,value)
-        target[key] = value;
-        if (key === 'length' && oldLength !== value) {
-          console.log(target);
-          console.log(`Array length changed from ${oldLength} to ${value}`);
-          oldLength = value;
-        }
-        return true;
-      }
-    });
-  }
-  let arr = observeArray([1, 2, 3]);
+    
+//   };
+
+// function observeArray(obj) {
+//     if (!Array.isArray(obj)) {
+//       throw new Error('Expected an array');
+//     }
+//     let oldLength = obj.length;
+//     return new Proxy(obj, {
+//       set: function(target, key, value) {
+//         console.log("tttt",target,key,value)
+//         target[key] = value;
+//         if (key === 'length' && oldLength !== value) {
+          
+//           console.log(`Array length changed from ${oldLength} to ${value}`);
+//           oldLength = value;
+//         }
+//         return true;
+//       }
+//     });
+//   }
+//   let arr = observeArray([1, 2, 3]);
 //   arr.cpush(4, 5, 6); // 将只打印一次 `Array length changed from 3 to 6`
-// arr.length = 0 
-arr.push(1,2,3)
+// // arr.length = 0 
+// arr.push(1,2,3)
 
 
 
@@ -49,45 +51,53 @@ arr.push(1,2,3)
 
 
 
-//   function observeArray(arr) {
-//     if (!Array.isArray(arr)) {
-//         throw new Error('Expected an array');
-//     }
+  function observeArray(arr) {
+    if (!Array.isArray(arr)) {
+        throw new Error('Expected an array');
+    }
 
-//     var arrayProto = Object.create(Array.prototype);
+    var onChange = ()=>{
+        console.log(" change ",arr)
+    }
 
-//     arrayProto.emptyAndPush = function (...items) {
-//         this.length = 0;
-//         this.push(...items);
-//       };
+    var arrayProto = Object.create(Array.prototype);
 
-//     ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'].forEach(function(method) {
-//         arrayProto[method] = function() {
-//             var oldLength = this.length;
-//             Array.prototype[method].apply(this, arguments);
-//             if (this.length !== oldLength) {
-//                 console.log('Array length changed from ' + oldLength + ' to ' + this.length);
-//             }
-//         };
-//     });
+    arrayProto.fill = function (...items) {
+        this.length = 0;
+        this.push(...items);
+    };
+    arrayProto.clear = function (...items) {
+        this.length = 0;
+    };
+    ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'].forEach(function(method) {
+        arrayProto[method] = function() {
+            var oldLength = this.length;
+            Array.prototype[method].apply(this, arguments);
+            if (this.length !== oldLength) {
+                console.log('Array length changed from ' + oldLength + ' to ' + this.length);
+            }
+            onChange(this)
+        };
+    });
 
-//     var observedArray = arr;
-//     observedArray.__proto__ = arrayProto;
-//     return observedArray;
-// }
-// // 
-
-
-
-
-
-
-
+    var observedArray = arr;
+    observedArray.__proto__ = arrayProto;
+    return observedArray;
+}
+// 
 
 
+let arr = observeArray([1, 2, 3]);
+arr.push(4, 5, 6); // 将只打印一次 `Array length changed from 3 to 6`
 
-// let arr = observeArray([1, 2, 3]);
-// arr.push(4, 5, 6); // 将只打印一次 `Array length changed from 3 to 6`
+
+// arr.clear()
+console.log(arr)
+
+
+
+
+
 
 // arr.emptyAndPush(7,8,9)
 

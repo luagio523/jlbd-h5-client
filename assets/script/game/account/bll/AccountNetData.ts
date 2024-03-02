@@ -23,6 +23,7 @@ export class AccountNetDataComp extends ecs.Comp {
 /** 请求玩家游戏数据 */
 @ecs.register('Account')
 export class AccountNetDataSystem extends ecs.ComblockSystem implements ecs.IEntityEnterSystem {
+    
     filter(): ecs.IMatcher {
         return ecs.allOf(AccountNetDataComp, AccountModelComp);
     }
