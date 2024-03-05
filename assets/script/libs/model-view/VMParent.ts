@@ -1,5 +1,5 @@
 import { Component, _decorator } from 'cc';
-import { GameComponent } from '../../module/common/GameComponent';
+import { GameComponent } from '../../common/GameComponent';
 import { VM } from './ViewModel';
 
 const { ccclass, help, executionOrder } = _decorator;

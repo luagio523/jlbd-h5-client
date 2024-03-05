@@ -30,7 +30,7 @@ export enum UIID {
 export var UIConfigData: { [key: number]: UIConfig } = {
     [UIID.Loading]: { layer: LayerType.UI, prefab: "loading/prefab/loading", bundle: "resources" },
     [UIID.Netinstable]: { layer: LayerType.PopUp, prefab: "common/prefab/netinstable" },
-    [UIID.Window]: { layer: LayerType.Dialog, prefab: "common/prefab/window" },
+    [UIID.Window]: { Name:"Login",layer: LayerType.Dialog, prefab: "common/prefab/window" },
     [UIID.Demo]: { layer: LayerType.UI, prefab: "gui/prefab/demo" },
     [UIID.Demo_Role_Info]: { layer: LayerType.UI, prefab: "gui/prefab/role_info" },
     [UIID.MainUI]: { layer: LayerType.UI, prefab: "demo/MainUI" },

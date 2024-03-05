@@ -145,80 +145,80 @@ _module_configs["Story"] = {
     views :  ["Story"],
 }
 
-//引导
-_module_configs["Guide"] = {
-    events : [
-            "Plot_view_Show", "Plot_Step"
-                ],
-    views :  ["Guide", "Plot"],
-}
+// //引导
+// _module_configs["Guide"] = {
+//     events : [
+//             "Plot_view_Show", "Plot_Step"
+//                 ],
+//     views :  ["Guide", "Plot"],
+// }
 
 
-//战斗模块
-_module_configs["Battle"] = {
-    events : [
-            "Battle_View_Show","Show_Blood","Show_Drop_Item","Update_CharRoleInfo", "Update_Gold", "Update_Equip", "Receive_Item",  "Update_Statistic",
-            "Lock_View_Show", "MapBig_View_Show", "Send_Chat_Msg", "Boss_Borth", "Show_Tombstone", "Hide_Tombstone", "Enter_Area", "Leave_Area", "Boss_Hp_Update",
-            "Role_Resurrection", "Show_Msg", "Vmg_MsgSure_View_show", "Update_Area_Lock"
-                ],
-    views :  ["Battle", "Lock", "MapBig", "Msg"],
-}
+// //战斗模块
+// _module_configs["Battle"] = {
+//     events : [
+//             "Battle_View_Show","Show_Blood","Show_Drop_Item","Update_CharRoleInfo", "Update_Gold", "Update_Equip", "Receive_Item",  "Update_Statistic",
+//             "Lock_View_Show", "MapBig_View_Show", "Send_Chat_Msg", "Boss_Borth", "Show_Tombstone", "Hide_Tombstone", "Enter_Area", "Leave_Area", "Boss_Hp_Update",
+//             "Role_Resurrection", "Show_Msg", "Vmg_MsgSure_View_show", "Update_Area_Lock"
+//                 ],
+//     views :  ["Battle", "Lock", "MapBig", "Msg"],
+// }
 
 
-//登陆注册
-_module_configs["Login"] = {
-    events : [
-               "SdkLogin_View_Show","Native_View_Show", "Official_Web_View_Show", "Official_Native_Login_View_Show",
-               "Login_View_Show","Account_View_Show","GetPassword_View_Show",
-               "Fast_Register_Account","Update_Account_Pwd","Get_Login_Type","Auth_Login",
-               "Update_Login_Status","Update_Player_Status","Set_New_Password","Get_New_Password_Verify",
-               "Get_Player_Status","Get_Customer_Center","Register_Account",
-               "Quit_Game", "Reset_Login_Staute", "UpdateAssets_View_Show", "Update_Session_View",
-               "Sdk_Auth","Login_Start", "WX_Auth", "WX_Web_Auth","Official_Login_View", "QQ_Web_Auth","Test_Local_Token_Login", 
-             ],
-    views :  ["NativeLogin","SdkLogin","OfficialWebLogin","OfficialNativeLogin","Login", "Account",  "GetPassword", "UpdateAssets"],
-}
+// //登陆注册
+// _module_configs["Login"] = {
+//     events : [
+//                "SdkLogin_View_Show","Native_View_Show", "Official_Web_View_Show", "Official_Native_Login_View_Show",
+//                "Login_View_Show","Account_View_Show","GetPassword_View_Show",
+//                "Fast_Register_Account","Update_Account_Pwd","Get_Login_Type","Auth_Login",
+//                "Update_Login_Status","Update_Player_Status","Set_New_Password","Get_New_Password_Verify",
+//                "Get_Player_Status","Get_Customer_Center","Register_Account",
+//                "Quit_Game", "Reset_Login_Staute", "UpdateAssets_View_Show", "Update_Session_View",
+//                "Sdk_Auth","Login_Start", "WX_Auth", "WX_Web_Auth","Official_Login_View", "QQ_Web_Auth","Test_Local_Token_Login", 
+//              ],
+//     views :  ["NativeLogin","SdkLogin","OfficialWebLogin","OfficialNativeLogin","Login", "Account",  "GetPassword", "UpdateAssets"],
+// }
 
-//加载
-_module_configs["Loader"] = {
-    events : [
-            "Loader_View_Show"
-                ],
-    views :  ["Loader"],
-}
+// //加载
+// _module_configs["Loader"] = {
+//     events : [
+//             "Loader_View_Show"
+//                 ],
+//     views :  ["Loader"],
+// }
 
-//角色
-_module_configs["User"] = {
-    events : [
-            "Offline_Award_View_Show", "Create_Role_View_Show", "Create_Role", "Receive_Item", "Up_Lv_Equip","Show_Drop_Item",
-            "Set_RoleInfo","Update_RoleInfo"
-                ],
-    views :  ["OfflineAward", "CreateRole"],
-}
+// //角色
+// _module_configs["User"] = {
+//     events : [
+//             "Offline_Award_View_Show", "Create_Role_View_Show", "Create_Role", "Receive_Item", "Up_Lv_Equip","Show_Drop_Item",
+//             "Set_RoleInfo","Update_RoleInfo"
+//                 ],
+//     views :  ["OfflineAward", "CreateRole"],
+// }
 
 
-//sdk
-_module_configs["Sdk"] = {
-    events : ["Sdk_Init","Sdk_Login","Sdk_Logout","Sdk_Switch_Login","Sdk_Pay","Sdk_Exit","Get_RealName",
-    "Share_Wechat","Share_Friend_Page","Install_Apk","Sdk_submit", "Sdk_Report","Sdk_Open_Service"],
-    views :  [],
-}
+// //sdk
+// _module_configs["Sdk"] = {
+//     events : ["Sdk_Init","Sdk_Login","Sdk_Logout","Sdk_Switch_Login","Sdk_Pay","Sdk_Exit","Get_RealName",
+//     "Share_Wechat","Share_Friend_Page","Install_Apk","Sdk_submit", "Sdk_Report","Sdk_Open_Service"],
+//     views :  [],
+// }
 
-//设置
-_module_configs["Setting"] = {
-    events : [
-            "Setting_View_Show"
-                ],
-    views :  ["Setting"],
-}
+// //设置
+// _module_configs["Setting"] = {
+//     events : [
+//             "Setting_View_Show"
+//                 ],
+//     views :  ["Setting"],
+// }
 
-//排行榜
-_module_configs["Rank"] = {
-    events : [
-            "Rank_View_Show"
-                ],
-    views :  ["Rank"],
-}
+// //排行榜
+// _module_configs["Rank"] = {
+//     events : [
+//             "Rank_View_Show"
+//                 ],
+//     views :  ["Rank"],
+// }
 
 
 

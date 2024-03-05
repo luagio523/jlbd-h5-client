@@ -1,7 +1,7 @@
 import { Component } from "cc";
-import { oops } from "../../Oops";
 import { AudioEffect } from "./AudioEffect";
 import { AudioMusic } from "./AudioMusic";
+import { StorageManager } from "../storage/StorageManager";
 
 const LOCAL_STORE_KEY = "game_audio";
 
@@ -11,7 +11,8 @@ const LOCAL_STORE_KEY = "game_audio";
 // 模块功能通过 oops.audio 调用
 oops.audio.playMusic("audios/nocturne");
  */
-export class AudioManager extends Component {
+export class AudioManager  {
+
     private local_data: any = {};
 
     private music!: AudioMusic;
@@ -168,7 +169,7 @@ export class AudioManager extends Component {
         this.local_data.switch_effect = this._switch_effect;
 
         let data = JSON.stringify(this.local_data);
-        oops.storage.set(LOCAL_STORE_KEY, data);
+        StorageManager.Instance.set(LOCAL_STORE_KEY, data);
     }
 
 
@@ -177,7 +178,8 @@ export class AudioManager extends Component {
         this.music = this.getComponent(AudioMusic) || this.addComponent(AudioMusic)!;
         this.effect = this.getComponent(AudioEffect) || this.addComponent(AudioEffect)!;
 
-        let data = oops.storage.get(LOCAL_STORE_KEY);
+        let data = StorageManager.Instance.get(LOCAL_STORE_KEY);
+
         if (data) {
             try {
                 this.local_data = JSON.parse(data);

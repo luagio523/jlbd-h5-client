@@ -1,4 +1,5 @@
 import { IModel } from "../interfaces/IModel";
+import { IProxy } from "../interfaces/IProxy";
 
 	
 	export class Model

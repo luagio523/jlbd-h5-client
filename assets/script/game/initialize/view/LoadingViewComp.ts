@@ -8,7 +8,7 @@ import { _decorator } from "cc";
 import { oops } from "../../.././core/Oops";
 import { JsonUtil } from "../../.././core/utils/JsonUtil";
 import { ecs } from "../../.././libs/ecs/ECS";
-import { CCVMParentComp } from "../../.././module/common/CCVMParentComp";
+import { CCVMParentComp } from "../../../common/CCVMParentComp";
 import { GameEvent } from "../../common/config/GameEvent";
 import { UIID } from "../../common/config/GameUIConfig";
 import { smc } from "../../common/ecs/SingletonModuleComp";

@@ -18,7 +18,7 @@ import { ResLoader } from "./common/loader/ResLoader";
 import { Logger } from "./common/log/Logger";
 import { RandomManager } from "./common/random/RandomManager";
 import { StorageManager } from "./common/storage/StorageManager";
-import { TimerManager } from "./common/timer/TimerManager";
+import { TimerManager } from "./common/timer/GameTimer";
 import { GameManager } from "./game/GameManager";
 import { LayerManager } from "./gui/layer/LayerManager";
 

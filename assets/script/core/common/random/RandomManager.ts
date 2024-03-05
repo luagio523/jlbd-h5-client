@@ -39,11 +39,11 @@ export class RandomManager {
             }
         }
         else {
-            var seedrandom = require('seedrandom');
-            if (this.isGlobal)
-                new seedrandom(seed, { global: true });
-            else
-                this.random = new seedrandom(seed);
+            // var seedrandom = require('seedrandom');
+            // if (this.isGlobal)
+            //     new seedrandom(seed, { global: true });
+            // else
+            //     this.random = new seedrandom(seed);
         }
     }
 

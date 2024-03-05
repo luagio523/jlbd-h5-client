@@ -11,7 +11,7 @@ import { GameQueryConfig } from "../module/config/GameQueryConfig";
 import { oops, version } from "./Oops";
 import { AudioManager } from "./common/audio/AudioManager";
 import { EventMessage } from "./common/event/EventMessage";
-import { TimerManager } from "./common/timer/TimerManager";
+import { TimerManager } from "./common/timer/GameTimer";
 import { GameManager } from "./game/GameManager";
 import { GUI } from "./gui/GUI";
 import { LayerManager } from "./gui/layer/LayerManager";

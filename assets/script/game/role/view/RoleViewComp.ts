@@ -7,7 +7,7 @@
 
 import { sp, _decorator } from "cc";
 import { ecs } from "../../.././libs/ecs/ECS";
-import { CCComp } from "../../.././module/common/CCComp";
+import { CCComp } from "../../../common/CCComp";
 import { Role } from "../Role";
 import { RoleEvent } from "../RoleEvent";
 import { RoleViewAnimator } from "./RoleViewAnimator";

@@ -7,7 +7,7 @@
 import { Node } from "cc";
 
 /*** 界面回调参数对象定义 */
-export interface UICallbacks {
+export interface UICallback {
     /**
      * 节点添加到层级以后的回调
      * @param node   当前界面节点
@@ -35,10 +35,9 @@ export interface UICallbacks {
 }
 
 /** 弹框层回调对象定义 */
-export interface PopViewParams extends UICallbacks {
+export interface PopViewParams extends UICallback {
     /** 是否触摸背景关闭弹窗 */
     touchClose?: boolean,
-
     /** 控制暗色背景的透明度 默认为190*/
     opacity?: number;
 }
@@ -52,9 +51,14 @@ export class ViewParams {
     /** 传递给打开界面的参数 */
     params: any = null!;
     /** 窗口事件 */
-    callbacks: UICallbacks = null!;
+    callbacks: UICallback = null!;
     /** 是否在使用状态 */
     valid: boolean = true;
     /** 界面根节点 */
     node: Node = null!;
+}
+
+export class ViewOption {
+    id:number = null!;
+    params: any = null!;
 }

@@ -12,7 +12,7 @@
  */
 import { error, instantiate, isValid, Node, Prefab, warn, Widget } from "cc";
 import { oops } from "../../Oops";
-import { UICallbacks, ViewParams } from "./Defines";
+import { UICallback, ViewParams } from "./Defines";
 import { DelegateComponent } from "./DelegateComponent";
 import { UIConfig } from "./LayerManager";
 
@@ -50,7 +50,7 @@ export class LayerUI extends Node {
      * @param params     自定义参数
      * @param callbacks  回调函数对象，可选
      */
-    add(config: UIConfig, params?: any, callbacks?: UICallbacks): string {
+    add(config: UIConfig, params?: any, callbacks?: UICallback): string {
         let prefabPath = config.prefab;
         var uuid = this.getUuid(prefabPath);
         var viewParams = this.ui_nodes.get(uuid);

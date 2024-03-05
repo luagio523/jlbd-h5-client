@@ -1,0 +1,34 @@
+export const MethodType = {
+	TYPE_INIT : 1,
+	TYPE_LOGIN : 2,
+	TYPE_LOGOUT : 3,
+	TYPE_SWITCH : 4,
+	TYPE_PAY : 5,
+	TYPE_DEFAULT_EXIT : 6,
+	TYPE_RESULT : 7,
+	TYPE_SHARE : 8,
+    TYPE_SHOW_PAYVIEW : 9,
+    TYPE_SUBMIT_EXTRA:10,
+	TYPE_INSTALL_APK:11,
+	TYPE_CHECK_ORDER:12,
+	TYPE_GET_REALNAME:13,
+	TYPE_REPORT: 14,
+	TYPE_REGISTER:15,
+	TYPE_COPY:16,
+	TYPE_OPEN_SERVICE:17,
+}
+
+export const SDKCode = {
+    SUCC:0,       //成功
+    ERROR:3000,  //错误
+    CANCEL:2000, //取消
+}
+
+export const SubMitType = {
+	SELECT_SERVER:1,//选择服务器
+	CREATE_ROLE:2, //创建角色；3
+	ENTER_GAME:3,//进入游戏；4
+	LEVEL_UP:4,//等级提升；5
+	EXIT_GAME:5,//退出游戏
+	CREATE_ORDER: 6,//创建订单
+}

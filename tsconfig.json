@@ -3,7 +3,22 @@
   "extends": "./temp/tsconfig.cocos.json",
 
   /* Add your custom configuration here. */
+
   "compilerOptions": {
-    "strict": false
-  }
+    "strict": false,
+    "target": "es6",
+    "lib": ["es2017", "dom"], 
+    "module": "commonjs",
+    "experimentalDecorators": true
+  },
+  "exclude": [
+      "node_modules",
+      ".vscode",
+      "library",
+      "local",
+      "settings",
+      "temp"
+  ]
 }
+
+

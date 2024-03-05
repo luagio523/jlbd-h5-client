@@ -1,6 +1,6 @@
 import { Camera, Layers, Node, warn, Widget } from "cc";
 import { GUI } from "../GUI";
-import { UICallbacks } from "./Defines";
+import { UICallback } from "./Defines";
 import { DelegateComponent } from "./DelegateComponent";
 import { LayerDialog } from "./LayerDialog";
 import { LayerNotify } from "./LayerNotify";
@@ -44,6 +44,7 @@ export var UIConfigData: { [key: number]: UIConfig } = {
 }
  */
 export interface UIConfig {
+    Name?: string 
     /** 远程包名 */
     bundle?: string;
     /** 窗口层级 */
@@ -121,6 +122,15 @@ export class LayerManager {
     }
 
     /**
+     * 设置界面配置
+     * @param uiId   要设置的界面id
+     * @param config 要设置的配置
+     */
+    getConfig(uiId: number): UIConfig {
+        return this.configs[uiId];
+    }
+
+    /**
      * 设置界面地图配置
      * @param data 界面地图数据
      */
@@ -137,7 +147,7 @@ export class LayerManager {
      * @param uiArgs        窗口参数
      * @param callbacks     回调对象
      * @example
-    var uic: UICallbacks = {
+    var uic: UICallback = {
         onAdded: (node: Node, params: any) => {
             var comp = node.getComponent(LoadingViewComp) as ecs.Comp;
         }
@@ -147,7 +157,7 @@ export class LayerManager {
     };
     oops.gui.open(UIID.Loading, null, uic);
      */
-    open(uiId: number, uiArgs: any = null, callbacks?: UICallbacks): void {
+    open(uiId: number, uiArgs: any = null, callbacks?: UICallback): void {
         var config = this.configs[uiId];
         if (config == null) {
             warn(`打开编号为【${uiId}】的界面失败，配置信息不存在`);
@@ -179,7 +189,7 @@ export class LayerManager {
      */
     async openAsync(uiId: number, uiArgs: any = null): Promise<Node | null> {
         return new Promise<Node | null>((resolve, reject) => {
-            var callbacks: UICallbacks = {
+            var callbacks: UICallback = {
                 onAdded: (node: Node, params: any) => {
                     resolve(node)
                 }

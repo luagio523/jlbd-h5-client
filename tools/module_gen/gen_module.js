@@ -66,7 +66,7 @@ function handlerItem(module,item,tpldt,overide){
 
 //处理model
 function handlerModel(module){
-    handlerItem(module,"Model",{Template: module}) 
+    handlerItem(module,"Proxy",{Template: module}) 
 }
 
 //处理service
@@ -192,7 +192,7 @@ function handlerView(views,module){
 
         let tpldt = {module:module,module2:firstLower(module),Template: element,Template2:firstLower(element)}
 
-        var tpl = fs.readFileSync('templates/Template'+"View"+".tpl",'utf-8');
+        var tpl = fs.readFileSync('templates/Template'+"Mediator"+".tpl",'utf-8');
 
         let ret = handlerTemplate(tpl,tpldt)
     
@@ -203,7 +203,7 @@ function handlerView(views,module){
             fs.mkdirSync(modulePath)
         }
         
-        let moduleFile = modulePath + element+"View"+".ts"
+        let moduleFile = modulePath + element+"Mediator"+".ts"
 
         if( fs.existsSync(moduleFile)){
             console.log(moduleFile+" is exist,will not write")
@@ -265,7 +265,7 @@ function handlerModules(modules){
         let pt = `../modules/${element.toLocaleLowerCase()}/${element}`
 
 
-        tpldt.modulelist.push({name:element,c:pt+"Controller",m:pt+"Model",e:pt+"Event"})
+        tpldt.modulelist.push({name:element,c:pt+"Controller",m:pt+"Proxy",e:pt+"Event"})
     });
     var tpl = fs.readFileSync('templates/modules.tpl','utf-8');
 

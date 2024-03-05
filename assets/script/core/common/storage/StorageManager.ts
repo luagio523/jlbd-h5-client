@@ -4,6 +4,7 @@ import { EncryptUtil } from "../../utils/EncryptUtil";
 
 /** 本地存储 */
 export class StorageManager {
+    static readonly Instance: StorageManager = new StorageManager();
     private _key: string | null = null;
     private _iv: string | null = null;
     private _id: string = "";

@@ -6,7 +6,7 @@
  */
 
 import { Node } from "cc";
-import { UICallbacks, ViewParams } from "./Defines";
+import { UICallback, ViewParams } from "./Defines";
 import { UIConfig } from "./LayerManager";
 import { LayerPopUp } from "./LayerPopup";
 
@@ -14,7 +14,7 @@ import { LayerPopUp } from "./LayerPopup";
 type DialogParam = {
     config: UIConfig;
     params?: any;
-    callbacks?: UICallbacks;
+    callbacks?: UICallback;
 }
 
 /*
@@ -26,7 +26,7 @@ export class LayerDialog extends LayerPopUp {
     /** 当前窗口数据 */
     private current!: ViewParams;
 
-    add(config: UIConfig, params?: any, callbacks?: UICallbacks): string {
+    add(config: UIConfig, params?: any, callbacks?: UICallback): string {
         this.black.enabled = true;
 
         if (this.current && this.current.valid) {
@@ -41,7 +41,7 @@ export class LayerDialog extends LayerPopUp {
         return this.show(config, params, callbacks);
     }
 
-    private show(config: UIConfig, params?: any, callbacks?: UICallbacks): string {
+    private show(config: UIConfig, params?: any, callbacks?: UICallback): string {
         let prefabPath = config.prefab
         var uuid = this.getUuid(prefabPath);
         var viewParams = this.ui_nodes.get(uuid);
