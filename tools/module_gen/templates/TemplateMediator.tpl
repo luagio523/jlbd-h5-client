@@ -7,8 +7,6 @@ const { ccclass, property } = _decorator;
 /**
  * <%=Template%>Mediator
  */
-
-
 @ccclass
 export default class <%=Template%>Mediator extends BaseMediator {
 

@@ -53,6 +53,7 @@ function handlerItem(module,item,tpldt,overide){
     }
     let moduleFile = modulePath + module+item+".ts"
 
+
     if(!overide && fs.existsSync(moduleFile)){
         console.log(moduleFile+" is exist,will not write")
         return false
@@ -77,7 +78,7 @@ function handlerService(module){
 //处理controller
 function handlerController(module,events,views){
     let modulePath = MODULE_ROOT_PATH+module.toLocaleLowerCase()+"/"
-    let moduleFile = modulePath + module+"Controller"+".ts"
+    let moduleFile = modulePath + module+"Command"+".ts"
     let isExist = fs.existsSync(moduleFile)
     let fileData = null
     if(isExist){
@@ -90,37 +91,47 @@ function handlerController(module,events,views){
 
     ctlpdt.importlist = []
 
-    events.forEach(element => {
-        let rmethod =`public  notice{0}(notification:any){
 
-    } `
+    
+
+
+    events.forEach(element => {
+   
+
+    let rmethod =`export class {0}Command extends BaseCommand{
+    public static NAME = "{0}Command"
+        execute( notification:INotification )
+    {
+        
+    }
+}`
 
         rmethod = strfmt(rmethod,element.replace(/_/g,""))
-        let method = "notice"+element.replace(/_/g,"")+"(notification:any)"
-        let method2 = "notice"+element.replace(/_/g,"")+"(notification: any)"
+        let method = ""+element.replace(/_/g,"")+"Command"
+        let method2 = ""+element.replace(/_/g,"")+"Command"
         if(!isExist || fileData.indexOf(method) ==  -1 && fileData.indexOf(method2) ==  -1){ //当文件不存在　或者　文件内容不包含
             ctlpdt.evtlist.push({method:rmethod})
         }
     });
     ctlpdt.viewlist = []
     views.forEach(element => {
-        let rmethod =`protected  get {0}View():{1}View{ 
-        return ns.views.{0}
-    } `
+        let rmethod =`function {0}Mediator():{1}Mediator{ 
+    return  app.facade.retrieveMediator({1}Mediator.NAME) as {1}Mediator
+} `
 
         rmethod = strfmt(rmethod,firstLower(element),element)
 
-        let method = "get " +firstLower(element)+"View():"+element+"View"
+        let method = "" +firstLower(element)+"Mediator():"+element+"Mediator"
         if(!isExist || fileData.indexOf(method) ==  -1){　//当文件不存在　或者　文件内容不包含
             ctlpdt.viewlist.push({method:rmethod})
-            ctlpdt.importlist.push({name:element+"View"})
+            ctlpdt.importlist.push({name:element+"Mediator"})
         }
     });
     
     
 
     if(!isExist){
-        handlerItem(module,"Controller",ctlpdt)
+        handlerItem(module,"Command",ctlpdt)
     }else{　//处理　增量更新
         if(ctlpdt.evtlist.length > 0){
             fileData = CreateAddEventMethod(fileData,"notices",{methodlist:ctlpdt.evtlist}) //创建　evt的增量
@@ -224,7 +235,7 @@ function handlerEvent(module,events){
         etlpdt.evtlist.push({name:element})
     });
 
-    handlerItem(module,"Event",etlpdt,true)
+    handlerItem(module,"Notification",etlpdt,true)
 
 }
 
@@ -240,13 +251,13 @@ function handlerTotalEvent(events){
         temp[element] = 1
     });
 
-    var tpl = fs.readFileSync('templates/GameEvent.tpl','utf-8');
+    var tpl = fs.readFileSync('templates/Notification.tpl','utf-8');
 
     let ret = handlerTemplate(tpl,tpldt)
 
     let gameEvtPath = GAME_MVC_ROOT_PATH
     
-    let evtFile = gameEvtPath+"GameEvent.ts"
+    let evtFile = gameEvtPath+"Notification.ts"
     fs.writeFileSync(evtFile,ret)
     console.log("write "+evtFile)
 }
@@ -265,7 +276,7 @@ function handlerModules(modules){
         let pt = `../modules/${element.toLocaleLowerCase()}/${element}`
 
 
-        tpldt.modulelist.push({name:element,c:pt+"Controller",m:pt+"Proxy",e:pt+"Event"})
+        tpldt.modulelist.push({name:element,c:pt+"Command",m:pt+"Proxy",e:pt+"Notification"})
     });
     var tpl = fs.readFileSync('templates/modules.tpl','utf-8');
 

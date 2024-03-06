@@ -6,6 +6,11 @@ import { UIID } from "../game/common/config/GameUIConfig";
 import { Mediator } from "../core/mvc/patterns/mediator/Mediator";
 import { PopViewParams, ViewOption } from "../core/gui/layer/Defines";
 
+
+export class BaseCommand extends SimpleCommand{
+}
+
+
 export class OpenUICommand extends SimpleCommand{
     public static NAME = "OpenUICommand"
     async execute( notification:INotification ):Promise<void>

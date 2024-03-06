@@ -7,8 +7,6 @@ const { ccclass, property } = _decorator;
 /** 
  * StoryMediator 
  */ 
- 
- 
 @ccclass 
 export default class StoryMediator extends BaseMediator { 
  
