@@ -5,7 +5,7 @@ const { ccclass, property } = _decorator;
 export default class StoryNotification { 
     public listNotifications(): string[] { 
         return [ 
-            Notification.PlotStep, 
+            Notification.PLOT_STEP, 
             "EOF" 
         ]; 
     } 

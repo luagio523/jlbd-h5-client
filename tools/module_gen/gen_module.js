@@ -7,7 +7,7 @@ var fs=require('fs');//引入他的模块之后调用读取文件的方法
 
 
 let MODULE_ROOT_PATH = "../../assets/script/modules/" //模块路径
-let GAME_MVC_ROOT_PATH = "../../assets/script/mvc/" //GameEvent路径
+let GAME_MVC_ROOT_PATH = "../../assets/script/mvc/" //GameNotification路径
 /**
  * 将第一个字母小写
  * @param {} str 
@@ -53,7 +53,6 @@ function handlerItem(module,item,tpldt,overide){
     }
     let moduleFile = modulePath + module+item+".ts"
 
-
     if(!overide && fs.existsSync(moduleFile)){
         console.log(moduleFile+" is exist,will not write")
         return false
@@ -66,7 +65,7 @@ function handlerItem(module,item,tpldt,overide){
 
 
 //处理model
-function handlerModel(module){
+function handlerProxy(module){
     handlerItem(module,"Proxy",{Template: module}) 
 }
 
@@ -75,10 +74,18 @@ function handlerService(module){
     handlerItem(module,"Service",{Template: module}) 
 }
 
+function toPascalCase(str) {
+    return str
+      .toLowerCase()
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('');
+}
+
 //处理controller
-function handlerController(module,events,views){
+function handlerActor(module,events,views){
     let modulePath = MODULE_ROOT_PATH+module.toLocaleLowerCase()+"/"
-    let moduleFile = modulePath + module+"Command"+".ts"
+    let moduleFile = modulePath + module+"Actor"+".ts"
     let isExist = fs.existsSync(moduleFile)
     let fileData = null
     if(isExist){
@@ -91,37 +98,26 @@ function handlerController(module,events,views){
 
     ctlpdt.importlist = []
 
-
-    
-
-
     events.forEach(element => {
-   
+        let rmethod =`public  execute{0}(...args: any){
 
-    let rmethod =`export class {0}Command extends BaseCommand{
-    public static NAME = "{0}Command"
-        execute( notification:INotification )
-    {
-        
-    }
-}`
-
-        rmethod = strfmt(rmethod,element.replace(/_/g,""))
-        let method = ""+element.replace(/_/g,"")+"Command"
-        let method2 = ""+element.replace(/_/g,"")+"Command"
-        if(!isExist || fileData.indexOf(method) ==  -1 && fileData.indexOf(method2) ==  -1){ //当文件不存在　或者　文件内容不包含
-            ctlpdt.evtlist.push({method:rmethod})
+    } `
+        let method = "execute"+toPascalCase(element)
+        rmethod = strfmt(rmethod,toPascalCase(element))
+        // let method = method+"(notification:any)"
+        if(!isExist || fileData.indexOf(method) ==  -1){ //当文件不存在　或者　文件内容不包含
+            ctlpdt.evtlist.push({rmethod:rmethod,method:method,event:element})
         }
     });
     ctlpdt.viewlist = []
     views.forEach(element => {
-        let rmethod =`function {0}Mediator():{1}Mediator{ 
-    return  app.facade.retrieveMediator({1}Mediator.NAME) as {1}Mediator
-} `
+        let rmethod =`protected  get {0}Mediator():{1}Mediator{ 
+        return ns.views.{0}
+    } `
 
         rmethod = strfmt(rmethod,firstLower(element),element)
 
-        let method = "" +firstLower(element)+"Mediator():"+element+"Mediator"
+        let method = "get " +firstLower(element)+"Mediator():"+element+"Mediator"
         if(!isExist || fileData.indexOf(method) ==  -1){　//当文件不存在　或者　文件内容不包含
             ctlpdt.viewlist.push({method:rmethod})
             ctlpdt.importlist.push({name:element+"Mediator"})
@@ -131,15 +127,15 @@ function handlerController(module,events,views){
     
 
     if(!isExist){
-        handlerItem(module,"Command",ctlpdt)
+        handlerItem(module,"Actor",ctlpdt)
     }else{　//处理　增量更新
         if(ctlpdt.evtlist.length > 0){
-            fileData = CreateAddEventMethod(fileData,"notices",{methodlist:ctlpdt.evtlist}) //创建　evt的增量
+            fileData = CreateAddNotificationMethod(fileData,"notices",{methodlist:ctlpdt.evtlist}) //创建　evt的增量
         }
         if(ctlpdt.viewlist.length > 0 ){
            
             fileData = CreateImport(fileData,ctlpdt.importlist)
-            fileData = CreateAddEventMethod(fileData,"views",{methodlist:ctlpdt.viewlist}) //创建　views的增量
+            fileData = CreateAddNotificationMethod(fileData,"views",{methodlist:ctlpdt.viewlist}) //创建　views的增量
         }
         if(ctlpdt.evtlist.length > 0 || ctlpdt.viewlist.length > 0){ //有增量需要重新写入
             fs.writeFileSync(moduleFile,fileData)
@@ -181,9 +177,9 @@ let METHOD_TAG = "/*---------------------------------[tag]----------------------
  * @param {*} tag 
  * @param {*} tpldt 
  */
-function CreateAddEventMethod(fileData,tag,tpldt){
+function CreateAddNotificationMethod(fileData,tag,tpldt){
     if(!fileData || !tag || !tpldt) {
-        console.log("CreateAddEventMethod params error,plz check")
+        console.log("CreateAddNotificationMethod params error,plz check")
         return
     }
     var tpl = fs.readFileSync('templates/Template'+"AddMethod"+".tpl",'utf-8');
@@ -198,7 +194,7 @@ function CreateAddEventMethod(fileData,tag,tpldt){
 
 
 //处理视图
-function handlerView(views,module){
+function handlerMediator(views,module){
     views.forEach(element => {
 
         let tpldt = {module:module,module2:firstLower(module),Template: element,Template2:firstLower(element)}
@@ -227,7 +223,7 @@ function handlerView(views,module){
 }
 
 //处理事件
-function handlerEvent(module,events){
+function handlerNotification(module,events){
     let etlpdt = {Template:module}
     etlpdt.evtlist = []
 
@@ -239,8 +235,8 @@ function handlerEvent(module,events){
 
 }
 
-//处理总GameEvent
-function handlerTotalEvent(events){
+//处理总GameNotification
+function handlerTotalNotification(events){
     let tpldt = {}
     tpldt.evtlist = []
     let temp = {}
@@ -263,7 +259,7 @@ function handlerTotalEvent(events){
 }
 
 
-// import LoginController from "../modules/login/LoginController"
+// import LoginActor from "../modules/login/LoginActor"
 /**
  * 处理模块
  * @param {} modules 
@@ -276,7 +272,7 @@ function handlerModules(modules){
         let pt = `../modules/${element.toLocaleLowerCase()}/${element}`
 
 
-        tpldt.modulelist.push({name:element,c:pt+"Command",m:pt+"Proxy",e:pt+"Notification"})
+        tpldt.modulelist.push({name:element,c:pt+"Actor",m:pt+"Proxy",e:pt+"Notification"})
     });
     var tpl = fs.readFileSync('templates/modules.tpl','utf-8');
 
@@ -299,15 +295,15 @@ function genRun(_module_configs){
     let modules = []
     for (const module in _module_configs) {
         let config = _module_configs[module]
-        handlerModel(module)
+        handlerProxy(module)
     
         if(config.services){
             handlerService(module)
         }
     
-        handlerController(module,config.events,config.views)
-        handlerView(config.views,module)
-        handlerEvent(module,config.events)
+        handlerActor(module,config.events,config.views)
+        handlerMediator(config.views,module)
+        handlerNotification(module,config.events)
 
         config.events.forEach(element => {
             evts.push(element)
@@ -315,7 +311,7 @@ function genRun(_module_configs){
 
         modules.push(module)
     }
-    handlerTotalEvent(evts) 
+    handlerTotalNotification(evts) 
     handlerModules(modules)
 }
 
