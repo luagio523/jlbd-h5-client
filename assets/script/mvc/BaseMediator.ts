@@ -1,8 +1,9 @@
-import { Mediator } from "../core/mvc/patterns/mediator/Mediator";
+import { Mediator } from "./init";
+
 
 
 export default class BaseMediator extends Mediator  {
-   
+    protected viewComponent:any 
     public createParam:any //创建时的参数
 
     protected get view() :fgui.GComponent {

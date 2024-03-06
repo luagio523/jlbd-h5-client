@@ -112,7 +112,7 @@ function handlerActor(module,events,views){
     ctlpdt.viewlist = []
     views.forEach(element => {
         let rmethod =`protected  get {0}Mediator():{1}Mediator{ 
-        return ns.views.{0}
+        return app.facade.retrieveMediator({1}Mediator.NAME) as {1}Mediator
     } `
 
         rmethod = strfmt(rmethod,firstLower(element),element)
@@ -121,6 +121,7 @@ function handlerActor(module,events,views){
         if(!isExist || fileData.indexOf(method) ==  -1){　//当文件不存在　或者　文件内容不包含
             ctlpdt.viewlist.push({method:rmethod})
             ctlpdt.importlist.push({name:element+"Mediator"})
+            // ctlpdt.importlist.push({name:element+"Proxy"})
         }
     });
     
@@ -303,7 +304,7 @@ function genRun(_module_configs){
     
         handlerActor(module,config.events,config.views)
         handlerMediator(config.views,module)
-        handlerNotification(module,config.events)
+        // handlerNotification(module,config.events)
 
         config.events.forEach(element => {
             evts.push(element)

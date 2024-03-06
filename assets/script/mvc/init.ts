@@ -306,12 +306,12 @@ export class Actor extends Notifier{
         Facade.getInstance().registerObserver(eventName, observer)
     }
 
-    public proxy(name:string){
+    public proxy(name?:string){
         let proxyName = name ? name:this.moduleName
         return Facade.getInstance().retrieveProxy(proxyName)
     }
 
-    public mediator(name:string){
+    public mediator(name?:string){
         let proxyName = name ? name:this.moduleName
         return Facade.getInstance().retrieveMediator(proxyName)
     }

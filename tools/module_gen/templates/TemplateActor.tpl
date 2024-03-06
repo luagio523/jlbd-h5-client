@@ -2,7 +2,11 @@ import { _decorator } from "cc";
 import { BaseActor } from "../../mvc/BaseActor";
 import { Notification } from "../../mvc/Notification";
 import { IActionHandler } from "../../mvc/init";
-const { ccclass, property } = _decorator;
+import app from "../../App";
+import <%=Template%>Proxy from "./<%=Template%>Proxy";
+<%for(var i = 0; i < importlist.length; i++) {%>
+import <%:=importlist[i].name%> from "./<%:=importlist[i].name%>";<%}%>
+const { ccclass } = _decorator;
 @ccclass
 export class <%=Template%>Actor extends BaseActor{
     
@@ -20,6 +24,14 @@ export class <%=Template%>Actor extends BaseActor{
     <%}%>
     
 
+    public <%=Template2%>Proxy():<%=Template%>Proxy{
+        return app.facade.retrieveProxy(<%=Template%>Proxy.NAME) as <%=Template%>Proxy
+    }
+
+
+     /*---------------------------------[views]------------------------------------*/<%for(var i = 0; i < viewlist.length; i++) {%>
+    <%:=viewlist[i].method%>
+    <%}%>
 }
 
 

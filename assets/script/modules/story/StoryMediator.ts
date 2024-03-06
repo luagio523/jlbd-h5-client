@@ -1,24 +1,24 @@
   
 import { _decorator } from "cc"; 
-import app from "../../App"; 
 import BaseMediator from "../../mvc/BaseMediator"; 
-import StoryProxy from "./StoryProxy"; 
+import { IActionHandler } from "../../mvc/init"; 
 const { ccclass, property } = _decorator; 
 /** 
  * StoryMediator 
  */ 
 @ccclass 
 export default class StoryMediator extends BaseMediator { 
- 
-    protected get proxy():StoryProxy{ 
-        return app.facade.retrieveProxy('story') as StoryProxy 
+    public static NAME = "Story" 
+    public listInterests(): [string, IActionHandler][] { 
+        return [] 
     } 
+     
  
     public onRegister(){ 
         super.onRegister()  
     } 
  
-    
+     
  
     /** 
      * 初始化ui 

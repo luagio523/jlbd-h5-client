@@ -4,5 +4,5 @@ const { ccclass, property } = _decorator;
  
 @ccclass 
 export default class StoryProxy extends BaseProxy { 
-    
+    public static NAME = "Story" 
 }

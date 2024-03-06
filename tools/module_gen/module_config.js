@@ -142,7 +142,7 @@ _module_configs ={}
 _module_configs["Story"] = {
     events : ["PLOT_STEP"
                 ],
-    views :  ["Story"],
+    views :  ["Story","StoryGuide"],
 }
 
 // //引导

@@ -1,5 +1,4 @@
-import { Proxy } from "../core/mvc/patterns/proxy/Proxy";
-
+import { Proxy } from "./init";
 
 export default class BaseProxy extends Proxy  {
    
