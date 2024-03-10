@@ -1,0 +1,22 @@
+//游戏中的颜色
+export const Color = {
+     COLOR_WHITE :0xffffff,
+	 COLOR_BLACK:  0x000000,
+	 COLOR_RED:  0xFF0000,
+	/*米色*/
+	 COLOR_BUFF:  0xFFE7BA,
+	 COLOR_YELLOW:  0xE9FC1E,
+	 COLOR_GREEN:  0x3CEA68,
+
+	 COLOR_ORANGE:  0xFF7F24,
+	/*淡棕色*/
+	 COLOR_MAPLE:  0xDCBF9C,
+
+	 COLOR_GOLD:  0xFFD700,
+	/*阴影颜色*/
+	 COLOR_SHADOW:  0x0C0901,
+
+	 STR_COLOR_WHITE:  0xffffff,
+	 STR_COLOR_BLACK:  0x000000,
+	 STR_COLOR_RED:  0xFF0000,
+}

@@ -1,0 +1,21 @@
+public open(uiId: string, uiLayer: UILayer, ...params: any[]): void {
+        const config = UI_CONFIG[uiId];
+        assert(!!config, `config is not exist,plz check uiId:${uiId}`)
+        let uiInstance = this.uiInstances.get(uiId);
+        if (!uiInstance) {
+            const instanceId = this.genInstanceId(config)
+            UIFactory.loadAndCreateUI(config)
+                .then((loadedUIInstance) => {
+                    this.uiInstances.set(instanceId, loadedUIInstance);
+                    this.addUIToLayer(loadedUIInstance, uiLayer);
+                    loadedUIInstance.name = instanceId
+                    let mediator = MediatorFactory.create(config.mediatorClass, loadedUIInstance);
+                    this.mediators.set(instanceId, mediator);
+                    mediator.initialize(instanceId);
+                    mediator.open(...params);
+                })
+                .catch((error) => {
+                    // 处理加载或创建UI实例时出现的错误
+                });
+        } 
+    }

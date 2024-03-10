@@ -339,10 +339,13 @@ export class Event extends Component{
  * 视图基类
  */
 export class Mediator extends Notifier{
-    public mediatorName:string
+    protected mediatorName:string
+    protected viewComponent:any 
 
-    public constructor(){
+    public constructor(mediatorName:string,viewComponent:any){
         super()
+        this.mediatorName = mediatorName
+        this.viewComponent = viewComponent
     }
 
     public onRegister():void{

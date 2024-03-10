@@ -83,7 +83,7 @@ function toPascalCase(str) {
 }
 
 //处理controller
-function handlerActor(module,events,views){
+async function handlerActor(module,events,views){
     let modulePath = MODULE_ROOT_PATH+module.toLocaleLowerCase()+"/"
     let moduleFile = modulePath + module+"Actor"+".ts"
     let isExist = fs.existsSync(moduleFile)
@@ -133,18 +133,27 @@ function handlerActor(module,events,views){
         if(ctlpdt.evtlist.length > 0){
             fileData = CreateAddNotificationMethod(fileData,"notices",{methodlist:ctlpdt.evtlist}) //创建　evt的增量
         }
-        if(ctlpdt.viewlist.length > 0 ){
+        // if(ctlpdt.viewlist.length > 0 ){
            
-            fileData = CreateImport(fileData,ctlpdt.importlist)
-            fileData = CreateAddNotificationMethod(fileData,"views",{methodlist:ctlpdt.viewlist}) //创建　views的增量
-        }
+        //     fileData = CreateImport(fileData,ctlpdt.importlist)
+        //     fileData = CreateAddNotificationMethod(fileData,"views",{methodlist:ctlpdt.viewlist}) //创建　views的增量
+        // }
         if(ctlpdt.evtlist.length > 0 || ctlpdt.viewlist.length > 0){ //有增量需要重新写入
+
+            const prettier = require('prettier');
+        fileData = await prettier.format(fileData, {
+            semi: false,
+            parser: "typescript",
+          });
+
             fs.writeFileSync(moduleFile,fileData)
             console.log("update write "+moduleFile)
         }else{
             console.log(moduleFile+" is exist and no need update")
         }
         
+        
+
     }
 }
 
@@ -185,13 +194,22 @@ function CreateAddNotificationMethod(fileData,tag,tpldt){
     }
     var tpl = fs.readFileSync('templates/Template'+"AddMethod"+".tpl",'utf-8');
     let ret = handlerTemplate(tpl,tpldt)
-    methodTag = METHOD_TAG.replace("tag",tag)
-    ret = methodTag + ret
+    // methodTag = METHOD_TAG.replace("tag",tag)
+    // ret = methodTag + ret
 
-    fileData = fileData.replace(methodTag,ret)
+    // fileData = fileData.replace(methodTag,ret)
+    fileData = addNewFunctionAbove(fileData,ret)
 
     return fileData
 }
+
+function addNewFunctionAbove(text, newFunctionText) {
+    const functionPattern = /((\/\/.*\n)|(\/\*[\s\S]*?\*\/\s*))?\s*public\s+execute\w*\s*\(([^)]*\)\s*{[\s\S]*?})/;
+    // 替换匹配到的第一个函数，将新函数文本添加到它之前
+    const modifiedText = text.replace(functionPattern, `${newFunctionText}\n\n$&`);
+  
+    return modifiedText;
+  }
 
 
 //处理视图

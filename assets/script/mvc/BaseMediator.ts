@@ -3,18 +3,19 @@ import { Mediator } from "./init";
 
 
 export default class BaseMediator extends Mediator  {
-    protected viewComponent:any 
-    public createParam:any //创建时的参数
+    public param:any //创建时的参数
 
-    protected get view() :fgui.GComponent {
-        return this.viewComponent 
+   
+
+
+    
+    public onAdded(param:any):void{
+        this.param = param
+        this.initUI()
     }
-     /**
-     * 在初始化之前
-     * 比如初始化ctrl model
-     */
-    protected beforeInit(){
-        
+
+    public onRemoved(param:any):void{
+
     }
       
     /**
@@ -24,22 +25,11 @@ export default class BaseMediator extends Mediator  {
 
     }
 
-    /**
-     * 初始化事件
-     * 
-     */
-    protected initData(){
 
-    }
-
-     /**
-     * 初始化事件
-     * 数据事件
-     * 按钮事件
-     */
-    protected initEvent(){
+    public close(){
         
     }
+    
     ////////////////////////////////////////////////////////////////////////
 
     /**
@@ -49,6 +39,9 @@ export default class BaseMediator extends Mediator  {
 
     }
 
+    protected get view() :fgui.GComponent {
+        return this.viewComponent 
+    }
     
      /**
      * 根据路径获取借点

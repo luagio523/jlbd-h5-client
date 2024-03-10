@@ -3,6 +3,7 @@
 */ 
 export const Notification = { 
     PLOT_STEP : "PLOT_STEP", 
+    LOGIN : "LOGIN", 
     EOF:"EOF" 
 } 
  

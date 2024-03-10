@@ -5,6 +5,7 @@
     "version": "3.8.2"
   },
   "dependencies": {
-    "crypto-es": "^2.1.0"
+    "crypto-es": "^2.1.0",
+    "prettier": "^3.2.5"
   }
 }

@@ -11,7 +11,7 @@ const LOCAL_STORE_KEY = "game_audio";
 // 模块功能通过 oops.audio 调用
 oops.audio.playMusic("audios/nocturne");
  */
-export class AudioManager  {
+export class AudioManager extends Component {
 
     private local_data: any = {};
 

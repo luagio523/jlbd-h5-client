@@ -140,7 +140,7 @@ _module_configs ={}
 
 //剧情
 _module_configs["Story"] = {
-    events : ["PLOT_STEP"
+    events : ["PLOT_STEP","LOGIN"
                 ],
     views :  ["Story","StoryGuide"],
 }

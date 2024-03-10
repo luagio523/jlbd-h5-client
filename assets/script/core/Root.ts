@@ -6,15 +6,13 @@
  */
 import { Component, Game, JsonAsset, Node, _decorator, director, game, screen, sys } from "cc";
 import { LanguageManager } from "../libs/gui/language/Language";
-import { GameConfig } from "../module/config/GameConfig";
-import { GameQueryConfig } from "../module/config/GameQueryConfig";
 import { oops, version } from "./Oops";
 import { AudioManager } from "./common/audio/AudioManager";
 import { EventMessage } from "./common/event/EventMessage";
-import { TimerManager } from "./common/timer/GameTimer";
 import { GameManager } from "./game/GameManager";
 import { GUI } from "./gui/GUI";
 import { LayerManager } from "./gui/layer/LayerManager";
+import { TimeManager } from "./common/time/TimerManager";
 
 const { ccclass, property } = _decorator;
 
@@ -44,23 +42,23 @@ export class Root extends Component {
             isInited = true;      // 注：这里是规避cc3.8在编辑器模式下运行时，关闭游戏会两次初始化报错
 
             console.log(`Oops Framework v${version}`);
-            this.enabled = false;
+            // this.enabled = false;
 
-            let config_name = "config";
-            oops.res.load(config_name, JsonAsset, () => {
-                var config = oops.res.get(config_name);
-                // oops.config.btc = new BuildTimeConstants();
-                oops.config.query = new GameQueryConfig();
-                oops.config.game = new GameConfig(config);
-                oops.http.server = oops.config.game.httpServer;                                      // Http 服务器地址
-                oops.http.timeout = oops.config.game.httpTimeout;                                    // Http 请求超时时间
-                oops.storage.init(oops.config.game.localDataKey, oops.config.game.localDataIv);      // 初始化本地存储加密
-                game.frameRate = oops.config.game.frameRate;                                         // 初始化每秒传输帧数
+            // let config_name = "config";
+            // oops.res.load(config_name, JsonAsset, () => {
+            //     var config = oops.res.get(config_name);
+            //     // oops.config.btc = new BuildTimeConstants();
+            //     oops.config.query = new GameQueryConfig();
+            //     oops.config.game = new GameConfig(config);
+            //     oops.http.server = oops.config.game.httpServer;                                      // Http 服务器地址
+            //     oops.http.timeout = oops.config.game.httpTimeout;                                    // Http 请求超时时间
+            //     oops.storage.init(oops.config.game.localDataKey, oops.config.game.localDataIv);      // 初始化本地存储加密
+            //     game.frameRate = oops.config.game.frameRate;                                         // 初始化每秒传输帧数
 
-                this.enabled = true;
-                this.init();
-                this.run();
-            });
+            //     this.enabled = true;
+            //     this.init();
+            //     this.run();
+            // });
         }
     }
 
@@ -93,7 +91,7 @@ export class Root extends Component {
         oops.audio.load();
 
         // 创建时间模块
-        oops.timer = this.persistRootNode.addComponent(TimerManager)!;
+        oops.time = this.persistRootNode.addComponent(TimeManager);
 
         oops.language = new LanguageManager();
         oops.game = new GameManager(this.game);
@@ -104,7 +102,7 @@ export class Root extends Component {
 
         // 游戏显示事件
         game.on(Game.EVENT_SHOW, () => {
-            oops.timer.load();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
+            oops.time.load();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
             oops.audio.resumeAll();
             director.resume();
             game.resume();
@@ -113,7 +111,7 @@ export class Root extends Component {
 
         // 游戏隐藏事件
         game.on(Game.EVENT_HIDE, () => {
-            oops.timer.save();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
+            oops.time.save();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
             oops.audio.pauseAll();
             director.pause();
             game.pause();

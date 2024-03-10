@@ -2,13 +2,17 @@
 import { _decorator } from "cc"; 
 import BaseMediator from "../../mvc/BaseMediator"; 
 import { IActionHandler } from "../../mvc/init"; 
-const { ccclass, property } = _decorator; 
+const { ccclass } = _decorator; 
 /** 
  * StoryMediator 
  */ 
 @ccclass 
 export default class StoryMediator extends BaseMediator { 
     public static NAME = "Story" 
+    public constructor(view:any){ 
+        super(StoryMediator.NAME,view) 
+    } 
+ 
     public listInterests(): [string, IActionHandler][] { 
         return [] 
     } 
