@@ -28,8 +28,6 @@ export class StoryActor extends BaseActor {
   }
 
   /*---------------------------------[views]------------------------------------*/
-  protected get storyMediator(): StoryMediator {
-    return app.facade.retrieveMediator(StoryMediator.NAME) as StoryMediator
-  }
+  
   
 }

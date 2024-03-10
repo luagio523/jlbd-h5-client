@@ -2,73 +2,54 @@ import { Node, Prefab, assetManager, instantiate, resources } from "cc";
 import { DefaultAssetsIdleTime, DefaultUIIdleTime, IUIConfig, ResourceType } from "./config";
 import { sys } from "cc";
 
-// 针对不同类型的资源定义不同的加载方法
-const loadFairyGuiComponent = (config: IUIConfig): Promise<fgui.GComponent> => {
-    return new Promise((resolve, reject) => {
-        fgui.UIPackage.loadPackage(config.resourcePath, (error, uiPackage) => {
-            if (error) {
-                // 如果加载过程中出现错误，拒绝这个Promise
-                reject(error);
-            } else {
-                // 加载成功, 根据UI配置创建组件
-                try {
-                    
-                    const component = fgui.UIPackage.createObject(uiPackage.name, config.uiComponentName);
-                    if (component instanceof fgui.GComponent) {
-                        // 如果创建的是GComponent, 解析这个Promise
-                        resolve(component);
-                    } else {
-                        // 如果创建了一个意外的对象类型, 拒绝这个Promise
-                        reject(new Error("UI component created is not a GComponent"));
-                    }
-                } catch (creationError) {
-                    // 如果创建组件过程中有任何错误，拒绝这个Promise
-                    reject(creationError);
-                }
-            }
-        });
-    });
-};
+// IUserInterfaceLoader接口
+export interface IUILoader {
+    load(config: IUIConfig): Promise<any>;
+}
 
-
-
-// 加载预制件的函数
-const loadCocosPrefab = (config: IUIConfig): Promise<Node> => {
-    return new Promise((resolve, reject) => {
-        // 使用 assetManager 加载 Prefab
-        assetManager.loadBundle('bundleName', (err, bundle) => {
-            if (err) {
-                reject(err); // 如果无法加载资源包，拒绝 Promise
-                return;
-            }
-            // 在资源包中加载 Prefab
-            bundle.load(config.resourcePath, Prefab, (error, loadedPrefab: Prefab) => {
+// FairyGuiComponentLoader 类，实现了 IUserInterfaceLoader
+export class FairyGuiLoader implements IUILoader {
+    load(config: IUIConfig): Promise<fgui.GComponent> {
+        return new Promise((resolve, reject) => {
+            fgui.UIPackage.loadPackage(config.resourcePath, (error, uiPackage) => {
                 if (error) {
-                    // 如果加载过程中出现错误，则拒绝这个Promise
                     reject(error);
                 } else {
-                    // 加载成功，创建一个Prefab的实例
-                    const prefabInstance = instantiate(loadedPrefab);
-                    // 如果创建的是 Node，解析这个 Promise
-                    resolve(prefabInstance);
+                    try {
+                        const component = fgui.UIPackage.createObject(uiPackage.name, config.uiComponentName);
+                        if (component instanceof fgui.GComponent) {
+                            resolve(component);
+                        } else {
+                            reject(new Error("UI component created is not a GComponent"));
+                        }
+                    } catch (creationError) {
+                        reject(creationError);
+                    }
                 }
             });
         });
-    });
-};
+    }
+}
 
-
-
-
-// 一个通用的资源加载策略
-export function loaderUI(config: IUIConfig): Promise<Node | fgui.GComponent> {
-    const resourceType = config.resourceType ?? ResourceType.FairyGuiComponent; // 使用默认值
-    switch (resourceType) {
-        case ResourceType.CocosCreatorPrefab:
-            return loadCocosPrefab(config);
-        case ResourceType.FairyGuiComponent:
-        default: // 默认情况下处理为 FairyGuiComponent
-            return loadFairyGuiComponent(config);
+// CocosPrefabLoader 类，也实现了 IUserInterfaceLoader
+export class CocosPrefabLoader implements IUILoader {
+    load(config: IUIConfig): Promise<Node> {
+        return new Promise((resolve, reject) => {
+            assetManager.loadBundle('bundleName', (err, bundle) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                bundle.load(config.resourcePath, Prefab, (error, loadedPrefab: Prefab) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        const prefabInstance = instantiate(loadedPrefab);
+                        resolve(prefabInstance);
+                    }
+                });
+            });
+        });
     }
 }
 

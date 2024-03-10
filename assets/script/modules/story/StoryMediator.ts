@@ -8,10 +8,7 @@ const { ccclass } = _decorator;
  */ 
 @ccclass 
 export default class StoryMediator extends BaseMediator { 
-    public static NAME = "Story" 
-    public constructor(view:any){ 
-        super(StoryMediator.NAME,view) 
-    } 
+    
  
     public listInterests(): [string, IActionHandler][] { 
         return [] 

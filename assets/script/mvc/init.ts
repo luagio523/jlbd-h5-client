@@ -306,16 +306,7 @@ export class Actor extends Notifier{
         Facade.getInstance().registerObserver(eventName, observer)
     }
 
-    public proxy(name?:string){
-        let proxyName = name ? name:this.moduleName
-        return Facade.getInstance().retrieveProxy(proxyName)
-    }
-
-    public mediator(name?:string){
-        let proxyName = name ? name:this.moduleName
-        return Facade.getInstance().retrieveMediator(proxyName)
-    }
-
+    
     // let interests: [string, IActionHandler][] = [
     //     ['event1', () => console.log('Handling event 1')],
     //     ['event2', () => console.log('Handling event 2')],

@@ -8,10 +8,7 @@ const { ccclass } = _decorator;
  */
 @ccclass
 export default class <%=Template%>Mediator extends BaseMediator {
-    public static NAME = "<%=Template%>"
-    public constructor(view:any){
-        super(<%=Template%>Mediator.NAME,view)
-    }
+   
 
     public listInterests(): [string, IActionHandler][] {
         return []

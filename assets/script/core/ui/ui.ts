@@ -1,17 +1,32 @@
-import { assert, log } from "cc";
+import { assert, js, log } from "cc";
 import { LRUCache } from "./cache";
 import { DefaultAssetsIdleTime, DefaultUIIdleTime, IUIConfig, ResourceType } from "./config";
 import { FairyGUILayerManager, ILayerManager, UILayer } from "./layer";
-import { CocosCreatorAssetsRelease, CocosCreatorUIRelease, FairyGuiPackageRelease, FairyGuiUIRelease, loaderUI } from "./loader";
-import { IViewMediator, MediatorFactory } from "./mediator";
+import { FairyGuiLoader, FairyGuiPackageRelease, FairyGuiUIRelease, IUILoader } from "./loader";
 
-interface IUIManager {
-    // 打开UI界面
-    open(uiId: string, uiLayer: UILayer, ...params: any[]): void;
-    // 关闭UI界面
-    close(uiId: string): void;
-    // 获取UI界面实例
-    get(uiId: string): any | undefined;
+
+// 
+export interface IViewMediator {
+   initialize(instanceId :string): void;
+   open(...params: any[]): void; 
+   dispose(): void; 
+ }
+
+
+export class MediatorFactory {
+    public static create(mediatorClassName: string,mediatorName:string, uiInstance: any): IViewMediator {
+        const MediatorClass = js.getClassByName(mediatorClassName) as new (mediatorName:string,uiInstance: any) => IViewMediator;
+        if (!MediatorClass) {
+            throw new Error(`Mediator class not found: ${mediatorClassName}`);
+        }
+        return new MediatorClass(mediatorName,uiInstance);
+    }
+}
+
+interface IFacade {
+    registerMediator(mediator: any): void;
+    retrieveMediator(instanceId: string): any;
+    removeMediator(instanceId:string):void 
 }
 
 
@@ -29,31 +44,33 @@ const UI_CONFIG: { [uiId: string]: IUIConfig } = {
 
 
 
-class UIFactory {
-    public static loadAndCreateUI(config: IUIConfig): Promise<any> {
-        if (!config) {
-            return Promise.reject(new Error(`No UI configuration found for ${config.uiId}`));
-        }
-        return loaderUI(config).then(uiInstance => {
-            return uiInstance;
-        });
-    }
-}
 
-
-// 示例的UI管理器实现
-export class UIManager implements IUIManager {
+// UI管理器实现
+export class UIManager  {
     private uiInstances: Map<string, any>;
-    private mediators: Map<string, IViewMediator>;
     private lruCache: LRUCache
     private layerManager: ILayerManager
-
-    constructor() {
+    private facade:IFacade 
+    private UI_CONFIG:{ [uiId: string]: IUIConfig }
+    private uiLoader:IUILoader
+    constructor(facade:IFacade) {
         this.uiInstances = new Map<string, any>();
-        this.mediators = new Map<string, IViewMediator>();
+        this.facade = facade
         this.lruCache = new LRUCache()
         this.layerManager = new FairyGUILayerManager()
+        this.uiLoader = new FairyGuiLoader()
     }
+
+
+    public initialize(configs:{ [uiId: string]: IUIConfig }):UIManager{
+        this.UI_CONFIG = configs 
+        return this 
+    }
+
+    public loadUI(config: IUIConfig): Promise<any> {
+        return this.uiLoader.load(config)
+    }
+    
 
     private instanceCounter: number = 0;
     private genInstanceId(config:IUIConfig): string {
@@ -72,19 +89,18 @@ export class UIManager implements IUIManager {
 
 
     public open(uiId: string, uiLayer: UILayer, ...params: any[]): Promise<string> {
-        const config = UI_CONFIG[uiId];
+        const config = this.UI_CONFIG[uiId];
         assert(!!config, `config is not exist,plz check uiId:${uiId}`);
         let uiInstance = this.uiInstances.get(uiId);
         return new Promise((resolve, reject) => {
             if (!uiInstance) {
                 const instanceId = this.genInstanceId(config);
-                UIFactory.loadAndCreateUI(config)
+                this.loadUI(config)
                     .then((loadedUIInstance) => {
                         this.uiInstances.set(instanceId, loadedUIInstance);
                         this.addUIToLayer(loadedUIInstance, uiLayer);
-                        loadedUIInstance.name = instanceId;
-                        let mediator = MediatorFactory.create(config.mediatorClass, loadedUIInstance);
-                        this.mediators.set(instanceId, mediator);
+                        let mediator = MediatorFactory.create(config.mediatorClass,instanceId, loadedUIInstance);
+                        this.facade.registerMediator( mediator);
                         mediator.initialize(instanceId);
                         mediator.open(...params);
                         resolve(instanceId);
@@ -99,9 +115,6 @@ export class UIManager implements IUIManager {
         })
     }
 
-    
-    
-
     private addUIToLayer(uiInstance: any, uiLayer: UILayer): void {
         this.layerManager.addToLayer(uiInstance, uiLayer)
     }
@@ -109,29 +122,22 @@ export class UIManager implements IUIManager {
     public close(instanceId: string): void {
         const uiId = this.getUiIdFromInstanceId(instanceId)
         const uiInstance = this.uiInstances.get(instanceId);
-        const mediator = this.mediators.get(instanceId);
-        const config = UI_CONFIG[uiId]
+        const mediator = this.facade.retrieveMediator(instanceId);
+        const config = this.UI_CONFIG[uiId]
         if (!config || !uiInstance || !mediator) {
             log(`close fail,plz check instanceId:${instanceId},uiId:${uiId}`)
             return
         }
 
         mediator.dispose();
-        this.mediators.delete(instanceId);
+        this.facade.removeMediator(instanceId);
 
         this.layerManager.removeFromLayer(uiInstance, config.uiLayer) //移除
-        const resourceType = config.resourceType ?? ResourceType.FairyGuiComponent; // 使用默认值
+       
         const uiIdleTime = config.uiIdleTime ?? DefaultUIIdleTime
         const assetsIdleTime = config.uiIdleTime ?? DefaultAssetsIdleTime
-        switch (resourceType) {
-            case ResourceType.CocosCreatorPrefab:
-                this.lruCache.put(new CocosCreatorUIRelease(uiInstance, instanceId, uiIdleTime))
-                this.lruCache.put(new CocosCreatorAssetsRelease(config.resourcePath, assetsIdleTime))
-            case ResourceType.FairyGuiComponent:
-                this.lruCache.put(new FairyGuiUIRelease(uiInstance, instanceId, uiIdleTime))
-                this.lruCache.put(new FairyGuiPackageRelease(config.resourcePath, assetsIdleTime))
-            default: // 
-        }
+        this.lruCache.put(new FairyGuiUIRelease(uiInstance, instanceId, uiIdleTime))
+        this.lruCache.put(new FairyGuiPackageRelease(config.resourcePath, assetsIdleTime))
     }
 
 
