@@ -135,7 +135,7 @@ export class UIManager  {
         this.layerManager.removeFromLayer(uiInstance, config.uiLayer) //移除
        
         const uiIdleTime = config.uiIdleTime ?? DefaultUIIdleTime
-        const assetsIdleTime = config.uiIdleTime ?? DefaultAssetsIdleTime
+        const assetsIdleTime = config.assetIdleTime ?? DefaultAssetsIdleTime
         this.lruCache.put(new FairyGuiUIRelease(uiInstance, instanceId, uiIdleTime))
         this.lruCache.put(new FairyGuiPackageRelease(config.resourcePath, assetsIdleTime))
     }
