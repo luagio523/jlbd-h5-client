@@ -2,7 +2,7 @@
  * 定时器管理
 
  */
-import { CircularQueue } from "../utils/HighDicList";
+import { CircularQueue } from "../collection/CircularQueue";
 import { DLinkListNode, DoublyLinkedList, TLinkList, TLinkListNode } from "../utils/LinkList"
 
 

@@ -3,8 +3,8 @@ class ViewModel<T> {
     private _data: T;
     private _listeners: Array<Function> = [];
 
-    constructor(data: T) {
-        this._data = this.observe(data);
+    constructor() {
+        
     }
 
     addListener(listener: Function) {
@@ -21,6 +21,7 @@ class ViewModel<T> {
         } else if (data !== null && typeof data === 'object') {
             return this.observeObject(data);
         }
+        this._data = data 
         return data;
     }
 
@@ -103,9 +104,15 @@ export class ViewModelMgr<T>  {
     public register(bindName: string, arr: T) {
         let vm = this.dataMap[bindName]
         if (!vm) {
-            vm = new ViewModel(arr)
+            vm = this.addViewModel(bindName)
         }
-        return vm.observe(arr)
+        return vm.observe(arr) // 允许先绑定吧
+    }
+
+    private addViewModel(bindName: string): ViewModel<T> {
+        const viewModel = new ViewModel<T>();
+        this.dataMap[bindName] = viewModel;
+        return viewModel;
     }
 
     /**
@@ -116,16 +123,18 @@ export class ViewModelMgr<T>  {
      * @returns 
      */
     public bind(bindName: string, bindHandler: Function,isTrigger?:boolean) {
-        const vm = this.dataMap[bindName]
+        let vm = this.dataMap[bindName]
         if (!vm) {
-            return
+            vm = this.addViewModel(bindName)
         }
         if(typeof bindHandler !== 'function' ) {
             throw new Error('Provided bindHandler is not a function or is null');
         }
         vm.addListener(bindHandler)
         if(isTrigger??false){
-            bindHandler(vm.data)
+            if(vm.data){
+                bindHandler(vm.data)
+            }
         }
     }
 

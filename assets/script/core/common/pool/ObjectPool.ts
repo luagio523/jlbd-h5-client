@@ -1,279 +1,157 @@
-import { HighQueue } from "../utils/HighDicList";
-import scheduler from "../utils/scheduler";
+import { CircularQueue } from "../collection/CircularQueue";
 
+export class ObjectPool<T> {
 
-/**
- * 对象池
- */
-export class ObjectPool {
+    public queue: CircularQueue<T>;
+    private _stat: ObjectPoolReporter<T>;
+    public name: string;
 
-    public objQueue:HighQueue;
-    private _name: string;
-    private _stat: ObjectPoolReporter;
-
-    public set name(name:string){
-        this._name = name;
-
-        this.objQueue.name = name
-    }
-
-    public get name():string{
-        return this._name
-    }
-
-    public static checkCount:number = 0
-    
-   
-    private monitorTimer:number = -1;
-   
-    constructor(public creator: Function, public destructor?: (object: any) => void, public refresh?: (object: any) => void, public repool?: (object: any) => void) {
+    constructor(
+        public creator: () => T, 
+        public destructor?: (object: T) => void, 
+        public refresh?: (object: T) => void, 
+        public repool?: (object: T) => void, 
+        maxSize: number = 120) 
+    {
         if (!creator) {
-            throw new Error('ObjectPool needs a creator function');
+            throw new Error('ObjectPool needs a creator function.');
         }
         this._stat = new ObjectPoolReporter(this);
-
-        this.objQueue = new HighQueue
-
-        
-    }
-
-    /**
-     * 设置初始化数目
-     * 缓存命中率
-     * @param num 
-     */
-    public setInitNum(num:number = 50){
-        for (let index = 0; index < num; index++) {
-           let obj = this.getObject()
-           if(obj){
-               this.returnObject(obj)
-           }
+        this.queue = new CircularQueue<T>(maxSize); // Initialized with maxSize capacity
+        for (let i = 0; i < maxSize; i++) {
+            let newObject = this.creator();
+            if (!newObject) {
+                throw new Error('Creator function must return a non-null object.');
+            }
+            this.queue.enqueue(newObject); // Fill up object pool initially
         }
     }
 
-    private startMonitor(){
-        if(this.monitorTimer == -1){
-            this.monitorTimer = scheduler.scheduleGlobal((dt)=>{
+    getObject(): T {
+        let object: T | null = this.queue.dequeue();
 
-                ObjectPool.checkCount += 1
-
-                this.checkDormancy()
-            },30)
-        }
-    }
-
-    public setCapacity(capacity:number){
-        this.objQueue.setCapacity(capacity)
-    }
-
-    /**
-     * 设置基本容积
-     * @param limit 
-     */
-    public setLimit(limit:number){
-    }
-
-    getObject(): any {
-        var object: any;
-        if (!this.objQueue.isEmpty()) {
-            object = this.objQueue.pop();
-
-            if(!object){
-                cc.error(this.objQueue)
-            }
-            if (this.refresh) {
-                this.refresh(object);
-            }
+        if (!object) {
+            object = this.creator();
+            this._stat.created();
+        } else {
             this._stat.reused();
         }
-        else {
-            object = this.creator();
-            if(!object){
-                cc.error(" get object creator return null")
-                return 
-                // object._pool = this;
-            }
 
-            if (this.refresh) {
-                this.refresh(object);
-            }
-            this._stat.created();
+        if (this.refresh && object) {
+            this.refresh(object);
         }
+
         return object;
     }
 
-    //检测休眠
-    checkDormancy():void{
-        if(this._stat.isDormancy()){ //长时间未创建则从对象池删除一个 保证利用率
-            if (!this.objQueue.isEmpty() ) {
-
-                let obj = this.objQueue.pop()
-                if(obj){
-                    obj._pool = null;
-                    if(this.destructor) {
-                        this.destructor(obj);
-                    }
-                    this._stat.trimmed(); //丢弃
-                    // cc.log("objectpool dormancy trimmed:",this.name)
-                }
-            }
-        }
-    }
-
-    returnObject(object: any): boolean {
+    returnObject(object: T): void {
         if (!object) {
-            throw new Error('ObjectPool.returnObject null object');
+            throw new Error('Cannot return null or undefined object to the pool.');
         }
 
-        // if (object._pool === this) {
-           
-            let succ = this.objQueue.push(object);
-            if(!succ){
-                if (this.destructor) {
-                    this.destructor(object);
-                }
-                this._stat.trimmed(); //丢弃
-                return true
-            }
-
-
+        if (!this.queue.isFull()) {
             if (this.repool) {
                 this.repool(object);
             }
+            this.queue.enqueue(object);
             this._stat.returned();
-
-            this.startMonitor(); // 监测
-
-            return true;
-        // }
-
-        return false
-        // throw new Error('ObjectPool.returnObject object does not belong here');
+        } else {
+            if (this.destructor) {
+                this.destructor(object);
+            }
+            this._stat.trimmed(); // If the pool is full, the object is destroyed
+        }
     }
 
-    clear() {
-
-        if(this.monitorTimer != -1){
-            scheduler.unscheduleGlobal(this.monitorTimer) //
-            this.monitorTimer = -1
-        }
-
-
-        //cc.log(['ObjectPool.getObject clear', this.stat.getReport()]);
-     
-        let obj = null
-        while(!this.objQueue.isEmpty()){
-            obj = this.objQueue.pop()
-            obj._pool = null;
-            if (this.destructor) {
+    clear(): void {
+        while (!this.queue.isEmpty()) {
+            let obj = this.queue.dequeue();
+            if (this.destructor && obj) {
                 this.destructor(obj);
             }
         }
-       
-        this.objQueue.clear();
-
         this._stat.reset();
+        this.queue.clear();
     }
 
-    public get stat():ObjectPoolReporter{
-        return this._stat
+    public get stat(): ObjectPoolReporter<T> {
+        return this._stat;
     }
 }
 
 /**
  * 对象池 map组
  */
-export class ObjectPoolMap {
+export class ObjectPoolMap<T> {
+    private map: Map<string, ObjectPool<T>> = new Map<string, ObjectPool<T>>();
 
-    private map = new Map();
-
-    constructor() {
-    }
-
-    setPool(id: string, pool: ObjectPool) {
-        // cc.log(['ObjectPool.setPool', id]);
-        if (this.map.has(id)) {
-            return 
-            throw new Error('ObjectPoolMap.setPool cannot redefine pool id "' + id + '"');
+    constructor() {}
+    
+    setPool(id: string, pool: ObjectPool<T>): ObjectPool<T>  {
+        if (!this.map.has(id)) {
+            pool.name = id; // 假设 ObjectPool<T> 有一个 'name' 属性
+            this.map.set(id, pool);
+            return pool;
         }
-        pool.name = id;
-        this.map.set(id, pool);
-        return pool;
     }
 
     hasPool(id: string): boolean {
         return this.map.has(id);
     }
 
-    getPool(id: string): ObjectPool {
-        if (!this.map.has(id)) {
-            throw new Error('ObjectPoolMap.getPool unknown pool id "' + id + '"');
-        }
+    getPool(id: string): ObjectPool<T> | undefined {
         return this.map.get(id);
     }
 
-    getPool_(id: string): ObjectPool {
-        if (!this.map.has(id)) {
-           return null
-        }
-        return this.map.get(id);
+    getPool_(id: string): ObjectPool<T> | null {
+        return this.map.get(id) || null;
     }
 
-    clearPool(id:string){
-        if (!this.map.has(id)) {
-            // throw new Error('ObjectPoolMap.releasePool pool id "' + id + '"');
-            return
-        }
-        this.map.get(id).clear();
-    }
-
-    clearAllPool() {
-        this.map.forEach((pool, key, array)=>{
+    clearPool(id: string): void {
+        const pool = this.map.get(id);
+        if (pool) {
             pool.clear();
-        })
-
-    }
-
-    releasePool(id: string) {
-        if (!this.map.has(id)) {
-            // throw new Error('ObjectPoolMap.releasePool pool id "' + id + '"');
-            return
         }
-        this.map.get(id).clear();
-        this.map.delete(id);
     }
 
-    test() {
-        let arr = [];
-        this.map.forEach((pool:ObjectPool, key, array)=>{
-            if(!pool.objQueue.isEmpty()) {
-                arr.push({key:key, len:pool.objQueue.getObjSize()});
+    clearAllPool(): void {
+        this.map.forEach((pool) => {
+            pool.clear();
+        });
+    }
+
+    releasePool(id: string): void {
+        const pool = this.map.get(id);
+        if (pool) {
+            pool.clear();
+            this.map.delete(id);
+        }
+    }
+
+    test(): void {
+        let arr: Array<{ key: string; len: number }> = [];
+        this.map.forEach((pool, key) => {
+            if (!pool.queue.isEmpty()) { // 假设 ObjectPool<T> 有一个 'queue' 属性
+                arr.push({ key: key, len: pool.queue.getSize() }); // 假设 'queue' 有一个 'getSize' 方法
             }
-            console.log(">report>: \n", pool.stat.getReportStr());
-        })
+            console.log(">report>: \n", pool.stat.getReportStr()); // 假设 'stat' 有 'getReportStr' 方法
+        });
+        console.log(arr);
     }
 }
 /**
  * 对象池 状态报告
  */
-export class ObjectPoolReporter {
+export class ObjectPoolReporter<T> {
 
-    private pool: ObjectPool;
+    private pool: ObjectPool<T>;
     private stat: ObjectPoolStat;
 
-    private lstCheckCount:number
-
-    constructor(pool: ObjectPool) {
-        this.lstCheckCount = 0;
+    constructor(pool: ObjectPool<T>) {
         this.pool = pool;
         this.stat = new ObjectPoolStat(this.pool.name);
     }
-    /**
-     * 保证对象池的利用率，长时间未创建将做出处理
-     */
-    isDormancy(){
-        return ObjectPool.checkCount - this.lstCheckCount >= 2 // 大于2次
-    }
+   
 
     reused() {
         this.stat.reused++;
@@ -288,7 +166,6 @@ export class ObjectPoolReporter {
 
     created() {
         this.stat.created++;
-        this.lstCheckCount = ObjectPool.checkCount 
     }
 
     reset() {
@@ -305,8 +182,8 @@ export class ObjectPoolReporter {
         ret.returned = this.stat.returned;
         ret.reused = this.stat.reused;
         ret.trimmed = this.stat.trimmed;
-        ret.inpool = this.pool.objQueue ? this.pool.objQueue.getObjSize() : 0;
-        ret.wild = this.stat.created - this.pool.objQueue.getObjSize();
+        ret.inpool = this.pool.queue ? this.pool.queue.getSize() : 0;
+        ret.wild = this.stat.created - this.pool.queue.getSize();
         return ret;
     }
 
@@ -318,9 +195,9 @@ export class ObjectPoolReporter {
         ret.push('created: ' + this.stat.created);
         ret.push('returned: ' + this.stat.returned);
         ret.push('reused: ' + this.stat.reused);
-        ret.push('pool: ' + this.pool.objQueue.getObjSize());
+        ret.push('pool: ' + this.pool.queue.getSize());
         ret.push('trimmed: ' + this.stat.trimmed);
-        ret.push('wild: ' + (this.stat.created - this.pool.objQueue.getObjSize() - this.stat.trimmed));
+        ret.push('wild: ' + (this.stat.created - this.pool.queue.getSize() - this.stat.trimmed));
         return ret.join(sep);
     }
 }

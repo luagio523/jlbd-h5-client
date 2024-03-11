@@ -1,5 +1,4 @@
 import { log, sys } from "cc"
-import { DataUtil } from "./DataUtil"
 
 /**
  * 日期时间工具类
