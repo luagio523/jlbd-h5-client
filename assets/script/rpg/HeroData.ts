@@ -1,0 +1,61 @@
+class HeroData {
+    BaseClass: string;
+    HeroID: number;
+    Model: string;
+    ModelScale: string;
+    SoundSet: string;
+    Ability1: string;
+    ArmorPhysical: string;
+    MagicalResistance: string;
+    AttackCapabilities: string;
+    AttackDamageMin: number;
+    AttackDamageMax: number;
+    AttackDamageType: string;
+    AttackRate: number;
+    AttackAnimationPoint: number;
+    AttackRange: number;
+    AttributePrimary: string;
+    AttributeBaseStrength: number;
+    AttributeStrengthGain: number;
+    AttributeBaseIntelligence: number;
+    AttributeIntelligenceGain: number;
+    AttributeBaseAgility: number;
+    AttributeAgilityGain: number;
+    MovementCapabilities: string;
+    MovementSpeed: string;
+    MovementTurnRate: string;
+    TeamName: string;
+    VisionDaytimeRange: number;
+    VisionNighttimeRange: number;
+
+    constructor(heroData: any) {
+        this.BaseClass = heroData["BaseClass"];
+        this.HeroID = heroData["HeroID"];
+        this.Model = heroData["Model"];
+        this.ModelScale = heroData["ModelScale"];
+        this.SoundSet = heroData["SoundSet"];
+        this.Ability1 = heroData["Ability1"];
+        this.ArmorPhysical = heroData["ArmorPhysical"];
+        this.MagicalResistance = heroData["MagicalResistance"];
+        this.AttackCapabilities = heroData["AttackCapabilities"];
+        this.AttackDamageMin = heroData["AttackDamageMin"];
+        this.AttackDamageMax = heroData["AttackDamageMax"];
+        this.AttackDamageType = heroData["AttackDamageType"];
+        this.AttackRate = heroData["AttackRate"];
+        this.AttackAnimationPoint = heroData["AttackAnimationPoint"];
+        this.AttackRange = heroData["AttackRange"];
+        this.AttributePrimary = heroData["AttributePrimary"];
+        this.AttributeBaseStrength = heroData["AttributeBaseStrength"];
+        this.AttributeStrengthGain = heroData["AttributeStrengthGain"];
+        this.AttributeBaseIntelligence = heroData["AttributeBaseIntelligence"];
+        this.AttributeIntelligenceGain = heroData["AttributeIntelligenceGain"];
+        this.AttributeBaseAgility = heroData["AttributeBaseAgility"];
+        this.AttributeAgilityGain = heroData["AttributeAgilityGain"];
+        this.MovementCapabilities = heroData["MovementCapabilities"];
+        this.MovementSpeed = heroData["MovementSpeed"];
+        this.MovementTurnRate = heroData["MovementTurnRate"];
+        this.TeamName = heroData["TeamName"];
+        this.VisionDaytimeRange = heroData["VisionDaytimeRange"];
+        this.VisionNighttimeRange = heroData["VisionNighttimeRange"];
+    }
+}
