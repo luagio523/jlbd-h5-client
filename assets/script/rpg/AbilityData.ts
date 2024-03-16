@@ -60,7 +60,7 @@ export class AbilityData {
     }
  
     public GetMaxLevel(): number{
-        return this.maxLevel
+        return this.maxLevel || 100
     }
 
     public GetCastRange(): number{
