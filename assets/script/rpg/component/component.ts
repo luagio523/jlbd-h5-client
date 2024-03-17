@@ -1,3 +1,20 @@
+class HealthComponent {
+    constructor(public value: number) {}
+}
+
+class AttackComponent {
+    constructor(public damage: number, public critChance: number, public critMultiplier: number) {}
+}
+
+// 如果需要一个专门的暴击组件
+class CritComponent {
+    constructor(public chance: number, public multiplier: number) {}
+}
+
+
+
+
+
 // 在ECS框架下，这些方法应该被拆分到和他们的功能相关的组件中。这是我对你提到的方法的理解，并以此进行的拆分：
 // AbilityControlComponent：这个组件可以包括控制和调度技能的相关功能，例如使用技能、技能效果开始、技能效果结束、切换技能等。因此，以下方法可以放置在这个组件中：
 // OnAbilityPhaseInterrupted()

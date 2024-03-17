@@ -13,6 +13,7 @@ class HeroData {
     AttackDamageType: string;
     AttackRate: number;
     AttackAnimationPoint: number;
+    AttackAcquisitionRange:number;//攻击获取距离
     AttackRange: number;
     AttributePrimary: string;
     AttributeBaseStrength: number;

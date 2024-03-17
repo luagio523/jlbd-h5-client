@@ -7,6 +7,7 @@
  */
 export type Constructor<T = unknown> = new (...args: any[]) => T;
 
+let classMap:{[className:string]:Function}
 /**
  * ecsclass() 装饰器为 class 添加有效的 name 属性
  *
@@ -18,5 +19,9 @@ export function ecsclass(name: string) {
             value: name,
             writable: false,
         });
+        classMap[name] = ctor
     };
 }
+
+
+

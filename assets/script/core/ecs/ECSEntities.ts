@@ -8,6 +8,9 @@ import { ECSEntity } from "./ECSEntity";
  * 实体集合
  */
 export interface ECSEntities {
+
+        /** 实体造函数 */
+        static entityCtors: Map<string,number> = new Map();
     /**
      * 返回实体总数
      */

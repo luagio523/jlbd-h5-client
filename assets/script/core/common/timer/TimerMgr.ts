@@ -3,7 +3,7 @@
 
  */
 import { CircularQueue } from "../collection/CircularQueue";
-import { DLinkListNode, DoublyLinkedList, TLinkList, TLinkListNode } from "../utils/LinkList"
+import { DLinkListNode, DoublyLinkedList } from "../collection/LinkList";
 
 
 export interface ITimerMgr {

@@ -32,7 +32,7 @@ export class ECSModel {
     /** 实体自增id */
     static eid = 1;
     /** 实体造函数 */
-    static entityCtors: Map<EntityCtor<any>, string> = new Map();
+    static entityCtors: Map<string,EntityCtor<any>> = new Map();
     /** 实体对象缓存池 */
     static entityPool: Map<string, ECSEntity[]> = new Map();
     /** 通过实体id查找实体对象 */

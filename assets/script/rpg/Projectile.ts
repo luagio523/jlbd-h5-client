@@ -8,26 +8,25 @@ export class CreateBaseProjectileOptions {
     Ability?: BaseAbility;
     Source?: any;//CDOTA_BaseNPC
 
-    bProvidesVision?: boolean;
-    iVisionRadius?: number;
-    iVisionTeamNumber?: UnitTargetTeam;
+    bProvidesVision?: boolean; //是否提供视野
+    iVisionRadius?: number;  //视野半径
+    iVisionTeamNumber?: UnitTargetTeam;//视野可见的team
 
 
-    bCurze?:boolean; //是否是曲线
-    curzeControlPoints?:Array<Vec3>;//适用于曲线
-    curzeTime?:number  //曲线运动的时间
+    bDrawsOnMinimap?: boolean; //是否显示到小地图
+    bVisibleToEnemies?: boolean; //是否对所有敌人可见
 
-
-    bDrawsOnMinimap?: boolean;
-    bVisibleToEnemies?: boolean;
-
-    ExtraData?: object;
+    ExtraData?: object; //额外数据
 }
 
 
 export class CreateLinearProjectileOptions extends CreateBaseProjectileOptions {
     vSpawnOrigin: Vec3; //起始点
     vTargetLoc:Vec3  //目标点，用于确定方向
+
+    bCurze?:boolean; //是否是曲线
+    curzeControlPoints?:Array<Vec3>;//适用于曲线
+    curzeTime?:number  //曲线运动的时间
     
     vAcceleration?: Vec3; //加速度
     iMoveSpeed?: number; //初始速度
@@ -49,10 +48,15 @@ export class CreateLinearProjectileOptions extends CreateBaseProjectileOptions {
 }
 
 export class CreateTrackingProjectileOptions extends CreateBaseProjectileOptions {
-    vSourceLoc?: Vec3;
+    vSourceLoc: Vec3;
     vTarget?:any
-    iMoveSpeed?: number;
-    flExpireTime?: number;
+
+    vAcceleration?:Vec3 //加速度
+    iMoveSpeed?: number;//初始速度
+    fMaxSpeed?:number //最大速度
+    fExpireTime?: number; //超时时间
+
+
     bDodgeable?: boolean;
     bIsAttack?: boolean;
   
@@ -129,7 +133,7 @@ export class LinearProjectile extends Projectile{
             this.maxSpeedSqr = options.fMaxSpeed * options.fMaxSpeed;
         }
         if(options.iMoveSpeed){
-            this.velocity = options.vTargetLoc.subtract(options.vSpawnOrigin).multiplyScalar(options.iMoveSpeed)
+            this.velocity = options.vTargetLoc.clone().subtract(options.vSpawnOrigin).normalize().multiplyScalar(options.iMoveSpeed)
         }
         if(options.bCurze){ //是曲线
             if(options.curzeControlPoints.length<1 || options.curzeControlPoints.length>2){
@@ -306,141 +310,77 @@ export class LinearProjectile extends Projectile{
 
 
 
-
-
-
-export class TrackingProjectile extends LinearProjectile {
+export class TrackingProjectile extends Projectile {
     protected target: any;  // 追踪的目标
     protected isDodgeable: boolean;
     protected isAttack: boolean;
-    protected moveSpeed:number
+    protected moveSpeed:number //当前移动速度
 
     constructor(options: CreateTrackingProjectileOptions) {
         super(options);
-        this.target = options.vTarget;
-        this.isDodgeable = options.bDodgeable ?? false;
-        this.isAttack = options.bIsAttack ?? false;
-        this.expireTime = options.flExpireTime ?? 0; // 设置过期时间，0表示永不过期
-
-        // 如果有设置，应用最大速度平方
-        if (this.maxSpeed) {
-            this.maxSpeedSqr = this.maxSpeed * this.maxSpeed;
+        if(!options.vTarget){
+            throw new Error("options vTarget can not be null")
         }
+        if(options.iMoveSpeed){
+            this.moveSpeed = options.iMoveSpeed
+        }
+    }
+
+    public get options():CreateTrackingProjectileOptions{
+        return this.options as CreateTrackingProjectileOptions
+    }
+
+    protected calculateVelocity(dt:number){
+        if(this.isMaxSpeed){
+            return 
+        }
+        let acceleration = this.options.vAcceleration
+        if (acceleration) { //处理加速度
+            let accEffect = acceleration.multiplyScalar(dt);
+            this.velocity.add(accEffect);
+            // 如果超过最大速度，重置为最大速度
+            if (this.maxSpeedSqr!=0 && this.velocity.lengthSqr() > this.maxSpeedSqr) {
+                this.velocity = this.velocity.normalize().multiplyScalar(this.options.fMaxSpeed);
+                this.isMaxSpeed = true
+            }
+            this.moveSpeed = this.velocity.length()
+        }
+        
     }
 
     update(dt: number) {
-        // 在调用基类的更新处理之前，更新速度向量指向目标
-        if (this.target !== undefined) {
-            // 这里需要一个方法来获取目标的当前位置
-            const targetPos = this.getTargetPosition();
-            // 更新速度方向
-            const toTarget = targetPos.subtract(this.position).normalize();
-            this.velocity = toTarget.multiplyScalar(this.moveSpeed);
-        }
 
-        if(this.controlPoints){//有控制点 说明是弧线，bezier
-            let speed = this.velocity.length()
-            this.position = this.getBezierPosition(this.target,speed)
-        }else{
-                // 计算当前时间段的加速度效应
-            // 通过速度计算位置变化
-            let displacement = this.velocity.multiplyScalar(dt);
-            this.position.add(displacement);
-        }
-        
-        // 更新已经过去的时间
         this.elapsedTime += dt;
 
-        // 当超过最大距离或者超过过期时间时，结束投射物
-        if (Vec3.distance(this.position, this.getSourcePosition()) > this.distance || this.elapsedTime > this.expireTime) {
-            this.endProjectile();
+        // 在调用基类的更新处理之前，更新速度向量指向目标
+        if (this.target) {
+            const targetPosition = this.options.vTarget.clone();
+            this.velocity = targetPosition.subtract(this.position).normalize().multiplyScalar(this.moveSpeed);
+        }
+
+        this.calculateVelocity(dt) //计算当前速度
+      
+            // 计算当前时间段的加速度效应
+        // 通过速度计算位置变化
+        let displacement = this.velocity.multiplyScalar(dt);
+        this.position.add(displacement);
+        
+       
+
+        if(this.elapsedTime > this.options.fExpireTime){
+            if(this.onProjectileEnd){
+                this.onProjectileEnd()
+            }
+            return 
+        }
+
+        if(this.onProjectileFlying){
+            this.onProjectileFlying()
         }
 
         
     }
-
-    getTargetPosition(): Vec3 {
-        return this.target.position;
-    }
-
     
 }
-
-
-
-
-
-// export class Example extends Component {
-
-//     @property(Node)
-//     targetNode: Node | null = null;
-
-//     start() {
-//         if (this.targetNode) {
-//             // 贝塞尔曲线控制点
-//             const startPoint = new Vec3(0, 0, 0);
-//             const controlPoints1 = new Vec3(100, 200, 0);
-//             const controlPoints2 = new Vec3(200, -100, 0);
-//             const endPoint = new Vec3(300, 0, 0);
-
-//             tween(this.targetNode)
-//                 .to(3, { position: endPoint }, {
-//                     easing: 'quadInOut', // 缓动效果
-//                     onUpdate: (target, ratio) => {
-//                         //计算贝塞尔曲线当前点位置
-//                         const x = this.bezier3(startPoint.x, controlPoints1.x, controlPoints2.x, endPoint.x, ratio);
-//                         const y = this.bezier3(startPoint.y, controlPoints1.y, controlPoints2.y, endPoint.y, ratio);
-                        
-//                         // 更新节点位置
-//                         this.targetNode!.setPosition(x, y, 0);
-//                     }
-//                 })
-//                 .start();
-//         }
-//     }
-
-
-//     // 二次贝塞尔曲线计算函数
-//     bezier2(p0:number, p1:number, p2:number, t:number) {
-//         const oneMinusT = 1 - t;
-//         return oneMinusT * oneMinusT * p0
-//             + 2 * oneMinusT * t * p1
-//             + t * t * p2;
-//     }
-
-//     //三次贝塞尔曲线计算函数
-//     bezier3(p0:number, p1:number, p2:number, p3:number, t:number) {
-//         const oneMinusT = 1 - t;
-//         return oneMinusT * oneMinusT * oneMinusT * p0
-//             + 3 * oneMinusT * oneMinusT * t * p1
-//             + 3 * oneMinusT * t * t * p2
-//             + t * t * t * p3;
-//     }
-
-//      // 使用三个点计算二次贝塞尔曲线上的点
-//     //  const position = this.bezier(startPoint, controlPoints, endPoint, ratio);
-//     // 二次贝塞尔曲线计算函数，使用 Vec3
-//     bezierV2(p0: Vec3, p1: Vec3, p2: Vec3, t: number): Vec3 {
-//         const q0 = Vec3.lerp(new Vec3(), p0, p1, t);
-//         const q1 = Vec3.lerp(new Vec3(), p1, p2, t);
-//         return Vec3.lerp(new Vec3(), q0, q1, t);
-//     }
-
-//     // 三次贝塞尔曲线计算函数，使用 Vec3
-//     //const position = this.bezier(startPoint, controlPoints1,controlPoints2, endPoint, ratio);
-//     bezierV3(p0: Vec3, p1: Vec3, p2: Vec3, p3: Vec3, t: number): Vec3 {
-//         // 第一层插值
-//         const q0 = Vec3.lerp(new Vec3(), p0, p1, t);
-//         const q1 = Vec3.lerp(new Vec3(), p1, p2, t);
-//         const q2 = Vec3.lerp(new Vec3(), p2, p3, t);
-//         // 第二层插值
-//         const r0 = Vec3.lerp(new Vec3(), q0, q1, t);
-//         const r1 = Vec3.lerp(new Vec3(), q1, q2, t);
-//         // 最终插值得到曲线上的点
-//         return Vec3.lerp(new Vec3(), r0, r1, t);
-//     }
-// }
-
-
 
 

@@ -10,6 +10,9 @@ import { ECSComponentsImpl } from "./ECSComponentsImpl";
  * 实体集合的实现
  */
 export class ECSEntitiesImpl implements ECSEntities {
+
+ 
+
     /**
      * 跟踪所有组件
      */

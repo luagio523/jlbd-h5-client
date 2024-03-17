@@ -130,7 +130,11 @@ export module ecs {
             }
             // 注册实体
             else if (ctor.tid == undefined) {
-                ECSModel.entityCtors.set(ctor as EntityCtor<T>, name);
+                Object.defineProperty(ctor, "name", {
+                    value: name,
+                    writable: false,
+                });
+                ECSModel.entityCtors.set(name,ctor as EntityCtor<T>);
             }
             // 注册组件
             else {
@@ -159,8 +163,8 @@ export module ecs {
      */
     export function getEntity<T extends Entity>(ctor: EntityCtor<T>): T {
         // 获取实体对象名
-        var entityName = ECSModel.entityCtors.get(ctor);
-        if (entityName == undefined)
+        var entityName = ctor.name;
+        if (ctor.name == undefined)
             console.error(`${ctor.name} 实体没有注册`);
 
         // 获取实体对象池
@@ -230,6 +234,18 @@ export module ecs {
     /** 创建实体 */
     function createEntity<E extends Entity = Entity>(): E {
         let entity = new Entity();
+        entity.eid = ECSModel.eid++;                     // 实体id也是有限的资源
+        ECSModel.eid2Entity.set(entity.eid, entity);
+        return entity as E;
+    }
+
+    /**根据类型创建实体*/
+    function createEntityByClassName<E extends Entity = Entity>(className:string):E{
+        let ctor =  ECSModel.entityCtors.get(className)
+        if(!ctor){
+            throw new Error(`${className} 实体没有注册`)
+        }
+        let entity = new ctor();
         entity.eid = ECSModel.eid++;                     // 实体id也是有限的资源
         ECSModel.eid2Entity.set(entity.eid, entity);
         return entity as E;
