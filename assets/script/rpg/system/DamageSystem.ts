@@ -1,54 +1,23 @@
+import { AttackComponent } from "../component/AttackComponent";
+import { BuffComponent } from "../component/BuffComponent";
+import { HealthComponent } from "../component/HealthComponent";
+import { ECSEntity } from "../ecs/ECSEntity";
+import { AttackEvent } from "../event/Event";
 import { BaseSystem } from "./BaseSystem";
-
-class EventQueue {
-    private static queue: AttackEvent[] = [];
-
-    static enqueue(event: AttackEvent) {
-        this.queue.push(event);
-    }
-
-    static getEvents(): AttackEvent[] {
-        return this.queue;
-    }
-
-    static clear() {
-        this.queue = [];
-    }
-}
-
-function fireEvent(event: AttackEvent) {
-    EventQueue.enqueue(event);
-}
-
-
-// const allNPCs = this.getAllEntitiesWithComponent<NPCComponent>(NPCComponent);
-// for (const npc of allNPCs) {
-//     this.stopLevitation(npc);
-// }
-
 
 class DamageSystem extends BaseSystem{
     update() {
-        const events = EventQueue.getEvents();
+        const events = this.getEvents(AttackEvent.NAME)
 
         for (const event of events) {
-            processAttackEvent(event);
+            this.processAttackEvent(event as AttackEvent);
         }
-
         // 清空事件队列
-        EventQueue.clear();
+        this.removeEvents("AttackEvent")
     }
 
     processAttackEvent(event: AttackEvent) {
-        const targetHealth = event.target.getComponent<Health>('Health');
-        if (targetHealth) {
-            targetHealth.value -= event.damage;
-
-            // 假设实体死亡，会产生实体死亡的事件等等...
-            if (targetHealth.value <= 0) {
-                fireEvent(new DeathEvent(event.target));
-            }
-        }
+        
     }
    
 
@@ -73,16 +42,16 @@ class DamageSystem extends BaseSystem{
     // }
 
 
-    function performAttack(attacker: Entity, target: Entity) {
-        const attackComponent = attacker.getComponent<AttackComponent>('AttackComponent');
-        const targetHealth = target.getComponent<HealthComponent>('HealthComponent');
+    performAttack(attacker: ECSEntity, target: ECSEntity) {
+        const attackComponent = attacker.getComponent(AttackComponent);
+        const targetHealth = target.getComponent(HealthComponent);
         let finalDamage = attackComponent.damage;
         let critChance = attackComponent.critChance;
         // 假设buff可能会增加暴击率
         let critMultiplier = attackComponent.critMultiplier;
     
         // 应用buff效果
-        const buffs = attacker.getComponent<BuffComponent>('BuffComponent').buffs;
+        const buffs = attacker.getComponent(BuffComponent).buffs;
         for (const buff of buffs) {
             switch(buff.type) {
                 case 'increaseCritChance':

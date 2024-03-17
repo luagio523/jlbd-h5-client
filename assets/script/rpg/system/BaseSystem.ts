@@ -20,6 +20,13 @@ export class BaseSystem extends ECSSystem{
         EventListenerManager.getInstance().registerListener(eventType, listener);
     }
 
+    protected getEvents(eventType:string):IEvent[]{
+        return EventQueueManager.getInstance().getEvents(eventType)
+    }
+
+    protected removeEvents(eventType:string):void{
+        EventQueueManager.getInstance().removeEvents(eventType)
+    }
 
     protected getEntitiesWithComponent<T extends ECSComponent>(constructor: Constructor<T>): ECSEntity[]{
         return this.ecs.entities.getEntitiesWithComponent(constructor)

@@ -1,12 +1,13 @@
+import { Buff, BuffComponent } from "../component/BuffComponent";
+import { ECSEntity } from "../ecs/ECSEntity";
 import { BaseSystem } from "./BaseSystem";
 
-class BuffSystem extends BaseSystem{
+export class BuffSystem extends BaseSystem{
     update(deltaTime: number) {
-        const entities = this.getEntitiesWithComponent<BuffComponent>(BuffComponent);
+        const entities = this.getEntitiesWithComponent(BuffComponent);
         
         for (const entity of entities) {
-            const buffComponent = entity.getComponent<BuffComponent>();
-
+            const buffComponent = entity.getComponent(BuffComponent);
             for (let i = buffComponent.buffs.length - 1; i >= 0; i--) {
                 const buff = buffComponent.buffs[i];
 
@@ -24,19 +25,19 @@ class BuffSystem extends BaseSystem{
         }
     }
 
-    applyBuff(entity, buff) {
-        switch(buff.type) {
-            case 'IncreaseHealth':
-                this.increaseHealth(entity, buff.intensity);
-                break;
-            case 'DamageOverTime':
-                this.applyDamageOverTime(entity, buff.intensity);
-                break;
-            case 'SpeedBoost':
-                this.increaseSpeed(entity, buff.intensity);
-                break;
-            // 其他buff类型
-        }
+    applyBuff(entity:ECSEntity, buff:Buff) {
+        // switch(buff.type) {
+        //     case 'IncreaseHealth':
+        //         this.increaseHealth(entity, buff.intensity);
+        //         break;
+        //     case 'DamageOverTime':
+        //         this.applyDamageOverTime(entity, buff.intensity);
+        //         break;
+        //     case 'SpeedBoost':
+        //         this.increaseSpeed(entity, buff.intensity);
+        //         break;
+        //     // 其他buff类型
+        // }
         // ... 其他buff应用逻辑 ...
     }
 
@@ -55,9 +56,4 @@ class BuffSystem extends BaseSystem{
         // 修改移动速度属性
     }
 
-    // ... 其他buff影响的函数 ...
-
-    getEntitiesWithComponent(componentType) {
-        // 实现方法以获取包含指定组件的所有实体
-    }
 }

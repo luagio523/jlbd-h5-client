@@ -1,30 +1,27 @@
+import { ECSEntity } from "../ecs/ECSEntity";
 import { BaseSystem } from "./BaseSystem";
 
 export class AttackSystem extends BaseSystem{
 
-    constructor() {
-        
-    }
+    attack(target: ECSEntity, damage: number): void {
+        // // 模拟攻击动画
+        // const animationState = target.getComponent<AnimationState>('animationState');
+        // animationState.current = "attack";
 
-    attack(target: Entity, damage: number): void {
-        // 模拟攻击动画
-        const animationState = target.getComponent<AnimationState>('animationState');
-        animationState.current = "attack";
+        // // 执行掉血
+        // const health = target.getComponent<Health>('health');
+        // health.value -= damage;
 
-        // 执行掉血
-        const health = target.getComponent<Health>('health');
-        health.value -= damage;
-
-        console.log(`Attacked entity ${target.id}, new health is ${health.value}`);
+        // console.log(`Attacked entity ${target.id}, new health is ${health.value}`);
     }
 
     update(): void {
-        // 更新所有实体的动画状态
-        this.entities.forEach(entity => {
-            const animationState = entity.getComponent<AnimationState>('animationState');
-            // 重置动画状态为默认值，例如 'idle'
-            animationState.current = "idle";
-        });
+        // // 更新所有实体的动画状态
+        // this.entities.forEach(entity => {
+        //     const animationState = entity.getComponent<AnimationState>('animationState');
+        //     // 重置动画状态为默认值，例如 'idle'
+        //     animationState.current = "idle";
+        // });
     }
 }
 

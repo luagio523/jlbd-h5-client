@@ -1,6 +1,7 @@
 import { Vec2 } from "cc";
+import { ECSComponent } from "../ecs/ECSComponent";
 
-export class PathfindingComponent {
+export class PathfindingComponent extends ECSComponent {
     targetPosition: Vec2; // 目标位置
     currentPath: Vec2[] = []; // 使用A*算法确定的当前路径点数组
     pathIndex: number = 0; // 当前路径数组中的索引

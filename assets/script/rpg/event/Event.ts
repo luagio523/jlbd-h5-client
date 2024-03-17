@@ -1,19 +1,36 @@
+import { ECSEntity } from "../ecs/ECSEntity";
+
 export interface IEvent {
     type: string;
     data?: any;
 }
 
-class Entity {
-    // Entity 类的实现；为了示例，保持简单
+
+
+/**
+ * ecsclass() 装饰器为 class 添加有效的 name 属性
+ *
+ * @param name
+ */
+export function ecsclass(name: string) {
+    return (ctor: Function) => {
+        Object.defineProperty(ctor, "name", {
+            value: name,
+            writable: false,
+        });
+    };
 }
 
-export class AttackEvent implements IEvent {
-    public readonly type = 'AttackEvent';
 
+
+export class AttackEvent implements IEvent {
+    static readonly NAME = 'AttackEvent';
+    public readonly type = AttackEvent.NAME
     constructor(
-        public readonly attacker: Entity,
-        public readonly target: Entity,
+        public readonly attacker: ECSEntity,
+        public readonly target: ECSEntity,
         public readonly damage: number,
         public readonly attackType: string
     ) {}
 }
+
