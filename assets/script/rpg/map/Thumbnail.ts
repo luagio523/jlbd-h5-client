@@ -33,9 +33,6 @@ import { ListenerFunc } from "../../core/common/event/EventMessage";
                 this.eventDispatcher.dispatchEvent( "Complete");
             });
         });
-
-
-        
     }
 
     public addEventListener(eventName:string,listener:ListenerFunc){
@@ -47,12 +44,9 @@ import { ListenerFunc } from "../../core/common/event/EventMessage";
     }
 
     public setSize(width:number,height:number){
-
         let scaleX = width/Thumbnail.MINI_WIDHT
         let scaleY = height/Thumbnail.MINI_HEIGHT
-
         this.setScale(scaleX,scaleY)
-
     }
     
 }

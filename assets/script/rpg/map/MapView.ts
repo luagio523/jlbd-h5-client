@@ -192,7 +192,7 @@ export class MapView extends Node {
 
 		this._mapImage.lastUpdateX = this.position.x
 		this._mapImage.lastUpdateY = this.position.y
-		this._mapImage.initThumbnail(GameMap.MAX_WIDTH, GameMap.MAX_HEIGHT, mapName);
+		this._mapImage.render(GameMap.MAX_WIDTH, GameMap.MAX_HEIGHT, mapName);
 		this.updateHDMap();
 
 		// if (GameMap.IsNoramlLevel()) {

@@ -6,6 +6,7 @@ import { Node, Sprite, SpriteFrame, UITransform, assetManager } from "cc";
  */
 export default class GameImage extends Node {
     protected renderSprite:Sprite //渲染精灵
+    protected url:string //
     public constructor(){
         super()
         this.renderSprite = this.addComponent(Sprite)
@@ -17,11 +18,16 @@ export default class GameImage extends Node {
         transform.anchorY = y 
     }
 
-    public isload(){
-        return !!this.renderSprite.spriteFrame
+    public isload(url:string){
+        if(this.url == url && this.renderSprite.spriteFrame){
+            return true 
+        }
+        return false 
     }
 
     public set source(url:string){
+        if(this.isload(url))return 
+        this.clear() //清除原有的
         assetManager.loadBundle(url, SpriteFrame,  (err, bundle)=> {
             if (err != null) {
                 console.log(err);
@@ -41,6 +47,21 @@ export default class GameImage extends Node {
     }
 
     public clear(){
-        this.renderSprite.spriteFrame = null 
+        this.url = ""
+        if(this.renderSprite.spriteFrame){
+            assetManager.releaseAsset(this.renderSprite.spriteFrame)
+            this.renderSprite.spriteFrame = null 
+        }
+    }
+
+    public addTo(node:Node){
+        if(!this.parent){
+            node.addChild(this)
+        }
+    }
+
+    public removeFromParent(): void {
+        //一段时间不用
+        super.removeFromParent()
     }
 }

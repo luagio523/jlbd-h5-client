@@ -234,18 +234,8 @@ oops.res.loadDir("game", onProgressCallback, onCompleteCallback);
             var asset = assetManager.assets.get(uuid);
             if (asset) {
                 asset.decRef();
-                // assetManager.releaseAsset(asset);
             }
         }
-
-        // Cocos引擎内部已处理子关联资源的释放
-        // if (asset instanceof Prefab) {
-        //     var uuids: string[] = assetManager.dependUtil.getDepsRecursively(uuid)!;
-        //     uuids.forEach(uuid => {
-        //         var asset = assetManager.assets.get(uuid)!;
-        //         asset.decRef();
-        //     });
-        // }
     }
 
     /**
