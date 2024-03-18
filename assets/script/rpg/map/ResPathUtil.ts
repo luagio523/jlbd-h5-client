@@ -15,11 +15,7 @@ export class ResPathUtil {
 	public static GetMapMiniPath(name: string) {
 		return "map/" + name + "/pk_preview.jpg";
 	}
-
 	
-	public static ANIM_PATH =  "anim/" // 角色躯体
-	
-
 	public static GetMap(mapId:string){
 		return "map/"+mapId+"/"+mapId+".tmx"
 	}

@@ -1,6 +1,13 @@
-export class LRUCache<K, V> {
+
+export interface IAssetExpire {
+    onExpire(): void;
+}
+
+
+
+export class LRUCache<K, T extends IAssetExpire> {
     private capacity: number;
-    private cache: Map<K, V>;
+    private cache: Map<K, T>;
     private accessOrder: Array<K>;
   
     constructor(capacity: number) {
@@ -8,11 +15,11 @@ export class LRUCache<K, V> {
         throw new Error("Cache capacity must be greater than 0");
       }
       this.capacity = capacity;
-      this.cache = new Map<K, V>();
+      this.cache = new Map<K, T>();
       this.accessOrder = new Array<K>();
     }
   
-    public get(key: K): V | undefined {
+    public get(key: K): T | undefined {
       const value = this.cache.get(key);
       if (value) {
         // 移到访问顺序的尾部
@@ -27,7 +34,7 @@ export class LRUCache<K, V> {
         this.updateAccessOrder(key);
     }
   
-    public set(key: K, value: V): void {
+    public set(key: K, value: T): void {
       if (this.cache.has(key)) {
         // 更新值并移动访问顺序
         this.cache.set(key, value);
@@ -39,15 +46,24 @@ export class LRUCache<K, V> {
         this.accessOrder.push(key);
       }
     }
+
+    public has(key:K):boolean{
+      return this.cache.has(key)
+    }
   
     private evictIfNeeded() {
-      // 如果缓存已满，删除最早的条目
-      if (this.cache.size >= this.capacity) {
-        const keyToEvict = this.accessOrder.shift();
-        if (keyToEvict !== undefined) {
-          this.cache.delete(keyToEvict);
+        // 如果缓存已满，删除最早的条目
+        if (this.cache.size >= this.capacity) {
+          const keyToEvict = this.accessOrder.shift();
+          if (keyToEvict !== undefined) {
+            // entity变量应该在delete之前从cache中获取
+            let entity = this.cache.get(keyToEvict);
+            if (entity) {
+              entity.onExpire()
+            }
+            this.cache.delete(keyToEvict);
+          }
         }
-      }
     }
   
     private updateAccessOrder(key: K) {

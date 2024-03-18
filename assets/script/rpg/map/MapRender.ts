@@ -1,21 +1,22 @@
 
-import { Game, Node,  log } from "cc";
+import {   Node,  log } from "cc";
 import { GameMap } from "./GameMap";
 import Thumbnail from "./Thumbnail";
 import { ResPathUtil } from "./ResPathUtil";
 import display from "../../core/common/utils/display";
-import GameImage from "./GameImage";
+import TileImage from "./TileImage";
 
 export class MapRender extends Node {
 	lastUpdateX: number; //上一次更新的指定X
 	lastUpdateY: number; //上一次更新的指定Y
 	thumbnail: Thumbnail; //缩略图
-	_imageList: Array<Array<GameImage>>; //地图切片列表
-	_showMap: {[key:string]:GameImage};
+	_imageList: Array<Array<TileImage>>; //地图切片列表
+	_showMap: {[key:string]:TileImage};
 	isThumbnailComplete: boolean; //是否已经加载完缩略图
 	mapName: string  //地图名字
 	maxImagX: number; //地图最大的宽
 	maxImagY: number; //地图最大的高
+	imgSize:number // 切片尺寸
 
 	public constructor() {
 		super();
@@ -62,13 +63,13 @@ export class MapRender extends Node {
 			if (Array.isArray(row)) {
 				for (let j = 0; j < row.length; j++) {
 					let img = row[j];
-					if (img instanceof GameImage) { // 确保img确实是GameImage的实例
+					if (img instanceof TileImage) { // 确保img确实是GameImage的实例
 						img.clear()
 					}
 				}
 			}
 		}
-		var imgSize = GameMap.IMG_SIZE;
+		var imgSize = this.imgSize;
 		this.maxImagX = Math.ceil(w / imgSize);
 		this.maxImagY = Math.ceil(h / imgSize);
 		this.thumbnail.source = ResPathUtil.GetMapThumbnailPath(this.mapName)
@@ -84,7 +85,7 @@ export class MapRender extends Node {
 
 
 	public updateHDMap(point: any, force: boolean = false) {
-		var IMG_SIZE = GameMap.IMG_SIZE;
+		var IMG_SIZE = this.imgSize;
 		var threshold = IMG_SIZE / 4;
 		if (force || Math.abs(this.lastUpdateX - point.x) > threshold || Math.abs(this.lastUpdateY - point.y) > threshold) {
 			this.lastUpdateX = point.x;
@@ -119,12 +120,13 @@ export class MapRender extends Node {
 					let sourceName = ResPathUtil.GetTileImagePath(this.mapName, i, this.maxImagY - j - 1); // 地图切割是按左上角坐标系
 					this._imageList[j] = this._imageList[j] || [];
 	
-					var s = this._imageList[j][i] || new GameImage();
+					var s = this._imageList[j][i] || new TileImage();
 					s.setAnchor(0, 0);
 					s.source = sourceName;
 					s.setPosition(i * IMG_SIZE, j * IMG_SIZE);
-	
-					if (!s.parent) this.addChild(s);
+					
+					s.addTo(this)
+					
 					
 					this._imageList[j][i] = s;
 					furtureMap[sourceName] = s;
@@ -183,7 +185,7 @@ export class MapRender extends Node {
 
 
 // public updateHDMap(point: any, force: boolean = false) {
-// 	var IMG_SIZE = GameMap.IMG_SIZE;
+// 	var IMG_SIZE = this.imgSize;
 // 	if (force || Math.abs(this.lastUpdateX - point.x) > IMG_SIZE / 4 || Math.abs(this.lastUpdateY - point.y) > IMG_SIZE / 4 ) {
 // 		this.lastUpdateX = point.x;
 // 		this.lastUpdateY = point.y;

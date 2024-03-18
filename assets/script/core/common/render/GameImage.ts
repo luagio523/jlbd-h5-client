@@ -5,6 +5,7 @@ import { Node, Sprite, SpriteFrame, UITransform, assetManager } from "cc";
  * 游戏图片
  */
 export default class GameImage extends Node {
+    
     protected renderSprite:Sprite //渲染精灵
     protected url:string //
     public constructor(){
@@ -33,7 +34,6 @@ export default class GameImage extends Node {
                 console.log(err);
                 return;
             }
-        
             bundle.load(url, SpriteFrame, (err, spFrame) => {
                 if (err != null) {
                     console.log(err);
@@ -49,19 +49,12 @@ export default class GameImage extends Node {
     public clear(){
         this.url = ""
         if(this.renderSprite.spriteFrame){
-            assetManager.releaseAsset(this.renderSprite.spriteFrame)
             this.renderSprite.spriteFrame = null 
         }
     }
-
-    public addTo(node:Node){
-        if(!this.parent){
-            node.addChild(this)
-        }
-    }
-
-    public removeFromParent(): void {
-        //一段时间不用
-        super.removeFromParent()
-    }
+    
+   
 }
+
+
+

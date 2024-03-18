@@ -1,9 +1,10 @@
 import { Graphics, Node, log } from "cc"
-import GameImage from "./GameImage"
+import GameImage from "./TileImage"
 import { ResPathUtil } from "./ResPathUtil"
 
 export default class MiniMap extends Node{
     private mapImage:GameImage
+    private pathGraphic:Graphics
 
     public showPath:boolean = true
 

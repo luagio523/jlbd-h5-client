@@ -1,97 +1,113 @@
-import TimeFrame from "../../core/common/timer/TimerFrame";
 import display from "../../core/common/utils/display";
-import scheduler from "../../utils/scheduler";
-import { GameMap, MapType } from "./GameMap";
 import { MapRender } from "./MapRender";
-import { Color, Graphics, Node, Rect, TiledMap, Vec2, log, tween } from "cc";
+import { Color, Component, Graphics, Node, Rect, Sprite, TiledMap, Tween, Vec2, Vec3, _decorator, log, tween } from "cc";
+import EntityLayer from "./layer/EntityLayer";
+import { GameMap, MapType } from "./GameMap";
+
+const { ccclass, property } = _decorator;
+
+class TrackLookAt{
+	private fixedDeltaTime: number; // 固定的时间步长
+    private accumulatedTime: number = 0; // 时间累积器
+
+	protected target:Node 
+	protected lastPos:Vec3
+	protected syncViewWithTarget:(callback:Function)=>Tween<Node> 
+	protected isTweening:boolean
+	protected tween:Tween<Node>
+	
+	public constructor(fixedDeltaTime:number = 0.2){
+		this.fixedDeltaTime = fixedDeltaTime
+	}
+
+	public update(dt:number){
+		if(!this.target) return 
+		if(this.isTweening) return 
+		this.accumulatedTime += dt;
+		if(this.accumulatedTime < this.fixedDeltaTime){
+			return 
+		}
+		this.accumulatedTime = 0 
+		if(!this.lastPos.equals(this.target.position)){
+			this.syncOnce()
+		}
+	}
+
+	private syncOnce(){
+		this.isTweening = true 
+		this.tween = this.syncViewWithTarget(()=>{
+			this.isTweening = false 
+		})
+	}
+
+	public lookAt(target:Node,sync:(callback:Function)=>Tween<Node>){
+		this.target = target 
+		this.lastPos = Vec3.ZERO
+		this.syncViewWithTarget = sync 
+		this.syncOnce() //直接触发一次
+	}
+
+}
+
 /**
  * 地图显示
  */
 export class MapView extends Node {
-	public constructor() {
+	protected gameMap: GameMap
+	public constructor(gameMap: GameMap) {
 		super();
+		this.gameMap = gameMap
 	}
 
-	_mapImage: MapRender;
-	_downEffectLayer: Node;
-	_entityLayer: Node;
-	_plotLayer: Node;
-	_shapeContainer:Node;
-	_shape: Node;
+	private _mapNode: Node;
+	private _mapImage: MapRender;
+	private _entityLayer: EntityLayer;
 
-	_mapNode:Node;
+	private offset: Vec2 = new Vec2(0, 0) //由于图片的切割 可能有不足切割大小的 图。
 
-
-	_followTimer:TimeFrame
-
-
-	public init() {
-		
-
-		this.addChild(this._mapNode = new Node)
-		this._mapNode .addComponent(TiledMap)
-
-		this.addChild(this._mapImage = new MapRender)
-		
-		this._downEffectLayer = new Node();
-		this.addChild(this._downEffectLayer);
-
-		this._entityLayer = new Node;
-		this.addChild(this._entityLayer);
-
-	
-
-		this._plotLayer = new Node();
-		this.addChild(this._plotLayer);
-				
-		// //定时排序实体层
-		scheduler.scheduleGlobal(this.sortEntity.bind(this),1)
-		
-	};
-
-
-
-	public sortEntity() {
-		this._entityLayer.children.sort(this.sortF);
-	};
-
-	public sortF(d1, d2) {
-		return d2.y - d1.y
-	};
-
-	public get tileMap(){
-		return this._mapNode.getComponent(TiledMap)
-	}
-
-
-	private _lookAtTarget:Node = null //跟随对象
-
-
-	public update(dt:number){
-		
-	}
-	
-	public follow(role:Node): void {
-		this._lookAtTarget = role 
-		if(!this._followTimer){
-			this._followTimer = new TimeFrame(24)
-			this._followTimer.addTimer((dt:number)=>{
-				this.syncTween(this._lookAtTarget,0.4)
-			})
-		}
-		if(!this._lookAtTarget){
-			this._followTimer.stop()
-		}else{
-			this._followTimer.play()
-		}
-
-	};
 
 	private lastLookX:number = Number.MAX_VALUE
 	private lastLookY:number = Number.MAX_VALUE 
 
-	public lookPoint(tx:number,ty:number){
+	protected trackLookAt:TrackLookAt
 
+
+	public init() {
+		this.addChild(this._mapNode = new Node)
+		this._mapNode.addComponent(TiledMap)
+
+		this.addChild(this._mapImage = new MapRender)
+		this._entityLayer = new EntityLayer;
+		this.addChild(this._entityLayer);
+
+		this.trackLookAt = new TrackLookAt(0.2) //每0.2秒检测下跟踪player
+		
+	};
+
+	public get tileMap() {
+		return this._mapNode.getComponent(TiledMap)
+	}
+
+	// 在update方法中更新摄像机/视图位置
+	public update(dt: number): void {
+
+	}
+	
+
+	public trackLookAtTarget(target: Node): void {
+		this.trackLookAt.lookAt(target,(callback)=>
+			this.syncViewWithTarget(target,0.2,callback)
+		)
+	}
+
+
+	public lookAtTargetWithTween(target: Node, duration: number = 0.2): void {
+		if (!target || duration <= 0) return;
+		if (!target.isValid) return;
+		this.syncViewWithTarget(target,duration)
+	}
+
+	public lookAtPoint(tx: number, ty: number): void {
 		if(tx == this.lastLookX && ty == this.lastLookY){
 			return 
 		}
@@ -99,118 +115,103 @@ export class MapView extends Node {
 		this.lastLookY  =ty
 
 		let p = new Vec2(tx,ty)
-		this.transH2MXY(p)
+		this.translateToMapCoordinates(p)
 		this.setPosition(p.x,p.y)
+	}
 	
-		// log(this.x,this.y,"lookpoint")
 
-		// this.x = -Math.min(Math.max(tx - (display.adaptWidth >> 1), 0), GameMap.MAX_WIDTH - display.adaptWidth -this.offset.x);
-		// this.y = -Math.min(Math.max(ty -  (display.adaptHeight >> 1), this.offset.y), GameMap.MAX_HEIGHT - display.adaptHeight);
+	public syncViewWithTarget(target:Node,time:number = 0.1,callback?:Function):Tween<Node>{
+		if(!target.isValid) return 
+
+		if(target.position.x == this.lastLookX && target.position.y == this.lastLookY){
+			return 
+		}
+		this.lastLookX =  target.position.x 
+		this.lastLookY  = target.position.y
+
+		let p = target.position
+		this.translateToMapCoordinates(new Vec2(target.position.x ,target.position.y))
+
+		return tween(<Node>this)
+			.to(time, { position: p })
+			.call(callback)
+			.start();
+	}
+
+	private translateToMapCoordinates(point: Vec2): void {
+		point.x = -Math.min(Math.max(point.x - (display.adaptWidth >> 1), 0), this.gameMap.maxWidth - display.adaptWidth);
+		point.y = -Math.min(Math.max(point.y - (display.adaptHeight >> 1), 0), this.gameMap.maxHeight - display.adaptHeight);
+	}
+
+	public changeMap() {
+		log("Change map for");
+		this.off(Node.EventType.TRANSFORM_CHANGED)
+		// 提早返回的策略减少条件嵌套
+		if (this.gameMap.mapType !== MapType.SLICE) {
+			this.updateTileMap();
+			this.centerViewOnMap();
+			return;
+		} else { //对于地图切块的
+			this.calculateOffset(); // 计算偏移的函数
+			this.adjustMapView(); // 调整地图视图的函数
+			this.updateMapImage(this.gameMap.getFileName());
+			this.centerViewOnMap(); // 中心视图到地图的函数
+		}
+	};
+
+	private calculateOffset() {
+		// 计算偏移值的逻辑
+		const remainderX = this.gameMap.maxWidth % GameMap.IMG_SIZE;
+		const remainderY = this.gameMap.maxHeight % GameMap.IMG_SIZE;
+		this.offset.x = remainderX > 0 ? GameMap.IMG_SIZE - remainderX : 0;
+		this.offset.y = remainderY > 0 ? GameMap.IMG_SIZE - remainderY : 0;
+	}
+
+	private adjustMapView() {
+		// 调整地图视图
+		this._mapImage.setPosition(this._mapImage.position.x, -this.offset.y); //切图导致的偏移 不满256的图 视觉上对y轴有影响（多出的黑块区）。不会影响地图本身
+	}
+
+	private centerViewOnMap() {
+		// 首次加载地图时的视图定位
+		this.lookAtPoint(this.gameMap.mapX, this.gameMap.mapY);
 	}
 
 	/**
-	 * 转换look位置到地图相对移动位置
-	 * @param p 
+	 * 直接更新tileMap地图
 	 */
-	private transH2MXY(p:Vec2){
-		p.x = -Math.min(Math.max(p.x - (display.adaptWidth >> 1), 0), GameMap.MAX_WIDTH - display.adaptWidth  );
-		p.y = -Math.min(Math.max(p.y -  (display.adaptHeight >> 1), 0), GameMap.MAX_HEIGHT - display.adaptHeight);
-	}
-
-	private offset:Vec2 = new Vec2(0,0) //由于图片的切割 可能有不足切割大小的 图。
-
-	public syncTween(role:Node,time:number = 0.1){
-		if(!role.isValid) return 
-
-		if(role.position.x == this.lastLookX && role.position.y == this.lastLookY){
-			return 
-		}
-		this.lastLookX =  role.position.x 
-		this.lastLookY  = role.position.y
-
-		let p = role.position
-		this.transH2MXY(new Vec2(role.position.x ,role.position.y))
-
-		tween(<Node>this).to(time,{position:p}).start()
-	}
-
-
-
-
-	public looAtTween(role:Node,time:number = 300): void {
-		if (role == null)
-			return;  
-		this.follow(null) //清空跟随
-		
-		this.syncTween(role)
-	};
-	
-
-    /**
-     * 切换地图会清除场景上的所有显示
-     */
-	public changeMap() {
-
-		log("change map for")
-		// // 移除震屏动画
-
-		if(GameMap.mapType == MapType.SLICE){
-			if(GameMap.MAX_WIDTH%GameMap.IMG_SIZE > 0){
-				this.offset.x = GameMap.IMG_SIZE - GameMap.MAX_WIDTH%GameMap.IMG_SIZE
-			}
-			
-			if(GameMap.MAX_HEIGHT%GameMap.IMG_SIZE > 0){
-				//切图导致的偏移 不满256的图 视觉上对y轴有影响（多出的黑块区）。不会影响地图本身
-				this.offset.y =  GameMap.IMG_SIZE - GameMap.MAX_HEIGHT%GameMap.IMG_SIZE 
-			}
-			this._mapImage.setPosition(this._mapImage.position.x,-this.offset.y)
-
-			let mapName = GameMap.getFileName()
-			this.updateMapImage(mapName)
-		}else{
-			this.updateTileMap()
-		}
-		
-		this.lookPoint(GameMap.mapX,GameMap.mapY)  //首次加载
-	};
-
-	private updateTileMap(){
+	private updateTileMap() {
 		this._mapImage.active = false
-		this.off(Node.EventType.TRANSFORM_CHANGED)
-
 		this._mapNode.active = true
-
-		this._mapNode.setPosition(GameMap.MAX_WIDTH >> 1,GameMap.MAX_HEIGHT >> 1)
+		this._mapNode.setPosition(this.gameMap.maxWidth >> 1, this.gameMap.maxHeight >> 1)
 	}
 
-	private updateMapImage(mapName:string){
+	/**
+	 * 更新切片地图
+	 * @param mapName 
+	 */
+	private updateMapImage(mapName: string) {
 		this._mapNode.active = false
 		this._mapImage.active = true
-		this.on(Node.EventType.TRANSFORM_CHANGED,()=>{
+		this.on(Node.EventType.TRANSFORM_CHANGED, () => {
 			this.updateHDMap();
 		})
-
 		this._mapImage.lastUpdateX = this.position.x
 		this._mapImage.lastUpdateY = this.position.y
-		this._mapImage.render(GameMap.MAX_WIDTH, GameMap.MAX_HEIGHT, mapName);
+		this._mapImage.render(this.gameMap.maxWidth, this.gameMap.maxHeight, mapName);
 		this.updateHDMap();
-
-		// if (GameMap.IsNoramlLevel()) {
-		// 	this._mapImage.ClearOtherNormalRes(mapName)
-		// }
 	}
 
-
-	private updateHDMap(force:boolean = false){
-		if(this._mapImage != null){
-			this._mapImage.updateHDMap(this,force);
+	private updateHDMap(force: boolean = false) {
+		if (this._mapImage != null) {
+			this._mapImage.updateHDMap(this, force);
 		}
 	}
-	
-	///////////////////////////////////////////////////////////
 
-	protected getDrawGraphics(){
-		if(this.graphics){
+	/***********************************************************用于测试********************************************************************* */
+
+	protected getDrawGraphics() {
+		if (this.graphics) {
 			return this.graphics
 		}
 		let node = new Node()
@@ -219,39 +220,39 @@ export class MapView extends Node {
 		this.graphics = node.addComponent(Graphics)
 		return this.graphics
 	}
-	
-	protected graphics:Graphics
 
-	public draw(points:Array<Vec2>,color:Color = Color.GREEN){
+	protected graphics: Graphics
+
+	public draw(points: Array<Vec2>, color: Color = Color.GREEN) {
 
 		let graphics = this.getDrawGraphics()
 		graphics.clear()
 
 		graphics.strokeColor = color
-        graphics.lineWidth = 6
+		graphics.lineWidth = 6
 
 		for (let index = 0; index < points.length; index++) {
 			const element = points[index];
-			if(index == 0){
-				graphics.moveTo(element.x,element.y)
-			}else{
-				graphics.lineTo(element.x,element.y)
+			if (index == 0) {
+				graphics.moveTo(element.x, element.y)
+			} else {
+				graphics.lineTo(element.x, element.y)
 
 			}
 		}
 		graphics.stroke()
 	}
 
-	public draw3(rect:Rect,color:Color = Color.GREEN){
+	public draw3(rect: Rect, color: Color = Color.GREEN) {
 		let graphics = this.getDrawGraphics()
 		graphics.clear()
 
 		graphics.strokeColor = color
-        graphics.lineWidth = 4
-		
-		graphics.rect(rect.x,rect.y,rect.width,rect.height)
+		graphics.lineWidth = 4
 
-		
+		graphics.rect(rect.x, rect.y, rect.width, rect.height)
+
+
 		graphics.stroke()
 	}
 }
