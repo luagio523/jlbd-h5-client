@@ -1,6 +1,6 @@
 import { _decorator,  Vec3,bezierByTime   } from 'cc';
-import { UnitTargetFlags, UnitTargetTeam, UnitTargetType } from './Type';
-import { BaseAbility } from './BaseAbility';
+import { UnitTargetFlags, UnitTargetTeam, UnitTargetType } from './type/Type';
+import { BaseAbility } from './ability/BaseAbility';
 const { ccclass, property } = _decorator;
 
 export class CreateBaseProjectileOptions {
@@ -384,3 +384,93 @@ export class TrackingProjectile extends Projectile {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+// class Projectile {
+//     private x: number;
+//     private y: number;
+//     private targetX: number;
+//     private targetY: number;
+//     private velocityX: number;
+//     private velocityY: number;
+//     private gravity: number;
+//     private timeElapsed: number = 0;
+
+//     constructor(x: number, y: number, targetX: number, targetY: number, velocity: number, gravity: number) {
+//         this.x = x;
+//         this.y = y;
+//         this.targetX = targetX;
+//         this.targetY = targetY;
+//         // Assuming equal initial velocity split between x and y for simplicity
+//         const angleRad = Math.atan2(targetY - y, targetX - x);
+//         this.velocityX = Math.cos(angleRad) * velocity;
+//         this.velocityY = Math.sin(angleRad) * velocity;
+//         this.gravity = gravity;
+//     }
+
+//     update(deltaTime: number): void {
+//         this.timeElapsed += deltaTime;
+//         // Update horizontal position
+//         this.x += this.velocityX * deltaTime;
+
+//         // Update vertical position with pseudo 3D effect
+//         // Objects that are "further away" (higher y value) should have less vertical movement to simulate depth
+//         const depthFactor = 1 - (this.y / this.targetY);
+//         this.velocityY -= this.gravity * deltaTime * depthFactor;
+//         this.y += this.velocityY * deltaTime;
+
+//         // Implement collision or arrival logic here
+//         // Example: if projectile reaches target y level, trigger explosion or damage
+//         if (this.y >= this.targetY) {
+//             this.explode();
+//             // Reset or destroy projectile here
+//         }
+//     }
+
+//     explode(): void {
+//         // Explosion or impact logic
+//         console.log(`Projectile exploded at (x: ${this.x}, y: ${this.y})`);
+//     }
+
+//     draw(context: CanvasRenderingContext2D): void {
+//         // Draw the projectile, adjusting size for depth if necessary
+//         context.beginPath();
+//         context.arc(this.x, this.y, 5, 0, Math.PI * 2);
+//         context.fill();
+//     }
+// }
+
+
+
+
+
+
+
+
+
+
+
+// function createQuadraticBezierProjectile(startX: number, startY: number, endX: number, endY: number, heightOffset: number): cc.Tween {
+//     // 控制点是在起点和终点的中间上方，创建一个偏移量用于决定控制点Y坐标的高度
+// // 中点X坐标
+// const midX = (startX + endX) / 2;
+// // 控制点Y坐标（由于Cocos坐标是Y轴向上，所以要加heightOffset）
+// const controlY = (startY + endY) / 2 + heightOffset;
+
+// // // 创建贝塞尔曲线动画的控制点坐标对象数组
+// // const bezierPoints = [
+// //     cc.v2(startX, startY), // 起点
+// //     cc.v2(controlX, controlY), // 控制点
+// //     cc.v2(endX, endY) // 终点
+// // ];
+    
+    
+// }
