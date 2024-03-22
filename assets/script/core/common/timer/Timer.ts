@@ -1,24 +1,4 @@
-/*
- * @Author: dgflash
- * @Date: 2023-01-19 11:09:38
- * @LastEditors: dgflash
- * @LastEditTime: 2023-01-19 14:28:05
- */
 
-/** 
- * 定时跳动组件 
- * @example
-    export class Test extends Component {
-        // 创建一个定时跳动组件
-        private timer: Timer = new Timer(1);
-
-        update(dt: number) {
-            if (this.timer.update(this.dt)) {
-                console.log(每一秒触发一次);
-            }
-        }
-    }
- */
 export class Timer {
     callback: Function | null = null;
 

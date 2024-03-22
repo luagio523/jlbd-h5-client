@@ -76,10 +76,6 @@ export enum ModifierState {
 
 
 
-
-
-
-
 export enum ModifierFunction {
     // `GetModifierPreAttack_BonusDamage`: Hero在攻击前获取额外的伤害。
     MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE = 0,

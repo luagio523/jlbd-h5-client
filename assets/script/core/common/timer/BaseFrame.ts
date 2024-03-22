@@ -1,4 +1,3 @@
-import { TimerMgr } from "./TimerMgr";
 
 /**
  * 暂时先简单实现吧
@@ -33,22 +32,22 @@ export default class BaseFrame {
         });
     }
     
-    public play(){
-        if(this.playTimer ==0){
-            this.playTimer = TimerMgr.ins().frameLoop(this.update.bind(this))
-        }
-        return this
-    }
+    // public play(){
+    //     if(this.playTimer ==0){
+    //         this.playTimer = TimerMgr.ins().frameLoop(this.update.bind(this))
+    //     }
+    //     return this
+    // }
 
-    public stop(){
-        if(this.playTimer !=0 ){
-            TimerMgr.ins().remove(this.playTimer)
-            this.playTimer = 0
-        }
-    }
+    // public stop(){
+    //     if(this.playTimer !=0 ){
+    //         TimerMgr.ins().remove(this.playTimer)
+    //         this.playTimer = 0
+    //     }
+    // }
 
     public clear(){
-        this.stop()
+        // this.stop()
         this.timerRenders = new Array()
     }
 }

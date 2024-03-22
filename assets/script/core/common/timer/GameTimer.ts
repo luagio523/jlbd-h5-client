@@ -1,11 +1,5 @@
-/*
- * @Author: dgflash
- * @Date: 2023-01-19 10:33:49
- * @LastEditors: dgflash
- * @LastEditTime: 2023-01-19 14:37:19
- */
+
 import { Component } from "cc";
-import { StringUtil } from "../../utils/StringUtil";
 import { Timer } from "./Timer";
 
 /** 时间管理 */
@@ -77,7 +71,7 @@ export class GameTimer extends Component {
         timer.step = 1;
 
         let data: any = {};
-        data.id = StringUtil.guid();
+        data.id = this.idCounter++;
         data.timer = timer;
         data.object = object;                                   // 管理对象
         data.field = field;                                     // 时间字段
@@ -86,6 +80,8 @@ export class GameTimer extends Component {
         this.times[data.id] = data;
         return data.id;
     }
+
+    protected idCounter:number
 
     /** 
      * 在指定对象上注销一个倒计时的回调管理器 

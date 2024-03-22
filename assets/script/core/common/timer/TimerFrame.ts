@@ -17,14 +17,11 @@ export default class TimeFrame extends BaseFrame{
    
     protected render(dt){
         super.render(dt)
-
-       
     }
     
     public update(dt:number){
         this._accruedTime = this._accruedTime + dt
         if(this._accruedTime >= this._interval){
-
             this.render(this._interval)
             this._accruedTime = this._accruedTime - this._interval
         } 

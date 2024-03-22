@@ -28,31 +28,31 @@ export class Timer {
         return this._elapsedTime;
     }
 
-    private _step: number = -1;
+    private _interval: number = -1;
     /** 触发间隔时间（秒） */
-    get step(): number {
-        return this._step;
+    get interval(): number {
+        return this._interval;
     }
-    set step(step: number) {
-        this._step = step;                     // 每次修改时间
+    set interval(interval: number) {
+        this._interval = interval;                     // 每次修改时间
         this._elapsedTime = 0;                 // 逝去时间
     }
 
     get progress(): number {
-        return this._elapsedTime / this._step;
+        return this._elapsedTime / this._interval;
     }
 
-    constructor(step: number = 0) {
-        this.step = step;
+    constructor(interval: number = 0) {
+        this.interval = interval;
     }
 
     update(dt: number) {
-        if (this.step <= 0) return false;
+        if (this.interval <= 0) return false;
 
         this._elapsedTime += dt;
 
-        if (this._elapsedTime >= this._step) {
-            this._elapsedTime -= this._step;
+        if (this._elapsedTime >= this._interval) {
+            this._elapsedTime -= this._interval;
             this.callback?.call(this);
             return true;
         }
@@ -65,6 +65,6 @@ export class Timer {
 
     stop() {
         this._elapsedTime = 0;
-        this.step = -1;
+        this.interval = -1;
     }
 }

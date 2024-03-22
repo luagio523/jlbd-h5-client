@@ -32,45 +32,9 @@ export default class RenderFrame extends BaseFrame{
 
             // this.render(dt)
         }else{
-
-
             this._accruedTime = this._accruedTime + dt
-
-
-            // let rate = Math.floor(this._accruedTime/this._realInterval)
-
-
-            // if(rate > 2){ //补超过3帧 //一次补回
                 this.onceRecoupFrames(this._accruedTime)
-               
                 this._accruedTime = 0
-                
-            // }else{
-            //     this.recoupFrames(rate,this._realInterval)
-
-            //     this._accruedTime = this._accruedTime  - rate*this._realInterval
-            //     if(this._accruedTime > this._realInterval){
-            //         this.render(this._realInterval)
-            //         this._accruedTime = this._accruedTime -this._realInterval
-            //     }
-            // }
-
-
-           
-
-
-            // let rate = Math.floor(dt/this._realInterval)
-
-            // cc.log(dt,"============xxxx=",rate)
-            // if(rate >= 1){
-            //     this.recoupFrames(rate,this._realInterval)
-            // }
-            // this._accruedTime = this._accruedTime + dt - rate*this._realInterval
-            // if(this._accruedTime > this._realInterval){
-            //     this.render(this._realInterval)
-            //     this._accruedTime = this._accruedTime -this._realInterval
-            // }
-            
         }
     }
 

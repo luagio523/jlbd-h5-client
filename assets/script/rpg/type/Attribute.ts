@@ -1,5 +1,5 @@
 
-export enum Attributes {
+export enum Attribute {
     ATTRIBUTE_INVALID = -1, // 无效属性，通常用作错误值或未初始化的标记
     ATTRIBUTE_STRENGTH = 0, // 力量属性，一般与增加生命值和生命恢复相关
     ATTRIBUTE_AGILITY = 1,  // 敏捷属性，一般与增加攻击速度和闪避几率相关
@@ -9,7 +9,7 @@ export enum Attributes {
 }
 
 
-export enum AttributeDerivedStats {
+export enum AttributeDerivedStat {
     ATTRIBUTE_STRENGTH_DAMAGE = 0,           // 力量提供的额外物理伤害
     ATTRIBUTE_STRENGTH_HP = 1,               // 力量提供的额外生命值
     ATTRIBUTE_STRENGTH_HP_REGEN = 2,         // 力量提供的生命恢复速度
@@ -24,6 +24,7 @@ export enum AttributeDerivedStats {
 }
 
 
+// 实际攻击间隔 = 基础攻击间隔 / (攻击速度 / 100)
 
 export enum AttackCapability {
     UNIT_CAP_NO_ATTACK = 0, // 单位无攻击能力
