@@ -82,7 +82,6 @@ export interface IModifierEffect {
     removeEffect(entity: ECSEntity): void 
 }
 
-
 export class Modifier {
 
     public id: string

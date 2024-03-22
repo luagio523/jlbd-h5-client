@@ -1,12 +1,7 @@
 import { ECSComponent } from "../ecs/ECSComponent";
 import { Attribute } from "../type/Attribute";
 
-
-export const AttributePrimary {
-
-}
-
-class AttackComponent extends ECSComponent{
+export class AttackComponent extends ECSComponent{
     public attackCapability: string; //攻击类型 远程近战
     public baseAttackDamageMin: number;
     public baseAttackDamageMax: number;
@@ -68,55 +63,48 @@ class AttackComponent extends ECSComponent{
 
 
 
-struct AttackComponent {
-    int physicalDamage;
-    int magicalDamage;
-    int pureDamage;
-};
+// struct AttackComponent {
+//     int physicalDamage;
+//     int magicalDamage;
+//     int pureDamage;
+// };
 
-int calculateTotalDamage(ECSEntity attacker, ECSEntity target) {
-    AttackComponent attackComp = attacker.getComponent(AttackComponent);
-    int totalPhysicalDamage = attackComp.physicalDamage;
-    int totalMagicalDamage = attackComp.magicalDamage;
-    int totalPureDamage = attackComp.pureDamage;
+// int calculateTotalDamage(ECSEntity attacker, ECSEntity target) {
+//     AttackComponent attackComp = attacker.getComponent(AttackComponent);
+//     int totalPhysicalDamage = attackComp.physicalDamage;
+//     int totalMagicalDamage = attackComp.magicalDamage;
+//     int totalPureDamage = attackComp.pureDamage;
 
-    // 处理Buff和Debuff效果
-    // 这里省略了处理护甲和魔法抗性的细节
-    for (BuffEffect effect : attacker.getComponent(BuffComponent).buffEffects) {
-        switch (effect.effectType) {
-            case EffectType.AdditionalPhysicalDamage:
-                totalPhysicalDamage += effect.value; // 额外的物理伤害
-                break;
-            case EffectType.AdditionalMagicalDamage:
-                totalMagicalDamage += effect.value; // 额外的魔法伤害
-                break;
-            // 添加其他Buff效果的处理...
-        }
-    }
+//     // 处理Buff和Debuff效果
+//     // 这里省略了处理护甲和魔法抗性的细节
+//     for (BuffEffect effect : attacker.getComponent(BuffComponent).buffEffects) {
+//         switch (effect.effectType) {
+//             case EffectType.AdditionalPhysicalDamage:
+//                 totalPhysicalDamage += effect.value; // 额外的物理伤害
+//                 break;
+//             case EffectType.AdditionalMagicalDamage:
+//                 totalMagicalDamage += effect.value; // 额外的魔法伤害
+//                 break;
+//             // 添加其他Buff效果的处理...
+//         }
+//     }
 
-    // 应用Debuff
-    for (BuffEffect effect : attacker.getComponent(BuffComponent).debuffEffects) {
-        switch (effect.effectType) {
-            case EffectType.FixedPureDamage:
-                // 固定纯粹伤害可能覆盖其他所有伤害
-                return effect.value; // 直接返回这个固定的伤害值
-            // 添加其他Debuff效果的处理...
-        }
-    }
+//     // 应用Debuff
+//     for (BuffEffect effect : attacker.getComponent(BuffComponent).debuffEffects) {
+//         switch (effect.effectType) {
+//             case EffectType.FixedPureDamage:
+//                 // 固定纯粹伤害可能覆盖其他所有伤害
+//                 return effect.value; // 直接返回这个固定的伤害值
+//             // 添加其他Debuff效果的处理...
+//         }
+//     }
 
-    // 最终伤害是所有类型的伤害加总，每种伤害都需要考虑目标的抗性因素
-    // 这里假设目标无抗性，直接加总所有伤害
-    int finalDamage = totalPhysicalDamage + totalMagicalDamage + totalPureDamage;
+//     // 最终伤害是所有类型的伤害加总，每种伤害都需要考虑目标的抗性因素
+//     // 这里假设目标无抗性，直接加总所有伤害
+//     int finalDamage = totalPhysicalDamage + totalMagicalDamage + totalPureDamage;
 
-    return finalDamage;
-}
-
-
-
-
-
-
-
+//     return finalDamage;
+// }
 
 
 // int calculateFinalPhysicalDamage(int rawPhysicalDamage, int targetArmor) {

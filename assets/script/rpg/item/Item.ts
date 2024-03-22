@@ -1,92 +1,24 @@
-class Item {
-    constructor(id, name, type, description) {
-        this.id = id;             // 物品唯一标识
-        this.name = name;         // 物品名称
-        this.type = type;         // 物品类型（装备，消耗品，材料等）
-        this.description = description; // 物品描述
-    }
+import { ECSEntity } from "../ecs/ECSEntity"
 
-    use() {
-        // 定义物品的使用方法，根据不同类型的物品，其逻辑会有所不同
-    }
+export class Item {
+    public id:string 
+    public name:string 
+    public itemType:ItemType 
+    public description:string
+
+
+    
 }
 
 
 
-enum Attributes {
-    ATTRIBUTE_INVALID = -1, // 无效属性，通常用作错误值或未初始化的标记
-    ATTRIBUTE_STRENGTH = 0, // 力量属性，一般与增加生命值和生命恢复相关
-    ATTRIBUTE_AGILITY = 1,  // 敏捷属性，一般与增加攻击速度和闪避几率相关
-    ATTRIBUTE_INTELLECT = 2,// 智力属性，一般与增加魔法值和魔法恢复相关
-    ATTRIBUTE_ALL = 3,      // 通用属性，可能指代所有属性或在增益效果中影响全部上述属性
-    ATTRIBUTE_MAX = 4,      // 用作枚举的上限标记，通常用于循环遍历或条件判断
+
+
+export enum ItemType {
+    ITEM_TYPE_EQUIPMENT = 1,
+    ITEM_TYPE_COMSUMABLE = 2,
+    ITEM_TYPE_MATERIAL = 3,
 }
-
-
-
-// 定义枚举来表示角色的属性类型
-enum AttributeType {
-    /** 力量：增加生命值和每秒生命恢复 */
-    Strength = 'strength',
-    
-    /** 敏捷：增加攻击速度和护甲 */
-    Agility = 'agility',
-    
-    /** 智力：增加魔法值和每秒魔法恢复 */
-    Intelligence = 'intelligence',
-    
-    /** 主属性：决定了英雄的主攻击属性 */
-    MainAttribute = 'mainAttribute',
-    
-    // League of Legends Specific Attributes
-    /** 生命值：角色的总生命 */
-    Health = 'health',
-    
-    /** 魔法值：角色使用技能所需的资源 */
-    Mana = 'mana',
-    
-    /** 攻击力：增加物理伤害输出 */
-    AttackDamage = 'attackDamage',
-    
-    /** 法术强度：增加技能伤害输出 */
-    AbilityPower = 'abilityPower',
-    
-    /** 护甲：减少受到的物理伤害 */
-    Armor = 'armor',
-    
-    /** 魔法抗性：减少受到的魔法伤害 */
-    MagicResist = 'magicResist',
-    
-    /** 攻击速度：决定角色攻击的速率 */
-    AttackSpeed = 'attackSpeed',
-    
-    /** 暴击几率：角色攻击造成额外伤害的概率 */
-    CriticalStrikeChance = 'criticalStrikeChance',
-    
-    // Other shared/common attributes
-    /** 移动速度：决定角色移动的速度 */
-    MovementSpeed = 'movementSpeed',
-    
-  }
-
-enum AttributeDerivedStats {
-    ATTRIBUTE_STRENGTH_DAMAGE = 0,           // 力量提供的额外物理伤害
-    ATTRIBUTE_STRENGTH_HP = 1,               // 力量提供的额外生命值
-    ATTRIBUTE_STRENGTH_HP_REGEN = 2,         // 力量提供的生命恢复速度
-    ATTRIBUTE_AGILITY_DAMAGE = 3,            // 敏捷提供的额外物理伤害
-    ATTRIBUTE_AGILITY_ARMOR = 4,             // 敏捷提供的额外护甲值
-    ATTRIBUTE_AGILITY_ATTACK_SPEED = 5,      // 敏捷提供的额外攻击速度
-    ATTRIBUTE_INTELLIGENCE_DAMAGE = 6,       // 智力提供的额外物理伤害
-    ATTRIBUTE_INTELLIGENCE_MANA = 7,         // 智力提供的额外魔法值
-    ATTRIBUTE_INTELLIGENCE_MANA_REGEN = 8,   // 智力提供的魔法恢复速度
-    ATTRIBUTE_INTELLIGENCE_MAGIC_RESIST = 9, // 智力提供的魔法抗性
-    ATTRIBUTE_ALL_DAMAGE = 10,               // 所有属性提供的额外伤害
-}
-
-// 使用枚举的示例：
-let heroDerivedStat: AttributeDerivedStats = AttributeDerivedStats.ATTRIBUTE_STRENGTH_HP;
-
-
 
 
 

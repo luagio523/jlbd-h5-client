@@ -1,10 +1,16 @@
-export abstract class Equipment {
-    public name: string;
-    public type: string;
+import { ECSEntity } from "../ecs/ECSEntity";
 
-    constructor(name: string, type: string) {
-        this.name = name;
-        this.type = type;
+export enum EquipmentType {
+    EQUIP_TYPE_WEAPON = 1,
+    EQUIP_TYPE_ARMOR = 2,
+}
+
+
+export abstract class Equipment {
+    public equipType: EquipmentType;
+
+    constructor(type: EquipmentType) {
+        this.equipType = type;
     }
 
 
@@ -28,11 +34,7 @@ export class Weapon extends Equipment {
     public damage: number;
     public attackSpeed: number;
 
-    constructor(name: string, damage: number, attackSpeed: number) {
-        super(name, 'Weapon');
-        this.damage = damage;
-        this.attackSpeed = attackSpeed;
-    }
+    
 
     // 其他武器特有的属性和行为
 }
@@ -40,21 +42,12 @@ export class Weapon extends Equipment {
 export class Armor extends Equipment {
     public defense: number;
 
-    constructor(name: string, defense: number) {
-        super(name, 'Armor');
-        this.defense = defense;
-    }
+    
 
     // 其他盔甲特有的属性和行为
 }
 
 export class Accessory extends Equipment {
     public critChance: number;
-
-    constructor(name: string, critChance: number) {
-        super(name, 'Accessory');
-        this.critChance = critChance;
-    }
-
     // 其他配饰特有的属性和行为
 }
