@@ -1,6 +1,6 @@
 import { _decorator,  Vec3,bezierByTime   } from 'cc';
-import { UnitTargetFlags, UnitTargetTeam, UnitTargetType } from './type/Type';
 import { BaseAbility } from './ability/BaseAbility';
+import { UnitTargetFlags, UnitTargetTeam, UnitTargetType } from './type/Unit';
 const { ccclass, property } = _decorator;
 
 export class CreateBaseProjectileOptions {

@@ -1,7 +1,9 @@
-import { AbilityBehavior, UnitTargetFlags, UnitTargetTeam, UnitTargetType,AbilityType,DamageType } from "../type/Type";
 
 // AbilitySpecial 通常用于定义一些变量数值，这些数值往往关联到技能的等级。例如，技能冷却时间、伤害、范围等在每个技能等级都可能有不同的设置。这就是为什么 AbilitySpecial 中常常会看到一些范围，比如 "110 140 170 200"，这表示在每个等级，该值会分别是 110, 140, 170, 200。
 // AbilityValues 则是用来提供一些对技能描述更为固定的属性信息，它的值通常不会因为技能等级的改变而改变。比如技能持续时间 (duration)、技能效果范围 (radius) 等等。
+
+import { AbilityBehavior, AbilityType, DamageType } from "../type/Type";
+import { UnitTargetFlags, UnitTargetTeam, UnitTargetType } from "../type/Unit";
 
 export class AbilityData {
     // 基础属性
