@@ -80,1061 +80,542 @@ export enum ModifierState {
 
 
 
-export enum modifierfunction {
-       // `GetModifierPreAttack_BonusDamage`: Hero在攻击前获取额外的伤害。
-       MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE = 0,
+export enum ModifierFunction {
+    // `GetModifierPreAttack_BonusDamage`: Hero在攻击前获取额外的伤害。
+    MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE = 0,
 
-       // `GetModifierPreAttack_BonusDamage_Target`: Hero在攻击特定目标前获取额外的伤害。
-       MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_TARGET = 1,
-   
-       // `GetModifierPreAttack_BonusDamage_Proc`: Hero在攻击被处理之前获取额外的伤害。
-       MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_PROC = 2,
-   
-       // `GetModifierPreAttack_BonusDamagePostCrit`: 伤害会在攻击后的暴击伤害计算中被考虑进去。
-       MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_POST_CRIT = 3,
-   
-       // `GetModifierBaseAttack_BonusDamage`: 获取到基础攻击额外的伤害。
-       MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE = 4,
-   
-       // `GetModifierProcAttack_BonusDamage_Physical`: 获取物理伤害的攻击加成。
-       MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_PHYSICAL = 5,
-   
-       // `GetModifierProcAttack_ConvertPhysicalToMagical`: 将物理伤害转变为魔法伤害。
-       MODIFIER_PROPERTY_PROCATTACK_CONVERT_PHYSICAL_TO_MAGICAL = 6,
-   
-       // `GetModifierProcAttack_BonusDamage_Magical`: 获取魔法伤害的攻击加成。
-       MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_MAGICAL = 7,
-   
-       // `GetModifierOverrideAttackDamage`: 重写所有伤害源。
-       MODIFIER_PROPERTY_OVERRIDE_ATTACK_DAMAGE = 11,
-   
-       // `GetModifierInvisibilityLevel`: 定义单位的隐形级别。
-       MODIFIER_PROPERTY_INVISIBILITY_LEVEL = 13,
-   
-       // `GetModifierPersistentInvisibility`: 让单位持续隐形。
-       MODIFIER_PROPERTY_PERSISTENT_INVISIBILITY = 15,
-   
-       // `GetModifierMoveSpeedBonus_Constant`: 获取移动速度的加成。
-       MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT = 16,
-   
-       // `GetModifierMoveSpeedOverride`: 覆盖基础移动速度。
-       MODIFIER_PROPERTY_MOVESPEED_BASE_OVERRIDE = 17,
-   
-       // `GetModifierIgnoreMovespeedLimit`: 忽略移动速度限制。
-       MODIFIER_PROPERTY_IGNORE_MOVESPEED_LIMIT = 27,
-   
-       // `GetModifierMoveSpeed_Limit`: 设定移动速度的上限。
-       MODIFIER_PROPERTY_MOVESPEED_LIMIT = 28,
-   
-       // `GetModifierAttackSpeedBaseOverride`: 获取基础攻击速度的加成。
-       MODIFIER_PROPERTY_ATTACKSPEED_BASE_OVERRIDE = 29,
-   
-       // `GetModifierFixedAttackRate`: 获取单位固定的攻击速度。
-       MODIFIER_PROPERTY_FIXED_ATTACK_RATE = 30,
-   
-       // `GetModifierAttackSpeed_Limit`: 这个方法应该类似于忽略最大攻击速度限制。
-       MODIFIER_PROPERTY_IGNORE_ATTACKSPEED_LIMIT = 32,
-   
-       // `GetModifierCooldownReduction_Constant`: 获取技能冷却时间的减少量。
-       MODIFIER_PROPERTY_COOLDOWN_REDUCTION_CONSTANT = 33,
-   
-       // `GetModifierManacostReduction_Constant`: 获取法力消耗的减少量。
-       MODIFIER_PROPERTY_MANACOST_REDUCTION_CONSTANT = 34,
- 
-        // `GetModifierHealthcostReduction_Constant`: 获取技能消耗生命值的减少量。
-        MODIFIER_PROPERTY_HEALTHCOST_REDUCTION_CONSTANT = 35,
+    // `GetModifierPreAttack_BonusDamage_Target`: Hero在攻击特定目标前获取额外的伤害。
+    MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_TARGET = 1,
 
-        // `GetModifierBaseAttackTimeConstant`: 获取单位的基础攻击间隔。
-        MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT = 36,
-    
-        // `GetModifierBaseAttackTimeConstant_Adjust`: 调整单位的基础攻击间隔。
-        MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT_ADJUST = 37,
-    
-        // `GetModifierBaseAttackTimePercentage`: 以百分比改变单位的基础攻击间隔。
-        MODIFIER_PROPERTY_BASE_ATTACK_TIME_PERCENTAGE = 38,
-    
-        // `GetModifierAttackPointConstant`: 调整单位的攻击触发点。
-        MODIFIER_PROPERTY_ATTACK_POINT_CONSTANT = 39,
-    
-        // `GetModifierBonusDamageOutgoing_Percentage`: 改变单位造成的额外伤害的百分比。
-        MODIFIER_PROPERTY_BONUSDAMAGEOUTGOING_PERCENTAGE = 40,
-    
-        // `GetModifierDamageOutgoing_Percentage`: 改变单位造成的总伤害的百分比。
-        MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE = 41,
-    
-        // `GetModifierDamageOutgoing_Percentage_Illusion`: 改变幻影造成的伤害的百分比。
-        MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE_ILLUSION = 42,
-    
-        // `GetModifierDamageOutgoing_Percentage_Illusion_Amplify`: 提高幻影造成的伤害的百分比。
-        MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE_ILLUSION_AMPLIFY = 43,
-    
-        // `GetModifierTotalDamageOutgoing_Percentage`: 获取单位造成的总伤害的百分比。
-        MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE = 44,
-    
-        // `GetModifierSpellAmplify_PercentageCreep`: 提高Creep的法术伤害的百分比。
-        MODIFIER_PROPERTY_SPELL_AMPLIFY_PERCENTAGE_CREEP = 45,
-    
-        // `GetModifierSpellAmplify_Percentage`: 提高单位的法术伤害的百分比。
-        MODIFIER_PROPERTY_SPELL_AMPLIFY_PERCENTAGE = 46,
-    
-        // `GetModifierHealAmplify_PercentageSource`: 提高单位对其他单位的治疗效果的百分比。
-        MODIFIER_PROPERTY_HEAL_AMPLIFY_PERCENTAGE_SOURCE = 48,
-    
-        // `GetModifierHPRegenAmplify_Percentage`: 提高单位治疗效果的百分比。
-        MODIFIER_PROPERTY_HP_REGEN_AMPLIFY_PERCENTAGE = 51,
-    
-        // `GetModifierLifestealRegenAmplify_Percentage`: 提高单位的吸血效果的百分比。
-        MODIFIER_PROPERTY_LIFESTEAL_AMPLIFY_PERCENTAGE = 52,
-    
-        // `GetModifierMPRegenAmplify_Percentage`: 提高单位的法力恢复速度的百分比。
-        MODIFIER_PROPERTY_MP_REGEN_AMPLIFY_PERCENTAGE = 54,
-    
-        // `GetModifierIncomingDamage_Percentage`: 改变单位受到的伤害的百分比。
-        MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE = 59,
-    
-        // `GetModifierIncomingPhysicalDamage_Percentage`: 改变单位受到的物理伤害的百分比。
-        MODIFIER_PROPERTY_INCOMING_PHYSICAL_DAMAGE_PERCENTAGE = 60,
-    /**
-     * This property controls 'physical' shield, if defined both on client and server.
-     * Return value on client should be current shield health, as a positive integer,
-     * on server - amount of damage blocked.
-     *
-     *
-     *
-     * Method Name: `GetModifierIncomingPhysicalDamageConstant`.
-     */
+    // `GetModifierPreAttack_BonusDamage_Proc`: Hero在攻击被处理之前获取额外的伤害。
+    MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_PROC = 2,
+
+    // `GetModifierPreAttack_BonusDamagePostCrit`: 伤害会在攻击后的暴击伤害计算中被考虑进去。
+    MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_POST_CRIT = 3,
+
+    // `GetModifierBaseAttack_BonusDamage`: 获取到基础攻击额外的伤害。
+    MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE = 4,
+
+    // `GetModifierProcAttack_BonusDamage_Physical`: 获取物理伤害的攻击加成。
+    MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_PHYSICAL = 5,
+
+    // `GetModifierProcAttack_ConvertPhysicalToMagical`: 将物理伤害转变为魔法伤害。
+    MODIFIER_PROPERTY_PROCATTACK_CONVERT_PHYSICAL_TO_MAGICAL = 6,
+
+    // `GetModifierProcAttack_BonusDamage_Magical`: 获取魔法伤害的攻击加成。
+    MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_MAGICAL = 7,
+
+    // `GetModifierOverrideAttackDamage`: 重写所有伤害源。
+    MODIFIER_PROPERTY_OVERRIDE_ATTACK_DAMAGE = 11,
+
+    // `GetModifierInvisibilityLevel`: 定义单位的隐形级别。
+    MODIFIER_PROPERTY_INVISIBILITY_LEVEL = 13,
+
+    // `GetModifierPersistentInvisibility`: 让单位持续隐形。
+    MODIFIER_PROPERTY_PERSISTENT_INVISIBILITY = 15,
+
+    // `GetModifierMoveSpeedBonus_Constant`: 获取移动速度的加成。
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT = 16,
+
+    // `GetModifierMoveSpeedOverride`: 覆盖基础移动速度。
+    MODIFIER_PROPERTY_MOVESPEED_BASE_OVERRIDE = 17,
+
+    // `GetModifierIgnoreMovespeedLimit`: 忽略移动速度限制。
+    MODIFIER_PROPERTY_IGNORE_MOVESPEED_LIMIT = 27,
+
+    // `GetModifierMoveSpeed_Limit`: 设定移动速度的上限。
+    MODIFIER_PROPERTY_MOVESPEED_LIMIT = 28,
+
+    // `GetModifierAttackSpeedBaseOverride`: 获取基础攻击速度的加成。
+    MODIFIER_PROPERTY_ATTACKSPEED_BASE_OVERRIDE = 29,
+
+    // `GetModifierFixedAttackRate`: 获取单位固定的攻击速度。
+    MODIFIER_PROPERTY_FIXED_ATTACK_RATE = 30,
+
+    // `GetModifierAttackSpeed_Limit`: 这个方法应该类似于忽略最大攻击速度限制。
+    MODIFIER_PROPERTY_IGNORE_ATTACKSPEED_LIMIT = 32,
+
+    // `GetModifierCooldownReduction_Constant`: 获取技能冷却时间的减少量。
+    MODIFIER_PROPERTY_COOLDOWN_REDUCTION_CONSTANT = 33,
+
+    // `GetModifierManacostReduction_Constant`: 获取法力消耗的减少量。
+    MODIFIER_PROPERTY_MANACOST_REDUCTION_CONSTANT = 34,
+
+    // `GetModifierHealthcostReduction_Constant`: 获取技能消耗生命值的减少量。
+    MODIFIER_PROPERTY_HEALTHCOST_REDUCTION_CONSTANT = 35,
+
+    // `GetModifierBaseAttackTimeConstant`: 获取单位的基础攻击间隔。
+    MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT = 36,
+
+    // `GetModifierBaseAttackTimeConstant_Adjust`: 调整单位的基础攻击间隔。
+    MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT_ADJUST = 37,
+
+    // `GetModifierBaseAttackTimePercentage`: 以百分比改变单位的基础攻击间隔。
+    MODIFIER_PROPERTY_BASE_ATTACK_TIME_PERCENTAGE = 38,
+
+    // `GetModifierAttackPointConstant`: 调整单位的攻击触发点。
+    MODIFIER_PROPERTY_ATTACK_POINT_CONSTANT = 39,
+
+    // `GetModifierBonusDamageOutgoing_Percentage`: 改变单位造成的额外伤害的百分比。
+    MODIFIER_PROPERTY_BONUSDAMAGEOUTGOING_PERCENTAGE = 40,
+
+    // `GetModifierDamageOutgoing_Percentage`: 改变单位造成的总伤害的百分比。
+    MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE = 41,
+
+    // `GetModifierDamageOutgoing_Percentage_Illusion`: 改变幻影造成的伤害的百分比。
+    MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE_ILLUSION = 42,
+
+    // `GetModifierDamageOutgoing_Percentage_Illusion_Amplify`: 提高幻影造成的伤害的百分比。
+    MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE_ILLUSION_AMPLIFY = 43,
+
+    // `GetModifierTotalDamageOutgoing_Percentage`: 获取单位造成的总伤害的百分比。
+    MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE = 44,
+
+    // `GetModifierSpellAmplify_PercentageCreep`: 提高Creep的法术伤害的百分比。
+    MODIFIER_PROPERTY_SPELL_AMPLIFY_PERCENTAGE_CREEP = 45,
+
+    // `GetModifierSpellAmplify_Percentage`: 提高单位的法术伤害的百分比。
+    MODIFIER_PROPERTY_SPELL_AMPLIFY_PERCENTAGE = 46,
+
+    // `GetModifierHealAmplify_PercentageSource`: 提高单位对其他单位的治疗效果的百分比。
+    MODIFIER_PROPERTY_HEAL_AMPLIFY_PERCENTAGE_SOURCE = 48,
+
+    // `GetModifierHPRegenAmplify_Percentage`: 提高单位治疗效果的百分比。
+    MODIFIER_PROPERTY_HP_REGEN_AMPLIFY_PERCENTAGE = 51,
+
+    // `GetModifierLifestealRegenAmplify_Percentage`: 提高单位的吸血效果的百分比。
+    MODIFIER_PROPERTY_LIFESTEAL_AMPLIFY_PERCENTAGE = 52,
+
+    // `GetModifierMPRegenAmplify_Percentage`: 提高单位的法力恢复速度的百分比。
+    MODIFIER_PROPERTY_MP_REGEN_AMPLIFY_PERCENTAGE = 54,
+
+    // `GetModifierIncomingDamage_Percentage`: 改变单位受到的伤害的百分比。
+    MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE = 59,
+
+    // `GetModifierIncomingPhysicalDamage_Percentage`: 改变单位受到的物理伤害的百分比。
+    MODIFIER_PROPERTY_INCOMING_PHYSICAL_DAMAGE_PERCENTAGE = 60,
+    // `GetModifierIncomingPhysicalDamageConstant`: 控制怪物在防御中承受的物理伤害。客户端返回防护值，服务器返回阻挡的伤害值。
     MODIFIER_PROPERTY_INCOMING_PHYSICAL_DAMAGE_CONSTANT = 61,
-    /**
-     * This property controls 'spell' shield, if defined both on client and server.
-     * Return value on client should be current shield health, as a positive integer,
-     * on server - amount of damage blocked.
-     *
-     *
-     *
-     * Method Name: `GetModifierIncomingSpellDamageConstant`.
-     */
+
+    // `GetModifierIncomingSpellDamageConstant`: 控制怪物在防御中承受的魔法伤害。客户端返回防御值，服务器返回阻挡的伤害值。
     MODIFIER_PROPERTY_INCOMING_SPELL_DAMAGE_CONSTANT = 62,
-    /**
-     * Method Name: `GetModifierEvasion_Constant`
-     */
+
+    // `GetModifierEvasion_Constant`: 提供常规的闪避率。
     MODIFIER_PROPERTY_EVASION_CONSTANT = 63,
-    /**
-     * Method Name: `GetModifierNegativeEvasion_Constant`
-     */
+
+    // `GetModifierNegativeEvasion_Constant`: 提供负的闪避率。
     MODIFIER_PROPERTY_NEGATIVE_EVASION_CONSTANT = 64,
-    /**
-     * Method Name: `GetModifierStatusResistance`
-     */
+
+    // `GetModifierStatusResistance`: 改变怪物的状态抗性。
     MODIFIER_PROPERTY_STATUS_RESISTANCE = 65,
-    /**
-     * Method Name: `GetModifierStatusResistanceStacking`
-     */
+
+    // `GetModifierStatusResistanceStacking`: 改变怪物的堆叠状态抗性。
     MODIFIER_PROPERTY_STATUS_RESISTANCE_STACKING = 66,
-    /**
-     * Method Name: `GetModifierStatusResistanceCaster`
-     */
-    MODIFIER_PROPERTY_STATUS_RESISTANCE_CASTER = 67,
-    /**
-     * Method Name: `GetModifierAvoidDamage`
-     */
+
+    // `GetModifierAvoidDamage`: 控制单位是否可以免疫某些类型的伤害。
     MODIFIER_PROPERTY_AVOID_DAMAGE = 68,
-    /**
-     * Method Name: `GetModifierAvoidSpell`
-     */
+
+    // `GetModifierAvoidSpell`: 控制单位是否可以免疫魔法攻击。
     MODIFIER_PROPERTY_AVOID_SPELL = 69,
-    /**
-     * Method Name: `GetModifierMiss_Percentage`
-     */
+
+    // `GetModifierMiss_Percentage`: 提供减少命中几率的百分比。
     MODIFIER_PROPERTY_MISS_PERCENTAGE = 70,
-    /**
-     * Values above 100% are ignored.
-     *
-     *
-     *
-     * Method Name: `GetModifierPhysicalArmorBase_Percentage`.
-     */
+
+    // `GetModifierPhysicalArmorBase_Percentage`: 提供基础物理护甲的增加百分比。
     MODIFIER_PROPERTY_PHYSICAL_ARMOR_BASE_PERCENTAGE = 71,
-    /**
-     * Method Name: `GetModifierPhysicalArmorTotal_Percentage`
-     */
-    MODIFIER_PROPERTY_PHYSICAL_ARMOR_TOTAL_PERCENTAGE = 72,
-    /**
-     * Method Name: `GetModifierPhysicalArmorBonus`
-     */
+
+    // `GetModifierPhysicalArmorBonus`: 提供额外的物理护甲加成。
     MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS = 73,
-    /**
-     * Method Name: `GetModifierPhysicalArmorBonusUnique`
-     */
-    MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_UNIQUE = 74,
-    /**
-     * Method Name: `GetModifierPhysicalArmorBonusUniqueActive`
-     */
-    MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_UNIQUE_ACTIVE = 75,
-    /**
-     * Method Name: `GetModifierPhysicalArmorBonusPost`
-     */
-    MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS_POST = 76,
-    /**
-     * Method Name: `GetModifierMinPhysicalArmor`
-     */
-    MODIFIER_PROPERTY_MIN_PHYSICAL_ARMOR = 77,
-    /**
-     * Method Name: `GetModifierIgnorePhysicalArmor`
-     */
-    MODIFIER_PROPERTY_IGNORE_PHYSICAL_ARMOR = 78,
-    /**
-     * Method Name: `GetModifierMagicalResistanceBaseReduction`
-     */
+
+    // `GetModifierMagicalResistanceBaseReduction`: 提供基础魔法抗性的降低。
     MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BASE_REDUCTION = 79,
-    /**
-     * Method Name: `GetModifierMagicalResistanceDirectModification`
-     */
-    MODIFIER_PROPERTY_MAGICAL_RESISTANCE_DIRECT_MODIFICATION = 80,
-    /**
-     * Method Name: `GetModifierMagicalResistanceBonus`
-     */
+
+    // `GetModifierMagicalResistanceBonus`: 提供额外的魔法抗性加成。
     MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS = 81,
-    /**
-     * Method Name: `GetModifierMagicalResistanceBonusIllusions`
-     */
-    MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS_ILLUSIONS = 82,
-    /**
-     * Method Name: `GetModifierMagicalResistanceBonusUnique`
-     */
-    MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS_UNIQUE = 83,
-    /**
-     * Method Name: `GetModifierMagicalResistanceDecrepifyUnique`
-     */
-    MODIFIER_PROPERTY_MAGICAL_RESISTANCE_DECREPIFY_UNIQUE = 84,
-    /**
-     * Method Name: `GetModifierBaseRegen`
-     */
+
+    // `GetModifierBaseRegen`: 更改单位的基础施法恢复率。
     MODIFIER_PROPERTY_BASE_MANA_REGEN = 85,
-    /**
-     * Method Name: `GetModifierConstantManaRegen`
-     */
+
+    // `GetModifierConstantManaRegen`:  提供常量法力回复速度。
     MODIFIER_PROPERTY_MANA_REGEN_CONSTANT = 86,
-    /**
-     * Method Name: `GetModifierConstantManaRegenUnique`
-     */
-    MODIFIER_PROPERTY_MANA_REGEN_CONSTANT_UNIQUE = 87,
-    /**
-     * Method Name: `GetModifierTotalPercentageManaRegen`
-     */
-    MODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE = 88,
-    /**
-     * Method Name: `GetModifierConstantHealthRegen`
-     */
+
+    // `GetModifierConstantHealthRegen`: 提供常量生命回复速度。
     MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT = 89,
-    /**
-     * Method Name: `GetModifierHealthRegenPercentage`
-     */
-    MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE = 90,
-    /**
-     * Method Name: `GetModifierHealthRegenPercentageUnique`
-     */
-    MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE_UNIQUE = 91,
-    /**
-     * Method Name: `GetModifierHealthBonus`
-     */
+
+    // `GetModifierHealthBonus`: 增加额外的生命值。
     MODIFIER_PROPERTY_HEALTH_BONUS = 92,
-    /**
-     * Method Name: `GetModifierManaBonus`
-     */
+
+    // `GetModifierManaBonus`: 增加额外的法力值。
     MODIFIER_PROPERTY_MANA_BONUS = 93,
-    /**
-     * Method Name: `GetModifierExtraStrengthBonus`
-     */
+
+    // `GetModifierExtraStrengthBonus`: 提供额外的力量加成。
     MODIFIER_PROPERTY_EXTRA_STRENGTH_BONUS = 94,
-    /**
-     * Method Name: `GetModifierExtraHealthBonus`
-     */
-    MODIFIER_PROPERTY_EXTRA_HEALTH_BONUS = 95,
-    /**
-     * Method Name: `GetModifierExtraManaBonus`
-     */
-    MODIFIER_PROPERTY_EXTRA_MANA_BONUS = 96,
-    /**
-     * Method Name: `GetModifierExtraManaBonusPercentage`
-     */
-    MODIFIER_PROPERTY_EXTRA_MANA_BONUS_PERCENTAGE = 97,
-    /**
-     * Method Name: `GetModifierExtraHealthPercentage`
-     */
-    MODIFIER_PROPERTY_EXTRA_HEALTH_PERCENTAGE = 98,
-    /**
-     * Method Name: `GetModifierExtraManaPercentage`
-     */
-    MODIFIER_PROPERTY_EXTRA_MANA_PERCENTAGE = 99,
-    /**
-     * Method Name: `GetModifierBonusStats_Strength`
-     */
+
+    // `GetModifierBonusStats_Strength`: 提供额外的力量加成的统计数据。
     MODIFIER_PROPERTY_STATS_STRENGTH_BONUS = 100,
-    /**
-     * Method Name: `GetModifierBonusStats_Agility`
-     */
+    // `GetModifierBonusStats_Agility`: 增加敏捷属性的值。
     MODIFIER_PROPERTY_STATS_AGILITY_BONUS = 101,
-    /**
-     * Method Name: `GetModifierBonusStats_Intellect`
-     */
+
+    // `GetModifierBonusStats_Intellect`: 增加智力属性的值。
     MODIFIER_PROPERTY_STATS_INTELLECT_BONUS = 102,
-    /**
-     * Method Name: `GetModifierBonusStats_Strength_Percentage`
-     */
+
+    // `GetModifierBonusStats_Strength_Percentage`: 按百分比增加力量属性的值。
     MODIFIER_PROPERTY_STATS_STRENGTH_BONUS_PERCENTAGE = 103,
-    /**
-     * Method Name: `GetModifierBonusStats_Agility_Percentage`
-     */
+
+    // `GetModifierBonusStats_Agility_Percentage`: 按百分比增加敏捷属性的值。
     MODIFIER_PROPERTY_STATS_AGILITY_BONUS_PERCENTAGE = 104,
-    /**
-     * Method Name: `GetModifierBonusStats_Intellect_Percentage`
-     */
+
+    // `GetModifierBonusStats_Intellect_Percentage`: 按百分比增加智力属性的值。
     MODIFIER_PROPERTY_STATS_INTELLECT_BONUS_PERCENTAGE = 105,
-    /**
-     * Method Name: `GetModifierCastRangeBonus`
-     */
+
+    // `GetModifierCastRangeBonus`: 增加施法距离。
     MODIFIER_PROPERTY_CAST_RANGE_BONUS = 106,
-    /**
-     * Method Name: `GetModifierCastRangeBonusPercentage`
-     */
+
+    // `GetModifierCastRangeBonusPercentage`: 按百分比增加施法距离。
     MODIFIER_PROPERTY_CAST_RANGE_BONUS_PERCENTAGE = 107,
-    /**
-     * Method Name: `GetModifierCastRangeBonusTarget`
-     */
-    MODIFIER_PROPERTY_CAST_RANGE_BONUS_TARGET = 108,
-    /**
-     * Method Name: `GetModifierCastRangeBonusStacking`
-     */
-    MODIFIER_PROPERTY_CAST_RANGE_BONUS_STACKING = 109,
-    /**
-     * Method Name: `GetModifierAttackRangeOverride`
-     */
+
+    // `GetModifierAttackRangeOverride`: 覆盖攻击距离的基础值。
     MODIFIER_PROPERTY_ATTACK_RANGE_BASE_OVERRIDE = 110,
-    /**
-     * Method Name: `GetModifierAttackRangeBonus`
-     */
-    MODIFIER_PROPERTY_ATTACK_RANGE_BONUS = 111,
-    /**
-     * Method Name: `GetModifierAttackRangeBonusUnique`
-     */
-    MODIFIER_PROPERTY_ATTACK_RANGE_BONUS_UNIQUE = 112,
-    /**
-     * Method Name: `GetModifierAttackRangeBonusPercentage`
-     */
-    MODIFIER_PROPERTY_ATTACK_RANGE_BONUS_PERCENTAGE = 113,
-    /**
-     * Method Name: `GetModifierMaxAttackRange`
-     */
-    MODIFIER_PROPERTY_MAX_ATTACK_RANGE = 114,
-    /**
-     * Method Name: `GetModifierProjectileSpeedBonus`
-     */
+
+    // `GetModifierProjectileSpeedBonus`: 增加投射物的速度。
     MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS = 115,
-    /**
-     * Method Name: `GetModifierProjectileSpeedBonusPercentage`
-     */
-    MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS_PERCENTAGE = 116,
-    /**
-     * Method Name: `GetModifierProjectileName`
-     */
+
+    // `GetModifierProjectileName`: 更改投射物模型名字。
     MODIFIER_PROPERTY_PROJECTILE_NAME = 117,
-    /**
-     * Method Name: `ReincarnateTime`
-     */
+
+    // `ReincarnateTime`: 决定单位的重生时间。
     MODIFIER_PROPERTY_REINCARNATION = 118,
-    /**
-     * Method Name: `ReincarnateSuppressFX`
-     */
-    MODIFIER_PROPERTY_REINCARNATION_SUPPRESS_FX = 119,
-    /**
-     * Method Name: `GetModifierConstantRespawnTime`
-     */
+
+    // `GetModifierConstantRespawnTime`: 修改单位的死亡复活时间。
     MODIFIER_PROPERTY_RESPAWNTIME = 120,
-    /**
-     * Method Name: `GetModifierPercentageRespawnTime`
-     */
-    MODIFIER_PROPERTY_RESPAWNTIME_PERCENTAGE = 121,
-    /**
-     * Method Name: `GetModifierStackingRespawnTime`
-     */
-    MODIFIER_PROPERTY_RESPAWNTIME_STACKING = 122,
-    /**
-     * Method Name: `GetModifierPercentageCooldown`
-     */
+
+    // `GetModifierPercentageCooldown`: 修改技能冷却时间的百分比。
     MODIFIER_PROPERTY_COOLDOWN_PERCENTAGE = 123,
-    /**
-     * Method Name: `GetModifierPercentageCooldownOngoing`
-     */
-    MODIFIER_PROPERTY_COOLDOWN_PERCENTAGE_ONGOING = 124,
-    /**
-     * Method Name: `GetModifierPercentageCasttime`
-     */
-    MODIFIER_PROPERTY_CASTTIME_PERCENTAGE = 125,
-    /**
-     * Method Name: `GetModifierPercentageAttackAnimTime`
-     */
-    MODIFIER_PROPERTY_ATTACK_ANIM_TIME_PERCENTAGE = 126,
-    /**
-     * Method Name: `GetModifierPercentageManacost`
-     */
-    MODIFIER_PROPERTY_MANACOST_PERCENTAGE = 127,
-    /**
-     * Method Name: `GetModifierPercentageManacostStacking`
-     */
-    MODIFIER_PROPERTY_MANACOST_PERCENTAGE_STACKING = 128,
-    /**
-     * Method Name: `GetModifierPercentageHealthcost`
-     */
-    MODIFIER_PROPERTY_HEALTHCOST_PERCENTAGE = 129,
-    /**
-     * Method Name: `GetModifierPercentageHealthcostStacking`
-     */
-    MODIFIER_PROPERTY_HEALTHCOST_PERCENTAGE_STACKING = 130,
-    /**
-     * Method Name: `GetModifierConstantDeathGoldCost`
-     */
-    MODIFIER_PROPERTY_DEATHGOLDCOST = 131,
-    /**
-     * Method Name: `GetModifierPercentageExpRateBoost`
-     */
-    MODIFIER_PROPERTY_EXP_RATE_BOOST = 132,
-    /**
-     * Method Name: `GetModifierPercentageGoldRateBoost`
-     */
-    MODIFIER_PROPERTY_GOLD_RATE_BOOST = 133,
-    /**
-     * Method Name: `GetModifierPreAttack_CriticalStrike`
-     */
-    MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE = 134,
-    /**
-     * Method Name: `GetModifierPreAttack_Target_CriticalStrike`
-     */
-    MODIFIER_PROPERTY_PREATTACK_TARGET_CRITICALSTRIKE = 135,
-    /**
-     * Method Name: `GetModifierMagical_ConstantBlock`
-     */
+
+
+    // `GetModifierMagical_ConstantBlock`: 提供一定量的魔法伤害阻挡。
     MODIFIER_PROPERTY_MAGICAL_CONSTANT_BLOCK = 136,
-    /**
-     * Method Name: `GetModifierPhysical_ConstantBlock`
-     */
+
+    // `GetModifierPhysical_ConstantBlock`: 提供一定量的物理伤害阻挡。
     MODIFIER_PROPERTY_PHYSICAL_CONSTANT_BLOCK = 137,
-    /**
-     * Method Name: `GetModifierPhysical_ConstantBlockSpecial`
-     */
-    MODIFIER_PROPERTY_PHYSICAL_CONSTANT_BLOCK_SPECIAL = 138,
-    /**
-     * Method Name: `GetModifierPhysical_ConstantBlockUnavoidablePreArmor`
-     */
-    MODIFIER_PROPERTY_TOTAL_CONSTANT_BLOCK_UNAVOIDABLE_PRE_ARMOR = 139,
-    /**
-     * Method Name: `GetModifierTotal_ConstantBlock`
-     */
-    MODIFIER_PROPERTY_TOTAL_CONSTANT_BLOCK = 140,
-    /**
-     * Method Name: `GetOverrideAnimation`
-     */
+
+    // `GetOverrideAnimation`: 改变单位的动画。
     MODIFIER_PROPERTY_OVERRIDE_ANIMATION = 141,
-    /**
-     * Method Name: `GetOverrideAnimationWeight`
-     */
-    MODIFIER_PROPERTY_OVERRIDE_ANIMATION_WEIGHT = 142,
-    /**
-     * Method Name: `GetOverrideAnimationRate`
-     */
-    MODIFIER_PROPERTY_OVERRIDE_ANIMATION_RATE = 143,
-    /**
-     * Method Name: `GetAbsorbSpell`
-     */
+
+    // `GetAbsorbSpell`: 吸收一个单次技能的前提下。
     MODIFIER_PROPERTY_ABSORB_SPELL = 144,
-    /**
-     * Method Name: `GetReflectSpell`
-     */
+
+    // `GetReflectSpell`: 反射一个单次技能的前提下。
     MODIFIER_PROPERTY_REFLECT_SPELL = 145,
-    /**
-     * Method Name: `GetDisableAutoAttack`
-     */
+
+    // `GetDisableAutoAttack`: 禁止单位自动攻击。
     MODIFIER_PROPERTY_DISABLE_AUTOATTACK = 146,
-    /**
-     * Method Name: `GetBonusDayVision`
-     */
+
+    // `GetBonusDayVision`: 增加单位的白天视野范围。
     MODIFIER_PROPERTY_BONUS_DAY_VISION = 147,
-    /**
-     * Method Name: `GetBonusDayVisionPercentage`
-     */
-    MODIFIER_PROPERTY_BONUS_DAY_VISION_PERCENTAGE = 148,
-    /**
-     * Method Name: `GetBonusNightVision`
-     */
-    MODIFIER_PROPERTY_BONUS_NIGHT_VISION = 149,
-    /**
-     * Method Name: `GetBonusNightVisionUnique`
-     */
-    MODIFIER_PROPERTY_BONUS_NIGHT_VISION_UNIQUE = 150,
-    /**
-     * Method Name: `GetBonusVisionPercentage`
-     */
-    MODIFIER_PROPERTY_BONUS_VISION_PERCENTAGE = 151,
-    /**
-     * Method Name: `GetFixedDayVision`
-     */
+
+    // `GetFixedDayVision`: 设置单位的白天固定视野范围。
     MODIFIER_PROPERTY_FIXED_DAY_VISION = 152,
-    /**
-     * Method Name: `GetFixedNightVision`
-     */
-    MODIFIER_PROPERTY_FIXED_NIGHT_VISION = 153,
-    /**
-     * Method Name: `GetMinHealth`
-     */
+
+    // `GetMinHealth`: 设置单位的最小生命值。
     MODIFIER_PROPERTY_MIN_HEALTH = 154,
-    /**
-     * Method Name: `GetAbsoluteNoDamagePhysical`
-     */
-    MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL = 155,
-    /**
-     * Method Name: `GetAbsoluteNoDamageMagical`
-     */
-    MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_MAGICAL = 156,
-    /**
-     * Method Name: `GetAbsoluteNoDamagePure`
-     */
-    MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PURE = 157,
-    /**
-     * Method Name: `GetIsIllusion`
-     */
+
+    // `GetIsIllusion`: 标记单位为幻象。
     MODIFIER_PROPERTY_IS_ILLUSION = 158,
-    /**
-     * Method Name: `GetModifierIllusionLabel`
-     */
-    MODIFIER_PROPERTY_ILLUSION_LABEL = 159,
-    /**
-     * Method Name: `GetModifierStrongIllusion`
-     */
-    MODIFIER_PROPERTY_STRONG_ILLUSION = 160,
-    /**
-     * Method Name: `GetModifierSuperIllusion`
-     */
-    MODIFIER_PROPERTY_SUPER_ILLUSION = 161,
-    /**
-     * Method Name: `GetModifierSuperIllusionWithUltimate`
-     */
-    MODIFIER_PROPERTY_SUPER_ILLUSION_WITH_ULTIMATE = 162,
-    /**
-     * Method Name: `GetModifierXPDuringDeath`
-     */
-    MODIFIER_PROPERTY_XP_DURING_DEATH = 163,
-    /**
-     * Method Name: `GetModifierTurnRate_Percentage`
-     */
+
+    // `GetModifierTurnRate_Percentage`: 改变单位的转身速率百分比。
     MODIFIER_PROPERTY_TURN_RATE_PERCENTAGE = 164,
-    /**
-     * Method Name: `GetModifierTurnRate_Override`
-     */
-    MODIFIER_PROPERTY_TURN_RATE_OVERRIDE = 165,
-    /**
-     * Method Name: `GetDisableHealing`
-     */
+
+    // `GetDisableHealing`: 禁止一切治疗效果作用于单位。
     MODIFIER_PROPERTY_DISABLE_HEALING = 166,
-    /**
-     * Method Name: `GetAlwaysAllowAttack`
-     */
+    // `GetAlwaysAllowAttack`: 允许单位在任何情况下攻击，包括通常限制攻击的情况。
     MODIFIER_PROPERTY_ALWAYS_ALLOW_ATTACK = 167,
-    /**
-     * Method Name: `GetAllowEtherealAttack`
-     */
+
+    // `GetAllowEtherealAttack`: 允许单位在虚无状态下攻击。
     MODIFIER_PROPERTY_ALWAYS_ETHEREAL_ATTACK = 168,
-    /**
-     * Method Name: `GetOverrideAttackMagical`
-     */
+
+    // `GetOverrideAttackMagical`: 单位的攻击被视为魔法攻击。
     MODIFIER_PROPERTY_OVERRIDE_ATTACK_MAGICAL = 169,
-    /**
-     * Method Name: `GetModifierUnitStatsNeedsRefresh`
-     */
+
+    // `GetModifierUnitStatsNeedsRefresh`: 单位属性（力量、敏捷、智力）有需要更新的改变时触发。
     MODIFIER_PROPERTY_UNIT_STATS_NEEDS_REFRESH = 170,
-    MODIFIER_PROPERTY_BOUNTY_CREEP_MULTIPLIER = 171,
-    MODIFIER_PROPERTY_BOUNTY_OTHER_MULTIPLIER = 172,
-    /**
-     * Method Name: `GetModifierUnitDisllowUpgrading`
-     */
+
+    // `GetModifierUnitDisllowUpgrading`: 阻止单位进化或升级。
     MODIFIER_PROPERTY_UNIT_DISALLOW_UPGRADING = 173,
-    /**
-     * Method Name: `GetModifierDodgeProjectile`
-     */
+
+    // `GetModifierDodgeProjectile`: 单位具有躲避投射物的能力。
     MODIFIER_PROPERTY_DODGE_PROJECTILE = 174,
-    /**
-     * Method Name: `GetTriggerCosmeticAndEndAttack`
-     */
+
+    // `GetTriggerCosmeticAndEndAttack`: 基于外观效果判定攻击结束。
     MODIFIER_PROPERTY_TRIGGER_COSMETIC_AND_END_ATTACK = 175,
-    /**
-     * Method Name: `GetModifierMaxDebuffDuration`
-     */
+
+    // `GetModifierMaxDebuffDuration`: 控制对单位施加的负面效果的最大持续时间。
     MODIFIER_PROPERTY_MAX_DEBUFF_DURATION = 176,
-    /**
-     * Method Name: `GetPrimaryStatDamageMultiplier`
-     */
+
+    // `GetPrimaryStatDamageMultiplier`: 改变基于单位主要属性所获得的额外伤害倍数。
     MODIFIER_PROPERTY_PRIMARY_STAT_DAMAGE_MULTIPLIER = 177,
-    /**
-     * Method Name: `GetModifierPreAttack_DeadlyBlow`
-     */
+
+    // `GetModifierPreAttack_DeadlyBlow`: 攻击有机会造成致命一击，可能是更高的伤害或即死效果。
     MODIFIER_PROPERTY_PREATTACK_DEADLY_BLOW = 178,
-    /**
-     * Method Name: `GetAlwaysAutoAttackWhileHoldPosition`
-     */
+
+    // `GetAlwaysAutoAttackWhileHoldPosition`: 单位在原地不动状态下总是自动进行攻击。
     MODIFIER_PROPERTY_ALWAYS_AUTOATTACK_WHILE_HOLD_POSITION = 179,
-    /**
-     * Method Name: `OnSpellTargetReady`
-     */
+
+    // `OnSpellTargetReady`: 当施法目标就绪时触发。
     MODIFIER_EVENT_ON_SPELL_TARGET_READY = 180,
-    /**
-     * Method Name: `OnAttackRecord`
-     */
-    MODIFIER_EVENT_ON_ATTACK_RECORD = 181,
-    /**
-     * Method Name: `OnAttackStart`
-     */
-    MODIFIER_EVENT_ON_ATTACK_START = 182,
-    /**
-     * Method Name: `OnAttack`
-     */
-    MODIFIER_EVENT_ON_ATTACK = 183,
-    /**
-     * Method Name: `OnAttackLanded`
-     */
-    MODIFIER_EVENT_ON_ATTACK_LANDED = 184,
-    /**
-     * Method Name: `OnAttackFail`
-     */
-    MODIFIER_EVENT_ON_ATTACK_FAIL = 185,
-    /**
-     * Happens even if attack can't be issued.
-     *
-     *
-     *
-     * Method Name: `OnAttackAllied`.
-     */
-    MODIFIER_EVENT_ON_ATTACK_ALLIED = 186,
-    /**
-     * Method Name: `OnProjectileDodge`
-     */
-    MODIFIER_EVENT_ON_PROJECTILE_DODGE = 187,
-    /**
-     * Method Name: `OnOrder`
-     */
-    MODIFIER_EVENT_ON_ORDER = 188,
-    /**
-     * Method Name: `OnUnitMoved`
-     */
-    MODIFIER_EVENT_ON_UNIT_MOVED = 189,
-    /**
-     * Method Name: `OnAbilityStart`
-     */
+
+    // `OnAbilityStart`: 当一个技能开始施法时触发。
     MODIFIER_EVENT_ON_ABILITY_START = 190,
-    /**
-     * Method Name: `OnAbilityExecuted`
-     */
-    MODIFIER_EVENT_ON_ABILITY_EXECUTED = 191,
-    /**
-     * Method Name: `OnAbilityFullyCast`
-     */
+
+    // `OnAbilityFullyCast`: 当一个技能完成施法时（有效释放）触发。
     MODIFIER_EVENT_ON_ABILITY_FULLY_CAST = 192,
-    /**
-     * Method Name: `OnBreakInvisibility`
-     */
-    MODIFIER_EVENT_ON_BREAK_INVISIBILITY = 193,
-    /**
-     * Method Name: `OnAbilityEndChannel`
-     */
-    MODIFIER_EVENT_ON_ABILITY_END_CHANNEL = 194,
-    MODIFIER_EVENT_ON_PROCESS_UPGRADE = 195,
-    MODIFIER_EVENT_ON_REFRESH = 196,
-    /**
-     * Method Name: `OnTakeDamage`
-     */
+
+    // `OnTakeDamage`: 当单位承受伤害时触发。
     MODIFIER_EVENT_ON_TAKEDAMAGE = 197,
-    /**
-     * Method Name: `OnDamagePrevented`
-     */
-    MODIFIER_EVENT_ON_DEATH_PREVENTED = 198,
-    /**
-     * Method Name: `OnStateChanged`
-     */
+
+    // `OnStateChanged`: 当单位的状态改变时触发（例如：隐身、缴械等）。
     MODIFIER_EVENT_ON_STATE_CHANGED = 199,
-    MODIFIER_EVENT_ON_ORB_EFFECT = 200,
-    /**
-     * Method Name: `OnProcessCleave`
-     */
-    MODIFIER_EVENT_ON_PROCESS_CLEAVE = 201,
-    /**
-     * Method Name: `OnDamageCalculated`
-     */
-    MODIFIER_EVENT_ON_DAMAGE_CALCULATED = 202,
-    /**
-     * Method Name: `OnMagicDamageCalculated`
-     */
-    MODIFIER_EVENT_ON_MAGIC_DAMAGE_CALCULATED = 203,
-    /**
-     * Method Name: `OnAttacked`
-     */
+
+    // `OnAttacked`: 当单位受到攻击时触发。
     MODIFIER_EVENT_ON_ATTACKED = 204,
-    /**
-     * Method Name: `OnDeath`
-     */
+
+    // `OnDeath`: 当单位死亡时触发。
     MODIFIER_EVENT_ON_DEATH = 205,
-    /**
-     * Method Name: `OnDeathCompleted`
-     */
-    MODIFIER_EVENT_ON_DEATH_COMPLETED = 206,
-    /**
-     * Method Name: `OnRespawn`
-     */
+
+    // `OnRespawn`: 当单位复活时触发。
     MODIFIER_EVENT_ON_RESPAWN = 207,
-    /**
-     * Method Name: `OnSpentMana`
-     */
-    MODIFIER_EVENT_ON_SPENT_MANA = 208,
-    /**
-     * Method Name: `OnSpentHealth`
-     */
-    MODIFIER_EVENT_ON_SPENT_HEALTH = 209,
-    /**
-     * Method Name: `OnTeleporting`
-     */
+
+    // `OnTeleporting`: 当单位开始传送时触发。
     MODIFIER_EVENT_ON_TELEPORTING = 210,
-    /**
-     * Method Name: `OnTeleported`
-     */
+
+    // `OnTeleported`: 当单位传送完成时触发。
     MODIFIER_EVENT_ON_TELEPORTED = 211,
-    /**
-     * Method Name: `OnSetLocation`
-     */
+
+    // `OnSetLocation`: 当单位位置被强制改变时触发。
     MODIFIER_EVENT_ON_SET_LOCATION = 212,
-    /**
-     * Method Name: `OnHealthGained`
-     */
+
+    // `OnHealthGained`: 当单位获得生命值时触发。
     MODIFIER_EVENT_ON_HEALTH_GAINED = 213,
-    /**
-     * Method Name: `OnManaGained`
-     */
+
+    // `OnManaGained`: 当单位获得法力值时触发。
     MODIFIER_EVENT_ON_MANA_GAINED = 214,
-    /**
-     * Method Name: `OnTakeDamageKillCredit`
-     */
-    MODIFIER_EVENT_ON_TAKEDAMAGE_KILLCREDIT = 215,
-    /**
-     * Method Name: `OnHeroKilled`
-     */
-    MODIFIER_EVENT_ON_HERO_KILLED = 216,
-    /**
-     * Method Name: `OnHealReceived`
-     */
-    MODIFIER_EVENT_ON_HEAL_RECEIVED = 217,
-    /**
-     * Method Name: `OnBuildingKilled`
-     */
-    MODIFIER_EVENT_ON_BUILDING_KILLED = 218,
-    /**
-     * Method Name: `OnModelChanged`
-     */
-    MODIFIER_EVENT_ON_MODEL_CHANGED = 219,
-    /**
-     * Method Name: `OnModifierAdded`
-     */
+
+    // `OnModifierAdded`: 当有新的修饰器（Modifier）被加到单位上时触发。
     MODIFIER_EVENT_ON_MODIFIER_ADDED = 220,
-    /**
-     * Method Name: `OnTooltip`
-     */
+    // `OnTooltip`: 提供在游戏中鼠标悬浮时显示的工具提示文本的值。
     MODIFIER_PROPERTY_TOOLTIP = 221,
-    /**
-     * Method Name: `GetModifierModelChange`
-     */
+
+    // `GetModifierModelChange`: 更改或替换单位的模型。
     MODIFIER_PROPERTY_MODEL_CHANGE = 222,
-    /**
-     * Method Name: `GetModifierModelScale`
-     */
+
+    // `GetModifierModelScale`: 调整单位模型的缩放比例。
     MODIFIER_PROPERTY_MODEL_SCALE = 223,
-    /**
-     * Method Name: `GetModifierModelScaleAnimateTime`
-     */
+
+    // `GetModifierModelScaleAnimateTime`: 配置模型缩放动画的过渡时间。
     MODIFIER_PROPERTY_MODEL_SCALE_ANIMATE_TIME = 224,
-    /**
-     * Method Name: `GetModifierModelScaleUseInOutEase`
-     */
+
+    // `GetModifierModelScaleUseInOutEase`: 为模型缩放动画提供淡入淡出效果。
     MODIFIER_PROPERTY_MODEL_SCALE_USE_IN_OUT_EASE = 225,
-    /**
-     * Method Name: `GetModifierModelScaleConstant`
-     */
+
+    // `GetModifierModelScaleConstant`: 提供恒定的模型缩放比例，不受动画影响。
     MODIFIER_PROPERTY_MODEL_SCALE_CONSTANT = 226,
-    /**
-     * Applies scepter when this property is active
-     *
-     *
-     *
-     * Method Name: `GetModifierScepter`.
-     */
+
+    // `GetModifierScepter`: 当这个属性激活时，单位被视为持有阿哈利姆神杖。
     MODIFIER_PROPERTY_IS_SCEPTER = 227,
-    /**
-     * Applies shard when this property is active
-     *
-     *
-     *
-     * Method Name: `GetModifierShard`.
-     */
+
+    // `GetModifierShard`: 当这个属性激活时，单位被视为持有阿哈利姆裂片。
     MODIFIER_PROPERTY_IS_SHARD = 228,
-    /**
-     * Method Name: `GetModifierRadarCooldownReduction`
-     */
+
+    // `GetModifierRadarCooldownReduction`: 减少雷达技能的冷却时间。
     MODIFIER_PROPERTY_RADAR_COOLDOWN_REDUCTION = 229,
-    /**
-     * Method Name: `GetActivityTranslationModifiers`
-     */
+
+    // `GetActivityTranslationModifiers`: 更改单位活动时所使用的修饰符名。
     MODIFIER_PROPERTY_TRANSLATE_ACTIVITY_MODIFIERS = 230,
-    /**
-     * Method Name: `GetAttackSound`
-     */
+
+    // `GetAttackSound`: 改变单位攻击时的声音。
     MODIFIER_PROPERTY_TRANSLATE_ATTACK_SOUND = 231,
-    /**
-     * Method Name: `GetUnitLifetimeFraction`
-     */
+
+    // `GetUnitLifetimeFraction`: 获取单位的存活时间比例。
     MODIFIER_PROPERTY_LIFETIME_FRACTION = 232,
-    /**
-     * Method Name: `GetModifierProvidesFOWVision`
-     */
+
+    // `GetModifierProvidesFOWVision`: 修饰符提供战争迷雾视野。
     MODIFIER_PROPERTY_PROVIDES_FOW_POSITION = 233,
-    /**
-     * Method Name: `GetModifierSpellsRequireHP`
-     */
+
+    // `GetModifierSpellsRequireHP`: 技能消耗改为生命值而非法力值。
     MODIFIER_PROPERTY_SPELLS_REQUIRE_HP = 234,
-    /**
-     * Method Name: `GetForceDrawOnMinimap`
-     */
+
+    // `GetForceDrawOnMinimap`: 在小地图上强制显示单位。
     MODIFIER_PROPERTY_FORCE_DRAW_MINIMAP = 235,
-    /**
-     * Method Name: `GetModifierDisableTurning`
-     */
+
+    // `GetModifierDisableTurning`: 禁用单位的转身动作。
     MODIFIER_PROPERTY_DISABLE_TURNING = 236,
-    /**
-     * Method Name: `GetModifierIgnoreCastAngle`
-     */
+
+    // `GetModifierIgnoreCastAngle`: 允许技能忽略施法角度的限制。
     MODIFIER_PROPERTY_IGNORE_CAST_ANGLE = 237,
-    /**
-     * Method Name: `GetModifierChangeAbilityValue`
-     */
+
+    // `GetModifierChangeAbilityValue`: 更改特定能力的某些数值。
     MODIFIER_PROPERTY_CHANGE_ABILITY_VALUE = 238,
-    /**
-     * Method Name: `GetModifierOverrideAbilitySpecial`
-     */
+
+    // `GetModifierOverrideAbilitySpecial`: 覆盖技能的特殊值。
     MODIFIER_PROPERTY_OVERRIDE_ABILITY_SPECIAL = 239,
-    /**
-     * Method Name: `GetModifierOverrideAbilitySpecialValue`
-     */
+
+    // `GetModifierOverrideAbilitySpecialValue`: 提供技能覆盖的特殊值。
     MODIFIER_PROPERTY_OVERRIDE_ABILITY_SPECIAL_VALUE = 240,
-    /**
-     * Method Name: `GetModifierAbilityLayout`
-     */
+
+    // `GetModifierAbilityLayout`: 改变英雄的技能布局。
     MODIFIER_PROPERTY_ABILITY_LAYOUT = 241,
-    /**
-     * Method Name: `OnDominated`
-     */
+
+    // `OnDominated`: 当单位被支配或控制时触发。
     MODIFIER_EVENT_ON_DOMINATED = 242,
-    /**
-     * Method Name: `OnKill`
-     */
+
+    // `OnKill`: 当单位杀死另一个单位时触发。
     MODIFIER_EVENT_ON_KILL = 243,
-    /**
-     * Method Name: `OnAssist`
-     */
+
+    // `OnAssist`: 当单位协助杀死敌方单位时触发。
     MODIFIER_EVENT_ON_ASSIST = 244,
-    /**
-     * Method Name: `GetModifierTempestDouble`
-     */
+
+    // `GetModifierTempestDouble`: 允许单位复制技能或物品的加强效果到其分身上。
     MODIFIER_PROPERTY_TEMPEST_DOUBLE = 245,
-    /**
-     * Method Name: `PreserveParticlesOnModelChanged`
-     */
+
+    // `PreserveParticlesOnModelChanged`: 模型更改时保留特效粒子。
     MODIFIER_PROPERTY_PRESERVE_PARTICLES_ON_MODEL_CHANGE = 246,
-    /**
-     * Method Name: `OnAttackFinished`
-     */
+
+    // `OnAttackFinished`: 当单位的攻击动作完成后触发。
     MODIFIER_EVENT_ON_ATTACK_FINISHED = 247,
-    /**
-     * Method Name: `GetModifierIgnoreCooldown`
-     */
+
+    // `GetModifierIgnoreCooldown`: 允许单位忽略技能冷却时间。
     MODIFIER_PROPERTY_IGNORE_COOLDOWN = 248,
-    /**
-     * Method Name: `GetModifierCanAttackTrees`
-     */
+
+    // `GetModifierCanAttackTrees`: 允许单位攻击树木。
     MODIFIER_PROPERTY_CAN_ATTACK_TREES = 249,
-    /**
-     * Method Name: `GetVisualZDelta`
-     */
+
+    // `GetVisualZDelta`: 调整单位视觉上的Z轴位置偏移。
     MODIFIER_PROPERTY_VISUAL_Z_DELTA = 250,
-    /**
-     * Method Name: `GetVisualZSpeedBaseOverride`
-     */
+    // `GetVisualZSpeedBaseOverride`: 调整单位的Z轴速度基础值。
     MODIFIER_PROPERTY_VISUAL_Z_SPEED_BASE_OVERRIDE = 251,
+
+    // `MODIFIER_PROPERTY_INCOMING_DAMAGE_ILLUSION`: 修改幻象承受的伤害值。
     MODIFIER_PROPERTY_INCOMING_DAMAGE_ILLUSION = 252,
-    /**
-     * Method Name: `GetModifierNoVisionOfAttacker`
-     */
+
+    // `GetModifierNoVisionOfAttacker`: 被攻击时不为攻击者提供视野。
     MODIFIER_PROPERTY_DONT_GIVE_VISION_OF_ATTACKER = 253,
-    /**
-     * Method Name: `OnTooltip2`
-     */
+
+    // `OnTooltip2`: 提供第二个工具提示，可以用于显示额外的信息，如升级的效果。
     MODIFIER_PROPERTY_TOOLTIP2 = 254,
-    /**
-     * Method Name: `OnAttackRecordDestroy`
-     */
+
+    // `OnAttackRecordDestroy`: 当攻击记录被销毁时触发。
     MODIFIER_EVENT_ON_ATTACK_RECORD_DESTROY = 255,
-    /**
-     * Method Name: `OnProjectileObstructionHit`
-     */
+
+    // `OnProjectileObstructionHit`: 当投射物撞击到障碍物时触发。
     MODIFIER_EVENT_ON_PROJECTILE_OBSTRUCTION_HIT = 256,
-    /**
-     * Method Name: `GetSuppressTeleport`
-     */
+
+    // `GetSuppressTeleport`: 阻止单位使用传送技能或物品。
     MODIFIER_PROPERTY_SUPPRESS_TELEPORT = 257,
-    /**
-     * Method Name: `OnAttackCancelled`
-     */
+
+    // `OnAttackCancelled`: 当单位的攻击被取消时触发。
     MODIFIER_EVENT_ON_ATTACK_CANCELLED = 258,
-    /**
-     * Method Name: `GetSuppressCleave`
-     */
+
+    // `GetSuppressCleave`: 抑制单位的劈击效果。
     MODIFIER_PROPERTY_SUPPRESS_CLEAVE = 259,
-    /**
-     * Method Name: `BotAttackScoreBonus`
-     */
+
+    // `BotAttackScoreBonus`: 为AI（人工智能）提供攻击评分奖励。
     MODIFIER_PROPERTY_BOT_ATTACK_SCORE_BONUS = 260,
-    /**
-     * Method Name: `GetModifierAttackSpeedReductionPercentage`
-     */
+
+    // `GetModifierAttackSpeedReductionPercentage`: 攻击速度降低的百分比。
     MODIFIER_PROPERTY_ATTACKSPEED_REDUCTION_PERCENTAGE = 261,
-    /**
-     * Method Name: `GetModifierMoveSpeedReductionPercentage`
-     */
+
+    // `GetModifierMoveSpeedReductionPercentage`: 移速减少的百分比。
     MODIFIER_PROPERTY_MOVESPEED_REDUCTION_PERCENTAGE = 262,
+
+    // `MODIFIER_PROPERTY_ATTACK_WHILE_MOVING_TARGET`: 允许单位在移动时攻击特定目标。
     MODIFIER_PROPERTY_ATTACK_WHILE_MOVING_TARGET = 263,
-    /**
-     * Method Name: `GetModifierAttackSpeedPercentage`
-     */
+
+    // `GetModifierAttackSpeedPercentage`: 提供攻击速度的百分比增益。
     MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE = 264,
-    /**
-     * Method Name: `OnAttemptProjectileDodge`
-     */
+
+    // `OnAttemptProjectileDodge`: 尝试躲避投射物时触发。
     MODIFIER_EVENT_ON_ATTEMPT_PROJECTILE_DODGE = 265,
-    /**
-     * Method Name: `OnPreDebuffApplied`
-     */
+
+    // `OnPreDebuffApplied`: 在负面效果应用之前触发。
     MODIFIER_EVENT_ON_PREDEBUFF_APPLIED = 266,
-    /**
-     * Method Name: `GetModifierPercentageCooldownStacking`
-     */
+
+    // `GetModifierPercentageCooldownStacking`: 提供技能冷却时间的百分比叠加。
     MODIFIER_PROPERTY_COOLDOWN_PERCENTAGE_STACKING = 267,
-    /**
-     * Method Name: `GetModifierSpellRedirectTarget`
-     */
+
+    // `GetModifierSpellRedirectTarget`: 使技能效果重定向到其他目标。
     MODIFIER_PROPERTY_SPELL_REDIRECT_TARGET = 268,
-    /**
-     * Method Name: `GetModifierTurnRateConstant`
-     */
+
+    // `GetModifierTurnRateConstant`: 为单位提供固定的转身速率。
     MODIFIER_PROPERTY_TURN_RATE_CONSTANT = 269,
-    /**
-     * Method Name: `GetModifierIsRatPack`
-     */
+
+    // `GetModifierIsRatPack`: 识别单位是否是鼠群成员，用于某些特殊效果的叠加。
     MODIFIER_PROPERTY_RAT_PACK = 270,
-    /**
-     * Method Name: `GetModifierPhysicalDamageOutgoing_Percentage`
-     */
+
+    // `GetModifierPhysicalDamageOutgoing_Percentage`: 物理伤害输出的百分比修改。
     MODIFIER_PROPERTY_PHYSICALDAMAGEOUTGOING_PERCENTAGE = 271,
-    /**
-     * Method Name: `GetModifierKnockbackAmplification_Percentage`
-     */
+
+    // `GetModifierKnockbackAmplification_Percentage`: 增加单位被击退效果的百分比。
     MODIFIER_PROPERTY_KNOCKBACK_AMPLIFICATION_PERCENTAGE = 272,
-    /**
-     * Return value is a count of pips.
-     *
-     *
-     *
-     * Method Name: `GetModifierHealthBarPips`.
-     */
+
+    // `GetModifierHealthBarPips`: 控制单位生命条上标记的数量，用于表示额外的信息，比如可叠加的层数。
     MODIFIER_PROPERTY_HEALTHBAR_PIPS = 273,
-    /**
-     * This property controls 'universal' shield, if defined both on client and
-     * server. Return value on client should be current shield health, as a positive
-     * integer, on server - amount of damage blocked.
-     *
-     *
-     *
-     * Method Name: `GetModifierIncomingDamageConstant`.
-     */
+
+    // `GetModifierIncomingDamageConstant`: 修改单位受到的固定数值伤害。
     MODIFIER_PROPERTY_INCOMING_DAMAGE_CONSTANT = 274,
-    /**
-     * Method Name: `OnSpellAppliedSuccessfully`
-     */
+
+    // `OnSpellAppliedSuccessfully`: 当技能成功施放并命中目标后触发。
     MODIFIER_EVENT_SPELL_APPLIED_SUCCESSFULLY = 275,
-    /**
-     * Method Name: `GetModifierAvoidDamageAfterReductions`
-     */
+
+    // `GetModifierAvoidDamageAfterReductions`: 允许单位在伤害减免计算后，有一定机会避免受到所有伤害。
     MODIFIER_PROPERTY_AVOID_DAMAGE_AFTER_REDUCTIONS = 276,
-    /**
-     * Method Name: `GetModifierPropetyFailAttack`
-     */
+
+    // `GetModifierFailAttack`: 提供攻击可能失败（即攻击不会造成伤害或其他效果）的机制。
     MODIFIER_PROPERTY_FAIL_ATTACK = 277,
-    /**
-     * Method Name: `GetModifierPrereduceIncomingDamage_Mult`
-     */
+
+    // `GetModifierPrereduceIncomingDamage_Mult`: 使用乘法运算来进一步减少单位接收的传入伤害。
     MODIFIER_PROPERTY_PREREDUCE_INCOMING_DAMAGE_MULT = 278,
-    /**
-     * Method Name: `GetModifierSuppressFullscreenDeathFX`
-     */
+
+    // `GetModifierSuppressFullscreenDeathFX`: 当单位死亡时，阻止全屏死亡特效的播放。
     MODIFIER_PROPERTY_SUPPRESS_FULLSCREEN_DEATH_FX = 279,
-    /**
-     * Method Name: `MODIFIER_PROPERTY_INCOMING_DAMAGE_CONSTANT_POST`
-     */
+
+    // `MODIFIER_PROPERTY_INCOMING_DAMAGE_CONSTANT_POST`: 修改单位在所有其他减伤计算完成后受到的伤害的固定数值。
     MODIFIER_PROPERTY_INCOMING_DAMAGE_CONSTANT_POST = 280,
-    /**
-     * Method Name: `GetModifierDamageOutgoing_PercentageMultiplicative`
-     */
+    // `GetModifierDamageOutgoing_PercentageMultiplicative`: 修改单位输出伤害的乘法百分比。
     MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE_MULTIPLICATIVE = 281,
-    /**
-     * Method Name: `GetModifierTickGold_Multiplier`
-     */
+
+    // `GetModifierTickGold_Multiplier`: 改变单位每次金钱滴答的乘法因子。
     MODIFIER_PROPERTY_TICK_GOLD_MULTIPLIER = 282,
-    /**
-     * Method Name: `GetModifierSlowResistance`
-     */
+
+    // `GetModifierSlowResistance`: 提供单位抵抗减速效果的能力。
     MODIFIER_PROPERTY_SLOW_RESISTANCE = 283,
-    /**
-     * Method Name: `GetModifierAoEBonusPercentage`
-     */
+
+    // `GetModifierAoEBonusPercentage`: 改变单位的范围效果（AoE）伤害增益百分比。
     MODIFIER_PROPERTY_AOE_BONUS_PERCENTAGE = 284,
-    /**
-     * Method Name: `GetModifierProjectileSpeed`
-     */
+
+    // `GetModifierProjectileSpeed`: 修改单位投掷物的速度。
     MODIFIER_PROPERTY_PROJECTILE_SPEED = 285,
-    /**
-     * Method Name: `GetModifierBecomeUniversal`
-     */
+
+    // `GetModifierBecomeUniversal`: 允许特定单位的技能或者效果成为通用的，可能在多种单位间共享。
     MODIFIER_PROPERTY_BECOME_UNIVERSAL = 286,
-    /**
-     * Method Name: `OnForceProcMagicStick`
-     */
+
+    // `OnForceProcMagicStick`: 强制触发魔棒（Magic Stick）或者类似物品的效果。
     MODIFIER_EVENT_ON_FORCE_PROC_MAGIC_STICK = 287,
-    /**
-     * Method Name: `GetModifierDoNotSinkAfterDeath`
-     */
+
+    // `GetModifierDoNotSinkAfterDeath`: 单位死亡后不下沉（游戏中一些单位死亡后会有下沉消失的动画）。
     MODIFIER_PROPERTY_DO_NOT_SINK_AFTER_DEATH = 288,
-    /**
-     * Method Name: `OnDamageHPLoss`
-     */
+
+    // `OnDamageHPLoss`: 当单位承受伤害导致生命值降低时触发。
     MODIFIER_EVENT_ON_DAMAGE_HPLOSS = 289,
-    /**
-     * Method Name: `GetModifierForceMaxHealth`
-     */
+
+    // `GetModifierForceMaxHealth`: 设置单位的最大生命值。
     MODIFIER_PROPERTY_FORCE_MAX_HEALTH = 290,
-    /**
-     * Method Name: `GetModifierAoEBonusConstant`
-     */
+
+    // `GetModifierAoEBonusConstant`: 提供范围效果伤害的恒定增益值。
     MODIFIER_PROPERTY_AOE_BONUS_CONSTANT = 291,
+
+    // `MODIFIER_FUNCTION_LAST`: 修饰符函数的最大索引值，用于内部使用。
     MODIFIER_FUNCTION_LAST = 292,
+
+    // `MODIFIER_FUNCTION_INVALID`: 无效修饰符的标记值。
     MODIFIER_FUNCTION_INVALID = 65535,
 }
