@@ -2,8 +2,8 @@
 // AbilitySpecial 通常用于定义一些变量数值，这些数值往往关联到技能的等级。例如，技能冷却时间、伤害、范围等在每个技能等级都可能有不同的设置。这就是为什么 AbilitySpecial 中常常会看到一些范围，比如 "110 140 170 200"，这表示在每个等级，该值会分别是 110, 140, 170, 200。
 // AbilityValues 则是用来提供一些对技能描述更为固定的属性信息，它的值通常不会因为技能等级的改变而改变。比如技能持续时间 (duration)、技能效果范围 (radius) 等等。
 
-import { AbilityBehavior, AbilityType, DamageType } from "../type/Type";
-import { UnitTargetFlags, UnitTargetTeam, UnitTargetType } from "../type/Unit";
+import { AbilityBehavior, AbilityType, DamageType } from "../enum/Type";
+import { UnitTargetFlag, UnitTargetTeam, UnitTargetType } from "../enum/Unit";
 
 export class AbilityData {
     // 基础属性
@@ -18,7 +18,7 @@ export class AbilityData {
     protected abilityBehavior: AbilityBehavior; //技能行为 具体看定义
     protected abilityUnitTargetTeam: UnitTargetTeam; //目标组
     protected abilityUnitTargetType: UnitTargetType; //目标类型
-    protected abilityUnitTargetFlags: UnitTargetFlags; //目标特殊标记
+    protected abilityUnitTargetFlag: UnitTargetFlag; //目标特殊标记
 
     protected spellDispellableType:number //驱散类型
     protected spellImmunityType:number //免疫类型
@@ -46,8 +46,8 @@ export class AbilityData {
         return this.abilityUnitDamageType
     }
 
-    public GetAbilityTargetFlags(): UnitTargetFlags{
-        return this.abilityUnitTargetFlags
+    public GetAbilityTargetFlags(): UnitTargetFlag{
+        return this.abilityUnitTargetFlag
     }
 
     public GetAbilityTargetTeam(): UnitTargetTeam{
@@ -105,7 +105,7 @@ export class AbilityData {
         this.abilityBehavior = this.parseAbilityBehavior(data.AbilityBehavior);
         this.abilityUnitTargetTeam = this.parseAbilityUnitTargetTeam(data.AbilityUnitTargetTeam);
         this.abilityUnitTargetType =  this.parseAbilityUnitTargetType(data.AbilityUnitTargetType);
-        this.abilityUnitTargetFlags =  this.parseAbilityUnitTargetFlags(data.abilityUnitTargetFlags);
+        this.abilityUnitTargetFlag =  this.parseAbilityUnitTargetFlag(data.abilityUnitTargetFlag);
 
         this.abilityCooldown = data.abilityCooldown.split(' ').map((cooldown: string) => parseInt(cooldown));
         this.abilityManaCost = data.AbilityManaCost.split(' ').map((cost: string) => parseInt(cost));
@@ -174,13 +174,13 @@ export class AbilityData {
         return unitTargetTypeValue;
     }
 
-    protected parseAbilityUnitTargetFlags(unitTargetFlagsString: string): number {
-        let unitTargetFlagsValue = 0;
-        let unitTargetFlagss = unitTargetFlagsString.split(' | ');
-        for (let i = 0; i < unitTargetFlagss.length; i++) {
-            unitTargetFlagsValue |= UnitTargetFlags[unitTargetFlagss[i]] || 0; // 使用枚举获取行为对应的数值
+    protected parseAbilityUnitTargetFlag(unitTargetFlagString: string): number {
+        let unitTargetFlagValue = 0;
+        let unitTargetFlag = unitTargetFlagString.split(' | ');
+        for (let i = 0; i < unitTargetFlag.length; i++) {
+            unitTargetFlagValue |= UnitTargetFlag[unitTargetFlag[i]] || 0; // 使用枚举获取行为对应的数值
         }
-        return unitTargetFlagsValue;
+        return unitTargetFlagValue;
     }
 
 }

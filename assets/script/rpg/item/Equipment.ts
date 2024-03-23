@@ -1,3 +1,4 @@
+import { Modifier } from "../ability/Modifier";
 import { ECSEntity } from "../ecs/ECSEntity";
 
 export enum EquipmentType {
@@ -6,7 +7,7 @@ export enum EquipmentType {
 }
 
 
-export abstract class Equipment {
+export abstract class Equipment extends Modifier{
     public equipType: EquipmentType;
 
     constructor(type: EquipmentType) {

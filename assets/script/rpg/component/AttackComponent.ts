@@ -1,5 +1,5 @@
 import { ECSComponent } from "../ecs/ECSComponent";
-import { Attribute } from "../type/Attribute";
+import { Attribute } from "../enum/Attribute";
 
 export class AttackComponent extends ECSComponent{
     public attackCapability: string; //攻击类型 远程近战
@@ -9,26 +9,30 @@ export class AttackComponent extends ECSComponent{
     public attackRange: number; //攻击范围
     public target: any; // 这是攻击目标，可以根据需要的对象类型进行相应的修改
     public attacksMade: number; // 这是进行的攻击次数
-    public attributePrimary:Attribute //主属性
+    
 
-    public critMultiplier:number = 0 //（暴击倍数/暴击伤害）：当你的角色在游戏中进行暴击时，这就是决定暴击伤害的因素。是基础伤害的倍数值。例如，如果基础伤害是10，暴击倍数是2，则暴击伤害为20。
-    public critChance:number = 0 //暴击概率 （暴击概率/暴击率）：这是你的角色在攻击时实现暴击的概率。举例来说，如果暴击概率是25%，那么平均说来，每四次攻击就有一次能够造成暴击。
+   
 
   
     public bonusDamage: number = 0;//攻击加成
-    calculateAttackDamage(equipmentBonus: number, attributeBonus: number, skillBonus: number) {
+    calculateAttackDamage() {
         // 攻击伤害在最小伤害和最大伤害之间的一个随机值
         let baseDamage = this.baseAttackDamageMin + Math.random() * (this.baseAttackDamageMax - this.baseAttackDamageMin);
-        let totalDamage = baseDamage + this.bonusDamage + equipmentBonus + attributeBonus + skillBonus;
-
         // 返回总伤害
-        return totalDamage;
+        return baseDamage;
     }
 
     // ...其他方法省略...
 }
 
 
+//基础攻击力 + 属性攻击力  + 装备 + 技能buff
+
+
+
+// 装备通常提供两种类型的攻击力增益：
+// 基础攻击力的增加：这种类型的增加极其罕见，目前在游戏中并没有装备直接增加基础攻击力。
+// 额外攻击力的增加（通常显示为绿色数字）：这是装备最常见的攻击力增益类型。它被添加到英雄从主属性和其他来源获得的基础攻击力之上。额外攻击力的增益不会由于主属性的提升而改变。
 
 
 

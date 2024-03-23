@@ -22,7 +22,7 @@ export enum UnitTargetType {
 }
 
 
-export enum UnitTargetFlags {
+export enum UnitTargetFlag {
     UNIT_TARGET_FLAG_NONE = 1 << 0, // 没有特殊目标标志
     UNIT_TARGET_FLAG_RANGED_ONLY = 1 << 1, // 只能选定远程单位
     UNIT_TARGET_FLAG_MELEE_ONLY = 1 << 2, // 只能选定近战单位

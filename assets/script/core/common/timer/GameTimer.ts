@@ -1,180 +1,169 @@
 
-import { Component } from "cc";
-import { Timer } from "./Timer";
 
-/** 时间管理 */
-export class GameTimer extends Component {
-    /** 倒计时数据 */
-    private times: any = {};
-    /** 当前游戏进入的时间毫秒值 */
-    private initTime: number = (new Date()).getTime();
-    /** 服务器时间与本地时间同步 */
-    private serverTime: number = 0;
+import { Timer } from './Timer'; // 假定Timer类在'Timer.ts'文件中
 
-    update(dt: number) {
-        // 后台管理倒计时完成事件
-        for (let key in this.times) {
-            let data = this.times[key];
-            var timer = data.timer as Timer;
-            if (timer.update(dt)) {
-                if (data.object[data.field] > 0) {
-                    data.object[data.field]--;
+// 游戏计时器类定义
+export class GameTimer {
+    private gameStartTime: number;
+    private pausedTime: number;
+    private pausedAt: number | null;
+    private timers: Timer[];
+    private serverTimeOffset: number; // 服务器时间偏移量
 
-                    // 倒计时结束触发
-                    if (data.object[data.field] == 0) {
-                        this.onTimerComplete(data);
-                    }
-                    // 触发每秒回调事件  
-                    else if (data.onSecond) {
-                        data.onSecond.call(data.object);
-                    }
-                }
-            }
-        }
+    constructor() {
+        this.gameStartTime = Date.now();
+        this.pausedTime = 0;
+        this.pausedAt = null;
+        this.timers = [];
     }
 
-    /** 触发倒计时完成事件 */
-    private onTimerComplete(data: any) {
-        if (data.onComplete) data.onComplete.call(data.object);
-        if (data.event) this.node.dispatchEvent(data.event);
-
-        delete this.times[data.id];
-    }
-
-    /**
-     * 在指定对象上注册一个倒计时的回调管理器
-     * @param object        注册定时器的对象
-     * @param field         时间字段
-     * @param onSecond      每秒事件
-     * @param onComplete    倒计时完成事件
-     * @returns 
-     * @example
-    export class Test extends Component {
-        private timeId!: string;
-        
-        start() {
-            // 在指定对象上注册一个倒计时的回调管理器
-            this.timeId = oops.timer.register(this, "countDown", this.onSecond, this.onComplete);
-        }
-        
-        private onSecond() {
-            console.log("每秒触发一次");
-        }
-
-        private onComplete() {
-            console.log("倒计时完成触发");
-        }
-    }
+     /**
+     * 更新服务器时间与本地时间的偏移量。
+     * @param serverTimestamp 从服务器获取的当前时间戳（单位：毫秒）
      */
-    register(object: any, field: string, onSecond: Function, onComplete: Function): any {
-        var timer = new Timer();
-        timer.step = 1;
-
-        let data: any = {};
-        data.id = this.idCounter++;
-        data.timer = timer;
-        data.object = object;                                   // 管理对象
-        data.field = field;                                     // 时间字段
-        data.onSecond = onSecond;                               // 每秒事件
-        data.onComplete = onComplete;                           // 倒计时完成事件
-        this.times[data.id] = data;
-        return data.id;
+     public syncServerTime(serverTimestamp: number): void {
+        const localTimestamp = Date.now();
+        // 更新服务器时间偏移量
+        this.serverTimeOffset = serverTimestamp - localTimestamp;
     }
 
-    protected idCounter:number
-
-    /** 
-     * 在指定对象上注销一个倒计时的回调管理器 
-     * @param id         时间对象唯一表示
-     * @example
-    export class Test extends Component {
-        private timeId!: string;
-
-        start() {
-            this.timeId = oops.timer.register(this, "countDown", this.onSecond, this.onComplete);
-        }
-
-        onDestroy() {
-            // 在指定对象上注销一个倒计时的回调管理器
-            oops.timer.unRegister(this.timeId);
-        }
-    }
+       /**
+     * 获取本地客户端当前时间。
+     * @returns 返回本地时间戳（单位：毫秒）
      */
-    unRegister(id: string) {
-        if (this.times[id])
-            delete this.times[id];
-    }
-
-    /**
-     * 服务器时间与本地时间同步
-     * @param val   服务器时间刻度
-     * 
-     */
-    setServerTime(val?: number): number {
-        if (val) {
-            this.serverTime = val;
-        }
-        return this.serverTime;
-    }
-    getServerTime(): number {
-        return this.serverTime + this.getTime();
-    }
-
-    /**
-     * 格式化日期显示
-     * @param format 格式化字符串（例：yyyy-MM-dd hh:mm:ss）
-     * @param date   时间对象
-     */
-    format(format: string, date: Date): string {
-        let o: any = {
-            "M+": date.getMonth() + 1,                      // month 
-            "d+": date.getDate(),                           // day 
-            "h+": date.getHours(),                          // hour 
-            "m+": date.getMinutes(),                        // minute 
-            "s+": date.getSeconds(),                        // second 
-            "q+": Math.floor((date.getMonth() + 3) / 3),    // quarter 
-            "S": date.getMilliseconds()                     // millisecond 
-        }
-        if (/(y+)/.test(format)) {
-            format = format.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
-        }
-
-        for (let k in o) {
-            if (new RegExp("(" + k + ")").test(format)) {
-                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
-            }
-        }
-        return format;
-    }
-
-    /** 获取游戏开始到现在逝去的时间 */
-    getTime(): number {
-        return this.getLocalTime() - this.initTime;
-    }
-
-    /** 获取本地时间刻度 */
-    getLocalTime(): number {
+    public getLocalTime(): number {
         return Date.now();
     }
 
-    /** 游戏最小化时记录时间数据 */
-    save() {
-        for (let key in this.times) {
-            this.times[key].startTime = this.getTime();
-        }
+    /**
+     * 获取服务器当前时间。
+     * @returns 返回通过偏移量校正过的服务器时间戳（单位：毫秒）
+     */
+    public getServerTime(): number {
+        return this.getLocalTime() + this.serverTimeOffset;
     }
 
-    /** 游戏最大化时回复时间数据 */
-    load() {
-        for (let key in this.times) {
-            let interval = Math.floor((this.getTime() - (this.times[key].startTime || this.getTime())) / 1000);
-            let data = this.times[key];
-            data.object[data.field] = data.object[data.field] - interval;
-            if (data.object[data.field] < 0) {
-                data.object[data.field] = 0;
-                this.onTimerComplete(data);
-            }
-            this.times[key].startTime = null;
+    /************************************************************************************************************************** */
+
+    /**
+     * 更新游戏计时和所有计时器的状态。
+     * @param deltaTime 从上次更新以来经过的时间（单位：毫秒）
+     */
+    public update(deltaTime: number): void {
+        if (this.pausedAt !== null) {
+            return; // 如果游戏已暂停，则不更新计时器。
         }
+
+        // 遍历并更新每个计时器。
+        this.timers.forEach(timer => timer.update(deltaTime));
+    }
+
+    /**
+     * 开始或者继续游戏计时。
+     */
+    public start(): void {
+        if (this.pausedAt) {
+            // 如果游戏以前暂停过，计算并记录暂停时间。
+            this.pausedTime += Date.now() - this.pausedAt;
+            this.pausedAt = null;
+        }
+        this.gameStartTime = Date.now() - this.pausedTime;
+        // 从新的开始时间激活所有Timer计时器。
+        this.timers.forEach(timer => timer.resume());
+    }
+
+    /**
+     * 暂停游戏和所有计时器。
+     */
+    public pause(): void {
+        this.pausedAt = Date.now();
+        // 暂停所有Timer计时器。
+        this.timers.forEach(timer => timer.pause());
+    }
+
+    /**
+     * 添加一个新的定时器到游戏计时器。
+     * @param interval 定时器的时间间隔。
+     * @param callback 定时器的回调函数。
+     * @param repeat 定时器是否应该重复。
+     * @param autoStart 定时器是否在创建时自动开始。
+     * @returns 创建的Timer实例。
+     */
+    public addTimer(interval: number, callback: Function, repeat = true, autoStart = true): Timer {
+        const timer = new Timer(interval, callback, { repeat, autoStart });
+        this.timers.push(timer);
+        return timer;
+    }
+
+
+    /**
+     * 添加倒计时器。
+     * @param duration 倒计时持续时间（单位：毫秒）
+     * @param onTick 每秒执行的回调函数
+     * @param onComplete 倒计时结束的回调函数
+     * @returns 返回创建的计时器对象
+     */
+    public addCountdown(duration: number, onTick: (secondsRemaining: number) => void, onComplete: () => void): Timer {
+        // 每秒钟调用一次onTick函数
+        const interval = 1000;
+        let secondsRemaining = duration / 1000;
+
+        const tickFunction = () => {
+            secondsRemaining--;
+            onTick(secondsRemaining);
+        };
+
+        const completeFunction = () => {
+            onComplete();
+            countdownTimer.stop(); // 停止倒计时器
+        };
+
+        // 创建一个Timer对象，该对象在指定的时间间隔后调用tickFunction，
+        // 并在总持续时间结束后调用completeFunction。
+        const countdownTimer = new Timer(interval, tickFunction, {
+            repeat: true,
+            autoStart: true
+        });
+
+        // 添加一个额外的回调函数用来检查倒计时是否完成
+        countdownTimer.addCallback(() => {
+            if (secondsRemaining <= 0) {
+                completeFunction();
+            }
+        });
+
+        this.timers.push(countdownTimer);
+        
+        // 如果游戏当前是暂停的，我们需要保持倒计时器的状态为暂停
+        if(this.pausedAt !== null) {
+            countdownTimer.pause();
+        }
+
+        return countdownTimer;
+    }
+
+
+    /**
+     * 从游戏计时器中移除一个计时器。
+     * @param timer 要移除的计时器对象。
+     */
+    public removeTimer(timer: Timer): void {
+        // 停止定时器
+        timer.stop();
+        // 从定时器数组中移除
+        this.timers = this.timers.filter(t => t !== timer);
+    }
+
+    /**
+     * 获取游戏经过时间，考虑任何暂停时间。
+     * @returns 游戏已经经过的时间（单位：毫秒）
+     */
+    public getTimeElapsed(): number {
+        if (this.pausedAt) {
+            // 游戏暂停时，返回已经记录的暂停时间。
+            return this.pausedTime;
+        }
+        // 游戏进行时，返回当前时间减去游戏开始时间。
+        return Date.now() - this.gameStartTime - this.pausedTime;
     }
 }

@@ -1,5 +1,5 @@
 import { EntityIndex } from "./BaseEntity";
-import { DamageType } from "./type/Type";
+import { DamageType } from "./enum/Type";
 
 
 

@@ -1,15 +1,15 @@
-class HealthComponent {
-    constructor(public value: number) {}
-}
+// class HealthComponent {
+//     constructor(public value: number) {}
+// }
 
-class AttackComponent {
-    constructor(public damage: number, public critChance: number, public critMultiplier: number) {}
-}
+// class AttackComponent {
+//     constructor(public damage: number, public critChance: number, public critMultiplier: number) {}
+// }
 
-// 如果需要一个专门的暴击组件
-class CritComponent {
-    constructor(public chance: number, public multiplier: number) {}
-}
+// // 如果需要一个专门的暴击组件
+// class CritComponent {
+//     constructor(public chance: number, public multiplier: number) {}
+// }
 
 
 
