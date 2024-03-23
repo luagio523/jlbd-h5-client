@@ -1,5 +1,5 @@
 import { ECSComponent } from "../ecs/ECSComponent";
-import { Attribute } from "../enum/Attribute";
+import { DamageType } from "../enum/Type";
 
 export class AttackComponent extends ECSComponent{
     public attackCapability: string; //攻击类型 远程近战
@@ -10,19 +10,9 @@ export class AttackComponent extends ECSComponent{
     public target: any; // 这是攻击目标，可以根据需要的对象类型进行相应的修改
     public attacksMade: number; // 这是进行的攻击次数
     
-
+    public damageType:DamageType //伤害类型
    
-
-  
-    public bonusDamage: number = 0;//攻击加成
-    calculateAttackDamage() {
-        // 攻击伤害在最小伤害和最大伤害之间的一个随机值
-        let baseDamage = this.baseAttackDamageMin + Math.random() * (this.baseAttackDamageMax - this.baseAttackDamageMin);
-        // 返回总伤害
-        return baseDamage;
-    }
-
-    // ...其他方法省略...
+    
 }
 
 

@@ -1,9 +1,9 @@
-export class DefenseComponent {
+import { ECSComponent } from "../ecs/ECSComponent";
+
+export class DefenseComponent extends ECSComponent{
     public armorPhysical: number;
     public magicResistance:number
 
-    constructor(armor: number) {
-        this.armorPhysical = armor;
-    }
+    
 }
 

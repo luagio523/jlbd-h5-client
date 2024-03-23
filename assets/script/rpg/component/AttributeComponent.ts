@@ -1,6 +1,7 @@
+import { ECSComponent } from "../ecs/ECSComponent";
 import { Attribute } from "../enum/Attribute";
 
-export class AttributeComponent {
+export class AttributeComponent extends ECSComponent{
     public baseStrength: number; // 基础力量值
     public strenghtGain: number; // 每级力量增长值
     public baseAgility: number; // 基础敏捷值
@@ -10,23 +11,23 @@ export class AttributeComponent {
 
     public attributePrimary:Attribute; // 主属性，用于确定英雄类型，例如力量、敏捷或智力
 
-    /**
-     * 创建 AttributeComponent 实例。
-     * @param baseStr 初始力量值。
-     * @param strGain 英雄每升一级的力量增长。
-     * @param baseAgi 初始敏捷值。
-     * @param agiGain 英雄每升一级的敏捷增长。
-     * @param baseInt 初始智力值。
-     * @param intGain 英雄每升一级的智力增长。
-     */
-    constructor(baseStr: number, strGain: number, baseAgi: number, agiGain: number, baseInt: number, intGain: number) {
-        this.baseStrength = baseStr; // 设置基础力量值
-        this.strenghtGain = strGain; // 设置力量增长值
-        this.baseAgility = baseAgi; // 设置基础敏捷值
-        this.agilityGain = agiGain; // 设置敏捷增长值
-        this.baseIntelligence = baseInt; // 设置基础智力值
-        this.intelligenceGain = intGain; // 设置智力增长值
-    }
+    // /**
+    //  * 创建 AttributeComponent 实例。
+    //  * @param baseStr 初始力量值。
+    //  * @param strGain 英雄每升一级的力量增长。
+    //  * @param baseAgi 初始敏捷值。
+    //  * @param agiGain 英雄每升一级的敏捷增长。
+    //  * @param baseInt 初始智力值。
+    //  * @param intGain 英雄每升一级的智力增长。
+    //  */
+    // constructor(baseStr: number, strGain: number, baseAgi: number, agiGain: number, baseInt: number, intGain: number) {
+    //     this.baseStrength = baseStr; // 设置基础力量值
+    //     this.strenghtGain = strGain; // 设置力量增长值
+    //     this.baseAgility = baseAgi; // 设置基础敏捷值
+    //     this.agilityGain = agiGain; // 设置敏捷增长值
+    //     this.baseIntelligence = baseInt; // 设置基础智力值
+    //     this.intelligenceGain = intGain; // 设置智力增长值
+    // }
 
 
     /**
@@ -47,3 +48,5 @@ export class AttributeComponent {
         }
     }
 }
+
+

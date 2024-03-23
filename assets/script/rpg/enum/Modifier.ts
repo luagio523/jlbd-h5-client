@@ -86,7 +86,7 @@ export enum ModifierFunction {
     // `GetModifierPreAttack_BonusDamage_Proc`: Hero在攻击被处理之前获取额外的伤害。
     MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_PROC = 2,
 
-    // `GetModifierPreAttack_BonusDamagePostCrit`: 伤害会在攻击后的暴击伤害计算中被考虑进去。
+    // `GetModifierPreAttack_BonusDamagePostCrit`: 伤害会在攻击后的暴击伤害计算后被考虑进去。
     MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_POST_CRIT = 3,
 
     // `GetModifierBaseAttack_BonusDamage`: 获取到基础攻击额外的伤害。 直接增加基础攻击力
@@ -101,131 +101,130 @@ export enum ModifierFunction {
     // `GetModifierProcAttack_BonusDamage_Magical`: 获取魔法伤害的攻击加成。
     MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_MAGICAL = 7,
 
-     /**
-     * 方法名称：`GetModifierProcAttack_BonusDamage_Pure`
-     * 这个方法会返回修饰器提供的纯粹伤害攻击加成。
-     */
-     MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_PURE = 8,
+    /**
+    * 方法名称：`GetModifierProcAttack_BonusDamage_Pure`
+    * 这个方法会返回修饰器提供的纯粹伤害攻击加成。
+    */
+    MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_PURE = 8,
 
-     /**
-      * 方法名称：`GetModifierProcAttack_BonusDamage_Magical_Target`
-      * 这个方法返回修饰器提供的对魔法伤害攻击目标的加成。
-      */
-     MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_MAGICAL_TARGET = 9,
- 
-     /**
-      * 方法名称：`GetModifierProcAttack_Feedback`
-      * 攻击反馈处理函数的返回值。
-      */
-     MODIFIER_PROPERTY_PROCATTACK_FEEDBACK = 10,
- 
-     /**
-      * 方法名称：`GetModifierOverrideAttackDamage`
-      * 这个方法返回一个值作为攻击伤害的上限。
-      */
-     MODIFIER_PROPERTY_OVERRIDE_ATTACK_DAMAGE = 11,
- 
-     /**
-      * 方法名称：`GetModifierPreAttack`
-      * 返回一个值，该值将添加到单位的物理攻击伤害上。
-      */
-     MODIFIER_PROPERTY_PRE_ATTACK = 12,
- 
-     /**
-      * 方法名称：`GetModifierInvisibilityLevel`
-      * 此方法控制单位的隐身等级。级别越高，单位越难以被侦测。
-      */
-     MODIFIER_PROPERTY_INVISIBILITY_LEVEL = 13,
- 
-     /**
-      * 方法名称：`GetModifierInvisibilityAttackBehaviorException`
-      * 该方法如果返回真，则允许单位在隐形状态下攻击或使用技能而不会破坏隐形效果。
-      */
-     MODIFIER_PROPERTY_INVISIBILITY_ATTACK_BEHAVIOR_EXCEPTION = 14,
- 
-     /**
-      * 方法名称：`GetModifierPersistentInvisibility`
-      * 如果值为真，单位会一直保持隐身，直到该修饰符被移除。
-      */
-     MODIFIER_PROPERTY_PERSISTENT_INVISIBILITY = 15,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeedBonus_Constant`
-      * 这个方法返回一个固定的移动速度加成。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT = 16,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeedOverride`
-      * 这个方法可以覆盖单位的基础移动速度。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_BASE_OVERRIDE = 17,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeedBonus_Percentage`
-      * 这个方法返回一个百分比形式的移动速度加成。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE = 18,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeedBonus_Percentage_Unique`
-      * 这个方法返回一个独特的移动速度百分比加成，不和其他百分比移动速度加成堆叠，只取最大的那个值。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE_UNIQUE = 19,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeedBonus_Special_Boots`
-      * 这个方法会返回一个独特的移动速度加成，常常用于特殊的鞋类物品。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_BONUS_UNIQUE = 20,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeedBonus_Special_Boots_2`
-      * 此方法是对上述鞋类移动速度加成属性的补充，用于情况复杂或需要更多控制的物品。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_BONUS_UNIQUE_2 = 21,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeedBonus_Constant_Unique`
-      * 这个方法返回一个独特的固定值移动速度加成，它只应用最大的那个固定值加成。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT_UNIQUE = 22,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeedBonus_Constant_Unique_2`
-      * 这个方法是对上述独特的固定值移动速度加成的补充,它是另一种特殊固定值加成.
-      */
-     MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT_UNIQUE_2 = 23,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeed_Absolute`
-      * 这个方法会设定单位的移动速度为一个绝对值，无视所有其他移动速度加成或减少。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE = 24,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeed_AbsoluteMin`
-      * 这个方法可以设定一个移动速度的绝对最小值，单位的移动速度不会低于这个数值。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE_MIN = 25,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeed_AbsoluteMax`
-      * 这个方法可以设定一个移动速度的绝对最大值，单位的移动速度不会超过这个数值。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE_MAX = 26,
- 
-     /**
-      * 方法名称：`GetModifierIgnoreMovespeedLimit`
-      * 如果这个方法返回真，单位的移动速度将忽视游戏默认的350-550的移动速度限制，可以超过这个范围。
-      */
-     MODIFIER_PROPERTY_IGNORE_MOVESPEED_LIMIT = 27,
- 
-     /**
-      * 方法名称：`GetModifierMoveSpeed_Limit`
-      * 这个方法可以设定一个移动速度上限，单位的移动速度不会超过这个数值。
-      */
-     MODIFIER_PROPERTY_MOVESPEED_LIMIT = 28,
+    /**
+     * 方法名称：`GetModifierProcAttack_BonusDamage_Magical_Target`
+     * 这个方法返回修饰器提供的对魔法伤害攻击目标的加成。
+     */
+    MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_MAGICAL_TARGET = 9,
+
+    /**
+     * 方法名称：`GetModifierProcAttack_Feedback`
+     * 攻击反馈处理函数的返回值。
+     */
+    MODIFIER_PROPERTY_PROCATTACK_FEEDBACK = 10,
+
+    /**
+     * 方法名称：`GetModifierOverrideAttackDamage`
+     * 这个方法返回一个值作为攻击伤害的上限。
+     */
+    MODIFIER_PROPERTY_OVERRIDE_ATTACK_DAMAGE = 11,
+
+    /**
+     * 方法名称：`GetModifierPreAttack`
+     */
+    MODIFIER_PROPERTY_PRE_ATTACK = 12,
+
+    /**
+     * 方法名称：`GetModifierInvisibilityLevel`
+     * 此方法控制单位的隐身等级。级别越高，单位越难以被侦测。
+     */
+    MODIFIER_PROPERTY_INVISIBILITY_LEVEL = 13,
+
+    /**
+     * 方法名称：`GetModifierInvisibilityAttackBehaviorException`
+     * 该方法如果返回真，则允许单位在隐形状态下攻击或使用技能而不会破坏隐形效果。
+     */
+    MODIFIER_PROPERTY_INVISIBILITY_ATTACK_BEHAVIOR_EXCEPTION = 14,
+
+    /**
+     * 方法名称：`GetModifierPersistentInvisibility`
+     * 如果值为真，单位会一直保持隐身，直到该修饰符被移除。
+     */
+    MODIFIER_PROPERTY_PERSISTENT_INVISIBILITY = 15,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Constant`
+     * 这个方法返回一个固定的移动速度加成。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT = 16,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedOverride`
+     * 这个方法可以覆盖单位的基础移动速度。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BASE_OVERRIDE = 17,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Percentage`
+     * 这个方法返回一个百分比形式的移动速度加成。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE = 18,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Percentage_Unique`
+     * 这个方法返回一个独特的移动速度百分比加成，不和其他百分比移动速度加成堆叠，只取最大的那个值。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE_UNIQUE = 19,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Special_Boots`
+     * 这个方法会返回一个独特的移动速度加成，常常用于特殊的鞋类物品。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_UNIQUE = 20,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Special_Boots_2`
+     * 此方法是对上述鞋类移动速度加成属性的补充，用于情况复杂或需要更多控制的物品。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_UNIQUE_2 = 21,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Constant_Unique`
+     * 这个方法返回一个独特的固定值移动速度加成，它只应用最大的那个固定值加成。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT_UNIQUE = 22,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Constant_Unique_2`
+     * 这个方法是对上述独特的固定值移动速度加成的补充,它是另一种特殊固定值加成.
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT_UNIQUE_2 = 23,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeed_Absolute`
+     * 这个方法会设定单位的移动速度为一个绝对值，无视所有其他移动速度加成或减少。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE = 24,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeed_AbsoluteMin`
+     * 这个方法可以设定一个移动速度的绝对最小值，单位的移动速度不会低于这个数值。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE_MIN = 25,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeed_AbsoluteMax`
+     * 这个方法可以设定一个移动速度的绝对最大值，单位的移动速度不会超过这个数值。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE_MAX = 26,
+
+    /**
+     * 方法名称：`GetModifierIgnoreMovespeedLimit`
+     * 如果这个方法返回真，单位的移动速度将忽视游戏默认的350-550的移动速度限制，可以超过这个范围。
+     */
+    MODIFIER_PROPERTY_IGNORE_MOVESPEED_LIMIT = 27,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeed_Limit`
+     * 这个方法可以设定一个移动速度上限，单位的移动速度不会超过这个数值。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_LIMIT = 28,
 
     // `GetModifierAttackSpeedBaseOverride`: 获取基础攻击速度的加成。
     MODIFIER_PROPERTY_ATTACKSPEED_BASE_OVERRIDE = 29,
@@ -380,7 +379,7 @@ export enum ModifierFunction {
     MODIFIER_PROPERTY_STATUS_RESISTANCE_STACKING = 66,
     /**
      * 方法名称：`GetModifierStatusResistanceCaster`
-     * 此方法返回施法者的状态抵抗的修改值。
+     * 此方法返回施法者的状态格挡的修改值。
      */
     MODIFIER_PROPERTY_STATUS_RESISTANCE_CASTER = 67,
 
@@ -391,7 +390,7 @@ export enum ModifierFunction {
     MODIFIER_PROPERTY_AVOID_SPELL = 69,
 
     // `GetModifierMiss_Percentage`: 提供减少命中几率的百分比。
-    MODIFIER_PROPERTY_MISS_PERCENTAGE = 70,
+    MODIFIER_PROPERTY_MISS_PERCENTAGE = 70, 
 
     // `GetModifierPhysicalArmorBase_Percentage`: 提供基础物理护甲的增加百分比。
     MODIFIER_PROPERTY_PHYSICAL_ARMOR_BASE_PERCENTAGE = 71,
@@ -441,71 +440,71 @@ export enum ModifierFunction {
     MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BASE_REDUCTION = 79,
     /**
      * 方法名称：`GetModifierMagicalResistanceDirectModification`
-     * 此方法返回魔法抵抗的直接修改值。
+     * 此方法返回魔法格挡的直接修改值。
      */
     MODIFIER_PROPERTY_MAGICAL_RESISTANCE_DIRECT_MODIFICATION = 80,
 
     // `GetModifierMagicalResistanceBonus`: 提供额外的魔法抗性加成。
     MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS = 81,
-/**
-     * 方法名称：`GetModifierMagicalResistanceBonusIllusions`
-     * 此方法返回幻影魔法抵抗的加值。
+    /**
+         * 方法名称：`GetModifierMagicalResistanceBonusIllusions`
+         * 此方法返回幻影魔法格挡的加值。
+         */
+    MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS_ILLUSIONS = 82,
+
+    /**
+     * 方法名称：`GetModifierMagicalResistanceBonusUnique`
+     * 此方法返回独特魔法格挡的加值。
      */
-MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS_ILLUSIONS = 82,
-    
-/**
- * 方法名称：`GetModifierMagicalResistanceBonusUnique`
- * 此方法返回独特魔法抵抗的加值。
- */
-MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS_UNIQUE = 83,
+    MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS_UNIQUE = 83,
 
-/**
- * 方法名称：`GetModifierMagicalResistanceDecrepifyUnique`
- * 此方法返回独特魔法减值抵抗的削减值。
- */
-MODIFIER_PROPERTY_MAGICAL_RESISTANCE_DECREPIFY_UNIQUE = 84,
- 
-/**
- * 方法名称：`GetModifierBaseRegen`
- * 此方法返回基础魔力再生值的修改值。
- */
-MODIFIER_PROPERTY_BASE_MANA_REGEN = 85,
+    /**
+     * 方法名称：`GetModifierMagicalResistanceDecrepifyUnique`
+     * 此方法返回独特魔法减值格挡的削减值。
+     */
+    MODIFIER_PROPERTY_MAGICAL_RESISTANCE_DECREPIFY_UNIQUE = 84,
 
-/**
- * 方法名称：`GetModifierConstantManaRegen`
- * 此方法返回稳定魔力再生的修改值。
- */
-MODIFIER_PROPERTY_MANA_REGEN_CONSTANT = 86,
+    /**
+     * 方法名称：`GetModifierBaseRegen`
+     * 此方法返回基础魔力再生值的修改值。
+     */
+    MODIFIER_PROPERTY_BASE_MANA_REGEN = 85,
 
-/**
- * 方法名称：`GetModifierConstantManaRegenUnique`
- * 此方法返回独特稳定魔力再生的修改值。
- */
-MODIFIER_PROPERTY_MANA_REGEN_CONSTANT_UNIQUE = 87,
+    /**
+     * 方法名称：`GetModifierConstantManaRegen`
+     * 此方法返回稳定魔力再生的修改值。
+     */
+    MODIFIER_PROPERTY_MANA_REGEN_CONSTANT = 86,
 
-/**
- * 方法名称：`GetModifierTotalPercentageManaRegen`
- * 此方法返回魔力再生总百分比的修改值。
- */
-MODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE = 88,
+    /**
+     * 方法名称：`GetModifierConstantManaRegenUnique`
+     * 此方法返回独特稳定魔力再生的修改值。
+     */
+    MODIFIER_PROPERTY_MANA_REGEN_CONSTANT_UNIQUE = 87,
 
-/**
- * 方法名称：`GetModifierConstantHealthRegen`
- * 此方法返回稳定生命值再生的修改值。
- */
-MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT = 89,
+    /**
+     * 方法名称：`GetModifierTotalPercentageManaRegen`
+     * 此方法返回魔力再生总百分比的修改值。
+     */
+    MODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE = 88,
 
-/**
- * 方法名称：`GetModifierHealthRegenPercentage`
- * 此方法返回生命值再生百分比的修改值。
- */
-MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE = 90,
+    /**
+     * 方法名称：`GetModifierConstantHealthRegen`
+     * 此方法返回稳定生命值再生的修改值。
+     */
+    MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT = 89,
 
-/**
- * 方法名称：`GetModifierHealthRegenPercentageUnique`
- * 此方法返回独特生命值再生百分比的修改值。
- */
-MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE_UNIQUE = 91,
+    /**
+     * 方法名称：`GetModifierHealthRegenPercentage`
+     * 此方法返回生命值再生百分比的修改值。
+     */
+    MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE = 90,
+
+    /**
+     * 方法名称：`GetModifierHealthRegenPercentageUnique`
+     * 此方法返回独特生命值再生百分比的修改值。
+     */
+    MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE_UNIQUE = 91,
 
     // `GetModifierHealthBonus`: 增加额外的生命值。
     MODIFIER_PROPERTY_HEALTH_BONUS = 92,
@@ -521,38 +520,38 @@ MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE_UNIQUE = 91,
      * 此方法返回额外生命值的加值。
      */
     MODIFIER_PROPERTY_EXTRA_HEALTH_BONUS = 95,
-    
+
     /**
      * 方法名称：`GetModifierExtraManaBonus`
      * 此方法返回额外魔力的加值。
      */
     MODIFIER_PROPERTY_EXTRA_MANA_BONUS = 96,
-    
+
     /**
      * 方法名称：`GetModifierExtraManaBonusPercentage`
      * 此方法返回魔力的额外百分比加值。
      */
     MODIFIER_PROPERTY_EXTRA_MANA_BONUS_PERCENTAGE = 97,
-    
+
     /**
      * 方法名称：`GetModifierExtraHealthPercentage`
      * 此方法返回生命值的额外百分比加值。
      */
     MODIFIER_PROPERTY_EXTRA_HEALTH_PERCENTAGE = 98,
-    
+
     /**
      * 方法名称：`GetModifierExtraManaPercentage`
      * 此方法返回魔力的额外百分比加值。
      */
     MODIFIER_PROPERTY_EXTRA_MANA_PERCENTAGE = 99,
-    
+
     /**
      * 方法名称：`GetModifierBonusStats_Strength`
      * 提供额外的力量加成的统计数据。
      */
     MODIFIER_PROPERTY_STATS_STRENGTH_BONUS = 100,
 
-    
+
     // `GetModifierBonusStats_Agility`: 增加敏捷属性的值。
     MODIFIER_PROPERTY_STATS_AGILITY_BONUS = 101,
 
@@ -580,328 +579,328 @@ MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE_UNIQUE = 91,
      * 此方法返回攻击范围基础值的替代值。
      */
     MODIFIER_PROPERTY_ATTACK_RANGE_BASE_OVERRIDE = 110,
-    
+
     /**
      * 方法名称：`GetModifierAttackRangeBonus`
      * 此方法返回攻击范围的加值。
      */
     MODIFIER_PROPERTY_ATTACK_RANGE_BONUS = 111,
-    
+
     /**
      * 方法名称：`GetModifierAttackRangeBonusUnique`
      * 此方法返回独特的攻击范围加值。
      */
     MODIFIER_PROPERTY_ATTACK_RANGE_BONUS_UNIQUE = 112,
-    
+
     /**
      * 方法名称：`GetModifierAttackRangeBonusPercentage`
      * 此方法返回攻击范围的加值百分比。
      */
     MODIFIER_PROPERTY_ATTACK_RANGE_BONUS_PERCENTAGE = 113,
-    
+
     /**
      * 方法名称：`GetModifierMaxAttackRange`
      * 此方法返回最大攻击范围。
      */
     MODIFIER_PROPERTY_MAX_ATTACK_RANGE = 114,
-    
+
     /**
      * 方法名称：`GetModifierProjectileSpeedBonus`
      * 此方法返回投射物速度的加值。
      */
     MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS = 115,
-    
+
     /**
      * 方法名称：`GetModifierProjectileSpeedBonusPercentage`
      * 此方法返回投射物速度的加值百分比。
      */
     MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS_PERCENTAGE = 116,
-    
+
     /**
      * 方法名称：`GetModifierProjectileName`
      * 此方法返回投射物的名称。
      */
     MODIFIER_PROPERTY_PROJECTILE_NAME = 117,
-    
+
     /**
      * 方法名称：`ReincarnateTime`
      * 此方法指示复活时间。
      */
     MODIFIER_PROPERTY_REINCARNATION = 118,
-    
+
     /**
      * 方法名称：`ReincarnateSuppressFX`
      * 此方法指示复活效果应被抑制。
      */
     MODIFIER_PROPERTY_REINCARNATION_SUPPRESS_FX = 119,
-    
+
     /**
      * 方法名称：`GetModifierConstantRespawnTime`
      * 此方法返回恒定的重生时间。
      */
     MODIFIER_PROPERTY_RESPAWNTIME = 120,
 
-  /**
-     * 方法名称：`GetModifierPercentageRespawnTime`
-     * 此方法返回重生时间百分比的加值。
-     */
-  MODIFIER_PROPERTY_RESPAWNTIME_PERCENTAGE = 121,
-    
-  /**
-   * 方法名称：`GetModifierStackingRespawnTime`
-   * 此方法返回堆叠的重生时间加值。
-   */
-  MODIFIER_PROPERTY_RESPAWNTIME_STACKING = 122,
-  
-  /**
-   * 方法名称：`GetModifierPercentageCooldown`
-   * 此方法返回冷却时间百分比的加值。
-   */
-  MODIFIER_PROPERTY_COOLDOWN_PERCENTAGE = 123,
-  
-  /**
-   * 方法名称：`GetModifierPercentageCooldownOngoing`
-   * 此方法返回正在进行的冷却时间百分比的加值。
-   */
-  MODIFIER_PROPERTY_COOLDOWN_PERCENTAGE_ONGOING = 124,
-  
-  /**
-   * 方法名称：`GetModifierPercentageCasttime`
-   * 此方法返回施法时间百分比的加值。
-   */
-  MODIFIER_PROPERTY_CASTTIME_PERCENTAGE = 125,
-  
-  /**
-   * 方法名称：`GetModifierPercentageAttackAnimTime`
-   * 此方法返回攻击动画时间百分比的加值。
-   */
-  MODIFIER_PROPERTY_ATTACK_ANIM_TIME_PERCENTAGE = 126,
-  
-  /**
-   * 方法名称：`GetModifierPercentageManacost`
-   * 此方法返回魔力消耗百分比的加值。
-   */
-  MODIFIER_PROPERTY_MANACOST_PERCENTAGE = 127,
-  
-  /**
-   * 方法名称：`GetModifierPercentageManacostStacking`
-   * 此方法返回堆叠的魔力消耗百分比的加值。
-   */
-  MODIFIER_PROPERTY_MANACOST_PERCENTAGE_STACKING = 128,
-  
-  /**
-   * 方法名称：`GetModifierPercentageHealthcost`
-   * 此方法返回生命值消耗百分比的加值。
-   */
-  MODIFIER_PROPERTY_HEALTHCOST_PERCENTAGE = 129,
-  
-  /**
-   * 方法名称：`GetModifierPercentageHealthcostStacking`
-   * 此方法返回堆叠的生命值消耗百分比的加值。
-   */
-  MODIFIER_PROPERTY_HEALTHCOST_PERCENTAGE_STACKING = 130,
+    /**
+       * 方法名称：`GetModifierPercentageRespawnTime`
+       * 此方法返回重生时间百分比的加值。
+       */
+    MODIFIER_PROPERTY_RESPAWNTIME_PERCENTAGE = 121,
 
-   /**
-     * 方法名称：`GetModifierConstantDeathGoldCost`
-     * 此方法返回死亡金币损失的固定值。
+    /**
+     * 方法名称：`GetModifierStackingRespawnTime`
+     * 此方法返回堆叠的重生时间加值。
      */
-   MODIFIER_PROPERTY_DEATHGOLDCOST = 131,
-    
-   /**
-    * 方法名称：`GetModifierPercentageExpRateBoost`
-    * 此方法返回经验获取速率提升的百分比。
-    */
-   MODIFIER_PROPERTY_EXP_RATE_BOOST = 132,
-   
-   /**
-    * 方法名称：`GetModifierPercentageGoldRateBoost`
-    * 此方法返回金币收入提升的百分比。
-    */
-   MODIFIER_PROPERTY_GOLD_RATE_BOOST = 133,
-   
-   /**
-    * 方法名称：`GetModifierPreAttack_CriticalStrike`
-    * 此方法返回预设的攻击暴击率。
-    */
-   MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE = 134,
-   
-   /**
-    * 方法名称：`GetModifierPreAttack_Target_CriticalStrike`
-    * 此方法返回预设的针对目标的攻击暴击率。
-    */
-   MODIFIER_PROPERTY_PREATTACK_TARGET_CRITICALSTRIKE = 135,
-   
-   /**
-    * 方法名称：`GetModifierMagical_ConstantBlock`
-    * 此方法返回对魔法伤害的固定抵抗值。
-    */
-   MODIFIER_PROPERTY_MAGICAL_CONSTANT_BLOCK = 136,
-   
-   /**
-    * 方法名称：`GetModifierPhysical_ConstantBlock`
-    * 此方法返回对物理伤害的固定抵抗值。
-    */
-   MODIFIER_PROPERTY_PHYSICAL_CONSTANT_BLOCK = 137,
-   
-   /**
-    * 方法名称：`GetModifierPhysical_ConstantBlockSpecial`
-    * 此方法返回特殊的对物理伤害的固定抵抗值。
-    */
-   MODIFIER_PROPERTY_PHYSICAL_CONSTANT_BLOCK_SPECIAL = 138,
-   
-   /**
-    * 方法名称：`GetModifierPhysical_ConstantBlockUnavoidablePreArmor`
-    * 此方法返回防止任何护甲前的应对物理伤害的固定抵抗值。
-    */
-   MODIFIER_PROPERTY_TOTAL_CONSTANT_BLOCK_UNAVOIDABLE_PRE_ARMOR = 139,
-   
-   /**
-    * 方法名称：`GetModifierTotal_ConstantBlock`
-    * 此方法返回对全部伤害的固定抵抗值。
-    */
-   MODIFIER_PROPERTY_TOTAL_CONSTANT_BLOCK = 140,
+    MODIFIER_PROPERTY_RESPAWNTIME_STACKING = 122,
+
+    /**
+     * 方法名称：`GetModifierPercentageCooldown`
+     * 此方法返回冷却时间百分比的加值。
+     */
+    MODIFIER_PROPERTY_COOLDOWN_PERCENTAGE = 123,
+
+    /**
+     * 方法名称：`GetModifierPercentageCooldownOngoing`
+     * 此方法返回正在进行的冷却时间百分比的加值。
+     */
+    MODIFIER_PROPERTY_COOLDOWN_PERCENTAGE_ONGOING = 124,
+
+    /**
+     * 方法名称：`GetModifierPercentageCasttime`
+     * 此方法返回施法时间百分比的加值。
+     */
+    MODIFIER_PROPERTY_CASTTIME_PERCENTAGE = 125,
+
+    /**
+     * 方法名称：`GetModifierPercentageAttackAnimTime`
+     * 此方法返回攻击动画时间百分比的加值。
+     */
+    MODIFIER_PROPERTY_ATTACK_ANIM_TIME_PERCENTAGE = 126,
+
+    /**
+     * 方法名称：`GetModifierPercentageManacost`
+     * 此方法返回魔力消耗百分比的加值。
+     */
+    MODIFIER_PROPERTY_MANACOST_PERCENTAGE = 127,
+
+    /**
+     * 方法名称：`GetModifierPercentageManacostStacking`
+     * 此方法返回堆叠的魔力消耗百分比的加值。
+     */
+    MODIFIER_PROPERTY_MANACOST_PERCENTAGE_STACKING = 128,
+
+    /**
+     * 方法名称：`GetModifierPercentageHealthcost`
+     * 此方法返回生命值消耗百分比的加值。
+     */
+    MODIFIER_PROPERTY_HEALTHCOST_PERCENTAGE = 129,
+
+    /**
+     * 方法名称：`GetModifierPercentageHealthcostStacking`
+     * 此方法返回堆叠的生命值消耗百分比的加值。
+     */
+    MODIFIER_PROPERTY_HEALTHCOST_PERCENTAGE_STACKING = 130,
+
+    /**
+      * 方法名称：`GetModifierConstantDeathGoldCost`
+      * 此方法返回死亡金币损失的固定值。
+      */
+    MODIFIER_PROPERTY_DEATHGOLDCOST = 131,
+
+    /**
+     * 方法名称：`GetModifierPercentageExpRateBoost`
+     * 此方法返回经验获取速率提升的百分比。
+     */
+    MODIFIER_PROPERTY_EXP_RATE_BOOST = 132,
+
+    /**
+     * 方法名称：`GetModifierPercentageGoldRateBoost`
+     * 此方法返回金币收入提升的百分比。
+     */
+    MODIFIER_PROPERTY_GOLD_RATE_BOOST = 133,
+
+    /**
+     * 方法名称：`GetModifierPreAttack_CriticalStrike`
+     * 此方法返回预设的攻击暴击率。
+     */
+    MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE = 134,
+
+    /**
+     * 方法名称：`GetModifierPreAttack_Target_CriticalStrike`
+     * 此方法返回预设的针对目标的攻击暴击率。
+     */
+    MODIFIER_PROPERTY_PREATTACK_TARGET_CRITICALSTRIKE = 135,
+
+    /**
+     * 方法名称：`GetModifierMagical_ConstantBlock`
+     * 此方法返回对魔法伤害的固定格挡值。
+     */
+    MODIFIER_PROPERTY_MAGICAL_CONSTANT_BLOCK = 136,
+
+    /**
+     * 方法名称：`GetModifierPhysical_ConstantBlock`
+     * 此方法返回对物理伤害的固定格挡值。
+     */
+    MODIFIER_PROPERTY_PHYSICAL_CONSTANT_BLOCK = 137,
+
+    /**
+     * 方法名称：`GetModifierPhysical_ConstantBlockSpecial`
+     * 此方法返回特殊的对物理伤害的固定格挡值。
+     */
+    MODIFIER_PROPERTY_PHYSICAL_CONSTANT_BLOCK_SPECIAL = 138,
+
+    /**
+     * 方法名称：`GetModifierPhysical_ConstantBlockUnavoidablePreArmor`
+     * 此方法返回防止任何护甲前的应对物理伤害的固定格挡值。
+     */
+    MODIFIER_PROPERTY_TOTAL_CONSTANT_BLOCK_UNAVOIDABLE_PRE_ARMOR = 139,
+
+    /**
+     * 方法名称：`GetModifierTotal_ConstantBlock`
+     * 此方法返回对全部伤害的固定格挡值。
+     */
+    MODIFIER_PROPERTY_TOTAL_CONSTANT_BLOCK = 140,
     /**
      * 方法名称：`GetOverrideAnimationWeight`
      * 此方法返回覆盖动画权重的值。
      */
     MODIFIER_PROPERTY_OVERRIDE_ANIMATION_WEIGHT = 142,
-    
+
     /**
      * 方法名称：`GetOverrideAnimationRate`
      * 此方法返回覆盖动画速度的值。
      */
     MODIFIER_PROPERTY_OVERRIDE_ANIMATION_RATE = 143,
-    
+
     /**
      * 方法名称：`GetAbsorbSpell`
      * 此方法返回吸收法术的特性。
      */
     MODIFIER_PROPERTY_ABSORB_SPELL = 144,
-    
+
     /**
      * 方法名称：`GetReflectSpell`
      * 此方法返回反射法术的特性。
      */
     MODIFIER_PROPERTY_REFLECT_SPELL = 145,
-    
+
     /**
      * 方法名称：`GetDisableAutoAttack`
      * 此方法返回禁用自动攻击的特性。
      */
     MODIFIER_PROPERTY_DISABLE_AUTOATTACK = 146,
-    
+
     /**
      * 方法名称：`GetBonusDayVision`
      * 此方法返回白天视野的加值。
      */
     MODIFIER_PROPERTY_BONUS_DAY_VISION = 147,
-    
+
     /**
      * 方法名称：`GetBonusDayVisionPercentage`
      * 此方法返回白天视野的加值百分比。
      */
     MODIFIER_PROPERTY_BONUS_DAY_VISION_PERCENTAGE = 148,
-    
+
     /**
      * 方法名称：`GetBonusNightVision`
      * 此方法返回夜晚视野的加值。
      */
     MODIFIER_PROPERTY_BONUS_NIGHT_VISION = 149,
-    
+
     /**
      * 方法名称：`GetBonusNightVisionUnique`
      * 此方法返回独特的夜晚视野的加值。
      */
     MODIFIER_PROPERTY_BONUS_NIGHT_VISION_UNIQUE = 150,
-    
+
     /**
      * 方法名称：`GetBonusVisionPercentage`
      * 此方法返回视野的加值百分比。
      */
     MODIFIER_PROPERTY_BONUS_VISION_PERCENTAGE = 151,
-    
+
     /**
      * 方法名称：`GetFixedDayVision`
      * 此方法返回固定的白天视野。
      */
     MODIFIER_PROPERTY_FIXED_DAY_VISION = 152,
-    
+
     /**
      * 方法名称：`GetFixedNightVision`
      * 此方法返回固定的夜晚视野。
      */
     MODIFIER_PROPERTY_FIXED_NIGHT_VISION = 153,
-    
+
     /**
      * 方法名称：`GetMinHealth`
      * 此方法返回最小生命值的加值。
      */
     MODIFIER_PROPERTY_MIN_HEALTH = 154,
-    
+
     /**
      * 方法名称：`GetAbsoluteNoDamagePhysical`
      * 此方法返回对物理伤害绝对免疫的特性。
      */
     MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL = 155,
-    
+
     /**
      * 方法名称：`GetAbsoluteNoDamageMagical`
      * 此方法返回对魔法伤害绝对免疫的特性。
      */
     MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_MAGICAL = 156,
-    
+
     /**
      * 方法名称：`GetAbsoluteNoDamagePure`
      * 此方法返回对纯粹伤害绝对免疫的特性。
      */
     MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PURE = 157,
-    
+
     /**
      * 方法名称：`GetIsIllusion`
      * 此方法返回是否为幻象的特性。
      */
     MODIFIER_PROPERTY_IS_ILLUSION = 158,
-    
+
     /**
      * 方法名称：`GetModifierIllusionLabel`
      * 此方法返回幻象的标签属性。
      */
     MODIFIER_PROPERTY_ILLUSION_LABEL = 159,
-    
+
     /**
      * 方法名称：`GetModifierStrongIllusion`
      * 此方法返回强大幻象的特性。
      */
     MODIFIER_PROPERTY_STRONG_ILLUSION = 160,
-/**
-     * 方法名称：`GetModifierSuperIllusion`
-     * 此方法返回超级幻象的特性。
+    /**
+         * 方法名称：`GetModifierSuperIllusion`
+         * 此方法返回超级幻象的特性。
+         */
+    MODIFIER_PROPERTY_SUPER_ILLUSION = 161,
+
+    /**
+     * 方法名称：`GetModifierSuperIllusionWithUltimate`
+     * 此方法返回拥有终极技能的超级幻象的特性。
      */
-MODIFIER_PROPERTY_SUPER_ILLUSION = 161,
-    
-/**
- * 方法名称：`GetModifierSuperIllusionWithUltimate`
- * 此方法返回拥有终极技能的超级幻象的特性。
- */
-MODIFIER_PROPERTY_SUPER_ILLUSION_WITH_ULTIMATE = 162,
+    MODIFIER_PROPERTY_SUPER_ILLUSION_WITH_ULTIMATE = 162,
 
-/**
- * 方法名称：`GetModifierXPDuringDeath`
- * 此方法返回死亡时仍然获得经验的特性。
- */
-MODIFIER_PROPERTY_XP_DURING_DEATH = 163,
+    /**
+     * 方法名称：`GetModifierXPDuringDeath`
+     * 此方法返回死亡时仍然获得经验的特性。
+     */
+    MODIFIER_PROPERTY_XP_DURING_DEATH = 163,
 
-/**
- * 方法名称：`GetModifierTurnRate_Percentage`
- * 此方法返回转身速度百分比的加值。
- */
-MODIFIER_PROPERTY_TURN_RATE_PERCENTAGE = 164,
+    /**
+     * 方法名称：`GetModifierTurnRate_Percentage`
+     * 此方法返回转身速度百分比的加值。
+     */
+    MODIFIER_PROPERTY_TURN_RATE_PERCENTAGE = 164,
 
-/**
- * 方法名称：`GetModifierTurnRate_Override`
- * 此方法返回覆盖转身速度的加值。
- */
-MODIFIER_PROPERTY_TURN_RATE_OVERRIDE = 165,
+    /**
+     * 方法名称：`GetModifierTurnRate_Override`
+     * 此方法返回覆盖转身速度的加值。
+     */
+    MODIFIER_PROPERTY_TURN_RATE_OVERRIDE = 165,
 
     // `GetDisableHealing`: 禁止一切治疗效果作用于单位。
     MODIFIER_PROPERTY_DISABLE_HEALING = 166,
@@ -922,7 +921,7 @@ MODIFIER_PROPERTY_TURN_RATE_OVERRIDE = 165,
      * 此方法返回怪物赏金的倍数增益。
      */
     MODIFIER_PROPERTY_BOUNTY_CREEP_MULTIPLIER = 171,
-    
+
     /**
      * 方法名称：`GetModifierBountyOtherMultiplier`
      * 此方法返回其他赏金的倍数增益。
@@ -970,109 +969,109 @@ MODIFIER_PROPERTY_TURN_RATE_OVERRIDE = 165,
      * 在破解隐身时，此方法被调用。
      */
     MODIFIER_EVENT_ON_BREAK_INVISIBILITY = 193,
-    
+
     /**
      * 方法名称：`OnAbilityEndChannel`
      * 在技能通道结束时，此方法被调用。
      */
     MODIFIER_EVENT_ON_ABILITY_END_CHANNEL = 194,
-    
+
     /**
      * 方法名称：`OnProcessUpgrade`
      * 在处理升级时，此方法被调用。
      */
     MODIFIER_EVENT_ON_PROCESS_UPGRADE = 195,
-    
+
     /**
      * 方法名称：`OnRefresh`
      * 在刷新时，此方法被调用。
      */
     MODIFIER_EVENT_ON_REFRESH = 196,
-    
+
     /**
      * 方法名称：`OnTakeDamage`
      * 当承受伤害时，此方法被调用。
      */
     MODIFIER_EVENT_ON_TAKEDAMAGE = 197,
-    
+
     /**
      * 方法名称：`OnDamagePrevented`
      * 当伤害被阻止时，此方法被调用。
      */
     MODIFIER_EVENT_ON_DEATH_PREVENTED = 198,
-    
+
     /**
      * 方法名称：`OnStateChanged`
      * 当状态改变时，此方法被调用。
      */
     MODIFIER_EVENT_ON_STATE_CHANGED = 199,
-    
+
     /**
      * 方法名称：`OnOrbEffect`
      * 在执行Orb Effect时，此方法被调用。
      */
     MODIFIER_EVENT_ON_ORB_EFFECT = 200,
-    
+
     /**
      * 方法名称：`OnProcessCleave`
      * 在处理Cleave时，此方法被调用。
      */
     MODIFIER_EVENT_ON_PROCESS_CLEAVE = 201,
-    
+
     /**
      * 方法名称：`OnDamageCalculated`
      * 当伤害计算后，此方法被调用。
      */
     MODIFIER_EVENT_ON_DAMAGE_CALCULATED = 202,
-    
+
     /**
      * 方法名称：`OnMagicDamageCalculated`
      * 当魔法伤害计算后，此方法被调用。
      */
     MODIFIER_EVENT_ON_MAGIC_DAMAGE_CALCULATED = 203,
-    
+
     /**
      * 方法名称：`OnAttacked`
      * 当被攻击时，此方法被调用。
      */
     MODIFIER_EVENT_ON_ATTACKED = 204,
-    
+
     /**
      * 方法名称：`OnDeath`
      * 当角色死亡时，此方法被调用。
      */
     MODIFIER_EVENT_ON_DEATH = 205,
-    
+
     /**
      * 方法名称：`OnDeathCompleted`
      * 当角色死亡完成时，此方法被调用。
      */
     MODIFIER_EVENT_ON_DEATH_COMPLETED = 206,
-    
+
     /**
      * 方法名称：`OnRespawn`
      * 当角色重生时，此方法被调用。
      */
     MODIFIER_EVENT_ON_RESPAWN = 207,
-    
+
     /**
      * 方法名称：`OnSpentMana`
      * 当花费法力值时，此方法被调用。
      */
     MODIFIER_EVENT_ON_SPENT_MANA = 208,
-    
+
     /**
      * 方法名称：`OnSpentHealth`
      * 当花费生命值时，此方法被调用。
      */
     MODIFIER_EVENT_ON_SPENT_HEALTH = 209,
-    
+
     /**
      * 方法名称：`OnTeleporting`
      * 在传送前时，此方法被调用。
      */
     MODIFIER_EVENT_ON_TELEPORTING = 210,
-    
+
     /**
      * 方法名称：`OnTeleported`
      * 在传送后时，此方法被调用。
@@ -1124,7 +1123,7 @@ MODIFIER_PROPERTY_TURN_RATE_OVERRIDE = 165,
      */
     MODIFIER_EVENT_ON_MODIFIER_ADDED = 220,
 
-   
+
     // `OnTooltip`: 提供在游戏中鼠标悬浮时显示的工具提示文本的值。
     MODIFIER_PROPERTY_TOOLTIP = 221,
 
@@ -1309,7 +1308,7 @@ MODIFIER_PROPERTY_TURN_RATE_OVERRIDE = 165,
     // `GetModifierTickGold_Multiplier`: 改变单位每次金钱滴答的乘法因子。
     MODIFIER_PROPERTY_TICK_GOLD_MULTIPLIER = 282,
 
-    // `GetModifierSlowResistance`: 提供单位抵抗减速效果的能力。
+    // `GetModifierSlowResistance`: 提供单位格挡减速效果的能力。
     MODIFIER_PROPERTY_SLOW_RESISTANCE = 283,
 
     // `GetModifierAoEBonusPercentage`: 改变单位的范围效果（AoE）伤害增益百分比。
