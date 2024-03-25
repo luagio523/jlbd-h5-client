@@ -1,3 +1,19 @@
+
+// "npc_dota_hero_juggernaut" // 剑圣的内部名称
+// {
+//     // 英雄基本属性配置
+//     "AttackCapability" "DOTA_UNIT_CAP_MELEE_ATTACK"
+//     "AttackDamageMin" "20"            // 攻击力最小值
+//     "AttackDamageMax" "25"            // 攻击力最大值
+//     "AttackRate" "1.7"                // 攻击速度
+//     "AttackAnimationPoint" "0.33"     // 攻击动画触发点，从0开始计算至此
+//     "AttackAcquisitionRange" "600"    // 攻击寻敌范围
+//     "AttackRange" "128"               // 攻击距离，近战通常是小于等于150
+//     // 其他属性...
+// }
+
+
+
 class HeroData {
     BaseClass: string;
     HeroID: number;

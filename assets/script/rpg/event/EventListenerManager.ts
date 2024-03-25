@@ -36,5 +36,15 @@ export class EventListenerManager {
     public getListeners(eventType: string): ((event: IEvent) => void)[] | undefined {
         return this.listeners.get(eventType);
     }
+
+
+    public dispatchEvent(eventType: string,event: IEvent): void {
+        const eventListeners = this.listeners.get(eventType);
+        if (eventListeners) {
+            eventListeners.forEach(listener => {
+                listener(event);
+            });
+        }
+    }
 }
 

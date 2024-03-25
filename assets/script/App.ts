@@ -6,15 +6,12 @@
  */
 
 import { oops } from "./core/Oops"
-import { MessageManager } from "./core/common/event/MessageManager"
 import NativeHelper from "./core/common/sdk/NativeHelper"
 import PoolMgr from "./core/common/pool/PoolMgr"
 import TextFilter from "./core/common/shield/TextFilter"
-import { StorageManager } from "./core/common/storage/StorageManager"
-import FrameMgr from "./core/common/timer/FrameMgr"
-import { ITimerMgr, LinkListTimerMgr } from "./core/common/timer/TimerMgr"
-import { IFacade } from "./core/mvc/interfaces/IFacade"
-import { Facade } from "./core/mvc/patterns/facade/Facade"
+import { HeapTimerMgr, ITimerMgr, LinkListTimerMgr } from "./core/common/timer/TimerMgr"
+import { Facade } from "./mvc/init"
+
 
 // const i18n = require("LanguageData");
 
@@ -27,10 +24,9 @@ export default class app extends oops{
     public static hasShowNewGuide:boolean
 
     
-    public static get facade():IFacade{
-        return Facade.getInstance("JLBD")
+    public static get facade():Facade{
+        return Facade.getInstance()
     }
-
     
 
     /**
@@ -40,22 +36,12 @@ export default class app extends oops{
         return PoolMgr.ins()
     }
 
-    /**
+     /**
      * 获取定时器
      */
-    public static get timerMgr():ITimerMgr{
-        return LinkListTimerMgr.ins()
-    }
+    public static timerMgr:ITimerMgr = new HeapTimerMgr()
 
    
-    
-
-    /**
-     * 帧类型交互管理
-     */
-    public static get FrameMgr():FrameMgr{
-        return FrameMgr.ins()
-    }
    
     
 

@@ -37,15 +37,22 @@ export enum AbilityType {
     ABILITY_TYPE_HIDDEN = 3, //隐藏技能。这是不会在技能面板上显示的技能，可能是被动技能，或者是特定场景下才会触发的技能。
 }
 
+export enum AttackType {
+    HeroAttack,      // 英雄攻击，通常对所有目标都有一致效果
+    BasicAttack,     // 基础攻击，一般为多数单位的攻击类型
+    PierceAttack,    // 穿刺攻击，对某些目标有更高效果
+    SiegeAttack,     // 攻城攻击，对建筑物造成更多伤害
+    ChaosAttack,     // 混沌攻击，对所有单位类型都造成全额伤害
+    MagicAttack      // 魔法攻击，非常规的攻击类型，通常利用技能模仿
+}
 
-export enum DamageType {
-    DAMAGE_TYPE_NONE = 0, // 无伤害类型
-    DAMAGE_TYPE_PHYSICAL = 1, // 物理伤害类型，一般受装甲抵消
-    DAMAGE_TYPE_MAGICAL = 2, // 魔法伤害类型，一般受魔法抗性抵消
-    DAMAGE_TYPE_PURE = 4, // 纯粹伤害类型，无视一切抵消
-    DAMAGE_TYPE_ALL = 7, // 所有伤害类型
-    DAMAGE_TYPE_HP_REMOVAL = 8, // 移除生命值伤害类型，直接扣血，不受任何抵消影响，无法触发'受伤害'条件
-    DAMAGE_TYPE_ABILITY_DEFINED = 22, // 技能定义的伤害类型，该类型伤害由技能直接定义，可能有特殊的计算或免疫规则
+
+export enum AttackCapability {
+    UNIT_CAP_NO_ATTACK = 0, // 单位无法进行攻击 这一选项常见于被禁止攻击的单位或某些特殊的非攻击单位，如观察守卫。
+    UNIT_CAP_MELEE_ATTACK = 1, // 单位具有近战攻击能力。这一选项适用于像斯温这样的近战英雄。
+    UNIT_CAP_RANGED_ATTACK = 2, // 单位具有远程攻击能力。这适用于像风行者这样的远程英雄。
+    UNIT_ATTACK_CAPABILITY_BIT_COUNT = 3, // 确定单位攻击能力选项的数量
+    UNIT_CAP_RANGED_ATTACK_DIRECTIONAL = 4, // 单位具有定向的远程攻击能力 单位具有定向的远程攻击能力。这个选项适用于需要定向攻击的单位或技能。
 }
 
 

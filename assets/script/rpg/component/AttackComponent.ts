@@ -1,18 +1,59 @@
+import { Cooldown } from "../base/CoolDown";
 import { ECSComponent } from "../ecs/ECSComponent";
-import { DamageType } from "../enum/Type";
+import { ECSEntity } from "../ecs/ECSEntity";
+import { AttackCapability, AttackType } from "../enum/Type";
 
+
+// 在Dota2中，一个单位的实际攻击间隔由几个因素决定，包括基础攻击时间 (BAT)，附加的攻击速度，以及游戏的内部机制。下面是一般的计算公式：
+// plaintext
+// 实际攻击间隔 = 基础攻击时间 / (1 + 攻击速度加成)
+// 基础攻击时间（BAT）是单位进行两次攻击之间的基础时间间隔。例如，大多数单位的BAT为1.7秒。不同的英雄有不同的BAT。这个值固定，无法通过任何方式修改。
+// 攻击速度加成是通过物品，技能，属性等获得的额外攻击速度，除以100。例如，如果一个单位有150额外攻击速度，那么攻击速度加成就是1.5。
+// 这公式表示: 英雄的攻击间隔 = 英雄的基础攻击时间 ÷ [1 + (单位的主属性-1) × 0.01]。所以，如果你要提高英雄的攻击速度（降低攻击间隔），你需要增加他的攻击速度加成。
+
+
+
+//普通攻击组件
 export class AttackComponent extends ECSComponent{
-    public attackCapability: string; //攻击类型 远程近战
+    public attackCapability: AttackCapability; //攻击类型 远程近战
     public baseAttackDamageMin: number;
     public baseAttackDamageMax: number;
-    public attackRate: number; //攻击频率
+    
     public attackRange: number; //攻击范围
-    public target: any; // 这是攻击目标，可以根据需要的对象类型进行相应的修改
+    public target: ECSEntity; // 这是攻击目标，可以根据需要的对象类型进行相应的修改
+
+    public attackRate: number; //基础攻击间隔               // 实际攻击间隔 = 基础攻击间隔 / (攻击速度 / 100)
     public attacksMade: number; // 这是进行的攻击次数
+
+    public attackAnimationPoint:number; //动画的时间点
+    public attackAcquisitionRange:number;
     
-    public damageType:DamageType //伤害类型
-   
+
+    public attackType:AttackType   //攻击类型
+
+
+    constructor(attackRate:number) { 
+        super()
+        this.attackCooldown = new Cooldown(attackRate);
+    }
+
+
+
+    /** 攻击冷却 */
+    private attackCooldown: Cooldown;;
     
+    /**
+     * @param deltaTime
+     * @returns boolean 是否可以攻击
+     */
+    canAttack(deltaTime: number): boolean {
+        return this.attackCooldown.check(deltaTime);
+    }
+
+    updateAttackRate(attackRate:number):void{
+        this.attackCooldown.resetCooldownRate(attackRate)
+    }
+
 }
 
 

@@ -26,13 +26,7 @@ export enum AttributeDerivedStat {
 
 // 实际攻击间隔 = 基础攻击间隔 / (攻击速度 / 100)
 
-export enum AttackCapability {
-    UNIT_CAP_NO_ATTACK = 0, // 单位无攻击能力
-    UNIT_CAP_MELEE_ATTACK = 1, // 单位具有近战攻击能力
-    UNIT_CAP_RANGED_ATTACK = 2, // 单位具有远程攻击能力
-    UNIT_ATTACK_CAPABILITY_BIT_COUNT = 3, // 统计单位拥有的攻击能力数量
-    UNIT_CAP_RANGED_ATTACK_DIRECTIONAL = 4, // 单位具有定向的远程攻击能力
-}
+
 
 export enum MoveCapability {
     UNIT_CAP_MOVE_NONE = 0, // 单位无移动能力

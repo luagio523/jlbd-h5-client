@@ -1,8 +1,9 @@
+import { BaseAbility } from "../ability/BaseAbility";
 import { ECSEntity } from "../ecs/ECSEntity";
+import { DamageFlag, DamageType } from "../enum/Damage";
 
 export interface IEvent {
     type: string;
-    data?: any;
 }
 
 
@@ -23,14 +24,35 @@ export function ecsclass(name: string) {
 
 
 
-export class AttackEvent implements IEvent {
-    static readonly NAME = 'AttackEvent';
-    public readonly type = AttackEvent.NAME
+// export class AttackEvent implements IEvent {
+//     static readonly NAME = 'AttackEvent';
+//     public readonly type = AttackEvent.NAME
+//     constructor(
+//         public readonly attacker: ECSEntity,
+//         public readonly target: ECSEntity,
+//         public readonly damage: number,
+//         public readonly attackType: string
+//     ) {}
+// }
+
+
+
+export class ApplyDamageEvent implements IEvent{
+    public readonly type = Event.ApplyDamage
     constructor(
         public readonly attacker: ECSEntity,
-        public readonly target: ECSEntity,
+        public readonly victim: ECSEntity,
         public readonly damage: number,
-        public readonly attackType: string
+        public readonly damageType: DamageType,
+        public readonly ability?:BaseAbility,
+        public readonly damageFlag?:DamageFlag,
     ) {}
 }
 
+
+
+
+
+export  enum  Event {
+    ApplyDamage = "ApplyDamage",
+}

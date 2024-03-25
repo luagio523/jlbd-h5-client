@@ -14,11 +14,11 @@ export class EventQueueManager {
         return this.instance;
     }
 
-    public enqueue(event: IEvent): void {
-        if (!this.queues.has(event.type)) {
-            this.queues.set(event.type, []);
+    public enqueue(eventType: string,event: IEvent): void {
+        if (!this.queues.has(eventType)) {
+            this.queues.set(eventType, []);
         }
-        this.queues.get(event.type)?.push(event);
+        this.queues.get(eventType)?.push(event);
     }
 
     public getEvents(eventType: string): IEvent[] {
