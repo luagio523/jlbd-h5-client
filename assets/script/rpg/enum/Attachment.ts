@@ -18,3 +18,14 @@ export enum ParticleAttachment {
     PATTACH_HEALTHBAR = 15, // 附着于单位的生命条
     MAX_PATTACH_TYPES = 16, // 最大附着类型数，用于数组或循环的上限
 }
+
+
+export enum ProjectileAttachment {
+    DOTA_PROJECTILE_ATTACHMENT_NONE = 0,      // 投射物不附着于任何特定点，可能就是单位的原点或者是世界中的某个点
+    DOTA_PROJECTILE_ATTACHMENT_ATTACK_1 = 1,    //投射物从单位的第一个攻击点发射，例如右手或主要攻击手
+    DOTA_PROJECTILE_ATTACHMENT_ATTACK_2 = 2,    // 投射物从单位的第二个攻击点发射，例如左手或副手（如果有的话）
+    DOTA_PROJECTILE_ATTACHMENT_HITLOCATION = 3,   // 投射物会以目标单位受击的位置为附着点
+    DOTA_PROJECTILE_ATTACHMENT_ATTACK_3 = 4,    // 投射物从单位的第三个攻击点发射，比如一个次要的攻击点或额外的攻击点
+    DOTA_PROJECTILE_ATTACHMENT_ATTACK_4 = 5,    // 投射物从单位的第四个攻击点发射，是附加的可能很少使用的攻击点
+    DOTA_PROJECTILE_ATTACHMENT_LAST = 6,         // 标记枚举的结束，用于循环或数组的极限值，并非实际的附着点
+}

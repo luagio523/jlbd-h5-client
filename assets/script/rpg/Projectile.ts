@@ -5,13 +5,41 @@ import { ECSEntity } from './ecs/ECSEntity';
 import { TransformComponent } from './component/TransformComponent';
 const { ccclass, property } = _decorator;
 
+export type ProjectileID = number
+
+
+interface IProjectileListener {
+    OnProjectileHit(target: ECSEntity | undefined, location: Vec2): boolean | void;
+
+    OnProjectileHit_ExtraData?(
+        target: ECSEntity | undefined,
+        location: Vec2,
+        extraData: object,
+    ): boolean | void;
+
+    OnProjectileHitHandle?(
+        target: ECSEntity | undefined,
+        location: Vec2,
+        projectileHandle: ProjectileID,
+    ): boolean | void;
+
+    OnProjectileThink?(location: Vec2): void;
+
+    // 通过在方法名后面添加问号，让该方法变为可选
+    OnProjectileThink_ExtraData?(location: Vec2, extraData: object): void;
+
+    OnProjectileThinkHandle?(projectileHandle: ProjectileID): void;
+}
+
+
+
 export interface ProvideVision {
     iVisionRadius:number;  //视野半径
 }
 
 export class CreateBaseProjectileOptions {
     EffectName?: string;
-    Ability?: BaseAbility;
+    listener?: IProjectileListener;
     Source?: ECSEntity;//CDOTA_BaseNPC
     vision?:ProvideVision;//是否提供视野
     ExtraData?: object; //额外数据
@@ -69,6 +97,7 @@ export class CreateTrackingProjectileOptions extends CreateBaseProjectileOptions
 
 
 export class Projectile {
+    public projectileID:ProjectileID
     protected _options:CreateBaseProjectileOptions
     public position: Vec2 //当前位置
     public velocity: Vec2 //当前速度
@@ -80,8 +109,8 @@ export class Projectile {
     protected totalCurveDistance:number //曲线距离
     protected curveDistance:number //当前曲线距离
 
-    protected onProjectileFlying:()=>{}
-    protected onProjectileEnd:()=>{}
+    public onProjectileUpdate:(projectile:Projectile)=>void
+    public onProjectileEnd:(projectile:Projectile)=>void
 
     public constructor(options :CreateBaseProjectileOptions){
         this._options = options
@@ -114,6 +143,7 @@ export class Projectile {
     
         return distance;
     }
+    
 }
 
 
@@ -202,21 +232,21 @@ export class LinearProjectile extends Projectile{
 
         if(this.elapsedTime > this.options.fExpireTime){
             if(this.onProjectileEnd){
-                this.onProjectileEnd()
+                this.onProjectileEnd(this)
             }
             return 
         }
 
         if (ratio > 1) { //进度大于1了说明已经达到
             if(this.onProjectileEnd){
-                this.onProjectileEnd()
+                this.onProjectileEnd(this)
             }
             return 
         }
         
         this.calculateRadius(ratio) //计算当前碰撞半径
-        if(this.onProjectileFlying){
-            this.onProjectileFlying()
+        if(this.onProjectileUpdate){
+            this.onProjectileUpdate(this)
         }
         //搜寻碰撞的逻辑
     }
@@ -341,13 +371,13 @@ export class TrackingProjectile extends Projectile {
 
         if(this.elapsedTime > this.options.fExpireTime){
             if(this.onProjectileEnd){
-                this.onProjectileEnd()
+                this.onProjectileEnd(this)
             }
             return 
         }
 
-        if(this.onProjectileFlying){
-            this.onProjectileFlying()
+        if(this.onProjectileUpdate){
+            this.onProjectileUpdate(this)
         }
 
         
