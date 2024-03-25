@@ -1,13 +1,14 @@
 enum ActType {
-    ACT_RESET = 0,
-    ACT_IDLE = 1,
-    ACT_WALK = 2,
-    ACT_RUN = 3,
-    ACT_ATTACK =4,
-    ACT_STAND = 5,
-    ACT_TRANSITION = 6,
-    ACT_FLY = 7,
-    ACT_SWIM = 8,
-    ACT_JUMP = 9,
-    ACT_USE = 10,
+    ACT_RESET = 0,        // 重置状态，通常用于初始化或者重置角色行为
+    ACT_IDLE = 1,         // 空闲状态，角色站立不动或进行轻微活动
+    ACT_WALK = 2,         // 行走状态，角色以走的方式移动
+    ACT_RUN = 3,          // 跑步状态，角色以跑的方式快速移动
+    ACT_ATTACK = 4,       // 攻击状态，角色执行攻击动作
+    ACT_STAND = 5,        // 站立状态，角色静止站立
+    ACT_DEATH = 6,        // 死亡状态，角色死亡动作和效果
+    ACT_TRANSITION = 10,  // 过渡状态，角色从一个动作过渡到另一个动作
+    ACT_FLY = 11,         // 飞行状态，角色在空中飞行或悬浮
+    ACT_SWIM = 12,        // 游泳状态，角色在水中游泳
+    ACT_JUMP = 13,        // 跳跃状态，角色执行跳跃动作
+    ACT_USE = 14,         // 使用状态，角色互动或使用前面的物体或设备
 }
