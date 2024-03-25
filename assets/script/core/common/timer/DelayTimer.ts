@@ -1,3 +1,5 @@
+import { CircularQueue } from "../collection/CircularQueue";
+
 interface DelayTask {
     id: number;
     callback: () => void;
@@ -5,15 +7,21 @@ interface DelayTask {
 }
 
 export class DelayTimer {
-    private taskHeap: MinHeap<DelayTask> = new MinHeap((a, b) => a.untilTime - b.untilTime); 
+    private taskHeap: MinHeap<DelayTask>;
     private nextId: number = 0; // 下一个任务的 ID
     private elapsedTime: number = 0;
-    private taskIdMap: Map<number, DelayTask> = new Map(); 
-    private idleTasks: Array<DelayTask> = []; // 可复用的任务
+    private taskIdMap: Map<number, DelayTask>;
+    private pool: CircularQueue<DelayTask>
+
+    public constructor(capcity: number = 20) {
+        this.taskHeap = new MinHeap((a, b) => a.untilTime - b.untilTime);
+        this.pool = new CircularQueue(capcity || 20)
+        this.taskIdMap = new Map()
+    }
 
     // 添加任务，重用空闲任务或创建新任务
-    addTask(callback: () => void, delay: number): number {
-        let task: DelayTask = this.idleTasks.pop() || { id: 0, callback: undefined, untilTime: 0 };
+    addTask(delay: number, callback: () => void): number {
+        let task: DelayTask = this.pool.dequeue() || { id: 0, callback: undefined, untilTime: 0 };
         task.id = this.nextId++;
         task.callback = callback;
         task.untilTime = this.elapsedTime + delay;
@@ -31,7 +39,7 @@ export class DelayTimer {
             if (task) {
                 task.callback();
                 this.taskIdMap.delete(task.id);
-                this.idleTasks.push(task);
+                this.pool.enqueue(task);
             }
         }
     }
@@ -42,7 +50,7 @@ export class DelayTimer {
         if (task) {
             task.untilTime = Number.MAX_VALUE;
             this.taskHeap = new MinHeap<DelayTask>((a, b) => a.untilTime - b.untilTime);
-            this.idleTasks.push(task);
+            this.pool.enqueue(task);
             this.taskIdMap.delete(task.id);
 
             for (const t of this.taskIdMap.values()) {

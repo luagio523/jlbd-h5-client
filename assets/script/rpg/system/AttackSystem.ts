@@ -13,6 +13,7 @@ import { CombatCalculator } from "../CombatCalculator";
 import { ApplyDamageEvent } from "../event/Event";
 import { DamageType } from "../enum/Damage";
 import { AttackCapability } from "../enum/Type";
+import { ModelComponent } from "../component/ModelComponent";
 
 
 // 伤害 =
@@ -43,12 +44,14 @@ export class AttackSystem extends BaseSystem {
                 let attack = this.getEntity(attackComponent.entityId);
                 attackComponent.updateAttackRate(this.calculateAttackRate(attack)) //重新更新 攻击频率
                 if (this.shouldAttack(attack, target)) {
-                    
-                    if(attackComponent.attackCapability == AttackCapability.UNIT_CAP_RANGED_ATTACK){
-
-                    }else if(attackComponent.attackCapability == AttackCapability.UNIT_CAP_MELEE_ATTACK){
-
-                    }
+                    this.playAttackAnimation(attack.getComponent(ModelComponent))
+                    if(attackComponent.attackCapability == AttackCapability.UNIT_CAP_RANGED_ATTACK){ //远程攻击
+                        //投掷物
+                    }else if(attackComponent.attackCapability == AttackCapability.UNIT_CAP_MELEE_ATTACK){ //近战攻击
+                        this.addDelay(attackComponent.attackAnimationPoint,()=>{
+                            this.performAttack(attack,target)
+                        })
+                    }   
                 }
             }
         }
@@ -68,10 +71,36 @@ export class AttackSystem extends BaseSystem {
         return attackRate
     }
 
-
-
+    private playAttackAnimation(modelComponent:ModelComponent):void{
+        modelComponent.changeAct(ActType.ACT_ATTACK)
+    }
     
-     // { [主要攻击力 × (1 + Σ 百分比加成) + 固定值加成]
+    /**
+     * 执行攻击
+     * @param attacker 
+     * @param target 
+     */
+    private performAttack(attacker: ECSEntity, target: ECSEntity) {
+        let damage = this.calculateNormalAttackDamage(attacker,target)
+        let applyDamageEvent = new ApplyDamageEvent(attacker,target,damage,DamageType.DAMAGE_TYPE_PHYSICAL)
+        this.enqueueEvent(applyDamageEvent)
+    }
+
+    /**
+     * 判断距离是否可以攻击
+     * @param attacker 
+     * @param target 
+     * @returns 
+     */
+    shouldAttack(attacker: ECSEntity, target: ECSEntity) {
+        let attackPosition = attacker.getComponent(TransformComponent).position
+        let targetPosition = target.getComponent(TransformComponent).position
+        let distance = Vec2.distance(attackPosition,targetPosition)
+        return distance <= attacker.getComponent(AttackComponent).attackRange;
+    }
+
+
+        // { [主要攻击力 × (1 + Σ 百分比加成) + 固定值加成]
     // × 致命一击倍数 - 被格挡伤害 }
     // × 护甲倍数  
     // × 一般伤害倍数
@@ -104,19 +133,6 @@ export class AttackSystem extends BaseSystem {
         // mainAttackDamage = mainAttackDamage * armorMultiplier //× 护甲倍数  
 
         return mainAttackDamage
-    }
-
-    private performAttack(attacker: ECSEntity, target: ECSEntity) {
-        let damage = this.calculateNormalAttackDamage(attacker,target)
-        let applyDamageEvent = new ApplyDamageEvent(attacker,target,damage,DamageType.DAMAGE_TYPE_PHYSICAL)
-        this.enqueueEvent(applyDamageEvent)
-    }
-
-    shouldAttack(attacker: ECSEntity, target: ECSEntity) {
-        let attackPosition = attacker.getComponent(TransformComponent).position
-        let targetPosition = target.getComponent(TransformComponent).position
-        let distance = Vec2.distance(attackPosition,targetPosition)
-        return distance <= attacker.getComponent(AttackComponent).attackRange;
     }
 
     attack(target: ECSEntity, damage: number): void {

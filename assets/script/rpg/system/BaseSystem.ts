@@ -33,6 +33,17 @@ export class BaseSystem extends ECSSystem{
         EventQueueManager.getInstance().removeEvents(eventType)
     }
 
+    /*******************************处理延时************************************** */
+
+    protected addDelay(delay: number, callback: () => void):number{
+        return this.ecs.delayTimer.addTask(delay,callback)
+    }
+
+    protected cancelDelay(id:number):void{
+        this.ecs.delayTimer.cancelTask(id)
+    }
+
+    /********************************组件实体获取************************************* */
     protected getEntitiesWithComponent<T extends ECSComponent>(constructor: Constructor<T>): ECSEntity[]{
         return this.ecs.entities.getEntitiesWithComponent(constructor)
     }
@@ -44,6 +55,8 @@ export class BaseSystem extends ECSSystem{
     protected getEntity(id:string):ECSEntity{
         return this.ecs.entities.get(id)
     }
+
+    
 
     public update(dt:number): void {
         // 每个系统具体的更新逻辑

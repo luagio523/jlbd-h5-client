@@ -4,7 +4,7 @@
  * ECS 实现
  */
 
-import { LinkListTimerMgr } from "../../core/common/timer/TimerMgr";
+import { DelayTimer } from "../../core/common/timer/DelayTimer";
 import { ECSComponents } from "./ECSComponents";
 import { ECSEntities } from "./ECSEntities";
 import { ECSSystems } from "./ECSSystems";
@@ -28,7 +28,10 @@ export class ECSManager {
      */
     readonly components: ECSComponents;
 
-    readonly timerMgr:LinkListTimerMgr
+    /**
+     * 一个延迟任务
+     */
+    readonly delayTimer:DelayTimer
 
     /**
      * 构造函数
@@ -37,7 +40,7 @@ export class ECSManager {
         this.systems = new ECSSystems(this);
         this.entities = new ECSEntities();
         this.components = this.entities.components;
-
+        this.delayTimer = new DelayTimer()
 
         this.updateInterval = updateInterval;
         this.accumulatedTime = 0;
@@ -82,6 +85,7 @@ export class ECSManager {
      * @param dt 当前时间和上次更新时间的间隔
      */
     updateFix(dt: number): void {
+        this.delayTimer.update(dt)
         // 更新累积时间
         this.accumulatedTime += dt;
 

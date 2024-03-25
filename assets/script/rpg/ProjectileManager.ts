@@ -1,6 +1,4 @@
-import { Vec2, Vec3 } from "cc";
-import { BaseAbility } from "./ability/BaseAbility";
-import { UnitTargetTeam } from "./enum/Type";
+import {  Vec3 } from "cc";
 import { CreateLinearProjectileOptions, CreateTrackingProjectileOptions, LinearProjectile, Projectile, TrackingProjectile } from "./Projectile";
 
 type ProjectileID = number
