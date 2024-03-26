@@ -10,40 +10,6 @@ import { ModifierFunction } from "./enum/Modifier";
 export class CombatCalculator {
      /*************************************************************普通攻击伤害******************************************************************** */
 
-     // { [主要攻击力 × (1 + Σ 百分比加成) + 固定值加成]
-    // × 致命一击倍数 - 被格挡伤害 }
-    // × 护甲倍数  
-    // × 一般伤害倍数
-    //计算普通攻击伤害
-    public static calculateNormalAttackDamage(attack:ECSEntity,target:ECSEntity):number{
-
-        let attackComponent =attack.getComponent(AttackComponent)
-        let attributeComponent = attack.getComponent(AttributeComponent)
-        let equipmentComponent = attack.getComponent(EquipmentComponent)
-        let buffComponent = attack.getComponent(BuffComponent)
-
-        let targetEvasion = CombatCalculator.calculateEvasion(target.getComponent(EquipmentComponent),target.getComponent(BuffComponent))
-        let attackEvasion = CombatCalculator.calculateNegativeEvasion(equipmentComponent,buffComponent)
-        targetEvasion -= attackEvasion
-        if(Math.random() < targetEvasion){ //被闪避
-            return 0 
-        }
-        
-        let mainAttackDamage = CombatCalculator.calculateAttackDamage(attackComponent,attributeComponent,equipmentComponent,buffComponent)
-        let mainAttackPercent = equipmentComponent.getModifierMapping().calculateModifierTotalValue(ModifierFunction.MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE) +
-        buffComponent.getModifierMapping().calculateModifierTotalValue(ModifierFunction.MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE)
-        mainAttackDamage = mainAttackDamage * (1 + mainAttackPercent) //主要攻击力 × (1 + Σ 百分比加成)
-
-        let criticalStrike = CombatCalculator.calculateCriticalStrike(equipmentComponent,buffComponent)
-        mainAttackDamage = mainAttackDamage * criticalStrike //*致命一击倍数 
-
-        // mainAttackDamage -= CombatCalculator.calculatePhysicalBlock(equipmentComponent,buffComponent) //+ 固定值加成    
-
-        // let armorMultiplier = CombatCalculator.calculateArmorMultiplier(defenseComponent,attributeComponent,equipmentComponent,buffComponent)
-        // mainAttackDamage = mainAttackDamage * armorMultiplier //× 护甲倍数  
-
-        return mainAttackDamage
-    }
     
     
     /*************************************************************攻击伤害******************************************************************** */

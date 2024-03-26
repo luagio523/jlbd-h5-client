@@ -12,6 +12,7 @@ import { ECSSystems } from "./ECSSystems";
 
 
 export class ECSManager {
+    static readonly Inst: ECSManager = new ECSManager();
 
     /**
      * 所有系统
@@ -63,10 +64,9 @@ export class ECSManager {
     /** 
      * @param dt
      */
-    update(dt: number): void {
+    updateDT(dt: number): void {
         this.systems.update(dt);
     }
-
 
 
     /**
@@ -84,7 +84,7 @@ export class ECSManager {
      * 更新系统
      * @param dt 当前时间和上次更新时间的间隔
      */
-    updateFix(dt: number): void {
+    update(dt: number): void {
         this.delayTimer.update(dt)
         // 更新累积时间
         this.accumulatedTime += dt;

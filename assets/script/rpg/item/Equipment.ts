@@ -10,9 +10,7 @@ export enum EquipmentType {
 export abstract class Equipment extends Modifier{
     public equipType: EquipmentType;
 
-    constructor(type: EquipmentType) {
-        this.equipType = type;
-    }
+   
 
 
     // 当装备被装备时调用

@@ -1,4 +1,5 @@
 
+import { log } from "cc"
 import Grid from "./core/Grid"
 import { Heuristic } from "./core/Heuristic"
 import Util from "./core/Util"
@@ -94,7 +95,7 @@ export default class PathFinding {
         //     allowDiagonal: true,
         // });
 
-        var finder = JumpPointFinder({
+        var finder = JumpPointFinder({//必须是格子，且不支持格子权重。 不支持navmesh。
             allowDiagonal: true,
         });
 
@@ -112,7 +113,7 @@ export default class PathFinding {
         // cc.log(JSON.stringify(grid))
 
         var path = finder.findPath(0, 0, 4, 5, grid);
-        cc.log(path)
+        log(path)
        
 
         grid.clear()

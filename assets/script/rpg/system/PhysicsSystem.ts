@@ -6,7 +6,7 @@ import { BaseSystem } from "./BaseSystem";
 import { MovableComponent } from "../component/MovableComponent";
 import { InputComponent } from "../component/InputComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
-import { ColliderComponent } from "../component/ColliderComponent";
+import { ShapeComponent } from "../component/ShapeComponent";
 
 export class PhysicsSystem extends BaseSystem{
     private fixedDeltaTime: number; // 固定的时间步长
@@ -23,7 +23,7 @@ export class PhysicsSystem extends BaseSystem{
         while (this.accumulatedTime >= this.fixedDeltaTime) {
             for (const entity of entities) {
                 const transform = entity.getComponent(TransformComponent);
-                const collider = entity.getComponent(ColliderComponent);
+                const collider = entity.getComponent(ShapeComponent);
                 const movable = entity.getComponent(MovableComponent);
                 const input = entity.getComponent(InputComponent);
 
@@ -41,7 +41,7 @@ export class PhysicsSystem extends BaseSystem{
     private handleJoystickMovement(entity: ECSEntity, deltaTime: number): void {
         // 获取必要的组件
         const transform = entity.getComponent(TransformComponent);
-        const collider = entity.getComponent(ColliderComponent);
+        const shape = entity.getComponent(ShapeComponent);
         const movable = entity.getComponent(MovableComponent);
         const input = entity.getComponent(InputComponent);
 
@@ -52,7 +52,7 @@ export class PhysicsSystem extends BaseSystem{
         // // 执行碰撞检测
         // for (const otherEntity of entities) {
         //     if (entity === otherEntity) continue;
-        //     const otherCollider = otherEntity.getComponent<ColliderComponent>();
+        //     const otherCollider = otherEntity.getComponent<ShapeComponent>();
 
         //     if (this.checkCollision(collider.bounds, otherCollider.bounds, proposedPosition)) {
         //         collisionOccurred = true;

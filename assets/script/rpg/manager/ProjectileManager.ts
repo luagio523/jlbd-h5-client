@@ -1,5 +1,5 @@
 import { Vec2 } from "cc";
-import { CreateLinearProjectileOptions, CreateTrackingProjectileOptions, LinearProjectile, Projectile, ProjectileID, TrackingProjectile } from "./Projectile";
+import { CreateLinearProjectileOptions, CreateTrackingProjectileOptions, LinearProjectile, Projectile, ProjectileID, TrackingProjectile } from "../base/Projectile";
 
 
 

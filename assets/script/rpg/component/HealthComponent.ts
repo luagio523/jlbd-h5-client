@@ -17,24 +17,4 @@ export class HealthComponent extends ECSComponent {
         this.isDead = false;
     }
 
-    takeDamage(amount: number) {
-        if (!this.isInvulnerable && !this.isDead) {
-            this.currentHealth -= amount;
-        }
-    }
-
-    heal(amount: number) {
-        if (!this.isDead) {
-            this.currentHealth += amount;
-            if (this.currentHealth > this.maxHealth) {
-                this.currentHealth = this.maxHealth;
-            }
-        }
-    }
-
-    die() {
-        this.isDead = true;
-        this.currentHealth = 0;
-    }
-
 }

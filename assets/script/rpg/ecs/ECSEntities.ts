@@ -55,6 +55,14 @@ export class ECSEntities  {
     }
 
 
+    all():  ECSEntity[] {
+        const entities: ECSEntity[] = [];
+        for (let entity of this.entities) {
+            entities.push(entity);
+        }
+        return entities; 
+    }
+
     getEntitiesWithComponent<T extends ECSComponent>(constructor: Constructor<T>):  ECSEntity[] {
         const entitiesWithComponent: ECSEntity[] = [];
         for (let entity of this.entities) {

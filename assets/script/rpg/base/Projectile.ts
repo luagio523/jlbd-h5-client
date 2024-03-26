@@ -1,8 +1,7 @@
 import { _decorator,  Vec2,bezierByTime   } from 'cc';
-import { BaseAbility } from './ability/BaseAbility';
-import { UnitTargetFlag, UnitTargetTeam, UnitTargetType } from './enum/Unit';
-import { ECSEntity } from './ecs/ECSEntity';
-import { TransformComponent } from './component/TransformComponent';
+import { ECSEntity } from '../ecs/ECSEntity';
+import { UnitTargetFlag, UnitTargetTeam, UnitTargetType } from '../enum/Unit';
+import { TransformComponent } from '../component/TransformComponent';
 const { ccclass, property } = _decorator;
 
 export type ProjectileID = number
