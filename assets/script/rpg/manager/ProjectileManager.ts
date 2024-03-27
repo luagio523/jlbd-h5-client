@@ -1,8 +1,15 @@
 import { Vec2 } from "cc";
 import { CreateLinearProjectileOptions, CreateTrackingProjectileOptions, LinearProjectile, Projectile, ProjectileID, TrackingProjectile } from "../base/Projectile";
 
-
-
+//设置拖尾
+// const motionStreak = projectile.addComponent(MotionStreak);
+        
+// // 设置MotionStreak的属性
+// motionStreak.texture = this.TrailTexture;
+// motionStreak.fadeTime = 1;
+// motionStreak.minSeg = 1;
+// motionStreak.stroke = 0.1;
+// motionStreak.color = color(255,255,255);
 
 
 export class ProjectileManager {

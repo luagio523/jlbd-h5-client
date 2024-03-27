@@ -16,17 +16,17 @@ export enum MapType {
  * 地图数据
  */
 export class GameMap extends EventDispatcher{
-    public static IMG_SIZE = 256 //地图切割大小
-    public mapType: MapType = MapType.NONE
-    public MAP_PATH: ""
-    public mapID: string = "map005";
-    public mapX: number = 0;
-    public mapY: number = 0;
+    public static IMG_SIZE = 256; //地图切割大小
+    public mapType: MapType = MapType.NONE; //地图类型，默认为NONE
+    public MAP_PATH: ""; 
+    public mapID: string = "map005"; //地图ID，默认为map005
+    public mapX: number = 0; //地图X坐标
+    public mapY: number = 0; //地图Y坐标
     public cellSize: number; //格子大小
     public maxWidth: number; //地图的最大宽度
     public maxHeight: number; //地图的最大高度
-    public col: number;
-    public row: number;
+    public col: number; //地图的列数
+    public row: number; //地图的行数
 
     private static inst:GameMap;
 
@@ -111,7 +111,7 @@ export class GameMap extends EventDispatcher{
      * @param y 
      * @returns 
      */
-    public getGridPoint(x, y) {
+    public getGridPoint(x:number, y:number) {
         let tx = Math.floor(x / this.cellSize)
         let ty = Math.floor(y / this.cellSize)
         return v2(tx, ty)
@@ -175,34 +175,32 @@ export class GameMap extends EventDispatcher{
         rect.yMax = up
     }
 
+  
+
+
+    
     /**
-   * 判断格子是否能走
-   * @param x 
-   * @param y 
-   * @returns 
-   */
+     * 检查格子是否可走
+     * @param x X坐标
+     * @param y Y坐标
+     * @returns 返回是否可走
+     */
     public isWalkable(x: number, y: number) {
         var sx = Math.floor(x / this.cellSize);
         var sy = Math.floor(y / this.cellSize);
-        return this.checkWalkable(sx, sy)
+        return this.checkWalkable(sx, sy);
     }
 
-
-    /** 检查是否不可移动 */
-    public checkWalkable(x, y) {
-        let node = MapGrid.ins().getNodeAt(x, y)
+    /**
+     * 检查格子是否不可移动
+     * @param gx x格子
+     * @param gy y格子
+     * @returns 返回是否可移动
+     */
+    public checkWalkable(gx: number, gy:number) {
+        let node = MapGrid.ins().getNodeAt(gx, gy)
         if (node) {
             return node.walkable
-        }
-        return false
-    };
-
-
-    /** 检查是否需要透明 */
-    public checkAlpha(x, y) {
-        let node = MapGrid.ins().getNodeAt(x, y)
-        if (node) {
-            return node.hidden
         }
         return false
     }

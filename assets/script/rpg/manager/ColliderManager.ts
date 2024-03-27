@@ -4,6 +4,7 @@ import { ECSEntity } from "../ecs/ECSEntity";
 import { TransformComponent } from "../component/TransformComponent";
 import { ShapeComponent } from "../component/ShapeComponent";
 import { ShapeUtil } from "../util/ShapeUtil";
+import { GameMap } from "../map/GameMap";
 
 export class ColliderManager{
     /**
@@ -28,8 +29,8 @@ export class ColliderManager{
      */
     public static checkEntityStaticBlocked(entity:ECSEntity):boolean{
         let transformComponent = entity.getComponent(TransformComponent)
-
-        return false 
+        let position = transformComponent.position
+        return !GameMap.ins().isWalkable(position.x,position.y)
     }
 
     /**
