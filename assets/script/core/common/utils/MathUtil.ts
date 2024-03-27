@@ -9,11 +9,7 @@ export  class MathUtil {
      // x0= (x - rx0)*cos(a) - (y - ry0)*sin(a) + rx0 ;
     // y0= (x - rx0)*sin(a) + (y - ry0)*cos(a) + ry0 ;
     //图片上任意点(x,y)，绕一个坐标点(rx0,ry0)逆时针旋转a角度后的新的坐标设为(x0, y0)
-    public static getRotatePoint(x:number,y:number,rx0:number,ry0:number,radian:number){
-        let x0= (x - rx0)*Math.cos(radian) - (y - ry0)*Math.sin(radian) + rx0 
-        let y0= (x - rx0)*Math.sin(radian) + (y - ry0)*Math.cos(radian) + ry0
-        return v2(x0,y0)
-    }
+    
 
     //判断介于2个数之间
      // x >min(x1,x2) x<max(x1,x2)
