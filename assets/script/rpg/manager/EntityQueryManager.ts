@@ -18,7 +18,9 @@ export interface QueryFilter {
     unitTargetType?: UnitTargetType;
 }
 
-
+/**
+ * 用于区域实体查询管理
+ */
 export class EntityQueryManager {
 
     /**
@@ -27,13 +29,13 @@ export class EntityQueryManager {
      * @param filter 
      * @returns 
      */
-    public queryNearyByEntitiesWithRect(rect: Rect, filter?: (entity: ECSEntity) => boolean): Array<ECSEntity> {
+    public static  queryNearyByEntitiesWithRect(rect: Rect, filter?: (entity: ECSEntity) => boolean): Array<ECSEntity> {
         let entities = ECSManager.Inst.entities.all();
         return filter ? entities.filter(filter) : entities;
     }
 
     //查询是否在AABB
-    public queryEntitiesInAABB(rect: Rect, filter?: QueryFilter): Array<ECSEntity> {
+    public static  queryEntitiesInAABB(rect: Rect, filter?: QueryFilter): Array<ECSEntity> {
         // 如果提供了queryFilter，创建一个filter并执行查询
         return this.queryNearyByEntitiesWithRect(rect, (entity: ECSEntity): boolean => {
             if (filter && !this.isMatch(entity, filter)) return false
@@ -42,8 +44,9 @@ export class EntityQueryManager {
         });
     }
 
+
     // 查询圆形范围内的实体
-    public queryEntitiesInCircle(center: Vec2, radius: number, filter?: QueryFilter) {
+    public static  queryEntitiesInCircle(center: Vec2, radius: number, filter?: QueryFilter) {
         //构造一个矩形，矩形的中心点与圆心重合，矩形的高和宽都等于圆的直径
         let rect = new Rect(center.x - radius, center.y - radius, 2 * radius, 2 * radius);
         let radiusSqr = radius*radius
@@ -57,7 +60,7 @@ export class EntityQueryManager {
     }
 
     // 查询多边形范围内的实体
-    public queryEntitiesInPolygon(polygon: Array<Vec2>, filter?: QueryFilter) {
+    public static  queryEntitiesInPolygon(polygon: Array<Vec2>, filter?: QueryFilter) {
         //获取多边形的外接矩形
         let rect = ShapeUtil.getBoundingBoxOfPolygon(polygon);
         return this.queryNearyByEntitiesWithRect(rect, (entity: ECSEntity): boolean => {
@@ -69,7 +72,7 @@ export class EntityQueryManager {
     }
 
     // 查询旋转矩形OBB范围内的实体
-    public queryEntitiesInOBB(aabb: Rect, radian: number, filter?: QueryFilter) {
+    public static  queryEntitiesInOBB(aabb: Rect, radian: number, filter?: QueryFilter) {
         let rect = ShapeUtil.getBoundingBoxOfOBB(aabb);
         //首先获取矩形范围内的所有实体
         return this.queryNearyByEntitiesWithRect(rect, (entity: ECSEntity): boolean => {
@@ -82,7 +85,7 @@ export class EntityQueryManager {
     }
 
     //通过射线查询
-    public queryEntitiesInRay(start: Vec2, end: Vec2, filter?: QueryFilter) {
+    public static  queryEntitiesInRay(start: Vec2, end: Vec2, filter?: QueryFilter) {
         //获取射线的外接矩形
         let rect = ShapeUtil.getBoundingBoxOfRay(start, end);
         let lineSegmentLengthSqr = Vec2.squaredDistance(start,end)
@@ -101,7 +104,7 @@ export class EntityQueryManager {
 
 
     //通过扇形查询
-    public queryEntitiesInSector(center: Vec2, radius: number, angleStart: number, angleEnd: number, filter?: QueryFilter) {
+    public static  queryEntitiesInSector(center: Vec2, radius: number, angleStart: number, angleEnd: number, filter?: QueryFilter) {
         // 构造一个表示扇形的矩形，以圆心为中心，直径为两倍距离
         let rect = ShapeUtil.getBoundingBoxOfCircle(center, radius);
         let radiusSqr = radius*radius
@@ -113,7 +116,7 @@ export class EntityQueryManager {
         });
     }
 
-    private isMatch(entity: ECSEntity, filter?: QueryFilter): boolean {
+    private static isMatch(entity: ECSEntity, filter?: QueryFilter): boolean {
         // let unitComponent = entity.getUnitComponent(); 
 
         // if(queryFilter.unitTargetFlag && unitComponent.unitTargetFlag !== queryFilter.unitTargetFlag)

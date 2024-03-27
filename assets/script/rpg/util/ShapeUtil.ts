@@ -116,6 +116,16 @@ export class ShapeUtil {
         }
         return false;
     }
+
+    /**
+     * 矩形矩形相交
+     * @param r1 
+     * @param r2 
+     * @returns 
+     */
+    public static rectRect(r1:Rect,r2:Rect):boolean{
+        return Intersection2D.rectRect(r1,r2)
+    }
     
 
     /**
