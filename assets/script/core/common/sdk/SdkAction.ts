@@ -1,5 +1,6 @@
-import { MethodType } from "../../consts/SdkConst";
+import { log } from "cc";
 import { Result } from "./Result";
+import { MethodType } from "./SdkConst";
 
 interface ISdkAction{
     init():void; 
@@ -23,7 +24,7 @@ export default class SdkAction implements ISdkAction{
      * @param data
      */
     public doAction(methodType:number,  data:any):void{
-        cc.log("doAction",""+methodType);
+        log("doAction",""+methodType);
         switch (methodType){
             case MethodType.TYPE_INIT:
 
@@ -64,35 +65,35 @@ export default class SdkAction implements ISdkAction{
                 break;
 
             default:
-                cc.log("SDK logic2sdk", "methodName is not support ");
+                log("SDK logic2sdk", "methodName is not support ");
         }
     }
 
     public openService(data):void{
-        cc.log("SDK init", "methodName is not impl ");
+        log("SDK init", "methodName is not impl ");
     }
 
     public init():void  {
-        cc.log("SDK init", "methodName is not impl ");
+        log("SDK init", "methodName is not impl ");
     }
 
     public login():void  {
-        cc.log("SDK login", "methodName is not impl ");
+        log("SDK login", "methodName is not impl ");
     }
 
     
     public switchLogin() {
-        cc.log("SDK switchLogin", "methodName is not impl ");
+        log("SDK switchLogin", "methodName is not impl ");
     }
 
     
     public pay(data:any) {
-        cc.log("SDK pay", "methodName is not impl ");
+        log("SDK pay", "methodName is not impl ");
     }
 
     
     public logout() {
-        cc.log("SDK logout", "methodName is not impl ");
+        log("SDK logout", "methodName is not impl ");
     }
 
     
@@ -102,28 +103,28 @@ export default class SdkAction implements ISdkAction{
 
     
     public submitExtra(data:any) {
-        cc.log("SDK submitExtra", "methodName is not impl ");
+        log("SDK submitExtra", "methodName is not impl ");
     }
 
     
     public installApk(url:string) {
-        cc.log("SDK installApk", "methodName is not impl ");
+        log("SDK installApk", "methodName is not impl ");
     }
 
     
     public getRealName() {
-        cc.log("SDK getRealName", "methodName is not impl ");
+        log("SDK getRealName", "methodName is not impl ");
     }
 
     
     public share(params:any) {
-        cc.log("SDK share", "methodName is not impl ");
+        log("SDK share", "methodName is not impl ");
     }
 
 
     
     public copy(text:string) {
-        cc.log("SDK copy", "methodName is not impl ");
+        log("SDK copy", "methodName is not impl ");
     }
 
     

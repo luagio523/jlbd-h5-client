@@ -1,4 +1,4 @@
-import { RoomPlayType, ClassicType, ClassicGrade, OSType } from "./GameConsts";
+import {OSType } from "./GameConsts";
 import { platform_config, config, useSdk } from '../config/GlobalConfig';
 
 
@@ -15,7 +15,6 @@ export  class GameGlobal{
     public static INIT_DOWNLOAD_MAX_CONCURRENT = 20
 
     public static GAME_DOWNLOAD_MAX_CONCURRENT = 8
-
 
     public static GAME_NAME = "击杀宙斯"
 

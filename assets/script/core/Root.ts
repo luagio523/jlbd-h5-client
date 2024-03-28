@@ -5,13 +5,11 @@
  * @LastEditTime: 2023-08-28 10:02:57
  */
 import { Component, Game, JsonAsset, Node, _decorator, director, game, screen, sys } from "cc";
-import { LanguageManager } from "../libs/gui/language/Language";
 import { oops, version } from "./Oops";
 import { AudioManager } from "./common/audio/AudioManager";
 import { EventMessage } from "./common/event/EventMessage";
 import { GameManager } from "./game/GameManager";
 import { GUI } from "./gui/GUI";
-import { LayerManager } from "./gui/layer/LayerManager";
 
 const { ccclass, property } = _decorator;
 
@@ -92,7 +90,6 @@ export class Root extends Component {
         // 创建音频模块
         oops.audio = this.persistRootNode.addComponent(AudioManager);
         oops.audio.load();
-        oops.language = new LanguageManager();
         oops.game = new GameManager(this.game);
         this.initGUI();
 

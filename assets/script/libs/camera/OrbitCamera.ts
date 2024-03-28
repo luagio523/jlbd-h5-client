@@ -204,6 +204,7 @@ export class OrbitCamera extends Component {
     private onTouchEnd() {
         this._touched = false;
     }
+    
     //#endregion
 
     private onMouseWheel(event: EventMouse) {

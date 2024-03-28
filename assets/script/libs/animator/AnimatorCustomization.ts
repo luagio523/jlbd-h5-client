@@ -13,7 +13,7 @@ const { ccclass, property, menu, disallowMultiple } = _decorator;
 export default class AnimatorCustomization extends AnimatorBase {
     /** 此组件必须主动调用onInit初始化 */
     @property({ override: true, visible: false })
-    protected PlayOnStart: boolean = false;
+    public PlayOnStart: boolean = false;
 
     /**
      * 手动初始化状态机，可传入0-3个参数，类型如下

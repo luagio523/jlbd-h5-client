@@ -5,7 +5,6 @@
  * @LastEditTime: 2023-08-21 15:19:56
  */
 import { DEBUG } from "cc/env";
-import { LanguageManager } from "../libs/gui/language/Language";
 import { AudioManager } from "./common/audio/AudioManager";
 import { MessageManager } from "./common/event/MessageManager";
 import { ResLoader } from "./common/loader/ResLoader";
@@ -50,8 +49,7 @@ export class oops {
     static res = new ResLoader();
     /** ----------可选模块---------- */
 
-    /** 多语言模块 */
-    static language: LanguageManager;
+    
    
     /** 数据绑定管理 */
     static vm = new ViewModelMgr;
