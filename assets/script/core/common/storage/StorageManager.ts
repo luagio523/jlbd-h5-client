@@ -151,10 +151,16 @@ export default class StorageManager{
         // 进行加密
         if (this.encryption) {
             valString = CryptoUtils.aesEncrypt(valString, this.fjalfjdlajfadsljf);
+            
+            sys.localStorage.setItem(key, valString);
+            
+
+        }else{
+            sys.localStorage.setItem(key, valString);
         }
     
         // 存入localStorage
-        sys.localStorage.setItem(key, valString);
+        
     }
 
     public getItem(key: string): string {
