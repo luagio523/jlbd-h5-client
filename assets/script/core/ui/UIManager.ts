@@ -1,4 +1,4 @@
-import { assert, js, log } from "cc";
+import { Camera, assert, js, log } from "cc";
 import {  IUIConfig } from "./UIConfig";
 import { FairyGUILayerManager, ILayerManager, UILayer } from "./LayerManager";
 import {FairyGuiResMgr,IResManager  } from "./ResManager";
@@ -43,6 +43,9 @@ const UI_CONFIG: { [uiId: string]: IUIConfig } = {
 
 // UI管理器实现
 export class UIManager  {
+    /** 界面摄像机 */
+    camera!: Camera;
+
     private uiInstances: Map<string, any>;
     private layerManager: ILayerManager
     private facade:IFacade 
@@ -64,7 +67,10 @@ export class UIManager  {
     protected loadUI(config: IUIConfig): Promise<any> {
         return this.resManager.load(config)
     }
-
+    
+    public toast(message:string):void{
+        console.log(message)
+    }
 
     public async open(uiId: string, uiLayer: UILayer, ...params: any[]): Promise<string> {
         const config = this.UI_CONFIG[uiId];

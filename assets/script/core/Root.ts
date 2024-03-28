@@ -12,7 +12,6 @@ import { EventMessage } from "./common/event/EventMessage";
 import { GameManager } from "./game/GameManager";
 import { GUI } from "./gui/GUI";
 import { LayerManager } from "./gui/layer/LayerManager";
-import { TimeManager } from "./common/time/TimerManager";
 
 const { ccclass, property } = _decorator;
 
@@ -37,7 +36,7 @@ export class Root extends Component {
     /** 持久根节点 */
     persistRootNode: Node = null!
 
-    onLoad() {
+    async onLoad() {
         if (!isInited) {
             isInited = true;      // 注：这里是规避cc3.8在编辑器模式下运行时，关闭游戏会两次初始化报错
 
@@ -59,21 +58,25 @@ export class Root extends Component {
             //     this.init();
             //     this.run();
             // });
+
+            await this.preload()
+            this.enabled = true;
+            this.init();
+            this.run();
         }
     }
 
     update(dt: number) {
-        oops.ecs.execute(dt);
+        // oops.ecs.execute(dt);
     }
 
     /** 初始化游戏界面 */
-    protected initGui() {
+    protected initGUI() {
 
     }
 
-    /** 初始化游戏业务模块 */
-    protected initEcsSystem() {
-
+    protected async  preload():Promise<any>{
+        return null 
     }
 
     /** 加载完引擎配置文件后执行 */
@@ -89,20 +92,13 @@ export class Root extends Component {
         // 创建音频模块
         oops.audio = this.persistRootNode.addComponent(AudioManager);
         oops.audio.load();
-
-        // 创建时间模块
-        oops.time = this.persistRootNode.addComponent(TimeManager);
-
         oops.language = new LanguageManager();
         oops.game = new GameManager(this.game);
-        oops.gui = new LayerManager(this.gui);
-        this.initGui();
-        this.initEcsSystem();
-        oops.ecs.init();
+        this.initGUI();
 
         // 游戏显示事件
         game.on(Game.EVENT_SHOW, () => {
-            oops.time.load();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
+            oops.time.resume();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
             oops.audio.resumeAll();
             director.resume();
             game.resume();
@@ -111,7 +107,7 @@ export class Root extends Component {
 
         // 游戏隐藏事件
         game.on(Game.EVENT_HIDE, () => {
-            oops.time.save();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
+            oops.time.pause();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
             oops.audio.pauseAll();
             director.pause();
             game.pause();

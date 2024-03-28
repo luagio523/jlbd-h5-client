@@ -1,5 +1,5 @@
 import { Node } from "cc";
-import scheduler from "../../../utils/scheduler";
+import scheduler from "../../utils/scheduler";
 
 export default class EntityLayer extends Node{
     public constructor(){

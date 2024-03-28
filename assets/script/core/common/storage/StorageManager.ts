@@ -1,149 +1,190 @@
+import { tonumber } from "../utils/lstring";
+import { CryptoUtils } from "../utils/CryptoUtils";
 import { sys } from "cc";
-import { PREVIEW } from "cc/env";
-import { EncryptUtil } from "../../utils/EncryptUtil";
 
-/** 本地存储 */
-export class StorageManager {
-    static readonly Instance: StorageManager = new StorageManager();
-    private _key: string | null = null;
-    private _iv: string | null = null;
-    private _id: string = "";
+/**
+ * 本地存储
+ * 基于localStorage
+ * 兼容UserDefault
+ */
+export default class StorageManager{
+    // private listeners:any;          //Consts.EventName => cb[]
+
+    public static readonly  Inst = new StorageManager();
+
+    private encryption:boolean = false //for test
+    private fjalfjdlajfadsljf:string //mima
 
     /**
-     * 初始化密钥
-     * @param key aes加密的key 
-     * @param iv  aes加密的iv
+     * 是否加密
+     * @param encryption 
      */
-    init(key: string, iv: string) {
-        EncryptUtil.initCrypto(key, iv);
-
-        this._key = EncryptUtil.md5(key);
-        this._iv = EncryptUtil.md5(iv);
+    public setEncryption(encryption){
+        this.encryption = encryption
     }
 
-    /**
-     * 设置用户唯一标识
-     * @param id 
-     */
-    setUser(id: string) {
-        this._id = id;
+    private constructor()
+    {
+        this.fjalfjdlajfadsljf = "fdanvcxfjdalfjdafdsxa"
+        this.localMap = {}
     }
 
-    /**
-     * 存储本地数据
-     * @param key 存储key
-     * @param value 存储值
-     * @returns 
-     */
-    set(key: string, value: any) {
-        var keywords = `${key}_${this._id}`;
+    
 
-        if (null == key) {
-            console.error("存储的key不能为空");
-            return;
+    public setStringForKey(key:string,value:string,flush:boolean=true ){
+        this.setItem(key,value,flush)
+    }
+
+    public getStringForKey(key:string,defval?:any):string{
+        return this.getItem(key) || defval
+    }
+
+    public setBoolForKey(key:string,value:boolean,flush:boolean=true ){
+        this.setItem(key,value+"",flush)
+    }
+
+    public getBoolForKey(key:string,defval?:boolean):boolean{
+        let item = this.getItem(key)
+        if (item == null || item == 'undefined'){
+            return defval
         }
-        if (!PREVIEW) {
-            keywords = EncryptUtil.md5(keywords);
+        if(item == "false"){
+            return false
         }
-        if (null == value) {
-            console.warn("存储的值为空，则直接移除该存储");
-            this.remove(key);
-            return;
+        if(item == "true"){
+            return true
         }
-        if (typeof value === 'function') {
-            console.error("储存的值不能为方法");
-            return;
+        return false
+    }
+
+    public getIntegerForKey(key:string,defval?:number ):number{
+        let item = this.getItem(key)
+        if (!item){
+            return defval
         }
-        if (typeof value === 'object') {
+        return tonumber(item)
+    }
+
+    public setIntegerForKey(key:string,value:number,flush:boolean=true ){
+        this.setItem(key,value+"",flush)
+    }
+
+    public getObjectForKey(key: string, defval?: any):any {
+        let item = this.getItem(key);
+    
+        if (!item || item === "NaN") {
+            return defval;
+        }
+      
+        // 尝试进行数据解析
+        try {
+            return JSON.parse(item);
+        } catch (error) {
+            // 返回默认值defval如果数据解析失败
+            return defval;
+        }
+    }
+
+    public setObjectForKey(key:string,value:any,flush:boolean =true){
+        this.setItem(key,value,flush)
+    }
+
+    public setItem(key:string,val:string,flush:boolean=true ){
+        if(flush){
+            this.flushItem(key,val)
+        }else{
+            this.localMap[key] = val
+            this.setDirty()
+        }
+    }
+
+    private _dirty:boolean = false
+
+     /**
+     * 设置数据脏
+     * @param force 
+     */
+    public setDirty(force: boolean = false) {
+        if (force) {
+            this.flushItems()
+            return
+        }
+        if (this._dirty) {
+            return
+        }
+        this._dirty = true
+
+        setTimeout(() => {
+            this.flushItems();
+            this._dirty = false;
+        }, StorageManager.MAX_DELAY_SAVE_TIME);
+    }
+
+    public static MAX_DELAY_SAVE_TIME:number = 25000 // 25秒
+
+    private localMap:any = null
+    /**
+     * 写入本地数据
+     */
+	private flushItems(){
+        let val = null
+		for (const key in this.localMap) {//每个鱼更新
+			val = this.localMap[key]
+            this.flushItem(key,val)
+        }
+        this.localMap = {}
+    }
+    
+
+    private flushItem(key: string, val: string | boolean | number | object) {
+        let valString: string;
+    
+        // 将非string类型的值转换为string
+        if (typeof val === 'string') {
+            valString = val;
+        } else if (typeof val === 'number' || typeof val === 'boolean') {
+            valString = val.toString();
+        } else if (typeof val === 'object') {
+            valString = JSON.stringify(val);
+        }
+      
+        // 进行加密
+        if (this.encryption) {
+            valString = CryptoUtils.aesEncrypt(valString, this.fjalfjdlajfadsljf);
+        }
+    
+        // 存入localStorage
+        sys.localStorage.setItem(key, valString);
+    }
+
+    public getItem(key: string): string {
+        let item: string = sys.localStorage.getItem(key);
+      
+        if (!item || item === 'NaN') {
+            return null;
+        }
+    
+        if (this.encryption) {
             try {
-                value = JSON.stringify(value);
+                item = CryptoUtils.aesDecrypt(item, this.fjalfjdlajfadsljf);
+            } catch (error) {
+                // 在解密操作失败时返回null
+                return null;
             }
-            catch (e) {
-                console.error(`解析失败，str = ${value}`);
-                return;
-            }
         }
-        else if (typeof value === 'number') {
-            value = value + "";
-        }
-
-        if (!PREVIEW && null != this._key && null != this._iv) {
-            value = EncryptUtil.aesEncrypt(`${value}`, this._key, this._iv);
-        }
-        sys.localStorage.setItem(keywords, value);
+        return item;
     }
 
-    /**
-     * 获取指定关键字的数据
-     * @param key          获取的关键字
-     * @param defaultValue 获取的默认值
-     * @returns 
-     */
-    get(key: string, defaultValue: any = ""): string {
-        if (null == key) {
-            console.error("存储的key不能为空");
-            return null!;
-        }
+    // var data = 'Hello, this is a secret message!';
+// var key = 'Password!';
+// var encrypted = aesEncrypt(data, key);
+// var decrypted = aesDecrypt(encrypted, key);
 
-        key = `${key}_${this._id}`;
+// cc.log('Plain text: ' + data);
+// cc.log('Encrypted text: ' + encrypted);
+// cc.log('Decrypted text: ' + decrypted);
 
-        if (!PREVIEW) {
-            key = EncryptUtil.md5(key);
-        }
 
-        let str: string | null = sys.localStorage.getItem(key);
-        if (null != str && '' !== str && !PREVIEW && null != this._key && null != this._iv) {
-            str = EncryptUtil.aesDecrypt(str, this._key, this._iv);
-        }
-
-        if (null === str) {
-            return defaultValue;
-        }
-        return str;
-    }
-
-    /** 获取指定关键字的数值 */
-    getNumber(key: string, defaultValue: number = 0): number {
-        var r = this.get(key);
-        if (r == "0") {
-            return Number(r);
-        }
-        return Number(r) || defaultValue;
-    }
-
-    /** 获取指定关键字的布尔值 */
-    getBoolean(key: string): boolean {
-        var r = this.get(key);
-        return Boolean(r) || false;
-    }
-
-    /** 获取指定关键字的JSON对象 */
-    getJson(key: string, defaultValue?: any): any {
-        var r = this.get(key);
-        return (r && JSON.parse(r)) || defaultValue;
-    }
-
-    /**
-     * 删除指定关键字的数据
-     * @param key 需要移除的关键字
-     * @returns 
-     */
-    remove(key: string) {
-        if (null == key) {
-            console.error("存储的key不能为空");
-            return;
-        }
-
-        var keywords = `${key}_${this._id}`;
-
-        if (!PREVIEW) {
-            keywords = EncryptUtil.md5(keywords);
-        }
-        sys.localStorage.removeItem(keywords);
-    }
-
-    /** 清空整个本地存储 */
-    clear() {
-        sys.localStorage.clear();
-    }
+    
 }
+

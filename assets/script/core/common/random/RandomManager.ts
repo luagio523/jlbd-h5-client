@@ -2,7 +2,7 @@
 
 /** 随机管理 */
 export class RandomManager {
-    private static _instance: RandomManager;
+    public static readonly  Inst = new RandomManager();
 
     /** 是否运行在客户端环境 */
     isClient: boolean = true;
@@ -11,13 +11,8 @@ export class RandomManager {
 
     private random: any = null;
 
-    /** 随机数管理单例对象 */
-    static get instance(): RandomManager {
-        if (this._instance == null) {
-            this._instance = new RandomManager();
-            this._instance.random = Math.random;
-        }
-        return this._instance;
+    private constructor(){
+        this.random = Math.random
     }
 
     private getRandom(): number {

@@ -58,28 +58,9 @@ export class GameTimer {
         this.timers.forEach(timer => timer.update(deltaTime));
     }
 
-    /**
-     * 开始或者继续游戏计时。
-     */
-    public start(): void {
-        if (this.pausedAt) {
-            // 如果游戏以前暂停过，计算并记录暂停时间。
-            this.pausedTime += Date.now() - this.pausedAt;
-            this.pausedAt = null;
-        }
-        this.gameStartTime = Date.now() - this.pausedTime;
-        // 从新的开始时间激活所有Timer计时器。
-        this.timers.forEach(timer => timer.resume());
-    }
+    
 
-    /**
-     * 暂停游戏和所有计时器。
-     */
-    public pause(): void {
-        this.pausedAt = Date.now();
-        // 暂停所有Timer计时器。
-        this.timers.forEach(timer => timer.pause());
-    }
+    
 
     /**
      * 添加一个新的定时器到游戏计时器。
@@ -165,5 +146,32 @@ export class GameTimer {
         }
         // 游戏进行时，返回当前时间减去游戏开始时间。
         return Date.now() - this.gameStartTime - this.pausedTime;
+    }
+
+
+
+    /**
+     * 平台不需要在退出时精准计算时间，直接暂时游戏时间 暂停游戏和所有计时器。
+     */
+    public pause(): void {
+        this.pausedAt = Date.now();
+        // 暂停所有Timer计时器。
+        this.timers.forEach(timer => timer.pause());
+    }
+
+
+
+    /**
+     * 开始或者继续游戏计时。
+     */
+    public resume(): void {
+        if (this.pausedAt) {
+            // 如果游戏以前暂停过，计算并记录暂停时间。
+            this.pausedTime += Date.now() - this.pausedAt;
+            this.pausedAt = null;
+        }
+        this.gameStartTime = Date.now() - this.pausedTime;
+        // 从新的开始时间激活所有Timer计时器。
+        this.timers.forEach(timer => timer.resume());
     }
 }

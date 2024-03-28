@@ -5,7 +5,8 @@
  * @LastEditTime: 2023-02-14 14:27:22
  */
 
-import { oops } from "../../core/Oops";
+import { oops } from "../core/Oops";
+
 
 /* 游戏配置解析，对应 resources/config/config.json 配置 */
 export class GameConfig {
@@ -77,7 +78,6 @@ export class GameConfig {
     constructor(config: any) {
         let data = config.json;
         this._data = Object.freeze(data);
-
         oops.log.logConfig(this._data, "游戏配置");
     }
 }

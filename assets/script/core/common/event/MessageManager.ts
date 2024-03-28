@@ -31,7 +31,7 @@ export class MessageEventData {
         data.object = object;
         list.push(data);
 
-        MessageManager.Instance.on(event, listener, object);
+        MessageManager.Inst.on(event, listener, object);
     }
 
     /**
@@ -44,7 +44,7 @@ export class MessageEventData {
             return;
         }
         for (let eb of ebs) {
-            MessageManager.Instance.off(event, eb.listener, eb.object);
+            MessageManager.Inst.off(event, eb.listener, eb.object);
         }
         delete this.events[event];
     }
@@ -55,7 +55,7 @@ export class MessageEventData {
      * @param args(any)          事件参数
      */
     dispatchEvent(event: string, arg: any = null) {
-        MessageManager.Instance.dispatchEvent(event, arg);
+        MessageManager.Inst.dispatchEvent(event, arg);
     }
 
     /** 清除所有的全局事件监听 */
@@ -68,7 +68,7 @@ export class MessageEventData {
 
 
 export class MessageManager {
-    static readonly Instance: MessageManager = new MessageManager();
+    static readonly Inst: MessageManager = new MessageManager();
 
     private events: any = {};
 

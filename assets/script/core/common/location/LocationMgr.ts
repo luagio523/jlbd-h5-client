@@ -1,4 +1,5 @@
-import LocalStore from "../storage/LocalStore";
+import StorageManager from "../storage/StorageManager";
+import LocalStore from "../storage/StorageManager";
 
 /**
  * 本地路径和window全局处理
@@ -13,16 +14,16 @@ export class LocationMgr {
 		let val = this.getGValue(key) //先从 window
 
 		if(val){
-			LocalStore.ins().setStringForKey(key,val)
+			StorageManager.Inst.setStringForKey(key,val)
 			return val
 		}
 		val = this.getUrlVal(key) //再从html5
         if(val){
-			LocalStore.ins().setStringForKey(key,val)
+			StorageManager.Inst.setStringForKey(key,val)
             return  val
 		}
 
-		val = LocalStore.ins().getStringForKey(key,null) //再从本地
+		val = StorageManager.Inst.getStringForKey(key,null) //再从本地
 		if(val){
 			return val
 		}

@@ -11,17 +11,13 @@ import PoolMgr from "./core/common/pool/PoolMgr"
 import TextFilter from "./core/common/shield/TextFilter"
 import { HeapTimerMgr, ITimerMgr, LinkListTimerMgr } from "./core/common/timer/TimerMgr"
 import { Facade } from "./mvc/init"
+import { GameTimer } from "./core/common/timer/GameTimer"
 
 
 // const i18n = require("LanguageData");
 
 export default class app extends oops{
     public static WRITABLE_PATH:string
-
-     /**
-     * 是否显示新手引导
-     */
-    public static hasShowNewGuide:boolean
 
     
     public static get facade():Facade{
@@ -40,10 +36,11 @@ export default class app extends oops{
      * 获取定时器
      */
     public static timerMgr:ITimerMgr = new HeapTimerMgr()
-
-   
-   
     
+    /**
+     * 游戏时间
+     */
+    public static gameTimer:GameTimer = new GameTimer()
 
      /**
      * 获取屏蔽词过滤器
@@ -60,32 +57,6 @@ export default class app extends oops{
     }
 
   
-
-     /**
-     * 获取cdn status
-     */
-    public static get cdnStatus():any{
-        return true
-    }
-
-    /**
-     * 退出游戏
-     */
-    public static exitGame():void{
-       
-    }
-
-     /**
-     * 尝试释放资源
-     */
-    public static tryDipose():void{
-        // display.removeUnusedTextures()
-        // cc.loader.release
-    }
-
-
-
- 
 }
 
 

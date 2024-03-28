@@ -1,7 +1,7 @@
 import display from "../../core/common/utils/display";
 import { MapRender } from "./MapRender";
 import { Color, Component, Graphics, Node, Rect, Sprite, TiledMap, Tween, Vec2, Vec3, _decorator, log, tween } from "cc";
-import EntityLayer from "./layer/EntityLayer";
+import EntityLayer from "./EntityLayer";
 import { GameMap, MapType } from "./GameMap";
 
 const { ccclass, property } = _decorator;
@@ -52,7 +52,7 @@ class TrackLookAt{
 /**
  * 地图显示
  */
-export class MapView extends Node {
+export class MapLayer extends Node {
 	protected gameMap: GameMap
 	public constructor(gameMap: GameMap) {
 		super();
@@ -65,7 +65,6 @@ export class MapView extends Node {
 
 	private offset: Vec2 = new Vec2(0, 0) //由于图片的切割 可能有不足切割大小的 图。
 
-
 	private lastLookX:number = Number.MAX_VALUE
 	private lastLookY:number = Number.MAX_VALUE 
 
@@ -77,11 +76,9 @@ export class MapView extends Node {
 		this._mapNode.addComponent(TiledMap)
 
 		this.addChild(this._mapImage = new MapRender)
-		this._entityLayer = new EntityLayer;
-		this.addChild(this._entityLayer);
+		
 
 		this.trackLookAt = new TrackLookAt(0.2) //每0.2秒检测下跟踪player
-		
 	};
 
 	public get tileMap() {
@@ -92,14 +89,12 @@ export class MapView extends Node {
 	public update(dt: number): void {
 
 	}
-	
 
 	public trackLookAtTarget(target: Node): void {
 		this.trackLookAt.lookAt(target,(callback)=>
 			this.syncViewWithTarget(target,0.2,callback)
 		)
 	}
-
 
 	public lookAtTargetWithTween(target: Node, duration: number = 0.2): void {
 		if (!target || duration <= 0) return;
@@ -208,51 +203,4 @@ export class MapView extends Node {
 		}
 	}
 
-	/***********************************************************用于测试********************************************************************* */
-
-	protected getDrawGraphics() {
-		if (this.graphics) {
-			return this.graphics
-		}
-		let node = new Node()
-		this.addChild(node)
-		node.setSiblingIndex(1)
-		this.graphics = node.addComponent(Graphics)
-		return this.graphics
-	}
-
-	protected graphics: Graphics
-
-	public draw(points: Array<Vec2>, color: Color = Color.GREEN) {
-
-		let graphics = this.getDrawGraphics()
-		graphics.clear()
-
-		graphics.strokeColor = color
-		graphics.lineWidth = 6
-
-		for (let index = 0; index < points.length; index++) {
-			const element = points[index];
-			if (index == 0) {
-				graphics.moveTo(element.x, element.y)
-			} else {
-				graphics.lineTo(element.x, element.y)
-
-			}
-		}
-		graphics.stroke()
-	}
-
-	public draw3(rect: Rect, color: Color = Color.GREEN) {
-		let graphics = this.getDrawGraphics()
-		graphics.clear()
-
-		graphics.strokeColor = color
-		graphics.lineWidth = 4
-
-		graphics.rect(rect.x, rect.y, rect.width, rect.height)
-
-
-		graphics.stroke()
-	}
 }
