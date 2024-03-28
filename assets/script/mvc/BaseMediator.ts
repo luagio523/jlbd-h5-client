@@ -1,3 +1,4 @@
+import { GComponent, GObject } from "fairygui-cc"
 import { Mediator } from "../core/mvc/init"
 
 
@@ -39,7 +40,7 @@ export default class BaseMediator extends Mediator  {
 
     }
 
-    protected get view() :fgui.GComponent {
+    protected get view() :GComponent {
         return this.viewComponent 
     }
     
@@ -47,7 +48,7 @@ export default class BaseMediator extends Mediator  {
      * 根据路径获取借点
      * 类似cc.find()
      */
-    public  findChild(path:string, referenceNode?:fgui.GObject):fgui.GObject{
+    public  findChild(path:string, referenceNode?:GObject):GObject{
         referenceNode = referenceNode || this.view
 
         var match:any = referenceNode;
@@ -89,7 +90,7 @@ export default class BaseMediator extends Mediator  {
      * 查找parent 下 名字为name的节点
      * 效率低下
      */
-    public seekChild(parent:fgui.GComponent,name:string){
+    public seekChild(parent:GComponent,name:string){
         if(!parent){
             return
         }

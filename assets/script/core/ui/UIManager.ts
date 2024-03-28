@@ -29,15 +29,6 @@ interface IFacade {
 }
 
 
-// 配置对象更新成包含loader方法
-const UI_CONFIG: { [uiId: string]: IUIConfig } = {
-    "loginUI": {
-        uiId: "loginUI",
-        uiLayer: UILayer.BACKGROUND,
-        mediatorClass: "LoginMediator",
-        resourcePath: "res/Login",
-    },
-};
 
 
 
@@ -67,7 +58,7 @@ export class UIManager  {
     protected loadUI(config: IUIConfig): Promise<any> {
         return this.resManager.load(config)
     }
-    
+
     public toast(message:string):void{
         console.log(message)
     }
