@@ -1,4 +1,4 @@
-class MinHeap<T> {
+export class MinHeap<T> {
     public heap: Array<T>;
   
     constructor(private comparator: (a: T, b: T) => number ) {

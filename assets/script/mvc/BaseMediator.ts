@@ -1,4 +1,4 @@
-import { Mediator } from "./init";
+import { Mediator } from "../core/mvc/init"
 
 
 

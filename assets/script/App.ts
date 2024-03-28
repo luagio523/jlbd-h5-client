@@ -10,7 +10,6 @@ import NativeHelper from "./core/common/sdk/NativeHelper"
 import PoolMgr from "./core/common/pool/PoolMgr"
 import TextFilter from "./core/common/shield/TextFilter"
 import { HeapTimerMgr, ITimerMgr, LinkListTimerMgr } from "./core/common/timer/TimerMgr"
-import { Facade } from "./mvc/init"
 import { GameTimer } from "./core/common/timer/GameTimer"
 
 
@@ -20,9 +19,7 @@ export default class app extends oops{
     public static WRITABLE_PATH:string
 
     
-    public static get facade():Facade{
-        return Facade.getInstance()
-    }
+    
     
 
     /**
