@@ -1,4 +1,4 @@
-enum ActType {
+export enum ActType {
     ACT_RESET = 0,        // 重置状态，通常用于初始化或者重置角色行为
     ACT_IDLE = 1,         // 空闲状态，角色站立不动或进行轻微活动
     ACT_WALK = 2,         // 行走状态，角色以走的方式移动
@@ -7,7 +7,8 @@ enum ActType {
     ACT_STAND = 5,        // 站立状态，角色静止站立
     ACT_DEATH = 6,        // 死亡状态，角色死亡动作和效果
     ACT_CAST =  7,        //施法
-    
+    ACT_HURT = 11, //受伤
+
     ACT_JUMP = 20,        // 跳跃状态，角色执行跳跃动作
     ACT_FLY = 21,         // 飞行状态，角色在空中飞行或悬浮
     ACT_SWIM = 22,        // 游泳状态，角色在水中游泳
@@ -17,3 +18,5 @@ enum ActType {
 
     
 }
+
+

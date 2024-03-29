@@ -210,13 +210,13 @@ export  class MovieBody extends  GameRenderObject  {
  * 龙骨播放器
  * 还能优化 如渲染层面等
  */
-export class DragonPlayer extends GameObject {
+export class DragonBody extends GameObject {
     public static DEFAULT_ANIMATION = "Idle";
 
 
     protected _display:dragonBones.ArmatureDisplay
     protected _armature:dragonBones.Armature
-    protected _aniName:string = DragonPlayer.DEFAULT_ANIMATION
+    protected _aniName:string = DragonBody.DEFAULT_ANIMATION
     
 
     protected _times:number = -1
@@ -232,14 +232,9 @@ export class DragonPlayer extends GameObject {
         this._display.addEventListener(dragonBones.EventObject.FADE_IN_COMPLETE, this._animationEventHandler, this);
         this._display.addEventListener(dragonBones.EventObject.FADE_OUT_COMPLETE, this._animationEventHandler, this);
         this._display.addEventListener(dragonBones.EventObject.COMPLETE, this._animationEventHandler, this);
-
-        // dragonBones.CCFactory.getInstance().
     }
 
-    public getNode(): Node {
-        return this
-    }
-
+    
     public setAnchor(anchorX:number,anchorY:number):void{
         let transform = this.getComponent(UITransform)
         if (anchorX !== null) {
@@ -354,7 +349,6 @@ export class DragonPlayer extends GameObject {
      */
     protected onDestroy():void{
         super.onDestroy()
-
         this._display.removeEventListener(dragonBones.EventObject.FADE_IN_COMPLETE, this._animationEventHandler, this);
         this._display.removeEventListener(dragonBones.EventObject.FADE_OUT_COMPLETE, this._animationEventHandler, this);
         this._display.removeEventListener(dragonBones.EventObject.COMPLETE, this._animationEventHandler, this);
