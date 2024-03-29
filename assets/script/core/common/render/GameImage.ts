@@ -1,4 +1,4 @@
-import { Node, Sprite, SpriteFrame, UITransform, assetManager } from "cc";
+import { Node, Sprite, SpriteFrame, Texture2D, UITransform, assetManager, resources } from "cc";
 
 
 /**
@@ -29,21 +29,35 @@ export default class GameImage extends Node {
     public set source(url:string){
         if(this.isload(url))return 
         this.clear() //清除原有的
-        assetManager.loadBundle(url, SpriteFrame,  (err, bundle)=> {
+        // assetManager.loadBundle(url, SpriteFrame,  (err, bundle)=> {
+        //     if (err != null) {
+        //         console.log(err);
+        //         return;
+        //     }
+        //     bundle.load(url, SpriteFrame, (err, spFrame) => {
+        //         if (err != null) {
+        //             console.log(err);
+        //             return;
+        //         }
+        //         // 使用加载的SpriteFrame
+        //         this.renderSprite.spriteFrame = spFrame;
+        //     });
+        // });
+
+        resources.load(url, SpriteFrame, (err, spFrame) => {
             if (err != null) {
                 console.log(err);
                 return;
             }
-            bundle.load(url, SpriteFrame, (err, spFrame) => {
-                if (err != null) {
-                    console.log(err);
-                    return;
-                }
-                // 使用加载的SpriteFrame
-                this.renderSprite.spriteFrame = spFrame;
-            });
+            // 使用加载的SpriteFrame
+            this.renderSprite.spriteFrame = spFrame;
         });
-     
+    }
+
+    public setTexture(texture:Texture2D){
+        if(this.renderSprite.spriteFrame){
+            this.renderSprite.spriteFrame.texture = texture
+        }
     }
 
     public clear(){
@@ -53,6 +67,11 @@ export default class GameImage extends Node {
         }
     }
     
+    public clone():GameImage{
+        let image = new GameImage
+        image.source = this.url
+        return image
+    }
    
 }
 

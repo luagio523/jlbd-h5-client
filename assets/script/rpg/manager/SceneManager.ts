@@ -11,6 +11,8 @@ export enum LayerType {
 }
 
 export class SceneManager {
+
+    public static readonly Inst = new SceneManager
     protected rootNode: Node
     protected mapLayer: Node;
     protected dropLayer: Node;

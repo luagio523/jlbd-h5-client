@@ -11,6 +11,7 @@ import PoolMgr from "./core/common/pool/PoolMgr"
 import TextFilter from "./core/common/shield/TextFilter"
 import { HeapTimerMgr, ITimerMgr, LinkListTimerMgr } from "./core/common/timer/TimerMgr"
 import { GameTimer } from "./core/common/timer/GameTimer"
+import ConfigMgr from "./manager/ConfigMgr"
 
 
 // const i18n = require("LanguageData");
@@ -53,6 +54,13 @@ export default class app extends oops{
         return NativeHelper.ins()
     }
 
+
+    /**
+     * 获取配置
+     */
+    public static get config():ConfigMgr{
+        return ConfigMgr.ins()
+    }
   
 }
 

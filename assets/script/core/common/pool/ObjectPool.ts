@@ -44,7 +44,7 @@ export class ObjectPool<T> {
         return object;
     }
 
-    returnObject(object: T): void {
+    returnObject(object: T): boolean {
         if (!object) {
             throw new Error('Cannot return null or undefined object to the pool.');
         }
@@ -55,11 +55,13 @@ export class ObjectPool<T> {
             }
             this.queue.enqueue(object);
             this._stat.returned();
+            return true 
         } else {
             if (this.destructor) {
                 this.destructor(object);
             }
             this._stat.trimmed(); // If the pool is full, the object is destroyed
+            return false 
         }
     }
 

@@ -1,7 +1,7 @@
 import { Component } from "cc";
 import { AudioEffect } from "./AudioEffect";
 import { AudioMusic } from "./AudioMusic";
-import { StorageManager } from "../storage/StorageManager";
+import StorageManager from "../storage/StorageManager";
 
 const LOCAL_STORE_KEY = "game_audio";
 
@@ -169,7 +169,7 @@ export class AudioManager extends Component {
         this.local_data.switch_effect = this._switch_effect;
 
         let data = JSON.stringify(this.local_data);
-        StorageManager.Instance.set(LOCAL_STORE_KEY, data);
+        StorageManager.Inst.setObjectForKey(LOCAL_STORE_KEY, data);
     }
 
 
@@ -178,7 +178,7 @@ export class AudioManager extends Component {
         this.music = this.getComponent(AudioMusic) || this.addComponent(AudioMusic)!;
         this.effect = this.getComponent(AudioEffect) || this.addComponent(AudioEffect)!;
 
-        let data = StorageManager.Instance.get(LOCAL_STORE_KEY);
+        let data = StorageManager.Inst.getObjectForKey(LOCAL_STORE_KEY);
 
         if (data) {
             try {
