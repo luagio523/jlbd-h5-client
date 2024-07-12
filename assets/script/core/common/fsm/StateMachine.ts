@@ -71,7 +71,7 @@ export class StateMachine<T, State> {
 
             this._transitions[key] = (() => {
                 if (!this.can(key)) {
-                    this.postError(1000, `You can not '${key}' now. Current state is ${this._curState}`);
+                    this.postError(1000, `You can not '${String(key)}' now. Current state is ${this._curState}`);
                     return;
                 }
 
@@ -84,7 +84,7 @@ export class StateMachine<T, State> {
                 const dir = this._findDir(curState, value);
 
                 if (dir == null) {
-                    this.postError(1000, `You can not '${key}' now. Current state is ${this._curState}`);
+                    this.postError(1000, `You can not '${String(key)}' now. Current state is ${this._curState}`);
                     return;
                 }
 
@@ -185,3 +185,114 @@ export class StateMachine<T, State> {
         return false;
     }
 }
+
+
+
+
+// {
+//     "name": "AnimationStateMachine",
+//     "initialState": "Idle",
+//     "states": ["Idle", "Running", "Jumping", "Attacking", "Dead"],
+//     "events": ["START_RUNNING", "STOP_RUNNING", "START_JUMPING", "LAND_JUMP", "START_ATTACK", "COMPLETE_ATTACK", "CHARACTER_DIES"],
+//     "transitions": [
+//         { "from": ["Idle", "Running", "Jumping", "Attacking"], "event": "START_RUNNING", "to": "Running"},
+//         { "from": ["Idle", "Attacking"], "event": "START_ATTACK", "to": "Attacking"},
+//         { "from": ["Idle", "Running", "Jumping", "Attacking"], "event": "CHARACTER_DIES", "to": "Dead"},
+//         { "from": ["Running"], "event": "STOP_RUNNING", "to": "Idle"},
+//         { "from": ["Running"], "event": "START_JUMPING", "to": "Jumping"},
+//         { "from": ["Jumping"], "event": "LAND_JUMP", "to": "Idle"},
+//         { "from": ["Attacking"], "event": "COMPLETE_ATTACK", "to": "Idle"}
+//     ]
+// }
+
+
+// {
+//     "name": "AnimationStateMachine",
+//     "initialState": "Idle",
+//     "states": {
+//         "Idle": {"loop": true, "animation": ["idleAnimation1", "idleAnimation2"]},
+//         "Running": {"loop": true, "animation": ["runningAnimation"]},
+//         "Jumping": {"loop": false, "animation": ["jumpingAnimation"]},
+//         "Attacking": {"loop": false, "animation": ["attackAnimation1", "attackAnimation2"]},
+//         "Dead": {"loop": false, "animation": ["deathAnimation"]}
+//     },
+//     "events": ["START_RUNNING", "STOP_RUNNING", "START_JUMPING", "LAND_JUMP", "START_ATTACK", "COMPLETE_ATTACK", "CHARACTER_DIES"],
+//     "transitions": [
+//         { "from": ["Idle", "Running", "Jumping", "Attacking"], "event": "START_RUNNING", "to": "Running"},
+//         { "from": ["Idle", "Attacking"], "event": "START_ATTACK", "to": "Attacking"},
+//         { "from": ["Idle", "Running", "Jumping", "Attacking"], "event": "CHARACTER_DIES", "to": "Dead"},
+//         { "from": ["Running"], "event": "STOP_RUNNING", "to": "Idle"},
+//         { "from": ["Running"], "event": "START_JUMPING", "to": "Jumping"},
+//         { "from": ["Jumping"], "event": "LAND_JUMP", "to": "Idle"},
+//         { "from": ["Attacking"], "event": "COMPLETE_ATTACK", "to": "Idle"}
+//     ]
+// }
+
+
+// {
+//     "name": "AnimationStateMachine",
+//     "initialState": "Idle",
+//     "states": {
+//         "Idle": {"loop": true, "animation": ["idleAnimation1", "idleAnimation2"]},
+//         "Running": {"loop": true, "animation": ["runningAnimation"]},
+//         "Jumping": {"loop": false, "animation": ["jumpingAnimation"]},
+//         "Attacking": {"loop": false, "animation": ["attackAnimation1", "attackAnimation2"]},
+//         "Dead": {"loop": false, "animation": ["deathAnimation"]}
+//     },
+//     "transitions": [
+//         { 
+//             "from": ["Idle"], 
+//             "to": "Dead",
+//             "event": "GODEAD",
+//             "auto_update": {
+//                 "delta": 5,
+//                 "condition": {"isInLava": true}
+//             }
+//         },
+//         { 
+//             "from": ["Running"], 
+//             "to": "Dead",
+//             "event": "CHARACTER_DIES_FROM_RUNNING",
+//             "auto_update": {
+//                 "delta": 5,
+//                 "condition": {"isInLava": true}
+//             }
+//         }
+//         // 后续过渡...
+//     ]
+// }
+
+
+
+
+// function createAnimationStateMachine(json) {
+//     // 将JSON数据转换为你的状态机格式
+//     const states = json.states;
+
+//     const transitions = {};
+//     for (const state of states) {
+//         transitions[state.name] = state.transitions.map(t => {
+//             return {
+//                 from: state.name,
+//                 to: t.to,
+//                 onTransition: (from, to) => {
+//                     console.log(`Transition from ${from} to ${to}`);
+//                 },
+//             };
+//         });
+//     }
+
+//     // 创建一个状态机实例
+//     const stateMachine = new StateMachine({
+//         init: states[0].name,
+//         transitions: transitions,
+//         onBefore: (from, to) => console.log(`Prepare to transition from ${from} to ${to}`),
+//         onAfter: (from, to) => console.log(`Transitioned from ${from} to ${to}`),
+//         onError: (code, reason) => console.log(`Error: ${code}, ${reason}`),
+//     });
+    
+//     return stateMachine;
+// }
+
+// // 使用JSON描述的动画状态机数据创建一个新的状态机实例
+// let animationStateMachine = createAnimationStateMachine(animationStateMachineJSON);

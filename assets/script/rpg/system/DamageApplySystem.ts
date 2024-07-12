@@ -1,7 +1,7 @@
 import { CombatCalculator } from "../CombatCalculator";
 import { AttackComponent } from "../component/AttackComponent";
 import { AttributeComponent } from "../component/AttributeComponent";
-import { BuffComponent } from "../component/BuffComponent";
+import { BuffComponent } from "../component/ModifierComponent";
 import { DefenseComponent } from "../component/DefenseComponent";
 import { EquipmentComponent } from "../component/EquipmentComponent";
 import { HealthComponent } from "../component/HealthComponent";

@@ -71,7 +71,7 @@ export default class GameObject extends Node {
      * 归还对象池
      */
     private __return_pool__():boolean{
-        let pool = app.poolMgr.getPool_(js.getClassName(this)) //getPool_不会丢出异常
+        let pool = app.poolMgr.getPool(js.getClassName(this)) //getPool_不会丢出异常
         if(pool){
             return pool.returnObject(this)
         }

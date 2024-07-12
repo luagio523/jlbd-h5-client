@@ -1,6 +1,7 @@
 import { Timer } from "../../core/common/timer/Timer";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { ModifierAttribute, ModifierFunction, ModifierState } from "../enum/Modifier";
+import { BaseAbility } from "./BaseAbility";
 
 
 // 例如，你可能想要把 value 当做基础的变化值，intensity 用来增强或者削弱这个基础效果。在这个框架里，
@@ -85,193 +86,261 @@ export interface IModifierEffect {
 
 
 
-export class Modifier {
+export abstract class Modifier {
+    public stackCount: number = 1;
+    public attribute: ModifierAttribute;
 
-    public id: string
-    public duration: number
-    public isHidden:boolean;//在状态界面中显示
-    public isDebuff:boolean; //是否是减益效果
-    public purgable: boolean; //可以被净化  被驱散
+    protected caster: ECSEntity | null = null;
+    protected ability: BaseAbility | null = null;
+    protected auraOwner: ECSEntity | null = null;
+    protected timer: Timer;
 
-    public stackCount:number //叠加次数
-    
-    public attribute :ModifierAttribute //可定义叠加类型
-    protected timer:Timer
-
-    effects:Array<IModifierEffect>; //效果列表
- 
-    constructor() {
+    constructor(
+        public id: string,
+        public duration: number = Infinity,
+        public isHidden: boolean = false,
+        public isDebuff: boolean = false,
+        public purgable: boolean = true,
+        public priority: number = 0,
+        attribute: ModifierAttribute = ModifierAttribute.MODIFIER_ATTRIBUTE_NONE
+    ) {
+        this.attribute = attribute;
     }
- 
-    // 更新方法，决定何时执行think
-    // 只使用deltaTime参数
+
     public update(deltaTime: number): void {
-        if(this.timer){
-            this.timer.update(deltaTime)
+        if (this.timer) {
+            this.timer.update(deltaTime);
         }
-    }
-
-    public applyModifier(entity: ECSEntity) {
-        for (let effect of this.effects) {
-            effect.applyEffect(entity);
-        }
-    }
-
-    public removeModifier(entity: ECSEntity) {
-        for (let effect of this.effects) {
-            effect.removeEffect(entity);
-        }
-    }
-    /********************************************************************************* */
-    public IsHidden():boolean{
-        return this.isHidden
-    }
-
-    public IsDebuff():boolean{
-        return this.isDebuff
-    }
-
-    public IsPurgable():boolean{
-        return this.purgable
-    }
-  
-
-    public OnCreated():void{
-
-    }
-
-    public OnRefresh():void{
-
-    }
-
-    public OnDestroy():void{
-
-    }
-
-
-    protected SetStackCount(count:number):void{
-        this.stackCount = count
-    }
-
-    protected IncrementStackCount():void{
-        this.stackCount ++ 
-    }
-
-    protected StartIntervalThink(thinkInterval: number){
-        if(!this.timer){
-            this.timer = new Timer(thinkInterval,this.OnIntervalThink.bind(this))
-        }
-        this.timer.setInterval(thinkInterval)
-    } 
- 
-    protected OnIntervalThink(){
-
-    }
-
-
-    public ListDeclareFunctions(): [ModifierFunction, IModifierValueGetter|IModifierEventHandler][]{
-        return []
-    }
-
-    public checkState(): IModifierStateInterface {
-        return {
-            // [ModifierState.MODIFIER_STATE_STUNNED]: true,
-        };
-    }
- 
- }
-
-
-export interface IModifierValueGetter {
-    (args?: any): number;
-}
-
-// 这个接口用于事件处理函数，如 OnAttacked。
-export interface IModifierEventHandler {
-    (params: any): void; 
-}
-
-export type IModifierStateInterface = {
-    [state : number]: boolean;
-};
-
-function isModifierValueGetter(functionToCheck: any): functionToCheck is IModifierValueGetter {
-    return functionToCheck && typeof(functionToCheck) === 'function' && functionToCheck.length === 0;
-}
-
-// ModifierMapping 类来管理 ModifierFunction 与 IModifierGetter 之间的关系
-export class ModifierMapping {
-
-    private modifierGetterMap: Map<ModifierFunction, IModifierValueGetter[]> = new Map();
-    private modifierEventMap: Map<ModifierFunction, IModifierEventHandler[]> = new Map();
-    
-    private static inst: ModifierMapping;
-    static ins(): ModifierMapping {
-        if (!this.inst) {
-            this.inst = new ModifierMapping();
-        }
-        return this.inst;
-    }
-
-    // 添加处理器，既可以是值获取器，也可以是事件处理器
-    public add(func: ModifierFunction , getterOrHandler: IModifierValueGetter | IModifierEventHandler): void {
-        if (isModifierValueGetter(getterOrHandler)) {
-            const getters = this.modifierGetterMap.get(func) || [];
-            getters.push(getterOrHandler);
-            this.modifierGetterMap.set(func, getters);
-        } else {
-            const handlers = this.modifierEventMap.get(func) || [];
-            handlers.push(getterOrHandler);
-            this.modifierEventMap.set(func, handlers);
-        }
-    }
-
-    // 从值获取器 Map 中移除处理器
-    public remove(func: ModifierFunction , getter: IModifierValueGetter): void {
-        const getters = this.modifierGetterMap.get(func);
-        if (getters) {
-            const index = getters.indexOf(getter);
-            if (index !== -1) {
-                getters.splice(index, 1); // 从列表中移除 getter
-                if (getters.length === 0) {
-                    this.modifierGetterMap.delete(func); // 列表为空则删除该键
-                } else {
-                    this.modifierGetterMap.set(func, getters); // 更新列表
-                }
+        if (this.duration !== Infinity) {
+            this.duration -= deltaTime;
+            if (this.duration <= 0) {
+                this.OnDestroy();
             }
         }
     }
 
-    public get(func: ModifierFunction): IModifierValueGetter[] {
-        return this.modifierGetterMap.get(func) || [];
-    }
+    public IsHidden(): boolean { return this.isHidden; }
+    public IsDebuff(): boolean { return this.isDebuff; }
+    public IsPurgable(): boolean { return this.purgable; }
 
-    public calculateModifierTotalValue(func: ModifierFunction): number {
-        let list =  this.modifierGetterMap.get(func) ;
-        if(!list) return 0
-        let totalValue = 0;
-        list.forEach(getter => {
-            totalValue += getter();
-        });
-        return totalValue;
-    }
+    public OnCreated(): void {}
+    public OnRefresh(): void {}
+    public OnDestroy(): void {}
 
+    protected SetStackCount(count: number): void { this.stackCount = count; }
+    protected IncrementStackCount(): void { this.stackCount++; }
 
-     // 添加一个新的方法来触发事件
-     public triggerEvent(func: ModifierFunction, params: any): void {
-        const handlers = this.modifierEventMap.get(func);
-        if (handlers) {
-            handlers.forEach(handler => {
-                handler(params);
-            });
+    protected StartIntervalThink(thinkInterval: number) {
+        if (!this.timer) {
+            this.timer = new Timer(thinkInterval, this.OnIntervalThink.bind(this));
         }
+        this.timer.setInterval(thinkInterval);
     }
 
-    public clear(): void {
-        this.modifierGetterMap.clear();
-        this.modifierEventMap.clear();
+    protected OnIntervalThink() {}
+
+    abstract ListDeclareFunctions(): ModifierFunction[];
+
+    getModifierValue(func: ModifierFunction, entity: ECSEntity): number {
+        const declaredFunctions = this.ListDeclareFunctions();
+        if (declaredFunctions.includes(func)) {
+            return this.getModifierValueInternal(func, entity);
+        }
+        return 0;
     }
+
+    protected abstract getModifierValueInternal(func: ModifierFunction, entity: ECSEntity): number;
+
+    abstract checkState(): Map<ModifierState, boolean>;
+
+    getModifierState(state: ModifierState): boolean {
+        return this.checkState().get(state) || false;
+    }
+
+    public handleStacking(newModifier: Modifier) {
+        if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_MULTIPLE)) {
+            this.IncrementStackCount();
+        }
+        this.OnRefresh();
+    }
+
+    public setCaster(caster: ECSEntity): void { this.caster = caster; }
+    public getCaster(): ECSEntity | null { return this.caster; }
+    public setAbility(ability: BaseAbility): void { this.ability = ability; }
+    public getAbility(): BaseAbility | null { return this.ability; }
+    public setAuraOwner(owner: ECSEntity): void { this.auraOwner = owner; }
+    public getAuraOwner(): ECSEntity | null { return this.auraOwner; }
+
+    public isAura(): boolean { return false; }
+    public createAuraEffect(target: ECSEntity): Modifier | null { return null; }
+    public getAuraRadius(): number { return 0; }
+    public shouldApplyToTarget(target: ECSEntity): boolean { return true; }
+
+    public hasAttribute(attr: ModifierAttribute): boolean {
+        return (this.attribute & attr) !== 0;
+    }
+
+    public getRemainingDuration(): number { return this.duration; }
+    public isExpired(): boolean { return this.duration <= 0; }
+
+    public abstract getAffectedComponentTypes(): Set<Function>;
+    public abstract clone(): Modifier;
 }
+
+
+
+
+
+//  class AttributeBonusModifier extends Modifier {
+//     constructor() {
+//         super("attribute_bonus", Infinity, false, false, false, 100);
+//     }
+
+//     ListDeclareFunctions(): ModifierFunction[] {
+//         return [ModifierFunction.MODIFIER_PROPERTY_STATS_STRENGTH_BONUS];
+//     }
+
+//     protected getModifierValueInternal(func: ModifierFunction, entity: ECSEntity): number {
+//         if (func === ModifierFunction.MODIFIER_PROPERTY_STATS_STRENGTH_BONUS) {
+//             return 30;
+//         }
+//         return 0;
+//     }
+// }
+
+// class GodsStrengthModifier extends Modifier {
+//     constructor() {
+//         super("gods_strength", 25, false, false, true, 10);
+//     }
+
+//     ListDeclareFunctions(): ModifierFunction[] {
+//         return [ModifierFunction.MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE];
+//     }
+
+//     protected getModifierValueInternal(func: ModifierFunction, entity: ECSEntity): number {
+//         if (func === ModifierFunction.MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE) {
+//             const level = entity.getLevel();
+//             if (level < 11) return 80;
+//             if (level < 16) return 120;
+//             return 160;
+//         }
+//         return 0;
+//     }
+// }
+
+
+//  class StunModifier extends Modifier {
+//     constructor(duration: number) {
+//         super("stun", duration, false, true, true, 100);
+//     }
+
+//     ListDeclareFunctions(): ModifierFunction[] {
+//         return [];  // 眩晕可能不直接修改属性
+//     }
+
+//     protected getModifierValueInternal(func: ModifierFunction, entity: ECSEntity): number {
+//         return 0;  // 眩晕可能不直接修改属性值
+//     }
+
+//     checkState(): Map<ModifierState, boolean> {
+//         return new Map([
+//             [ModifierState.MODIFIER_STATE_STUNNED, true]
+//         ]);
+//     }
+// }
+
+
+
+// export interface IModifierValueGetter {
+//     (args?: any): number;
+// }
+
+// // 这个接口用于事件处理函数，如 OnAttacked。
+// export interface IModifierEventHandler {
+//     (params: any): void; 
+// }
+
+// export type IModifierStateInterface = {
+//     [state : number]: boolean;
+// };
+
+// function isModifierValueGetter(functionToCheck: any): functionToCheck is IModifierValueGetter {
+//     return functionToCheck && typeof(functionToCheck) === 'function' && functionToCheck.length === 0;
+// }
+
+// // ModifierMapping 类来管理 ModifierFunction 与 IModifierGetter 之间的关系
+// export class ModifierMapping {
+
+//     private modifierGetterMap: Map<ModifierFunction, IModifierValueGetter[]> = new Map();
+//     private modifierEventMap: Map<ModifierFunction, IModifierEventHandler[]> = new Map();
+    
+//     private static inst: ModifierMapping;
+//     static ins(): ModifierMapping {
+//         if (!this.inst) {
+//             this.inst = new ModifierMapping();
+//         }
+//         return this.inst;
+//     }
+
+//     // 添加处理器，既可以是值获取器，也可以是事件处理器
+//     public add(func: ModifierFunction , getterOrHandler: IModifierValueGetter | IModifierEventHandler): void {
+//         if (isModifierValueGetter(getterOrHandler)) {
+//             const getters = this.modifierGetterMap.get(func) || [];
+//             getters.push(getterOrHandler);
+//             this.modifierGetterMap.set(func, getters);
+//         } else {
+//             const handlers = this.modifierEventMap.get(func) || [];
+//             handlers.push(getterOrHandler);
+//             this.modifierEventMap.set(func, handlers);
+//         }
+//     }
+
+//     // 从值获取器 Map 中移除处理器
+//     public remove(func: ModifierFunction , getter: IModifierValueGetter): void {
+//         const getters = this.modifierGetterMap.get(func);
+//         if (getters) {
+//             const index = getters.indexOf(getter);
+//             if (index !== -1) {
+//                 getters.splice(index, 1); // 从列表中移除 getter
+//                 if (getters.length === 0) {
+//                     this.modifierGetterMap.delete(func); // 列表为空则删除该键
+//                 } else {
+//                     this.modifierGetterMap.set(func, getters); // 更新列表
+//                 }
+//             }
+//         }
+//     }
+
+//     public get(func: ModifierFunction): IModifierValueGetter[] {
+//         return this.modifierGetterMap.get(func) || [];
+//     }
+
+//     public calculateModifierTotalValue(func: ModifierFunction): number {
+//         let list =  this.modifierGetterMap.get(func) ;
+//         if(!list) return 0
+//         let totalValue = 0;
+//         list.forEach(getter => {
+//             totalValue += getter();
+//         });
+//         return totalValue;
+//     }
+
+
+//      // 添加一个新的方法来触发事件
+//      public triggerEvent(func: ModifierFunction, params: any): void {
+//         const handlers = this.modifierEventMap.get(func);
+//         if (handlers) {
+//             handlers.forEach(handler => {
+//                 handler(params);
+//             });
+//         }
+//     }
+
+//     public clear(): void {
+//         this.modifierGetterMap.clear();
+//         this.modifierEventMap.clear();
+//     }
+// }
 
   
 

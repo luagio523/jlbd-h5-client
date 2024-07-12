@@ -1,4 +1,4 @@
-import {BuffComponent } from "../component/BuffComponent";
+import {BuffComponent } from "../component/ModifierComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { BaseSystem } from "./BaseSystem";
 

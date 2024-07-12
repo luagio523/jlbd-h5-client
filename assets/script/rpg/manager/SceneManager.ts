@@ -12,7 +12,18 @@ export enum LayerType {
 
 export class SceneManager {
 
-    public static readonly Inst = new SceneManager
+
+    private static instance: SceneManager;
+
+    private constructor() {}
+
+    public static getInstance(): SceneManager {
+        if (!SceneManager.instance) {
+            SceneManager.instance = new SceneManager();
+        }
+        return SceneManager.instance;
+    }
+
     protected rootNode: Node
     protected mapLayer: Node;
     protected dropLayer: Node;

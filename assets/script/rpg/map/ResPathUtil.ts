@@ -60,24 +60,7 @@ export class ResPathUtil {
 			return ResPathUtil.ANIM_PATH + "body/" + name
 		}
 	
-		/**
-		 * 获取动画
-		 * @param skinId 
-		 */
-		public static GetBodyAnimId(configId:number,action:ActType = ActType.ACT_STAND):string{
-			let actionID:number;
-			switch(action) {
-				case ActType.ACT_ATTACK: actionID = 1; break;
-				case ActType.ACT_CAST: actionID = 2; break;
-				case ActType.ACT_STAND: actionID = 3; break;
-				case ActType.ACT_RUN: actionID = 4; break;
-				case ActType.ACT_DEATH: actionID = 5; break;
-				case ActType.ACT_JUMP: actionID = 6; break;
-				default: actionID = 3; break;
-			}
-			return tostring(actionID * 1000 + configId);
-		}
-	
+		
 
 
 

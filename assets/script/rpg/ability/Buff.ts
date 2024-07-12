@@ -1,12 +1,30 @@
-import { ECSEntity } from "../ecs/ECSEntity";
+import { ModifierAttribute } from "../enum/Modifier";
 import { Modifier } from "./Modifier";
 
-export class Buff extends Modifier{
-    public source: ECSEntity ;
-    
+
+export abstract class Buff extends Modifier {
+    constructor(
+        id: string,
+        duration: number = Infinity,
+        isHidden: boolean = false,
+        isDebuff: boolean = false,
+        purgable: boolean = true,
+        priority: number = 0,
+        attribute: ModifierAttribute = ModifierAttribute.MODIFIER_ATTRIBUTE_NONE
+    ) {
+        super(id, duration, isHidden, isDebuff, purgable, priority);
+        this.attribute = attribute;
+    }
+
+    // 可以在这里添加 Buff 特有的方法和属性
+    public getRemainingDuration(): number {
+        return this.duration;
+    }
+
+    public refresh(): void {
+        this.OnRefresh();
+    }
 }
-
-
 
 
 

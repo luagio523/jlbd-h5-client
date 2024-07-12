@@ -2,232 +2,183 @@
 // AbilitySpecial 通常用于定义一些变量数值，这些数值往往关联到技能的等级。例如，技能冷却时间、伤害、范围等在每个技能等级都可能有不同的设置。这就是为什么 AbilitySpecial 中常常会看到一些范围，比如 "110 140 170 200"，这表示在每个等级，该值会分别是 110, 140, 170, 200。
 // AbilityValues 则是用来提供一些对技能描述更为固定的属性信息，它的值通常不会因为技能等级的改变而改变。比如技能持续时间 (duration)、技能效果范围 (radius) 等等。
 
-import { AbilityBehavior, AbilityType, DamageType } from "../enum/Type";
+import { DamageType } from "../enum/Damage";
+import { AbilityBehavior, AbilityType,  } from "../enum/Type";
 import { UnitTargetFlag, UnitTargetTeam, UnitTargetType } from "../enum/Unit";
+
+
+
+"AbilityCastPoint"				"0.3 0.3 0.3 0.3"
+"AbilityChannelTime"			"1.75"
 
 export class AbilityData {
     // 基础属性
-    protected baseClass: string; //基类BaseAbility
-    protected scriptFile: string;  //对应的技能实现类
-    protected abilityTextureName: string; //显示的图标纹理
+    private baseClass: string;
+    private scriptFile: string;
+    private abilityTextureName: string;
+    private maxLevel: number;
+    private abilityType: AbilityType;
+    private abilityUnitDamageType: DamageType;
 
-    protected maxLevel:number //最大等级
-    protected abilityType: AbilityType; //技能类型 看定义
-    protected abilityUnitDamageType:DamageType; //伤害类型
+    
+
     // 技能行为
-    protected abilityBehavior: AbilityBehavior; //技能行为 具体看定义
-    protected abilityUnitTargetTeam: UnitTargetTeam; //目标组
-    protected abilityUnitTargetType: UnitTargetType; //目标类型
-    protected abilityUnitTargetFlag: UnitTargetFlag; //目标特殊标记
-
-    protected spellDispellableType:number //驱散类型
-    protected spellImmunityType:number //免疫类型
-
-    protected abilityCastRange:number //施法距离
+    private abilityBehavior: AbilityBehavior;
+    private abilityUnitTargetTeam: UnitTargetTeam;
+    private abilityUnitTargetType: UnitTargetType;
+    private abilityUnitTargetFlag: UnitTargetFlag;
+    private spellDispellableType: number;
+    private spellImmunityType: number;
+    private abilityCastRange: number;
 
     // 技能数值
-    protected abilityCooldown: Array<number>; //冷却
-    protected abilityManaCost: Array<number>; //魔法消耗
-    protected abilityDuration: Array<number>; //施法间隔
-    protected abilityDamage: Array<number>; //伤害
-     // 特殊效果
-    protected abilitySpecials:{[specialKey:string]:AbilitySpecial}
-    
-    protected precache:{[key:string]:string} //预加载
+    private abilityCooldown: number[];
+    private abilityManaCost: number[];
+    private abilityDuration: number[];
+    private abilityDamage: number[];
 
-    protected abilityValues:AbilityValues 
+    private abilityCastPoint: number[];
+    private abilityChannelTime: number[];
 
-    
-    public GetAbilityType(): AbilityType{
-        return this.abilityType
-    }
-
-    public GetAbilityDamageType(): DamageType{
-        return this.abilityUnitDamageType
-    }
-
-    public GetAbilityTargetFlags(): UnitTargetFlag{
-        return this.abilityUnitTargetFlag
-    }
-
-    public GetAbilityTargetTeam(): UnitTargetTeam{
-        return this.abilityUnitTargetTeam
-    }
-
-    public GetAbilityTargetType(): UnitTargetType{
-        return this.abilityUnitTargetType
-    }
-    public GetBehavior(): AbilityBehavior{
-        return this.abilityBehavior
-    }
- 
-    public GetMaxLevel(): number{
-        return this.maxLevel || 100
-    }
-
-    public GetCastRange(): number{
-        return this.abilityCastRange
-    }
-
-
-    public GetCooldown(level: number): number{
-        if(level < 1) throw new Error("Level must be equal or greater than 1.");
-        level = Math.min(level, this.abilityCooldown.length);
-        return this.abilityCooldown[level - 1];
-    }
-    
-    public GetManaCost(level: number): number{
-        if(level < 1) throw new Error("Level must be equal or greater than 1.");
-        level = Math.min(level, this.abilityManaCost.length);
-        return this.abilityManaCost[level - 1];
-    }
-    
-    public GetLevelSpecialValueFor(name: string, level: number): number{
-        if(level < 1) throw new Error("Level must be equal or greater than 1.");
-        let propertyValues =  this.abilitySpecials[name]?.propertyValues;
-        if(!propertyValues) throw new Error("No such property name.");
-        level = Math.min(level, propertyValues.length);
-        return propertyValues[level - 1];
-    }
-
-    // GetChannelledHealthCostPerSecond(level: number): number;
-    // GetChannelledManaCostPerSecond(level: number): number;
-    // GetChannelStartTime(): number;
-    // GetChannelTime(): number;
-
+    // 特殊效果
+    private abilitySpecials: { [specialKey: string]: AbilitySpecial };
+    private precache: { [key: string]: string };
+    private abilityValues: AbilityValues;
 
     constructor(data: any) {
         this.baseClass = data.BaseClass;
         this.scriptFile = data.ScriptFile;
         this.abilityTextureName = data.AbilityTextureName;
-        this.abilityType = this.parseAbilityType(data.abilityType)
-        this.abilityUnitDamageType  = this.parseAbilityUnitDamageType(data.AbilityUnitDamageType)
-        this.abilityBehavior = this.parseAbilityBehavior(data.AbilityBehavior);
-        this.abilityUnitTargetTeam = this.parseAbilityUnitTargetTeam(data.AbilityUnitTargetTeam);
-        this.abilityUnitTargetType =  this.parseAbilityUnitTargetType(data.AbilityUnitTargetType);
-        this.abilityUnitTargetFlag =  this.parseAbilityUnitTargetFlag(data.abilityUnitTargetFlag);
+        this.maxLevel = data.MaxLevel || 1;
+        this.abilityType = this.parseEnumValue(AbilityType, data.AbilityType);
+        this.abilityUnitDamageType = this.parseEnumValue(DamageType, data.AbilityUnitDamageType);
+        this.abilityBehavior = this.parseEnumValue(AbilityBehavior, data.AbilityBehavior);
+        this.abilityUnitTargetTeam = this.parseEnumValue(UnitTargetTeam, data.AbilityUnitTargetTeam);
+        this.abilityUnitTargetType = this.parseEnumValue(UnitTargetType, data.AbilityUnitTargetType);
+        this.abilityUnitTargetFlag = this.parseEnumValue(UnitTargetFlag, data.AbilityUnitTargetFlag);
+        this.spellDispellableType = data.SpellDispellableType;
+        this.spellImmunityType = data.SpellImmunityType;
+        this.abilityCastRange = data.AbilityCastRange;
 
-        this.abilityCooldown = data.abilityCooldown.split(' ').map((cooldown: string) => parseInt(cooldown));
-        this.abilityManaCost = data.AbilityManaCost.split(' ').map((cost: string) => parseInt(cost));
-        this.abilityDuration = data.AbilityManaCost.split(' ').map((duration: string) => parseInt(duration));
-        this.abilityDamage = data.AbilityDamage.split(' ').map((damage: string) => parseInt(damage));
+        this.abilityCooldown = this.parseNumberArray(data.AbilityCooldown);
+        this.abilityManaCost = this.parseNumberArray(data.AbilityManaCost);
+        this.abilityDuration = this.parseNumberArray(data.AbilityDuration);
+        this.abilityDamage = this.parseNumberArray(data.AbilityDamage);
 
-        this.precache = data.precache
+        this.precache = data.precache;
+        this.abilityValues = new AbilityValues(data.AbilityValues);
+        this.abilitySpecials = this.parseAbilitySpecials(data.AbilitySpecial);
 
-        this.abilityValues = new AbilityValues(data.abilityValues)
-
-        this.abilitySpecials = {}
-        // 遍历AbilitySpecial并填充abilitySpecial数组
-        for (const key in data.AbilitySpecial) {
-            if (data.AbilitySpecial.hasOwnProperty(key)) {
-                const specialData = data.AbilitySpecial[key];
-                const varType = specialData.var_type;
-                delete specialData.var_type; // 删除 var_type 属性，它已经被单独处理了
-                const abilitySpecial = new AbilitySpecial(varType, specialData);
-                this.abilitySpecials[abilitySpecial.propertyKey] = abilitySpecial;
-            }
-        }
+        this.abilityCastPoint = this.parseNumberArray(data.AbilityCastPoint);
+        this.abilityChannelTime = this.parseNumberArray(data.AbilityChannelTime);
     }
 
-    protected parseAbilityType(typeString: string): number {
-        let typeValue = 0;
-        let types = typeString.split(' | ');
-        for (let i = 0; i < types.length; i++) {
-            typeValue |= AbilityType[types[i]] || 0; // 使用枚举获取行为对应的数值
-        }
-        return typeValue;
+    private parseEnumValue<T>(enumObj: T, value: string): number {
+        return value.split('|').reduce((acc, val) => acc | (enumObj[val.trim()] || 0), 0);
     }
 
-    protected parseAbilityUnitDamageType(unitDamageTypeString: string): number {
-        let unitDamageTypeValue = 0;
-        let unitDamageTypes = unitDamageTypeString.split(' | ');
-        for (let i = 0; i < unitDamageTypes.length; i++) {
-          unitDamageTypeValue |= DamageType[unitDamageTypes[i]] || 0; // 使用枚举获取行为对应的数值
-        }
-        return unitDamageTypeValue;
+    private parseNumberArray(value: string): number[] {
+        return value?.split(' ').map(Number) || [];
     }
 
-    protected parseAbilityBehavior(behaviorString: string): number {
-        let behaviorValue = 0;
-        let behaviors = behaviorString.split(' | ');
-        for (let i = 0; i < behaviors.length; i++) {
-          behaviorValue |= AbilityBehavior[behaviors[i]] || 0; // 使用枚举获取行为对应的数值
+    private parseAbilitySpecials(specials: any): { [key: string]: AbilitySpecial } {
+        const result: { [key: string]: AbilitySpecial } = {};
+        for (const key in specials) {
+            const specialData = specials[key];
+            const varType = specialData.var_type;
+            delete specialData.var_type;
+            const abilitySpecial = new AbilitySpecial(varType, specialData);
+            result[abilitySpecial.propertyKey] = abilitySpecial;
         }
-        return behaviorValue;
+        return result;
     }
 
-    protected parseAbilityUnitTargetTeam(unitTargetTeamString: string): number {
-        let unitTargetTeamValue = 0;
-        let unitTargetTeams = unitTargetTeamString.split(' | ');
-        for (let i = 0; i < unitTargetTeams.length; i++) {
-            unitTargetTeamValue |= UnitTargetTeam[unitTargetTeams[i]] || 0; // 使用枚举获取行为对应的数值
-        }
-        return unitTargetTeamValue;
+    public GetAbilityType(): AbilityType {
+        return this.abilityType;
     }
 
-    protected parseAbilityUnitTargetType(unitTargetTypeString: string): number {
-        let unitTargetTypeValue = 0;
-        let unitTargetTypes = unitTargetTypeString.split(' | ');
-        for (let i = 0; i < unitTargetTypes.length; i++) {
-            unitTargetTypeValue |= UnitTargetType[unitTargetTypes[i]] || 0; // 使用枚举获取行为对应的数值
-        }
-        return unitTargetTypeValue;
+    public GetAbilityDamageType(): DamageType {
+        return this.abilityUnitDamageType;
     }
 
-    protected parseAbilityUnitTargetFlag(unitTargetFlagString: string): number {
-        let unitTargetFlagValue = 0;
-        let unitTargetFlag = unitTargetFlagString.split(' | ');
-        for (let i = 0; i < unitTargetFlag.length; i++) {
-            unitTargetFlagValue |= UnitTargetFlag[unitTargetFlag[i]] || 0; // 使用枚举获取行为对应的数值
-        }
-        return unitTargetFlagValue;
+    public GetAbilityTargetFlags(): UnitTargetFlag {
+        return this.abilityUnitTargetFlag;
     }
 
+    public GetAbilityTargetTeam(): UnitTargetTeam {
+        return this.abilityUnitTargetTeam;
+    }
+
+    public GetAbilityTargetType(): UnitTargetType {
+        return this.abilityUnitTargetType;
+    }
+
+    public GetBehavior(): AbilityBehavior {
+        return this.abilityBehavior;
+    }
+
+    public GetMaxLevel(): number {
+        return this.maxLevel;
+    }
+
+    public GetCastRange(): number {
+        return this.abilityCastRange;
+    }
+
+    public GetCooldown(level: number = 1): number {
+        return this.abilityCooldown[Math.min(level, this.abilityCooldown.length) - 1] ?? 0;
+    }
+
+    public GetManaCost(level: number = 1): number {
+        return this.abilityManaCost[Math.min(level, this.abilityManaCost.length) - 1] ?? 0;
+    }
+
+    public GetLevelSpecialValueFor(name: string, level: number = 1): number {
+        const propertyValues = this.abilitySpecials[name]?.propertyValues;
+        if (!propertyValues) {
+            throw new Error(`No such property name: ${name}`);
+        }
+        return propertyValues[Math.min(level, propertyValues.length) - 1] ?? 0;
+    }
+
+    public GetCastPoint(level: number = 1): number {
+        return this.abilityCastPoint[Math.min(level, this.abilityCastPoint.length) - 1] ?? 0;
+    }
+
+    public GetChannelTime(level: number = 1): number {
+        return this.abilityChannelTime[Math.min(level, this.abilityChannelTime.length) - 1] ?? 0;
+    }
 }
 
-// AbilitySpecial类表示技能的特殊效果部分
 class AbilitySpecial {
     varType: VarType;
-    properties: {[key: string]: number[]};
-    propertyKey:string;
-    propertyValues:Array<number>
+    propertyKey: string;
+    propertyValues: number[];
 
-    constructor(varType: VarType, properties: {[key: string]: string}) {
+    constructor(varType: VarType, properties: { [key: string]: string }) {
         this.varType = varType;
-        this.properties = {};
-        
-        for (let key in properties) { //只接受一个key
-            if(key != "var_type"){
-                this.propertyKey = key
-                this.propertyValues = properties[key].split(' ').map(Number);
+        [[this.propertyKey, this.propertyValues]] = Object.entries(properties).map(([key, value]) => [
+            key,
+            this.parsePropertyValues(value, varType)
+        ]);
+    }
 
-                switch (varType) {
-                    case "FIELD_FLOAT":
-                        this.propertyValues = properties[key].split(' ').map((v: string) => parseFloat(v));
-                        break;
-                    case "FIELD_INTEGER":
-                        this.propertyValues = properties[key].split(' ').map((v: string) => parseInt(v));
-                        break;
-                    // 处理其他可能的var_type
-                }
-                break  //只接受一个key
-            }
-        }
+    private parsePropertyValues(value: string, varType: VarType): number[] {
+        const parser = varType === VarType.FIELD_FLOAT ? parseFloat : parseInt;
+        return value.split(' ').map(parser);
     }
 }
-
-
 
 class AbilityValues {
-    properties: {[key: string]: any};
+    properties: { [key: string]: any };
 
-    constructor(properties: {[key: string]: string}) {
-        this.properties = properties
+    constructor(properties: { [key: string]: string }) {
+        this.properties = properties;
     }
 }
 
-
-const enum VarType {
+enum VarType {
     FIELD_FLOAT = "FIELD_FLOAT",
     FIELD_INTEGER = "FIELD_INTEGER"
+    // ... other var types
 }

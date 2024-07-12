@@ -32,35 +32,34 @@ export interface MovieData{
 export  class MovieBody extends  GameRenderObject  {
     public static  DEFAULT_MOVIVE_INTERVAL:number = 200 //默认动画间隔
     protected movieClip:MovieClip
-
-
     protected animName:string = null //动画名
     private movieMap:{[key:string]:MovieData}
-
-    protected _complete:Function = null
-    
-    public getNode(): Node {
-        return this
-    }
+    private _complete:Function;
 
     public constructor() {
         super()
         this.movieClip = new MovieClip()
         this.movieMap = {}
         this.movieClip.setFrameUpdateRender(this.updateFrame.bind(this))
+        this.movieClip.setSpriteFrameIndex(1)//设置为第一帧
+      
+
         this.movieClip.setCallback(()=>{
             this.active = false
             if(this._complete){
                 this._complete()
             }
         })
-        this.movieClip.setSpriteFrameIndex(1)//设置为第一帧
     }
 
 
-
-    public playAnime(animName:string){
-        if(!animName || this.animName == animName){
+    public playAnime(animName:string,complete?:Function){
+        if(!animName) return 
+        if(complete){
+            this._complete = complete
+        }
+        if( this.animName == animName){
+            this.movieClip.setSpriteFrameIndex(1) ;//重回第一帧
             return 
         }
         this.animName = animName
@@ -86,7 +85,7 @@ export  class MovieBody extends  GameRenderObject  {
         }
         this.setAnchor(movieData.anchorX,movieData.anchorY)
         if(movieData.frameTb){
-            this.play(movieData.frameTb)
+            this.playWithFrames(movieData.frameTb)
             return 
         }
         
@@ -95,26 +94,12 @@ export  class MovieBody extends  GameRenderObject  {
         
     }
 
-    protected play(frames:Array<SpriteFrame>):void{
+    protected playWithFrames(frames:Array<SpriteFrame>):void{
         this.movieClip.setFrames(frames)
         this.movieClip.playAnime()
     }
 
-    /**
-     * 获取帧格式
-     * // Elementals_act_0
-     * frameKey_animName_%d
-     * @param animName 
-     * @param frameKey 
-     */
-    protected getFrameFormat(animName:string){
-        let frameFormat = ""
-        if(animName){
-            frameFormat = frameFormat + animName +"_"
-        }
-        frameFormat += "%d"
-        return frameFormat
-    }
+   
 
 
     /**
@@ -135,7 +120,7 @@ export  class MovieBody extends  GameRenderObject  {
                 let movieData = this.movieMap[animName]
                 if(movieData){
                     movieData.frameTb = FrameUtil.newFrames(animUrl,frameName, start, length)
-                    this.play(movieData.frameTb)
+                    this.playWithFrames(movieData.frameTb)
                 }
             }else{
                 log(err)
@@ -168,6 +153,23 @@ export  class MovieBody extends  GameRenderObject  {
     public getFrameTb(animUrl:string,frameName:string,start:number,length:number):any{
         return FrameManager.ins().getFrames(animUrl,frameName,start,length)
     }
+
+
+     /**
+     * 获取帧格式
+     * // Elementals_act_0
+     * frameKey_animName_%d
+     * @param animName 
+     * @param frameKey 
+     */
+     protected getFrameFormat(animName:string){
+        let frameFormat = ""
+        if(animName){
+            frameFormat = frameFormat + animName +"_"
+        }
+        frameFormat += "%d"
+        return frameFormat
+    }
     
 
     public setSpriteFrameIndex(index) {
@@ -188,7 +190,6 @@ export  class MovieBody extends  GameRenderObject  {
     protected onRemove():void{
         super.onRemove()
         this.movieClip.stopAnime()
-        this._complete = null
         this.movieClip.remove()
     }
 

@@ -105,9 +105,7 @@ export class ObjectPoolMap<T> {
         return this.map.get(id);
     }
 
-    getPool_(id: string): ObjectPool<T> | null {
-        return this.map.get(id) || null;
-    }
+  
 
     clearPool(id: string): void {
         const pool = this.map.get(id);

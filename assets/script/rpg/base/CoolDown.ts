@@ -1,65 +1,53 @@
 export class Cooldown {
-    /** 冷却时间 */
-    private remainingCooldown: number
-    /** 冷却速率 */
-    private cooldownRate: number
+    /** 剩余冷却时间 */
+    private remainingCooldown: number;
+    /** 冷却速率（总冷却时间） */
+    private cooldownRate: number;
+    /** 是否处于暂停状态 */
+    private isPaused: boolean;
 
-    constructor(cooldownRate?: number) {
+    constructor(cooldownRate: number = 0) {
         this.cooldownRate = cooldownRate;
         this.remainingCooldown = 0;
+        this.isPaused = false;
     }
 
     /**
-    * 检查冷却时间
-    * @param deltaTime
-    * @returns boolean 决定是否可以进行操作
-    */
+     * 开始一个新的冷却周期
+     */
+    start(): void {
+        this.remainingCooldown = this.cooldownRate;
+        this.isPaused = false;
+    }
+
+    /**
+     * 检查冷却时间并更新
+     * @param deltaTime 经过的时间
+     * @returns boolean 是否可以进行操作
+     */
     check(deltaTime: number): boolean {
-        this.remainingCooldown -= deltaTime;
+        if (this.isPaused) return false;
+
+        this.remainingCooldown = Math.max(0, this.remainingCooldown - deltaTime);
         if (this.remainingCooldown <= 0) {
-            this.remainingCooldown = this.cooldownRate;
+            this.remainingCooldown = 0;
             return true;
         }
-
         return false;
     }
 
-
     /**
-    * 暂停冷却
-    */
+     * 暂停冷却
+     */
     pause(): void {
-        this.remainingCooldown = this.remainingCooldown;
+        this.isPaused = true;
     }
 
     /**
-    * 恢复冷却
-    */
+     * 恢复冷却
+     */
     resume(): void {
-        this.remainingCooldown = this.remainingCooldown;
-    }
-
-    /**
-    * 跳过冷却
-    */
-    skip(): void {
-        this.remainingCooldown = 0;
-    }
-
-    /**
-    * 延长冷却时间
-    * @param extension 需要延长的时间
-    */
-    extend(extension: number): void {
-        this.remainingCooldown += extension;
-    }
-
-    /**
-    * 减少冷却时间
-    * @param reduction 需要减少的时间
-    */
-    shorten(reduction: number): void {
-        this.remainingCooldown = Math.max(0, this.remainingCooldown - reduction);
+        this.isPaused = false;
     }
 
     /**
@@ -67,13 +55,63 @@ export class Cooldown {
      */
     reset(): void {
         this.remainingCooldown = this.cooldownRate;
+        this.isPaused = false;
     }
 
+    /**
+     * 跳过冷却
+     */
+    skip(): void {
+        this.remainingCooldown = 0;
+        this.isPaused = false;
+    }
 
+    /**
+     * 延长冷却时间
+     * @param extension 需要延长的时间
+     */
+    extend(extension: number): void {
+        this.remainingCooldown = Math.max(0, this.remainingCooldown + extension);
+    }
+
+    /**
+     * 减少冷却时间
+     * @param reduction 需要减少的时间
+     */
+    shorten(reduction: number): void {
+        this.remainingCooldown = Math.max(0, this.remainingCooldown - reduction);
+    }
+
+    /**
+     * 重置冷却速率
+     * @param newCooldownRate 新的冷却速率
+     */
     resetCooldownRate(newCooldownRate: number): void {
-        if(this.cooldownRate == newCooldownRate) return 
-        // let proportion = this.remainingCooldown / this.cooldownRate;
+        if (this.cooldownRate === newCooldownRate) return;
         this.cooldownRate = newCooldownRate;
-        // this.remainingCooldown = proportion * this.cooldownRate;
+        if (this.remainingCooldown > 0) {
+            this.remainingCooldown = Math.min(this.remainingCooldown, this.cooldownRate);
+        }
+    }
+
+    /**
+     * 获取剩余冷却时间
+     */
+    getRemainingCooldown(): number {
+        return this.remainingCooldown;
+    }
+
+    /**
+     * 获取冷却进度（0-1之间的值）
+     */
+    getCooldownProgress(): number {
+        return 1 - (this.remainingCooldown / this.cooldownRate);
+    }
+
+    /**
+     * 检查是否处于冷却状态
+     */
+    isOnCooldown(): boolean {
+        return this.remainingCooldown > 0;
     }
 }

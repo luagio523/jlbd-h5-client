@@ -1,20 +1,15 @@
 import { Vec2 } from "cc";
 import { AttackComponent } from "../component/AttackComponent";
-import { AttributeComponent } from "../component/AttributeComponent";
-import { BuffComponent } from "../component/BuffComponent";
-import { DefenseComponent } from "../component/DefenseComponent";
-import { EquipmentComponent } from "../component/EquipmentComponent";
 import { TransformComponent } from "../component/TransformComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
-import { Attribute } from "../enum/Attribute";
-import { ModifierFunction } from "../enum/Modifier";
 import { BaseSystem } from "./BaseSystem";
-import { CombatCalculator } from "../CombatCalculator";
-import { ApplyDamageEvent } from "../event/Event";
+import { AnimationEvent, ApplyDamageEvent, DelayedEvent, ProjectileEvent,  } from "../event/Event";
 import { DamageType } from "../enum/Damage";
 import { AttackCapability } from "../enum/Type";
-import { ModelComponent } from "../component/ModelComponent";
 
+// CPU缓存的设计利用了两种主要的局部性原理：
+// 时间局部性（Temporal Locality）：如果一个数据项被访问，那么它很可能在不久的将来再次被访问。
+// 空间局部性（Spatial Locality）：如果一个数据项被访问，那么存储在附近的数据项也很可能被很快地访问。
 
 // 伤害 =
 // { [主要攻击力 × (1 + Σ 百分比加成) + 固定值加成]
@@ -30,132 +25,63 @@ import { ModelComponent } from "../component/ModelComponent";
 // 而MODIFIER_PROPERTY_INCOMING_PHYSICAL_DAMAGE_PERCENTAGE则专门用来影响物理伤害。
 
 export class AttackSystem extends BaseSystem {
-
-
     update(deltaTime: number) {
-
-        let attackComponents = this.getComponents(AttackComponent)
-
-        for (let attackComponent of attackComponents) {
-            let target = attackComponent.target;
-            if (!target) continue;
-    
+        const attackComponents = this.getComponents(AttackComponent);
+        for (const attackComponent of attackComponents) {
             if (attackComponent.canAttack(deltaTime)) {
-                let attack = this.getEntity(attackComponent.entityId);
-                attackComponent.updateAttackRate(this.calculateAttackRate(attack)) //重新更新 攻击频率
-                if (this.shouldAttack(attack, target)) {
-                    this.playAttackAnimation(attack.getComponent(ModelComponent))
-                    if(attackComponent.attackCapability == AttackCapability.UNIT_CAP_RANGED_ATTACK){ //远程攻击
-                        //投掷物
-                    }else if(attackComponent.attackCapability == AttackCapability.UNIT_CAP_MELEE_ATTACK){ //近战攻击
-                        this.addDelay(attackComponent.attackAnimationPoint,()=>{
-                            this.performAttack(attack,target)
-                        })
-                    }   
+                const attacker = this.getEntity(attackComponent.entityId);
+                const target = attackComponent.getTarget();
+                if (target && this.shouldAttack(attacker, target)) {
+                    this.initiateAttack(attacker, target, attackComponent);
                 }
             }
         }
     }
 
-    /**
-     * 计算攻击频率
-     * @param attack 
-     * @returns 
-     */
-    private calculateAttackRate(attack:ECSEntity):number{
-        let attackComponent =attack.getComponent(AttackComponent)
-        let attributeComponent = attack.getComponent(AttributeComponent)
-        let equipmentComponent = attack.getComponent(EquipmentComponent)
-        let buffComponent = attack.getComponent(BuffComponent)
-        let attackRate = CombatCalculator.calculateAttackRate(attackComponent,attributeComponent,equipmentComponent,buffComponent)
-        return attackRate
-    }
+    private shouldAttack(attacker: ECSEntity, target: ECSEntity): boolean {
+        const attackComponent = attacker.getComponent(AttackComponent);
+        const attackerTransform = attacker.getComponent(TransformComponent);
+        const targetTransform = target.getComponent(TransformComponent);
 
-    private playAttackAnimation(modelComponent:ModelComponent):void{
-        modelComponent.changeAct(ActType.ACT_ATTACK)
-    }
-    
-    /**
-     * 执行攻击
-     * @param attacker 
-     * @param target 
-     */
-    private performAttack(attacker: ECSEntity, target: ECSEntity) {
-        let damage = this.calculateNormalAttackDamage(attacker,target)
-        let applyDamageEvent = new ApplyDamageEvent(attacker,target,damage,DamageType.DAMAGE_TYPE_PHYSICAL)
-        this.enqueueEvent(applyDamageEvent)
-    }
-
-    /**
-     * 判断距离是否可以攻击
-     * @param attacker 
-     * @param target 
-     * @returns 
-     */
-    shouldAttack(attacker: ECSEntity, target: ECSEntity) {
-        let attackPosition = attacker.getComponent(TransformComponent).position
-        let targetPosition = target.getComponent(TransformComponent).position
-        let distance = Vec2.distance(attackPosition,targetPosition)
-        return distance <= attacker.getComponent(AttackComponent).attackRange;
-    }
-
-
-        // { [主要攻击力 × (1 + Σ 百分比加成) + 固定值加成]
-    // × 致命一击倍数 - 被格挡伤害 }
-    // × 护甲倍数  
-    // × 一般伤害倍数
-    //计算普通攻击伤害
-    public  calculateNormalAttackDamage(attack:ECSEntity,target:ECSEntity):number{
-
-        let attackComponent =attack.getComponent(AttackComponent)
-        let attributeComponent = attack.getComponent(AttributeComponent)
-        let equipmentComponent = attack.getComponent(EquipmentComponent)
-        let buffComponent = attack.getComponent(BuffComponent)
-
-        let targetEvasion = CombatCalculator.calculateEvasion(target.getComponent(EquipmentComponent),target.getComponent(BuffComponent))
-        let attackEvasion = CombatCalculator.calculateNegativeEvasion(equipmentComponent,buffComponent)
-        targetEvasion -= attackEvasion
-        if(Math.random() < targetEvasion){ //被闪避
-            return 0 
+        if (!attackComponent || !attackerTransform || !targetTransform) {
+            return false;
         }
-        
-        let mainAttackDamage = CombatCalculator.calculateAttackDamage(attackComponent,attributeComponent,equipmentComponent,buffComponent)
-        let mainAttackPercent = equipmentComponent.getModifierMapping().calculateModifierTotalValue(ModifierFunction.MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE) +
-        buffComponent.getModifierMapping().calculateModifierTotalValue(ModifierFunction.MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE)
-        mainAttackDamage = mainAttackDamage * (1 + mainAttackPercent) //主要攻击力 × (1 + Σ 百分比加成)
 
-        let criticalStrike = CombatCalculator.calculateCriticalStrike(equipmentComponent,buffComponent)
-        mainAttackDamage = mainAttackDamage * criticalStrike //*致命一击倍数 
-
-        // mainAttackDamage -= CombatCalculator.calculatePhysicalBlock(equipmentComponent,buffComponent) //+ 固定值加成    
-
-        // let armorMultiplier = CombatCalculator.calculateArmorMultiplier(defenseComponent,attributeComponent,equipmentComponent,buffComponent)
-        // mainAttackDamage = mainAttackDamage * armorMultiplier //× 护甲倍数  
-
-        return mainAttackDamage
+        const distance = Vec2.distance(attackerTransform.position, targetTransform.position);
+        return distance <= attackComponent.getAttackRange();
     }
 
-    attack(target: ECSEntity, damage: number): void {
-        // // 模拟攻击动画
-        // const animationState = target.getComponent<AnimationState>('animationState');
-        // animationState.current = "attack";
+    private initiateAttack(attacker: ECSEntity, target: ECSEntity, attackComponent: AttackComponent) {
+        // 触发攻击开始事件
+        // this.enqueueEvent(new AttackEvent(attacker, target));
 
-        // // 执行掉血
-        // const health = target.getComponent<Health>('health');
-        // health.value -= damage;
+        // 触发动画事件
+        this.enqueueEvent(new AnimationEvent(attacker));
 
-        // console.log(`Attacked entity ${target.id}, new health is ${health.value}`);
+        // 根据攻击类型决定是立即造成伤害还是延迟造成伤害
+        if (attackComponent.attackCapability === AttackCapability.UNIT_CAP_MELEE_ATTACK) {
+            this.enqueueEvent(new DelayedEvent(
+                () => this.performAttack(attacker, target, attackComponent),
+                attackComponent.getAttackAnimationPoint()
+            ));
+        } else if (attackComponent.attackCapability === AttackCapability.UNIT_CAP_RANGED_ATTACK) {
+            // 触发投射物事件
+            this.enqueueEvent(new ProjectileEvent(attacker, target));
+        }
+
+        // 重置攻击冷却
+        attackComponent.performAttack();
     }
 
-    
-    /*************************************************************计算伤害**************************************************************************** */
-    // 伤害 =
-   
+    private performAttack(attacker: ECSEntity, target: ECSEntity, attackComponent: AttackComponent) {
+        const damage = attackComponent.getBaseAttackDamage();
+        const damageType = DamageType.DAMAGE_TYPE_PHYSICAL; // 假设所有普通攻击都是物理伤害
 
-    
-    
+        this.enqueueEvent(new ApplyDamageEvent(attacker, target, damage, damageType));
+
+        attackComponent.performAttack();
+    }
 }
-
 
 
 

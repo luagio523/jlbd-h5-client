@@ -8,7 +8,7 @@ export default class MovieClip {
 
     protected frameTb: any[] = [];
     protected frameCount: number = 0; // 总帧数
-    protected updateGap: number = 0.08; // 跟新间隔默认值，需要除以1000转为秒
+    protected updateGap: number = 0.33; // 跟新间隔默认值
     protected animeTimes: number = 1;
     protected isLoop: boolean = false; // 是否循环
     protected callback: Function | null = null;
@@ -39,12 +39,29 @@ export default class MovieClip {
         this.frameCount = frameTb.length;
     }
 
+	/**
+	 * 秒
+	 * @param updateGap 
+	 */
     public setUpdateGap(updateGap: number) {
-        this.updateGap = updateGap / 1000;
+        this.updateGap = updateGap ;
+    }
+
+	 /**
+     * 调整动画播放的速度
+     * @param {number} scale - 播放速度的缩放比例。值大于1将加快动画速度，值小于1将减慢动画速度。
+     */
+	 public scaleTime(scale: number) {
+        if (scale <= 0) {
+            console.warn('scale must be greater than 0.');
+            return;
+        }
+        // 用传入的缩放比例调整更新间隔
+        this.updateGap /= scale;
     }
 
     public get interval(): number {
-        return this.updateGap * 1000;
+        return this.updateGap ;
     }
 
     public setAnimeTimes(animeTimes: number) {

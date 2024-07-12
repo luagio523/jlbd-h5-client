@@ -3,6 +3,7 @@
  */
 
 import { v2 } from "cc"
+import { MathUtil } from "../../core/common/utils/MathUtil"
 
 
 export enum DirectionType {
@@ -112,7 +113,6 @@ export class Direction {
 	public static get8DirBy2Point(p1, p2) {
 		//计算方向
         let angle = MathUtil.getAngle(MathUtil.getRadian2(p1.x, p1.y, p2.x, p2.y))
-
 
         //Direction.angleDirection[angle]
 

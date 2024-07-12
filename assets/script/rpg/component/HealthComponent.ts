@@ -4,17 +4,37 @@ import { ECSComponent } from "../ecs/ECSComponent";
 
 
 export class HealthComponent extends ECSComponent {
-    currentHealth: number;    // 当前生命值
-    maxHealth: number;        // 最大生命值
-    isInvulnerable: boolean;  // 是否无敌状态
-    isDead: boolean;          // 是否已死亡
+    entityId: string;
+    private maxHealth: number;
+    private currentHealth: number;
+   
 
-    constructor(maxHealth: number) {
-        super()
-        this.currentHealth = maxHealth;
+    getMaxHealth(): number {
+        return this.maxHealth;
+    }
+
+    getCurrentHealth(): number {
+        return this.currentHealth;
+    }
+
+    setMaxHealth(maxHealth: number): void {
         this.maxHealth = maxHealth;
-        this.isInvulnerable = false;
-        this.isDead = false;
+        this.currentHealth = Math.min(this.currentHealth, this.maxHealth);
+    }
+
+    heal(amount: number): void {
+        this.currentHealth = Math.min(this.currentHealth + amount, this.maxHealth);
+    }
+
+    takeDamage(amount: number): void {
+        this.currentHealth = Math.max(this.currentHealth - amount, 0);
+        if (this.currentHealth === 0) {
+            // Trigger death event or logic
+        }
+    }
+
+    isDead(): boolean {
+        return this.currentHealth <= 0;
     }
 
 }

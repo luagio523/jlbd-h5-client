@@ -51,8 +51,95 @@ export class ApplyDamageEvent implements IEvent{
 
 
 
+// 假设的 DelayedEvent 类，用于延迟执行事件
+export class DelayedEvent implements IEvent {
+    public readonly type = Event.Delayed
+    constructor(
+        public readonly  callback: () => void,
+        public readonly  delay: number
+    ) {}
+}
+
+export class AnimationEvent implements IEvent {
+    public readonly type = Event.Animation
+    constructor(
+        public readonly  attacker: ECSEntity,
+    ) {}
+}
+
+
+export class ProjectileEvent implements IEvent {
+    public readonly type = Event.Projectile
+    constructor(
+        public readonly  attacker: ECSEntity,
+        public readonly  target: ECSEntity,
+    ) {}
+}
+
+
+
+export class CastAbilityEvent implements IEvent {
+    public readonly type = Event.AbilityStart
+    constructor(
+        public readonly  caster: ECSEntity,
+        public readonly  ability: BaseAbility,
+    ) {}
+}
+
+
+
+export class AbilityPhaseStartEvent implements IEvent {
+    public readonly type = Event.AbilityPhaseStart
+    constructor(
+        public readonly  caster: ECSEntity,
+        public readonly  ability: BaseAbility,
+    ) {}
+}
+
+export class AbilityPhaseInterruptedEvent implements IEvent {
+    public readonly type = Event.AbilityPhaseInterrupted
+    constructor(
+        public readonly  caster: ECSEntity,
+        public readonly  ability: BaseAbility,
+    ) {}
+}
+
+
+
+export class AbilityStartEvent implements IEvent {
+    public readonly type = Event.AbilityStart
+    constructor(
+        public readonly  caster: ECSEntity,
+        public readonly  ability: BaseAbility,
+    ) {}
+}
+
+export class AbilityEndEvent implements IEvent {
+    public readonly type = Event.AbilityEnd
+    constructor(
+        public readonly  caster: ECSEntity,
+        public readonly  ability: BaseAbility,
+    ) {}
+}
+
+
+
+
+
+
+
+
 
 
 export  enum  Event {
     ApplyDamage = "ApplyDamage",
+    Delayed = "Delayed",
+    Animation = "Animation",
+    Projectile = "Projectile",
+
+    AbilityPhaseStart = "AbilityPhaseStart",
+    AbilityPhaseInterrupted = "AbilityPhaseInterrupted",
+    CastAbility = "CastAbility",
+    AbilityStart = "AbilityStart",
+    AbilityEnd = "AbilityEnd",
 }

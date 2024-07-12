@@ -2,6 +2,7 @@ import { Camera, assert, js, log } from "cc";
 import {  IUIConfig } from "./UIConfig";
 import { FairyGUILayerManager, ILayerManager, UILayer } from "./LayerManager";
 import {FairyGuiResMgr,IResManager  } from "./ResManager";
+import { GComponent } from "fairygui-cc";
 
 
 // 
@@ -41,7 +42,7 @@ export class UIManager  {
     private layerManager: ILayerManager
     private facade:IFacade 
     private UI_CONFIG:{ [uiId: string]: IUIConfig }
-    private resManager:IResManager<fgui.GComponent>
+    private resManager:IResManager<GComponent>
     constructor(facade:IFacade) {
         this.uiInstances = new Map<string, any>();
         this.facade = facade

@@ -1,177 +1,354 @@
+import { HeroData } from "../ability/HeroData";
 import { Cooldown } from "../base/CoolDown";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { AttackCapability, AttackType } from "../enum/Type";
 
 
-// 在Dota2中，一个单位的实际攻击间隔由几个因素决定，包括基础攻击时间 (BAT)，附加的攻击速度，以及游戏的内部机制。下面是一般的计算公式：
-// plaintext
-// 实际攻击间隔 = 基础攻击时间 / (1 + 攻击速度加成)
-// 基础攻击时间（BAT）是单位进行两次攻击之间的基础时间间隔。例如，大多数单位的BAT为1.7秒。不同的英雄有不同的BAT。这个值固定，无法通过任何方式修改。
-// 攻击速度加成是通过物品，技能，属性等获得的额外攻击速度，除以100。例如，如果一个单位有150额外攻击速度，那么攻击速度加成就是1.5。
-// 这公式表示: 英雄的攻击间隔 = 英雄的基础攻击时间 ÷ [1 + (单位的主属性-1) × 0.01]。所以，如果你要提高英雄的攻击速度（降低攻击间隔），你需要增加他的攻击速度加成。
 
-
-
-//普通攻击组件
-export class AttackComponent extends ECSComponent{
-    public attackCapability: AttackCapability; //攻击类型 远程近战
+export class AttackComponent extends ECSComponent {
+    public attackCapability: AttackCapability;
     public baseAttackDamageMin: number;
     public baseAttackDamageMax: number;
-    
-    public attackRange: number; //攻击范围
-    public target: ECSEntity; // 这是攻击目标，可以根据需要的对象类型进行相应的修改
+    public attackRange: number;
+    public attackRate: number;
+    public attackAnimationPoint: number; // 这个属性在 HeroData 中没有,可能需要另外提供或设置默认值
+    public attackAcquisitionRange: number; // 这个属性在 HeroData 中没有,可能需要另外提供或设置默认值
+    public attackType: AttackType; // 这个属性在 HeroData 中没有,可能需要另外提供或设置默认值
 
-    public attackRate: number; //基础攻击间隔               // 实际攻击间隔 = 基础攻击间隔 / (攻击速度 / 100)
-    public attacksMade: number; // 这是进行的攻击次数
+    private target: ECSEntity | null = null;
+    private attacksMade: number = 0;
+    private attackCooldown: Cooldown;
+    // private baseAttackAbility: BaseAttackAbility | null = null;
 
-    public attackAnimationPoint:number; //动画的时间点
-    public attackAcquisitionRange:number;
-    
+    constructor(heroData: HeroData) {
+        super();
+        
+        this.attackCapability = this.determineAttackCapability(heroData.GetAttackRange());
+        [this.baseAttackDamageMin, this.baseAttackDamageMax] = heroData.GetAttackDamage();
+        this.attackRange = heroData.GetAttackRange();
+        this.attackRate = heroData.GetAttackRate();
+        this.attackAnimationPoint = heroData.GetAttackAnimationPoint();
+        this.attackAcquisitionRange = heroData.GetAttackAcquisitionRange();
+        this.attackType = heroData.GetAttackType();
 
-    public attackType:AttackType   //攻击类型
-
-
-    constructor(attackRate:number) { 
-        super()
-        this.attackCooldown = new Cooldown(attackRate);
+        this.attackCooldown = new Cooldown(this.attackRate);
+            
+        // 创建基础攻击能力
+        // this.baseAttackAbility = new BaseAttackAbility(this);
     }
 
+    private determineAttackCapability(attackRange: number): AttackCapability {
+        return attackRange > 150 ? AttackCapability.UNIT_CAP_RANGED_ATTACK : AttackCapability.UNIT_CAP_MELEE_ATTACK;
+    }
 
+    public getBaseAttackDamage(): number {
+        return Math.random() * (this.baseAttackDamageMax - this.baseAttackDamageMin) + this.baseAttackDamageMin;
+    }
 
-    /** 攻击冷却 */
-    private attackCooldown: Cooldown;;
-    
-    /**
-     * @param deltaTime
-     * @returns boolean 是否可以攻击
-     */
-    canAttack(deltaTime: number): boolean {
+    public getAttackRange(): number {
+        return this.attackRange;
+    }
+
+    public getAttackSpeed(): number {
+        return 1 / this.attackRate;
+    }
+
+    public setTarget(target: ECSEntity | null): void {
+        this.target = target;
+    }
+
+    public getTarget(): ECSEntity | null {
+        return this.target;
+    }
+
+    public canAttack(deltaTime: number): boolean {
         return this.attackCooldown.check(deltaTime);
     }
 
-    updateAttackRate(attackRate:number):void{
-        this.attackCooldown.resetCooldownRate(attackRate)
+    public updateAttackRate(attackRate: number): void {
+        this.attackRate = attackRate;
+        this.attackCooldown.resetCooldownRate(attackRate);
     }
 
+    public performAttack(): void {
+        if (this.canAttack(0)) {
+            this.attacksMade++;
+            this.attackCooldown.start();
+            // if (this.baseAttackAbility && this.target) {
+            //     this.baseAttackAbility.OnAttack(this.target);
+            // }
+        }
+    }
+
+    public getAttacksMade(): number {
+        return this.attacksMade;
+    }
+
+    public getAttackAnimationPoint(): number {
+        return this.attackAnimationPoint;
+    }
+
+    public getAttackAcquisitionRange(): number {
+        return this.attackAcquisitionRange;
+    }
+
+    public getAttackType(): AttackType {
+        return this.attackType;
+    }
+
+    public getActualAttackInterval(attackSpeed: number): number {
+        return this.attackRate / (attackSpeed / 100);
+    }
+
+    public resetAttacksMade(): void {
+        this.attacksMade = 0;
+    }
+
+    public isInAcquisitionRange(distance: number): boolean {
+        return distance <= this.attackAcquisitionRange;
+    }
+
+    public isInAttackRange(distance: number): boolean {
+        return distance <= this.attackRange;
+    }
+
+    // public getBaseAttackAbility(): BaseAttackAbility | null {
+    //     return this.baseAttackAbility;
+    // }
 }
 
+// export class AttackComponent extends ECSComponent {
+//     public attackCapability: AttackCapability;
+//     public baseAttackDamageMin: number;
+//     public baseAttackDamageMax: number;
+//     public attackRange: number;
+//     public attackRate: number;
+//     public attackAnimationPoint: number;
+//     public attackAcquisitionRange: number;
+//     public attackType: AttackType;
 
-//基础攻击力 + 属性攻击力  + 装备 + 技能buff
+//     private target: ECSEntity | null = null;
+//     private attacksMade: number = 0;
+//     private attackCooldown: Cooldown;
+//     private baseAttackAbility: BaseAttackAbility | null = null;
 
-
-
-// 装备通常提供两种类型的攻击力增益：
-// 基础攻击力的增加：这种类型的增加极其罕见，目前在游戏中并没有装备直接增加基础攻击力。
-// 额外攻击力的增加（通常显示为绿色数字）：这是装备最常见的攻击力增益类型。它被添加到英雄从主属性和其他来源获得的基础攻击力之上。额外攻击力的增益不会由于主属性的提升而改变。
-
-
-
-// class AttackSystem {
-//     calculateAttackDamage(attacker: AttackComponent, defender: BaseStatsComponent, equipmentBonus: number, attributeBonus: number, skillBonus: number) {
-//         let baseDamage = attacker.baseAttackDamageMin + Math.random() * (attacker.baseAttackDamageMax - attacker.baseAttackDamageMin);
-//         let totalUnmitigatedDamage = baseDamage + attacker.bonusDamage + equipmentBonus + attributeBonus + skillBonus;
-
-//         // 用DOTA2的护甲计算公式计算伤害减免系数
-//         let damageMultiplier = 1 - 0.06 * defender.armorPhysical / (1 + 0.06 * Math.abs(defender.armorPhysical));
-
-//         // 返回实际伤害
-//         return totalUnmitigatedDamage * damageMultiplier;
+//     constructor(
+//         abilityData: AbilityData
+//     ) {
+//         super();
+//         this.attackCapability = this.parseAttackCapability(abilityData.GetBehavior());
+//         this.baseAttackDamageMin = abilityData.GetLevelSpecialValueFor('base_attack_min', 1);
+//         this.baseAttackDamageMax = abilityData.GetLevelSpecialValueFor('base_attack_max', 1);
+//         this.attackRange = abilityData.GetCastRange();
+//         this.attackRate = abilityData.GetLevelSpecialValueFor('base_attack_time', 1);
+//         this.attackAnimationPoint = abilityData.GetLevelSpecialValueFor('attack_point', 1);
+//         this.attackAcquisitionRange = abilityData.GetLevelSpecialValueFor('attack_acquisition_range', 1);
+//         this.attackType = this.parseAttackType(abilityData.GetAbilityType());
+//         this.attackCooldown = new Cooldown(this.attackRate);
+        
+//         // 创建基础攻击能力
+//         this.baseAttackAbility = new BaseAttackAbility(abilityData);
 //     }
-// }
 
+//     private parseAttackCapability(behavior: number): AttackCapability {
+//         // 根据 behavior 解析攻击能力
+//         // 这里需要根据实际的 AbilityBehavior 枚举来实现
+//         return AttackCapability.UNIT_CAP_MELEE_ATTACK; // 默认为近战攻击
+//     }
 
+//     private parseAttackType(abilityType: number): AttackType {
+//         // 根据 abilityType 解析攻击类型
+//         // 这里需要根据实际的 AbilityType 枚举来实现
+//         return AttackType.BasicAttack; // 默认为普通攻击
+//     }
 
+//     public getBaseAttackDamage(): number {
+//         return Math.random() * (this.baseAttackDamageMax - this.baseAttackDamageMin) + this.baseAttackDamageMin;
+//     }
 
+//     public getAttackRange(): number {
+//         return this.attackRange;
+//     }
 
-// struct DefenseComponent {
-//     int armor;
-//     // 可能还有其他防御属性，如魔法抗性等
-// };
+//     public getAttackSpeed(): number {
+//         return 1 / this.attackRate;
+//     }
 
-// // 这个函数用于根据护甲值计算最终的物理伤害减免
-// float calculatePhysicalDamageReduction(int armor) {
-//     // 一个简化的减伤公式：物理减伤百分比 = 护甲 / (护甲 + 100)
-//     // 真实的游戏可能使用更复杂的减伤计算方式
-//     return armor / (float)(armor + 100);
-// }
+//     public setTarget(target: ECSEntity | null): void {
+//         this.target = target;
+//     }
 
+//     public getTarget(): ECSEntity | null {
+//         return this.target;
+//     }
 
+//     public canAttack(deltaTime: number): boolean {
+//         return this.attackCooldown.check(deltaTime);
+//     }
 
-// struct AttackComponent {
-//     int physicalDamage;
-//     int magicalDamage;
-//     int pureDamage;
-// };
+//     public updateAttackRate(attackRate: number): void {
+//         this.attackRate = attackRate;
+//         this.attackCooldown.resetCooldownRate(attackRate);
+//     }
 
-// int calculateTotalDamage(ECSEntity attacker, ECSEntity target) {
-//     AttackComponent attackComp = attacker.getComponent(AttackComponent);
-//     int totalPhysicalDamage = attackComp.physicalDamage;
-//     int totalMagicalDamage = attackComp.magicalDamage;
-//     int totalPureDamage = attackComp.pureDamage;
-
-//     // 处理Buff和Debuff效果
-//     // 这里省略了处理护甲和魔法抗性的细节
-//     for (BuffEffect effect : attacker.getComponent(BuffComponent).buffEffects) {
-//         switch (effect.effectType) {
-//             case EffectType.AdditionalPhysicalDamage:
-//                 totalPhysicalDamage += effect.value; // 额外的物理伤害
-//                 break;
-//             case EffectType.AdditionalMagicalDamage:
-//                 totalMagicalDamage += effect.value; // 额外的魔法伤害
-//                 break;
-//             // 添加其他Buff效果的处理...
+//     public performAttack(): void {
+//         if (this.canAttack(0)) {
+//             this.attacksMade++;
+//             this.attackCooldown.start();
+//             if (this.baseAttackAbility && this.target) {
+//                 this.baseAttackAbility.OnAttack(this.target);
+//             }
 //         }
 //     }
 
-//     // 应用Debuff
-//     for (BuffEffect effect : attacker.getComponent(BuffComponent).debuffEffects) {
-//         switch (effect.effectType) {
-//             case EffectType.FixedPureDamage:
-//                 // 固定纯粹伤害可能覆盖其他所有伤害
-//                 return effect.value; // 直接返回这个固定的伤害值
-//             // 添加其他Debuff效果的处理...
+//     public getAttacksMade(): number {
+//         return this.attacksMade;
+//     }
+
+//     public getAttackAnimationPoint(): number {
+//         return this.attackAnimationPoint;
+//     }
+
+//     public getAttackAcquisitionRange(): number {
+//         return this.attackAcquisitionRange;
+//     }
+
+//     public getAttackType(): AttackType {
+//         return this.attackType;
+//     }
+
+//     public getActualAttackInterval(attackSpeed: number): number {
+//         return this.attackRate / (attackSpeed / 100);
+//     }
+
+//     public resetAttacksMade(): void {
+//         this.attacksMade = 0;
+//     }
+
+//     public isInAcquisitionRange(distance: number): boolean {
+//         return distance <= this.attackAcquisitionRange;
+//     }
+
+//     public isInAttackRange(distance: number): boolean {
+//         return distance <= this.attackRange;
+//     }
+
+//     public getBaseAttackAbility(): BaseAttackAbility | null {
+//         return this.baseAttackAbility;
+//     }
+// }
+
+
+
+// export class AttackComponent extends ECSComponent {
+//     public attackCapability: AttackCapability;
+//     public baseAttackDamageMin: number;
+//     public baseAttackDamageMax: number;
+//     public attackRange: number;
+//     public attackRate: number;
+//     public attackAnimationPoint: number;
+//     public attackAcquisitionRange: number;
+//     public attackType: AttackType;
+
+//     private target: ECSEntity
+//      | null = null;
+//     private attacksMade: number = 0;
+//     private attackCooldown: Cooldown;
+
+//     constructor(
+//         entityId: string,
+//         attackCapability: AttackCapability,
+//         baseAttackDamageMin: number,
+//         baseAttackDamageMax: number,
+//         attackRange: number,
+//         attackRate: number,
+//         attackAnimationPoint: number,
+//         attackAcquisitionRange: number,
+//         attackType: AttackType
+//     ) {
+//         super();
+//         this.attackCapability = attackCapability;
+//         this.baseAttackDamageMin = baseAttackDamageMin;
+//         this.baseAttackDamageMax = baseAttackDamageMax;
+//         this.attackRange = attackRange;
+//         this.attackRate = attackRate;
+//         this.attackAnimationPoint = attackAnimationPoint;
+//         this.attackAcquisitionRange = attackAcquisitionRange;
+//         this.attackType = attackType;
+//         this.attackCooldown = new Cooldown(attackRate);
+//     }
+
+//     public getBaseAttackDamage(): number {
+//         return Math.random() * (this.baseAttackDamageMax - this.baseAttackDamageMin) + this.baseAttackDamageMin;
+//     }
+
+//     public getAttackRange(): number {
+//         return this.attackRange;
+//     }
+
+//     public getAttackSpeed(): number {
+//         return 1 / this.attackRate;
+//     }
+
+//     public setTarget(target: ECSEntity | null): void {
+//         this.target = target;
+//     }
+
+//     public getTarget(): ECSEntity | null {
+//         return this.target;
+//     }
+
+//     public canAttack(deltaTime: number): boolean {
+//         return this.attackCooldown.check(deltaTime);
+//     }
+
+//     public updateAttackRate(attackRate: number): void {
+//         this.attackRate = attackRate;
+//         this.attackCooldown.resetCooldownRate(attackRate);
+//     }
+
+//     public performAttack(): void {
+//         if (this.canAttack(0)) {
+//             this.attacksMade++;
+//             this.attackCooldown.start();
+//             // 这里可以触发攻击事件或直接调用伤害计算
 //         }
 //     }
 
-//     // 最终伤害是所有类型的伤害加总，每种伤害都需要考虑目标的抗性因素
-//     // 这里假设目标无抗性，直接加总所有伤害
-//     int finalDamage = totalPhysicalDamage + totalMagicalDamage + totalPureDamage;
-
-//     return finalDamage;
-// }
-
-
-// int calculateFinalPhysicalDamage(int rawPhysicalDamage, int targetArmor) {
-//     float damageReduction = calculatePhysicalDamageReduction(targetArmor);
-//     int finalPhysicalDamage = (int)(rawPhysicalDamage * (1 - damageReduction));
-//     return finalPhysicalDamage;
-// }
-
-// int calculateTotalDamage(ECSEntity attacker, ECSEntity target) {
-//     AttackComponent attackComp = attacker.getComponent(AttackComponent);
-//     int totalPhysicalDamage = attackComp.physicalDamage;
-//     int totalMagicalDamage = attackComp.magicalDamage;
-//     int totalPureDamage = attackComp.pureDamage;
-
-//     DefenseComponent defenseComp = target.getComponent(DefenseComponent);
-//     int targetArmor = defenseComp.armor;
-
-//     // 处理Buff和Debuff效果
-//     for (BuffEffect effect : attacker.getComponent(BuffComponent).buffEffects) {
-//         // ...之前的代码处理魔法和纯粹伤害的Buff
+//     public getAttacksMade(): number {
+//         return this.attacksMade;
 //     }
 
-//     // 应用Debuff
-//     for (BuffEffect effect : attacker.getComponent(BuffComponent).debuffEffects) {
-//         // ...之前的代码处理固定纯粹伤害Debuff
+//     public getAttackAnimationPoint(): number {
+//         return this.attackAnimationPoint;
 //     }
 
-//     // 对物理伤害应用护甲减伤
-//     totalPhysicalDamage = calculateFinalPhysicalDamage(totalPhysicalDamage, targetArmor);
+//     public getAttackAcquisitionRange(): number {
+//         return this.attackAcquisitionRange;
+//     }
 
-//     // ...之前的代码计算总伤害
-//     int finalDamage = totalPhysicalDamage + totalMagicalDamage + totalPureDamage;
+//     public getAttackType(): AttackType {
+//         return this.attackType;
+//     }
 
-//     return finalDamage;
+//     // 新增方法，用于计算实际攻击间隔
+//     public getActualAttackInterval(attackSpeed: number): number {
+//         return this.attackRate / (attackSpeed / 100);
+//     }
+
+//     // 新增方法，用于重置攻击计数
+//     public resetAttacksMade(): void {
+//         this.attacksMade = 0;
+//     }
+
+//     // 新增方法，用于检查是否在攻击获取范围内
+//     public isInAcquisitionRange(distance: number): boolean {
+//         return distance <= this.attackAcquisitionRange;
+//     }
+
+//     // 新增方法，用于检查是否在攻击范围内
+//     public isInAttackRange(distance: number): boolean {
+//         return distance <= this.attackRange;
+//     }
 // }

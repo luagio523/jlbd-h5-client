@@ -1,12 +1,14 @@
 
 
+
+
 export enum ModifierAttribute {
-    MODIFIER_ATTRIBUTE_NONE = 0,    // 无特性。默认情况下，Modifier不具有任何属性。
-    MODIFIER_ATTRIBUTE_PERMANENT = 1,   // 永久性。Modifier不会被驱散。
-    MODIFIER_ATTRIBUTE_MULTIPLE = 2,    // 可叠加。允许多个相同的Modifier存在于一个单位上。
-    MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE = 4,  // 忽略无敌。在施加Modifier时，会忽略目标单位的无敌状态。
-    MODIFIER_ATTRIBUTE_AURA_PRIORITY = 8,   // 光环优先。在排序Modifier列表时，光环Modifier将总是排在非光环Modifier前面。
-    MODIFIER_ATTRIBUTE_IGNORE_DODGE = 16,   // 忽略闪避。Modifier的效果不会被目标单位的闪避能力或异界混沌骑士的幻象效果影响。
+  MODIFIER_ATTRIBUTE_NONE = 0,   // 无特性。默认情况下，Modifier不具有任何属性。
+  MODIFIER_ATTRIBUTE_PERMANENT = 1 << 0, // 永久性。Modifier不会被驱散。
+  MODIFIER_ATTRIBUTE_MULTIPLE = 1 << 1,// 可叠加。允许多个相同的Modifier存在于一个单位上。
+  MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE = 1 << 2, // 忽略无敌。在施加Modifier时，会忽略目标单位的无敌状态。
+  MODIFIER_ATTRIBUTE_AURA_PRIORITY = 1 << 3,// 光环优先。在排序Modifier列表时，光环Modifier将总是排在非光环Modifier前面。
+  MODIFIER_ATTRIBUTE_IGNORE_DODGE = 1 << 4,// 忽略闪避。Modifier的效果不会被目标单位的闪避能力或异界混沌骑士的幻象效果影响。
 }
 
 
