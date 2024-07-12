@@ -1,8 +1,9 @@
-
 export class InputManager {
     private static instance: InputManager;
     private listeners: Map<string, Set<(eventType: string, event: any) => void>> = new Map();
-    public readonly inputEvents = ['touchstart', 'touchmove', 'touchend', 'mousedown', 'mousemove', 'mouseup'];
+    public readonly mouseEvents = ['mousedown', 'mousemove', 'mouseup'];
+    public readonly touchEvents = ['touchstart', 'touchmove', 'touchend'];
+    public readonly joystickEvents = ['joystick'];
 
     private constructor() {
         this.initializeEventListeners();
@@ -16,20 +17,62 @@ export class InputManager {
     }
 
     private initializeEventListeners(): void {
-        this.inputEvents.forEach(eventType => {
+        this.mouseEvents.forEach(eventType => {
+            this.listeners.set(eventType, new Set());
+        });
+        this.touchEvents.forEach(eventType => {
+            this.listeners.set(eventType, new Set());
+        });
+        this.joystickEvents.forEach(eventType => {
             this.listeners.set(eventType, new Set());
         });
     }
 
-    public addListener(callback: (eventType: string, event: any) => void): void {
-        this.inputEvents.forEach(eventType => {
+    public addListener(eventType: string, callback: (eventType: string, event: any) => void): void {
+        if (this.listeners.has(eventType)) {
             this.listeners.get(eventType)!.add(callback);
+        }
+    }
+
+    public removeListener(eventType: string, callback: (eventType: string, event: any) => void): void {
+        if (this.listeners.has(eventType)) {
+            this.listeners.get(eventType)!.delete(callback);
+        }
+    }
+
+    public addMouseListeners(callback: (eventType: string, event: any) => void): void {
+        this.mouseEvents.forEach(eventType => {
+            this.addListener(eventType, callback);
         });
     }
 
-    public removeListener(callback: (eventType: string, event: any) => void): void {
-        this.inputEvents.forEach(eventType => {
-            this.listeners.get(eventType)!.delete(callback);
+    public removeMouseListeners(callback: (eventType: string, event: any) => void): void {
+        this.mouseEvents.forEach(eventType => {
+            this.removeListener(eventType, callback);
+        });
+    }
+
+    public addTouchListeners(callback: (eventType: string, event: any) => void): void {
+        this.touchEvents.forEach(eventType => {
+            this.addListener(eventType, callback);
+        });
+    }
+
+    public removeTouchListeners(callback: (eventType: string, event: any) => void): void {
+        this.touchEvents.forEach(eventType => {
+            this.removeListener(eventType, callback);
+        });
+    }
+
+    public addJoystickListeners(callback: (eventType: string, event: any) => void): void {
+        this.joystickEvents.forEach(eventType => {
+            this.addListener(eventType, callback);
+        });
+    }
+
+    public removeJoystickListeners(callback: (eventType: string, event: any) => void): void {
+        this.joystickEvents.forEach(eventType => {
+            this.removeListener(eventType, callback);
         });
     }
 
@@ -39,7 +82,62 @@ export class InputManager {
             callbacks.forEach(callback => callback(eventType, event));
         }
     }
+
+    public updateJoystickState(x: number, y: number): void {
+        this.handleInput('joystick', { x, y });
+    }
 }
+
+
+// export class InputManager {
+//     private static instance: InputManager;
+//     private listeners: Map<string, Set<(eventType: string, event: any) => void>> = new Map();
+//     public readonly inputEvents = ['touchstart', 'touchmove', 'touchend', 'mousedown', 'mousemove', 'mouseup'];
+
+//     private constructor() {
+//         this.initializeEventListeners();
+//     }
+
+//     public static getInstance(): InputManager {
+//         if (!InputManager.instance) {
+//             InputManager.instance = new InputManager();
+//         }
+//         return InputManager.instance;
+//     }
+
+//     private initializeEventListeners(): void {
+//         this.inputEvents.forEach(eventType => {
+//             this.listeners.set(eventType, new Set());
+//         });
+//     }
+
+//     public addListener(callback: (eventType: string, event: any) => void): void {
+//         this.inputEvents.forEach(eventType => {
+//             this.listeners.get(eventType)!.add(callback);
+//         });
+//     }
+
+//     public removeListener(callback: (eventType: string, event: any) => void): void {
+//         this.inputEvents.forEach(eventType => {
+//             this.listeners.get(eventType)!.delete(callback);
+//         });
+//     }
+
+//     //接受外部事件源的输入事件，并分发给监听者
+//     public handleInput(eventType: string, event: any): void {
+//         const callbacks = this.listeners.get(eventType);
+//         if (callbacks) {
+//             callbacks.forEach(callback => callback(eventType, event));
+//         }
+//     }
+
+
+//     // 新增：处理摇杆输入
+//     public handleJoystickInput(x: number, y: number): void {
+//         const joystickEvent = { x, y };
+//         this.handleInput('joystick', joystickEvent);
+//     }
+// }
 
 
 

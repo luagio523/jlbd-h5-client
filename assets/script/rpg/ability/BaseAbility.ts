@@ -4,8 +4,8 @@ import { ModifierManager } from "../manager/ModifierManager";
 import { DamageType } from "../enum/Damage";
 import { AttackComponent } from "../component/AttackComponent";
 import { AbilityBehavior } from "../enum/Type";
-import { AbilityInputHandlerFactory } from "../input/AbilityInputHandlerFactory";
-import { AbilityInputHandler } from "../input/AbilityInputHandler";
+import { AbilityInputHandlerFactory } from "../indicator/AbilityIndicatorFactory";
+import { AbilityInputHandler } from "../indicator/AbilityIndicator";
 import { Vec2 } from "cc";
 
 // OnAbilityPhaseStart(): boolean; 这个函数在英雄开始释放技能，也就是技能施法前摇的时候被调用。如果这个函数返回true，英雄会继续施法，然后OnSpellStart() 会被调用。如果返回false，英雄将取消施法，并且OnSpellStart() 不会被调用。

@@ -2,14 +2,30 @@ import { Vec2 } from "cc";
 import { BaseAbility } from "../ability/BaseAbility";
 import { AbilityBehavior } from "../enum/Type";
 import { RangeIndicator } from "../base/RangeIndicator";
-import { ECSEntity } from "../ecs/ECSEntity";
 
-export abstract class AbilityInputHandler {
+export abstract class AbilityIndicator {
     protected ability: BaseAbility;
     protected rangeIndicator: RangeIndicator | null = null;
+    public onCancel: () => void = () => {};
+    public onConfirm: () => void = () => {};
 
     constructor(ability: BaseAbility) {
         this.ability = ability;
+    }
+
+    public start(): void {
+        this.showRangeIndicator(this.getInputPosition());
+    }
+
+   
+
+    public cancel(): void {
+        this.hideRangeIndicator();
+        this.onCancel();
+    }
+
+    public confirm(): void {
+        this.onConfirm();
     }
 
     abstract handleInput(eventType: string, event: any): boolean;
@@ -37,7 +53,7 @@ export abstract class AbilityInputHandler {
         }
     }
 
-    protected getInputPosition(event: any): Vec2 {
+    protected getInputPosition(event?: any): Vec2 {
         // 实现获取输入位置的逻辑
         if (event instanceof TouchEvent) {
             const touch = event.touches[0] || event.changedTouches[0];
@@ -53,29 +69,28 @@ export abstract class AbilityInputHandler {
     }
 }
 
-
-export class UnitTargetAbilityInputHandler extends AbilityInputHandler {
+export class UnitTargetAbilityIndicator extends AbilityIndicator {
     // 实现单位目标技能的输入处理
     handleInput(eventType: string, event: TouchEvent):boolean{return true }
 
 }
 
-export class NoTargetAbilityInputHandler extends AbilityInputHandler {
+export class NoTargetAbilityIndicator extends AbilityIndicator {
     // 实现无目标技能的输入处理
     handleInput(eventType: string, event: TouchEvent):boolean{return true }
 }
 
-export class ToggleAbilityInputHandler extends AbilityInputHandler {
+export class ToggleAbilityIndicator extends AbilityIndicator {
     // 实现切换技能的输入处理
     handleInput(eventType: string, event: TouchEvent):boolean{return true }
 }
 
-export class PassiveAbilityInputHandler extends AbilityInputHandler {
+export class PassiveAbilityIndicator extends AbilityIndicator {
     // 实现被动技能的输入处理（通常不需要输入）
     handleInput(eventType: string, event: TouchEvent):boolean{return true }
 }
 
-export class DefaultAbilityInputHandler extends AbilityInputHandler {
+export class DefaultAbilityIndicator extends AbilityIndicator {
     // 默认的输入处理
     handleInput(eventType: string, event: TouchEvent):boolean{return true }
 }

@@ -1,8 +1,8 @@
 import { Vec2 } from "cc";
-import { AbilityInputHandler } from "./AbilityInputHandler";
+import { AbilityIndicator } from "./AbilityIndicator";
 
 
-export class PointTargetAbilityInputHandler extends AbilityInputHandler {
+export class PointTargetAbilityIndicator extends AbilityIndicator {
     private startPosition: Vec2 | null = null;
     private currentPosition: Vec2 | null = null;
 
@@ -12,15 +12,17 @@ export class PointTargetAbilityInputHandler extends AbilityInputHandler {
             case 'mousedown':
                 if (this.ability.CanBeExecuted()) {
                     this.startPosition = this.getInputPosition(event);
-                    this.showRangeIndicator(this.startPosition);
+                    this.start()
+                }else{
+                    this.cancel();
                 }
-                return false;
 
             case 'touchmove':
             case 'mousemove':
                 if (this.rangeIndicator && this.startPosition) {
                     this.currentPosition = this.getInputPosition(event);
                     this.updateRangeIndicator(this.currentPosition);
+                    return true;
                 }
                 return false;
 
@@ -28,13 +30,17 @@ export class PointTargetAbilityInputHandler extends AbilityInputHandler {
             case 'mouseup':
                 if (this.rangeIndicator && this.startPosition && this.currentPosition) {
                     this.hideRangeIndicator();
-                    
                     // 检查是否在施法范围内
                     const castRange = this.ability.GetCastRange();
                     const distance = Vec2.distance(this.startPosition, this.currentPosition);
                     
                     this.startPosition = null;
-                    return distance <= castRange;
+                    this.currentPosition = null;
+                    if (distance <= castRange){
+                        this.confirm();
+                    }else{
+                        this.cancel();
+                    }
                 }
                 this.startPosition = null;
                 this.currentPosition = null;
@@ -48,4 +54,6 @@ export class PointTargetAbilityInputHandler extends AbilityInputHandler {
     public getCurrentTarget(): Vec2 | null {
         return this.currentPosition;
     }
+    
+    
 }

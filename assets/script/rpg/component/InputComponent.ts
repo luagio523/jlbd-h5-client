@@ -5,9 +5,21 @@ export class InputComponent extends ECSComponent {
     joystickDirection: Vec2; // 摇杆的方向，范围从-1到1
     joystickActive: boolean; // 摇杆是否被操作激活
 
-    touches: Vec2; // 保存触摸的位置
-    buttonStates: Map<string, { pressed: boolean, pressTime: number, released: boolean }> = new Map(); 保存按钮的按下状态
+    constructor() {
+        super();
+        this.joystickDirection = new Vec2(0, 0);
+        this.joystickActive = false;
+    }
 
+    public setJoystickInput(active: boolean, direction: Vec2): void {
+        this.joystickActive = active;
+        this.joystickDirection = direction;
+    }
+
+    public resetJoystickInput(): void {
+        this.joystickActive = false;
+        this.joystickDirection.set(0, 0);
+    }
     
 }
 

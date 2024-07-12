@@ -54,7 +54,7 @@ export class GameEntityManager {
         this.playerControlledHero = hero;
     }
 
-    public getPlayerControlledHero(): ECSEntity | null {
+    public getPlayerControlledEntity(): ECSEntity | null {
         return this.playerControlledHero;
     }
 
