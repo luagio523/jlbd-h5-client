@@ -4,6 +4,9 @@ import { ModifierManager } from "../manager/ModifierManager";
 import { DamageType } from "../enum/Damage";
 import { AttackComponent } from "../component/AttackComponent";
 import { AbilityBehavior } from "../enum/Type";
+import { AbilityInputHandlerFactory } from "../input/AbilityInputHandlerFactory";
+import { AbilityInputHandler } from "../input/AbilityInputHandler";
+import { Vec2 } from "cc";
 
 // OnAbilityPhaseStart(): boolean; 这个函数在英雄开始释放技能，也就是技能施法前摇的时候被调用。如果这个函数返回true，英雄会继续施法，然后OnSpellStart() 会被调用。如果返回false，英雄将取消施法，并且OnSpellStart() 不会被调用。
 // 这两者的主要区别在于，OnSpellStart(): void; 是在技能成功释放后调用的，而 OnAbilityPhaseStart(): boolean; 是在技能开始施法的时候调用。所以这两者的主要区别在于它们影响技能何时启动，以及技能的效果何时产生。
@@ -21,7 +24,10 @@ export abstract class BaseAbility {
     protected toggled: boolean;
     protected caster: ECSEntity | null;
     protected cooldownTimeRemaining: number;
-    private channelThinkInterval: NodeJS.Timeout | null;
+    private channelThinkInterval: number | null; // 对应的timeout id
+    private activated: boolean; // 是否已经开始施法
+
+    protected inputHandler: AbilityInputHandler;
 
     constructor(abilityName: string, index: number, abilityData: AbilityData) {
         this.abilityName = abilityName;
@@ -32,6 +38,12 @@ export abstract class BaseAbility {
         this.caster = null;
         this.cooldownTimeRemaining = 0;
         this.channelThinkInterval = null;
+        this.inputHandler = AbilityInputHandlerFactory.createHandler(this);
+    }
+
+
+    public handleInput(eventType: string, event: TouchEvent): void {
+        this.inputHandler.handleInput(eventType, event);
     }
 
     public GetAbilityIndex(): number {
@@ -102,11 +114,11 @@ export abstract class BaseAbility {
         return this.toggled;
     }
 
-    public SetChannelThinkInterval(interval: NodeJS.Timeout): void {
+    public SetChannelThinkInterval(interval: number): void {
         this.channelThinkInterval = interval;
     }
 
-    public GetChannelThinkInterval(): NodeJS.Timeout | null {
+    public GetChannelThinkInterval(): number | null {
         return this.channelThinkInterval;
     }
 
@@ -121,6 +133,8 @@ export abstract class BaseAbility {
     public GetChannelTime(): number {
         return this.abilityData.GetChannelTime(this.level);
     }
+
+    
     
 
     // 以下方法可以被子类重写
@@ -145,6 +159,8 @@ export abstract class BaseAbility {
     public OnOwnerTakeDamage(attacker: ECSEntity, damage: number, damageType: DamageType): void {}
     public OnOwnerDealDamage(target: ECSEntity, damage: number, damageType: DamageType): void {}
 
+    public OnOwnerDied(): void {}
+    public OnOwnerSpawned(): void {}
 }
 
 

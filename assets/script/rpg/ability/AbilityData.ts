@@ -8,8 +8,6 @@ import { UnitTargetFlag, UnitTargetTeam, UnitTargetType } from "../enum/Unit";
 
 
 
-"AbilityCastPoint"				"0.3 0.3 0.3 0.3"
-"AbilityChannelTime"			"1.75"
 
 export class AbilityData {
     // 基础属性
