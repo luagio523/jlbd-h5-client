@@ -1,11 +1,12 @@
-import { AttackType } from "../enum/Type";
+import { AttackType, Attributes } from "../enum/Type";
+import { DataReader } from "./DataReader";
 
-export class HeroData {
+export class HeroData extends DataReader{
     // 基础属性
     protected heroName: string;
     protected heroId: number;
     protected team: string;
-    protected primaryAttribute: AttributeType;
+    protected primaryAttribute: Attributes;
 
     // 属性成长
     protected baseStrength: number;
@@ -14,6 +15,8 @@ export class HeroData {
     protected strengthGain: number;
     protected agilityGain: number;
     protected intelligenceGain: number;
+
+    protected magicalResistance: number;
 
     // 战斗属性
     protected baseHealth: number;
@@ -34,11 +37,12 @@ export class HeroData {
     protected abilities: string[];
     protected talents: string[];
 
-    constructor(data: any) {
+
+    protected parseJsonData(data: any): void {
         this.heroName = data.HeroName;
         this.heroId = data.HeroID;
         this.team = data.Team;
-        this.primaryAttribute = this.parsePrimaryAttribute(data.AttributePrimary);
+        this.primaryAttribute = this.parseEnumValue(Attributes, data.AttributePrimary);
 
         this.baseStrength = parseFloat(data.AttributeBaseStrength);
         this.baseAgility = parseFloat(data.AttributeBaseAgility);
@@ -46,6 +50,8 @@ export class HeroData {
         this.strengthGain = parseFloat(data.AttributeStrengthGain);
         this.agilityGain = parseFloat(data.AttributeAgilityGain);
         this.intelligenceGain = parseFloat(data.AttributeIntelligenceGain);
+
+        this.magicalResistance = parseFloat(data.AttributeMagicResistance) || 25;
 
         this.baseHealth = parseFloat(data.StatusHealth);
         this.baseMana = parseFloat(data.StatusMana);
@@ -59,11 +65,13 @@ export class HeroData {
 
         this.attackAnimationPoint = parseFloat(data.AttackAnimationPoint);
         this.attackAcquisitionRange = parseFloat(data.AttackAcquisitionRange);
-        this.attackType = this.parseAttackType(data.AttackType);
+        this.attackType = this.parseEnumValue(AttackType, data.AttackType);
 
         this.abilities = data.Ability1 ? [data.Ability1, data.Ability2, data.Ability3, data.Ability4] : [];
         this.talents = data.Talent1 ? [data.Talent1, data.Talent2, data.Talent3, data.Talent4, data.Talent5, data.Talent6, data.Talent7, data.Talent8] : [];
     }
+
+    
 
     public GetHeroName(): string {
         return this.heroName;
@@ -77,7 +85,7 @@ export class HeroData {
         return this.team;
     }
 
-    public GetPrimaryAttribute(): AttributeType {
+    public GetPrimaryAttribute(): Attributes {
         return this.primaryAttribute;
     }
 
@@ -141,18 +149,9 @@ export class HeroData {
         return this.talents;
     }
 
-    protected parsePrimaryAttribute(attributeString: string): AttributeType {
-        switch (attributeString) {
-            case "DOTA_ATTRIBUTE_STRENGTH":
-                return AttributeType.STRENGTH;
-            case "DOTA_ATTRIBUTE_AGILITY":
-                return AttributeType.AGILITY;
-            case "DOTA_ATTRIBUTE_INTELLECT":
-                return AttributeType.INTELLECT;
-            default:
-                throw new Error("Unknown primary attribute: " + attributeString);
-        }
-    }
+
+
+    
 
 
     public GetAttackAnimationPoint(): number {
@@ -167,32 +166,12 @@ export class HeroData {
         return this.attackType;
     }
 
-    // 新增的解析方法
-    protected parseAttackType(attackTypeString: string): AttackType {
-        switch (attackTypeString) {
-            case "HERO_ATTACK":
-                return AttackType.HeroAttack;
-            case "BASIC_ATTACK":
-                return AttackType.BasicAttack;
-            case "PIERCE_ATTACK":
-                return AttackType.PierceAttack;
-            case "SIEGE_ATTACK":
-                return AttackType.SiegeAttack;
-            case "CHAOS_ATTACK":
-                return AttackType.ChaosAttack;
-            case "MAGIC_ATTACK":
-                return AttackType.MagicAttack;
-            default:
-                return AttackType.BasicAttack; // 默认为基础攻击
-        }
+    public GetMagicResistance(): number {
+        return this.magicalResistance ;   
     }
 }
 
-enum AttributeType {
-    STRENGTH,
-    AGILITY,
-    INTELLECT
-}
+
 
 
 

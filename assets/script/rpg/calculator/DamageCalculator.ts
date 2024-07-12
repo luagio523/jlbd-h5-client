@@ -4,12 +4,24 @@ import { ECSEntity } from "../ecs/ECSEntity";
 import { DamageType } from "../enum/Damage";
 import { ModifierFunction } from "../enum/Modifier";
 import { ModifierManager } from "../manager/ModifierManager";
+import { ArmorCalculator } from "./ArmorCalculator";
+import { CriticalStrikeCalculator } from "./CriticalStrikeCalculator";
+import { EvasionAndBlockCalculator } from "./EvasionAndBlockCalculator";
+import { MagicResistanceCalculator } from "./MagicResistanceCalculator";
 
 export class DamageCalculator {
     private modifierManager: ModifierManager;
+    private armorCalculator: ArmorCalculator;
+    private magicResistanceCalculator: MagicResistanceCalculator;
+    private criticalStrikeCalculator: CriticalStrikeCalculator;
+    private evasionAndBlockCalculator: EvasionAndBlockCalculator;
 
     constructor(modifierManager: ModifierManager) {
         this.modifierManager = modifierManager;
+        this.armorCalculator = new ArmorCalculator(modifierManager);
+        this.magicResistanceCalculator = new MagicResistanceCalculator(modifierManager);
+        this.criticalStrikeCalculator = new CriticalStrikeCalculator(modifierManager);
+        this.evasionAndBlockCalculator = new EvasionAndBlockCalculator(modifierManager);
     }
 
     calculateDamage(attacker: ECSEntity, target: ECSEntity, baseDamage: number, damageType: DamageType, abilityData?: AbilityData): number {
@@ -30,7 +42,7 @@ export class DamageCalculator {
         totalDamage += this.calculateBaseAttackBonusDamage(attacker);
 
         // 暴击检查
-        const critMultiplier = this.checkCriticalStrike(attacker);
+        const critMultiplier = this.criticalStrikeCalculator.calculateFinalCriticalStrike(attacker);
         totalDamage *= critMultiplier;
 
         // 暴击后额外伤害
@@ -47,7 +59,7 @@ export class DamageCalculator {
 
         // 应用闪避和格挡（只对物理伤害有效）
         if (damageType === DamageType.DAMAGE_TYPE_PHYSICAL) {
-            totalDamage = this.applyEvasionAndBlock(target, totalDamage);
+            totalDamage = this.evasionAndBlockCalculator.calculateFinalEvasionAndBlock(target, totalDamage);
         }
 
         // 应用技能特定的伤害修正（如果有）
@@ -64,11 +76,6 @@ export class DamageCalculator {
 
     private calculateBaseAttackBonusDamage(entity: ECSEntity): number {
         return this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE);
-    }
-
-    private checkCriticalStrike(entity: ECSEntity): number {
-        const critChance = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE) / 100;
-        return Math.random() < critChance ? 2 : 1; // 假设暴击伤害是200%
     }
 
     private calculatePostCritBonusDamage(entity: ECSEntity): number {
@@ -92,11 +99,11 @@ export class DamageCalculator {
     private applyDefenses(target: ECSEntity, damage: number, damageType: DamageType): number {
         switch (damageType) {
             case DamageType.DAMAGE_TYPE_PHYSICAL:
-                const armor = this.calculateTotalArmor(target);
+                const armor = this.armorCalculator.calculateFinalArmor(target);
                 const armorReduction = 1 - (0.06 * armor) / (1 + 0.06 * Math.abs(armor));
                 return damage * armorReduction;
             case DamageType.DAMAGE_TYPE_MAGICAL:
-                const magicResistance = this.calculateMagicResistance(target);
+                const magicResistance = this.magicResistanceCalculator.calculateFinalMagicResistance(target);
                 return damage * (1 - magicResistance);
             case DamageType.DAMAGE_TYPE_PURE:
             case DamageType.DAMAGE_TYPE_ABILITY_DEFINED:
@@ -104,29 +111,6 @@ export class DamageCalculator {
             default:
                 return damage;
         }
-    }
-
-    private calculateTotalArmor(entity: ECSEntity): number {
-        const baseArmor = entity.getComponent(AttributeComponent).getBaseArmor();
-        const bonusArmor = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS);
-        const armorPercentage = 1 + this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PHYSICAL_ARMOR_TOTAL_PERCENTAGE) / 100;
-        return (baseArmor + bonusArmor) * armorPercentage;
-    }
-
-    private calculateMagicResistance(entity: ECSEntity): number {
-        const baseMagicResistance = entity.getComponent(AttributeComponent).getBaseMagicResistance();
-        const bonusMagicResistance = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS) / 100;
-        return Math.min(1, baseMagicResistance + bonusMagicResistance);
-    }
-
-    private applyEvasionAndBlock(target: ECSEntity, damage: number): number {
-        const evasion = this.modifierManager.getModifierValue(target, ModifierFunction.MODIFIER_PROPERTY_EVASION_CONSTANT) / 100;
-        if (Math.random() < evasion) {
-            return 0; // 闪避成功
-        }
-
-        const block = this.modifierManager.getModifierValue(target, ModifierFunction.MODIFIER_PROPERTY_TOTAL_CONSTANT_BLOCK);
-        return Math.max(0, damage - block);
     }
 
     private applyAbilitySpecificModifiers(damage: number, abilityData: AbilityData, attacker: ECSEntity, target: ECSEntity): number {
@@ -137,7 +121,6 @@ export class DamageCalculator {
         return damage;
     }
 }
-
 
 
 // const modifierManager = ModifierManager.getInstance();

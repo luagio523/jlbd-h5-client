@@ -4,53 +4,70 @@ import { MovableComponent } from "../component/MovableComponent";
 import { PathfindingComponent } from "../component/PathfindingComponent";
 import { TransformComponent } from "../component/TransformComponent";
 import { BaseSystem } from "./BaseSystem";
+import { ECSEntity } from "../ecs/ECSEntity";
+import { ModifierManager } from "../manager/ModifierManager";
+import { ModifierFunction } from "../enum/Modifier";
 
-export class MovementSystem extends BaseSystem{
+export class MovementSystem extends BaseSystem {
+    private modifierManager: ModifierManager;
+
+    constructor() {
+        super();
+        this.modifierManager = ModifierManager.getInstance();
+    }
+
     update(deltaTime: number): void {
-        const entities = this.getEntitiesWithComponent(MovableComponent)
+        const entities = this.getEntitiesWithComponents(TransformComponent, MovableComponent);
+        
         for (const entity of entities) {
             const transform = entity.getComponent(TransformComponent);
             const movable = entity.getComponent(MovableComponent);
             const input = entity.getComponent(InputComponent);
             const pathfinding = entity.getComponent(PathfindingComponent);
 
-            // 如果摇杆处于激活状态，则进行直接移动
-            if (input.joystickActive) {
-                // 计算移动方向，并更新朝向，这里摇杆的输入直接转换成移动方向
-                transform.rotation = Math.atan2(input.joystickDirection.y, input.joystickDirection.x);
-                // 移动实体
-                transform.position = transform.position.add(input.joystickDirection.multiplyScalar(movable.speed * deltaTime));
-                // 重置路径，因为玩家已经采取直接控制
-                pathfinding.currentPath = [];
-                pathfinding.pathIndex = 0;
+            // 应用速度修改器
+            const speedModifier = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE);
+            const currentSpeed = movable.baseSpeed * (1 + speedModifier / 100);
+
+            if (input && input.joystickActive) {
+                this.handleJoystickMovement(entity, transform, input, currentSpeed, deltaTime);
+            } else if (pathfinding && pathfinding.currentPath.length > 0 && !pathfinding.reachedTarget) {
+                this.handlePathfindingMovement(entity, transform, pathfinding, currentSpeed, deltaTime);
+            }
+
+            // 更新该实体的 modifiers
+            this.modifierManager.updateModifiers(entity, deltaTime);
+        }
+    }
+
+    private handleJoystickMovement(entity: ECSEntity, transform: TransformComponent, input: InputComponent, speed: number, deltaTime: number): void {
+        transform.rotation = Math.atan2(input.joystickDirection.y, input.joystickDirection.x);
+        transform.position = transform.position.add(input.joystickDirection.multiplyScalar(speed * deltaTime));
+
+        const pathfinding = entity.getComponent(PathfindingComponent);
+        if (pathfinding) {
+            pathfinding.currentPath = [];
+            pathfinding.pathIndex = 0;
+            pathfinding.reachedTarget = true;
+        }
+    }
+
+    private handlePathfindingMovement(entity: ECSEntity, transform: TransformComponent, pathfinding: PathfindingComponent, speed: number, deltaTime: number): void {
+        const nextPoint = pathfinding.currentPath[pathfinding.pathIndex];
+        const direction = nextPoint.subtract(transform.position).normalize();
+        
+        transform.rotation = Math.atan2(direction.y, direction.x);
+        transform.position = transform.position.add(direction.multiplyScalar(speed * deltaTime));
+
+        if (this.hasReachedPoint(transform.position, nextPoint, speed * deltaTime)) {
+            pathfinding.pathIndex++;
+            if (pathfinding.pathIndex >= pathfinding.currentPath.length) {
                 pathfinding.reachedTarget = true;
-            } else {
-                const transform = entity.getComponent(TransformComponent);
-               const movable = entity.getComponent(MovableComponent);
-               const pathfinding = entity.getComponent(PathfindingComponent);
-
-               if (pathfinding.currentPath.length > 0 && !pathfinding.reachedTarget) {
-                   // 获取下一个路径点并朝向该点移动
-                   const nextPoint = pathfinding.currentPath[pathfinding.pathIndex];
-
-                   // 计算移动方向，并更新朝向
-                   const direction = nextPoint.subtract(transform.position).normalize();
-                   transform.rotation = Math.atan2(direction.y, direction.x);
-
-                   // 移动实体
-                   transform.position = transform.position.add(direction.multiplyScalar(movable.speed * deltaTime));
-
-                   
-                   // 检查是否到达下一个路径点
-                   if (Vec2.distance(transform.position,nextPoint) < movable.speed * deltaTime) {
-                       pathfinding.pathIndex++;
-                       if (pathfinding.pathIndex >= pathfinding.currentPath.length) {
-                           // 如果到达最后一个点，更新状态为到达目标
-                           pathfinding.reachedTarget = true;
-                       }
-                   }
-               }
             }
         }
+    }
+
+    private hasReachedPoint(currentPosition: Vec2, targetPoint: Vec2, threshold: number): boolean {
+        return Vec2.distance(currentPosition, targetPoint) < threshold;
     }
 }

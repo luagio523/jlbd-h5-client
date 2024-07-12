@@ -28,8 +28,6 @@ export class ModifierManager {
                 modifierComponent.addModifier(newModifier);
                 newModifier.OnCreated();
             }
-
-            
         } else {
             console.error("Entity does not have a ModifierComponent");
         }

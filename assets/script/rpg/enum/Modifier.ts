@@ -1,6 +1,6 @@
 
 
-
+ 
 
 export enum ModifierAttribute {
   MODIFIER_ATTRIBUTE_NONE = 0,   // 无特性。默认情况下，Modifier不具有任何属性。
@@ -224,16 +224,106 @@ export enum ModifierFunction{
      * 方法名称：`GetModifierAttackSpeedBonus_Constant`
      * 这个方法将返回一个恒定的攻击速度加成数值。
      */
-     MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT = 31,
+    MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT = 31,
+
+         // `GetModifierBaseAttackTimeConstant`: 获取单位的基础攻击间隔。
+    MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT = 36,
+
+    // `GetModifierBaseAttackTimeConstant_Adjust`: 调整单位的基础攻击间隔。
+    MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT_ADJUST = 37,
+
+    // `GetModifierBaseAttackTimePercentage`: 以百分比改变单位的基础攻击间隔。
+    MODIFIER_PROPERTY_BASE_ATTACK_TIME_PERCENTAGE = 38,
+
+    // `GetModifierAttackSpeedBaseOverride`: 获取基础攻击速度的加成。
+    MODIFIER_PROPERTY_ATTACKSPEED_BASE_OVERRIDE = 29,
+
+    // `GetModifierFixedAttackRate`: 获取单位固定的攻击速度。
+    MODIFIER_PROPERTY_FIXED_ATTACK_RATE = 30,
+
+    // `GetModifierAttackSpeed_Limit`: 这个方法应该类似于忽略最大攻击速度限制。
+    MODIFIER_PROPERTY_IGNORE_ATTACKSPEED_LIMIT = 32,
 
 
      /****************************移动速度**************************************** */
 
-     /**
+        /**
      * 方法名称：`GetModifierMoveSpeedBonus_Constant`
      * 这个方法返回一个固定的移动速度加成。
      */
     MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT = 16,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedOverride`
+     * 这个方法可以覆盖单位的基础移动速度。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BASE_OVERRIDE = 17,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Percentage`
+     * 这个方法返回一个百分比形式的移动速度加成。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE = 18,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Percentage_Unique`
+     * 这个方法返回一个独特的移动速度百分比加成，不和其他百分比移动速度加成堆叠，只取最大的那个值。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE_UNIQUE = 19,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Special_Boots`
+     * 这个方法会返回一个独特的移动速度加成，常常用于特殊的鞋类物品。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_UNIQUE = 20,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Special_Boots_2`
+     * 此方法是对上述鞋类移动速度加成属性的补充，用于情况复杂或需要更多控制的物品。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_UNIQUE_2 = 21,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Constant_Unique`
+     * 这个方法返回一个独特的固定值移动速度加成，它只应用最大的那个固定值加成。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT_UNIQUE = 22,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeedBonus_Constant_Unique_2`
+     * 这个方法是对上述独特的固定值移动速度加成的补充,它是另一种特殊固定值加成.
+     */
+    MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT_UNIQUE_2 = 23,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeed_Absolute`
+     * 这个方法会设定单位的移动速度为一个绝对值，无视所有其他移动速度加成或减少。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE = 24,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeed_AbsoluteMin`
+     * 这个方法可以设定一个移动速度的绝对最小值，单位的移动速度不会低于这个数值。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE_MIN = 25,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeed_AbsoluteMax`
+     * 这个方法可以设定一个移动速度的绝对最大值，单位的移动速度不会超过这个数值。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE_MAX = 26,
+
+    /**
+     * 方法名称：`GetModifierIgnoreMovespeedLimit`
+     * 如果这个方法返回真，单位的移动速度将忽视游戏默认的350-550的移动速度限制，可以超过这个范围。
+     */
+    MODIFIER_PROPERTY_IGNORE_MOVESPEED_LIMIT = 27,
+
+    /**
+     * 方法名称：`GetModifierMoveSpeed_Limit`
+     * 这个方法可以设定一个移动速度上限，单位的移动速度不会超过这个数值。
+     */
+    MODIFIER_PROPERTY_MOVESPEED_LIMIT = 28,
 
 }
 

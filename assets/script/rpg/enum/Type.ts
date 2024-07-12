@@ -46,6 +46,38 @@ export enum AttackType {
     MagicAttack      // 魔法攻击，非常规的攻击类型，通常利用技能模仿
 }
 
+export enum AttributeType {
+    STRENGTH,
+    AGILITY,
+    INTELLECT
+}
+
+
+export enum AttributeDerivedStats {
+    ATTRIBUTE_STRENGTH_DAMAGE = 0,
+    ATTRIBUTE_STRENGTH_HP = 1,
+    ATTRIBUTE_STRENGTH_HP_REGEN = 2,
+    ATTRIBUTE_AGILITY_DAMAGE = 3,
+    ATTRIBUTE_AGILITY_ARMOR = 4,
+    ATTRIBUTE_AGILITY_ATTACK_SPEED = 5,
+    ATTRIBUTE_INTELLIGENCE_DAMAGE = 6,
+    ATTRIBUTE_INTELLIGENCE_MANA = 7,
+    ATTRIBUTE_INTELLIGENCE_MANA_REGEN = 8,
+    ATTRIBUTE_INTELLIGENCE_MAGIC_RESIST = 9,
+    ATTRIBUTE_ALL_DAMAGE = 10,
+}
+
+
+export enum Attributes {
+    ATTRIBUTE_INVALID = -1,
+    ATTRIBUTE_STRENGTH = 0,
+    ATTRIBUTE_AGILITY = 1,
+    ATTRIBUTE_INTELLECT = 2,
+    ATTRIBUTE_ALL = 3,
+    ATTRIBUTE_MAX = 4,
+}
+
+
 
 export enum AttackCapability {
     UNIT_CAP_NO_ATTACK = 0, // 单位无法进行攻击 这一选项常见于被禁止攻击的单位或某些特殊的非攻击单位，如观察守卫。

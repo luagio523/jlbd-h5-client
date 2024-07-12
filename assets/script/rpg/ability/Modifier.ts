@@ -189,6 +189,49 @@ export abstract class Modifier {
 
 
 
+// export class SpeedModifier extends Modifier {
+//     private duration: number;
+//     private elapsedTime: number = 0;
+//     private speedBonus: number;
+
+//     constructor(id: string, entity: ECSEntity, duration: number, speedBonus: number) {
+//         super(id, entity);
+//         this.duration = duration;
+//         this.speedBonus = speedBonus;
+//     }
+
+//     OnCreated(): void {
+//         // 初始化逻辑
+//     }
+
+//     OnDestroy(): void {
+//         // 清理逻辑
+//     }
+
+//     ListDeclareFunctions(): ModifierFunction[] {
+//         return [ModifierFunction.MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE];
+//     }
+
+//     getModifierValue(func: ModifierFunction, entity: ECSEntity): number {
+//         if (func === ModifierFunction.MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE) {
+//             return this.speedBonus;
+//         }
+//         return 0;
+//     }
+
+//     getModifierState(state: ModifierState): boolean {
+//         return false;
+//     }
+
+//     update(deltaTime: number): void {
+//         this.elapsedTime += deltaTime;
+//     }
+
+//     isExpired(): boolean {
+//         return this.elapsedTime >= this.duration;
+//     }
+// }
+
 
 
 //  class AttributeBonusModifier extends Modifier {
@@ -207,7 +250,7 @@ export abstract class Modifier {
 //         return 0;
 //     }
 // }
-
+  
 // class GodsStrengthModifier extends Modifier {
 //     constructor() {
 //         super("gods_strength", 25, false, false, true, 10);
@@ -251,98 +294,6 @@ export abstract class Modifier {
 
 
 
-// export interface IModifierValueGetter {
-//     (args?: any): number;
-// }
-
-// // 这个接口用于事件处理函数，如 OnAttacked。
-// export interface IModifierEventHandler {
-//     (params: any): void; 
-// }
-
-// export type IModifierStateInterface = {
-//     [state : number]: boolean;
-// };
-
-// function isModifierValueGetter(functionToCheck: any): functionToCheck is IModifierValueGetter {
-//     return functionToCheck && typeof(functionToCheck) === 'function' && functionToCheck.length === 0;
-// }
-
-// // ModifierMapping 类来管理 ModifierFunction 与 IModifierGetter 之间的关系
-// export class ModifierMapping {
-
-//     private modifierGetterMap: Map<ModifierFunction, IModifierValueGetter[]> = new Map();
-//     private modifierEventMap: Map<ModifierFunction, IModifierEventHandler[]> = new Map();
-    
-//     private static inst: ModifierMapping;
-//     static ins(): ModifierMapping {
-//         if (!this.inst) {
-//             this.inst = new ModifierMapping();
-//         }
-//         return this.inst;
-//     }
-
-//     // 添加处理器，既可以是值获取器，也可以是事件处理器
-//     public add(func: ModifierFunction , getterOrHandler: IModifierValueGetter | IModifierEventHandler): void {
-//         if (isModifierValueGetter(getterOrHandler)) {
-//             const getters = this.modifierGetterMap.get(func) || [];
-//             getters.push(getterOrHandler);
-//             this.modifierGetterMap.set(func, getters);
-//         } else {
-//             const handlers = this.modifierEventMap.get(func) || [];
-//             handlers.push(getterOrHandler);
-//             this.modifierEventMap.set(func, handlers);
-//         }
-//     }
-
-//     // 从值获取器 Map 中移除处理器
-//     public remove(func: ModifierFunction , getter: IModifierValueGetter): void {
-//         const getters = this.modifierGetterMap.get(func);
-//         if (getters) {
-//             const index = getters.indexOf(getter);
-//             if (index !== -1) {
-//                 getters.splice(index, 1); // 从列表中移除 getter
-//                 if (getters.length === 0) {
-//                     this.modifierGetterMap.delete(func); // 列表为空则删除该键
-//                 } else {
-//                     this.modifierGetterMap.set(func, getters); // 更新列表
-//                 }
-//             }
-//         }
-//     }
-
-//     public get(func: ModifierFunction): IModifierValueGetter[] {
-//         return this.modifierGetterMap.get(func) || [];
-//     }
-
-//     public calculateModifierTotalValue(func: ModifierFunction): number {
-//         let list =  this.modifierGetterMap.get(func) ;
-//         if(!list) return 0
-//         let totalValue = 0;
-//         list.forEach(getter => {
-//             totalValue += getter();
-//         });
-//         return totalValue;
-//     }
-
-
-//      // 添加一个新的方法来触发事件
-//      public triggerEvent(func: ModifierFunction, params: any): void {
-//         const handlers = this.modifierEventMap.get(func);
-//         if (handlers) {
-//             handlers.forEach(handler => {
-//                 handler(params);
-//             });
-//         }
-//     }
-
-//     public clear(): void {
-//         this.modifierGetterMap.clear();
-//         this.modifierEventMap.clear();
-//     }
-// }
-
-  
 
 
 //  在Dota 2中，一个单位的法力再生（mana regen）是由多个组件构成的，包括基础法力再生、法力再生速度的加成、百分比加成和flat（固定值）加成。当你查看一个单位的法力再生时，显示的值是所有这些因素计算之后的总和。

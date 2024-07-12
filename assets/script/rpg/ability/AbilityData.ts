@@ -5,11 +5,12 @@
 import { DamageType } from "../enum/Damage";
 import { AbilityBehavior, AbilityType,  } from "../enum/Type";
 import { UnitTargetFlag, UnitTargetTeam, UnitTargetType } from "../enum/Unit";
+import { DataReader } from "./DataReader";
 
 
 
 
-export class AbilityData {
+export class AbilityData extends DataReader{
     // 基础属性
     private baseClass: string;
     private scriptFile: string;
@@ -47,7 +48,8 @@ export class AbilityData {
     protected projectileSpeed: number;
     protected projectileDistance: number;
 
-    constructor(data: any) {
+
+    protected parseJsonData(data: any): void {
         this.baseClass = data.BaseClass;
         this.scriptFile = data.ScriptFile;
         this.abilityTextureName = data.AbilityTextureName;
@@ -79,9 +81,7 @@ export class AbilityData {
         this.projectileDistance = data.ProjectileDistance || 0;
     }
 
-    private parseEnumValue<T>(enumObj: T, value: string): number {
-        return value.split('|').reduce((acc, val) => acc | (enumObj[val.trim()] || 0), 0);
-    }
+  
 
     private parseNumberArray(value: string): number[] {
         return value?.split(' ').map(Number) || [];

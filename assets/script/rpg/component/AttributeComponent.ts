@@ -1,84 +1,68 @@
-import { AbilityData } from "../ability/AbilityData";
+import { HeroData } from "../ability/HeroData";
 import { ECSComponent } from "../ecs/ECSComponent";
-import { Attribute } from "../enum/Attribute";
 
-
+// AttributeComponent.ts
 export class AttributeComponent extends ECSComponent {
-    public baseStrength: number;
-    public strengthGain: number;
-    public baseAgility: number;
-    public agilityGain: number;
-    public baseIntelligence: number;
-    public intelligenceGain: number;
-
-    public attributePrimary: Attribute;
-
+    private heroData: HeroData;
     private level: number = 1;
-    private abilityData: AbilityData;
 
-    constructor( abilityData: AbilityData) {
+    // 直接存储属性值
+    private strength: number = 0;
+    private agility: number = 0;
+    private intelligence: number = 0;
+    private baseArmor: number = 0;
+    private baseMagicResistance: number = 0;
+
+
+    constructor(heroData: HeroData) {
         super();
-        this.abilityData = abilityData;
-
-        // 从 AbilityData 中初始化属性
-        this.baseStrength = this.abilityData.GetLevelSpecialValueFor('base_strength', 1);
-        this.strengthGain = this.abilityData.GetLevelSpecialValueFor('strength_gain', 1);
-        this.baseAgility = this.abilityData.GetLevelSpecialValueFor('base_agility', 1);
-        this.agilityGain = this.abilityData.GetLevelSpecialValueFor('agility_gain', 1);
-        this.baseIntelligence = this.abilityData.GetLevelSpecialValueFor('base_intelligence', 1);
-        this.intelligenceGain = this.abilityData.GetLevelSpecialValueFor('intelligence_gain', 1);
-
-        // 设置主属性
-        this.attributePrimary = this.parseAttributePrimary(this.abilityData.GetLevelSpecialValueFor('attribute_primary', 1));
-    }
-
-    private parseAttributePrimary(value: number): Attribute {
-        switch (value) {
-            case 0: return Attribute.ATTRIBUTE_STRENGTH;
-            case 1: return Attribute.ATTRIBUTE_AGILITY;
-            case 2: return Attribute.ATTRIBUTE_INTELLECT;
-            default: throw new Error("Invalid attribute primary value");
-        }
+        this.heroData = heroData;
+        this.updateAttributes();
     }
 
     public getStrength(): number {
-        return this.baseStrength + (this.level - 1) * this.strengthGain;
+        return this.strength;
     }
 
     public getAgility(): number {
-        return this.baseAgility + (this.level - 1) * this.agilityGain;
+        return this.agility;
     }
 
     public getIntelligence(): number {
-        return this.baseIntelligence + (this.level - 1) * this.intelligenceGain;
+        return this.intelligence;
     }
 
     public setLevel(level: number): void {
         this.level = level;
+        this.updateAttributes();
     }
 
     public getPrimaryAttributeAsAttackPower(): number {
-        switch (this.attributePrimary) {
-            case Attribute.ATTRIBUTE_STRENGTH:
-                return this.getStrength();
-            case Attribute.ATTRIBUTE_AGILITY:
-                return this.getAgility();
-            case Attribute.ATTRIBUTE_INTELLECT:
-                return this.getIntelligence();
+        switch (this.heroData.GetPrimaryAttribute()) {
+            case AttributeType.STRENGTH:
+                return this.strength;
+            case AttributeType.AGILITY:
+                return this.agility;
+            case AttributeType.INTELLECT:
+                return this.intelligence;
             default:
                 return 0;
         }
     }
 
     public getBaseArmor(): number {
-        return this.abilityData.GetLevelSpecialValueFor('base_armor', this.level);
+        return this.baseArmor;
     }
 
     public getBaseMagicResistance(): number {
-        return this.abilityData.GetLevelSpecialValueFor('base_magic_resistance', this.level);
+        return this.baseMagicResistance;
     }
 
-    // 其他可能需要的方法...
+    private updateAttributes(): void {
+        this.strength = this.heroData.GetBaseStrength() + (this.level - 1) * this.heroData.GetStrengthGain();
+        this.agility = this.heroData.GetBaseAgility() + (this.level - 1) * this.heroData.GetAgilityGain();
+        this.intelligence = this.heroData.GetBaseIntelligence() + (this.level - 1) * this.heroData.GetIntelligenceGain();
+        this.baseArmor = this.heroData.GetBaseArmor();
+        this.baseMagicResistance = this.heroData.GetMagicResistance();
+    }
 }
-
-
