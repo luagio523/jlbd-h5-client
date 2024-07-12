@@ -1,19 +1,20 @@
 import { Vec2 } from "cc";
 import { InputComponent } from "../component/InputComponent";
-import { MovableComponent } from "../component/MovableComponent";
 import { PathfindingComponent } from "../component/PathfindingComponent";
 import { TransformComponent } from "../component/TransformComponent";
 import { BaseSystem } from "./BaseSystem";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { ModifierManager } from "../manager/ModifierManager";
-import { ModifierFunction } from "../enum/Modifier";
+import { SpeedCalculator } from "../calculator/SpeedCalculator";
+import { MovableComponent } from "../component/MovableComponent";
+import { AttackComponent } from "../component/AttackComponent";
 
 export class MovementSystem extends BaseSystem {
-    private modifierManager: ModifierManager;
+    private speedCalculator: SpeedCalculator;
 
     constructor() {
         super();
-        this.modifierManager = ModifierManager.getInstance();
+        this.speedCalculator = new SpeedCalculator(ModifierManager.getInstance())
     }
 
     update(deltaTime: number): void {
@@ -24,22 +25,45 @@ export class MovementSystem extends BaseSystem {
             const movable = entity.getComponent(MovableComponent);
             const input = entity.getComponent(InputComponent);
             const pathfinding = entity.getComponent(PathfindingComponent);
+            const attack = entity.getComponent(AttackComponent);
 
-            // 应用速度修改器
-            const speedModifier = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE);
-            const currentSpeed = movable.baseSpeed * (1 + speedModifier / 100);
+            const calculatedSpeed = this.speedCalculator.calculateFinalSpeed(entity, movable.getBaseSpeed());
+            movable.updateSpeed(calculatedSpeed, deltaTime);
 
             if (input && input.joystickActive) {
-                this.handleJoystickMovement(entity, transform, input, currentSpeed, deltaTime);
-            } else if (pathfinding && pathfinding.currentPath.length > 0 && !pathfinding.reachedTarget) {
-                this.handlePathfindingMovement(entity, transform, pathfinding, currentSpeed, deltaTime);
+                this.handleJoystickMovement(entity, transform, input, movable.getSpeed(), deltaTime);
+            } else if (pathfinding && !pathfinding.reachedTarget) {
+                this.handlePathfindingMovement(entity, transform, pathfinding, movable.getSpeed(), deltaTime);
+            } else if (attack && attack.getTarget()) {
+                const target = attack.getTarget();
+                if (target) {
+                    const targetTransform = target.getComponent(TransformComponent);
+                    if (targetTransform) {
+                        const distance = Vec2.distance(transform.position, targetTransform.position);
+                        if (!attack.isInAttackRange(distance)) {
+                            this.handleTrackingMovement(entity, transform, targetTransform.position, movable.getSpeed(), deltaTime);
+                        }
+                    }
+                }
             }
-
-            // 更新该实体的 modifiers
-            this.modifierManager.updateModifiers(entity, deltaTime);
+            
+            transform.updateHeading(deltaTime);
         }
     }
 
+    private handleTrackingMovement(
+        entity: ECSEntity, 
+        transform: TransformComponent, 
+        targetPosition: Vec2,
+        speed: number, 
+        deltaTime: number
+    ): void {
+        const direction = targetPosition.subtract(transform.position).normalize();
+        transform.position = transform.position.add(direction.multiplyScalar(speed * deltaTime));
+    }
+
+
+  
     private handleJoystickMovement(entity: ECSEntity, transform: TransformComponent, input: InputComponent, speed: number, deltaTime: number): void {
         transform.rotation = Math.atan2(input.joystickDirection.y, input.joystickDirection.x);
         transform.position = transform.position.add(input.joystickDirection.multiplyScalar(speed * deltaTime));

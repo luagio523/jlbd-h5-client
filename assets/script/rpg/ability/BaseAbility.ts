@@ -191,7 +191,7 @@ export class BaseAttackAbility extends BaseAbility {
         if (!caster) return 0;
 
         const attackComponent = caster.getComponent(AttackComponent) ;
-        return attackComponent.getBaseAttackDamage();
+        return attackComponent.getAttackDamage();
     }
 }
 

@@ -1,7 +1,45 @@
 import { Vec2 } from "cc";
 import { ECSComponent } from "../ecs/ECSComponent";
 
-export class TransformComponent extends ECSComponent{
-    position: Vec2; // 2D世界中的x和y
-    rotation: number; // 实体的朝向
+export class TransformComponent extends ECSComponent {
+    position: Vec2;
+    rotation: number;
+    heading: Vec2;
+    targetPosition: Vec2;
+    turnRate: number;
+
+    constructor(position: Vec2, rotation: number = 0, turnRate: number = 1) {
+        super();
+        this.position = position;
+        this.rotation = rotation;
+        this.heading = new Vec2(0,1).rotate(rotation);
+        this.turnRate = turnRate;
+    }
+
+    setTargetPosition(target: Vec2): void {
+        this.targetPosition = target;
+    }
+
+    updatePosition(deltaTime: number, speed: number): void {
+        if (this.targetPosition) {
+            const movement = this.heading.multiplyScalar(speed * deltaTime);
+            this.position = this.position.add(movement);
+        }
+    }
+
+    updateHeading(deltaTime: number): void {
+        if (this.targetPosition) {
+            const desiredDirection = this.targetPosition.subtract(this.position).normalize();
+            const angle = this.heading.signAngle(desiredDirection);
+            const maxRotation = this.turnRate * deltaTime;
+            
+            if (Math.abs(angle) > maxRotation) {
+                this.heading = this.heading.rotate(Math.sign(angle) * maxRotation);
+            } else {
+                this.heading = desiredDirection;
+            }
+            
+            this.rotation = Math.atan2(this.heading.y, this.heading.x);
+        }
+    }
 }

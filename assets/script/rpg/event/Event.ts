@@ -1,6 +1,8 @@
 import { BaseAbility } from "../ability/BaseAbility";
 import { ECSEntity } from "../ecs/ECSEntity";
+import { ActType } from "../enum/Act";
 import { DamageFlag, DamageType } from "../enum/Damage";
+import { AttackType } from "../enum/Type";
 
 export interface IEvent {
     type: string;
@@ -50,6 +52,14 @@ export class ApplyDamageEvent implements IEvent{
 }
 
 
+export class AttackEvent implements IEvent{
+    public readonly type = Event.ApplyDamage
+    constructor(
+        public readonly attacker: ECSEntity,
+        public readonly victim: ECSEntity,
+    ) {}
+}
+
 
 // 假设的 DelayedEvent 类，用于延迟执行事件
 export class DelayedEvent implements IEvent {
@@ -64,6 +74,7 @@ export class AnimationEvent implements IEvent {
     public readonly type = Event.Animation
     constructor(
         public readonly  attacker: ECSEntity,
+        public readonly  act: ActType,
     ) {}
 }
 
@@ -132,6 +143,7 @@ export class AbilityEndEvent implements IEvent {
 
 
 export  enum  Event {
+    ApplyAttack = "ApplyAttack",
     ApplyDamage = "ApplyDamage",
     Delayed = "Delayed",
     Animation = "Animation",

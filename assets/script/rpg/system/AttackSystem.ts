@@ -3,9 +3,11 @@ import { AttackComponent } from "../component/AttackComponent";
 import { TransformComponent } from "../component/TransformComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { BaseSystem } from "./BaseSystem";
-import { AnimationEvent, ApplyDamageEvent, DelayedEvent, ProjectileEvent,  } from "../event/Event";
+import { AnimationEvent, ApplyDamageEvent, AttackEvent, DelayedEvent, ProjectileEvent,  } from "../event/Event";
 import { DamageType } from "../enum/Damage";
 import { AttackCapability } from "../enum/Type";
+import { PathfindingComponent } from "../component/PathfindingComponent";
+import { ActType } from "../enum/Act";
 
 // CPU缓存的设计利用了两种主要的局部性原理：
 // 时间局部性（Temporal Locality）：如果一个数据项被访问，那么它很可能在不久的将来再次被访问。
@@ -25,38 +27,45 @@ import { AttackCapability } from "../enum/Type";
 // 而MODIFIER_PROPERTY_INCOMING_PHYSICAL_DAMAGE_PERCENTAGE则专门用来影响物理伤害。
 
 export class AttackSystem extends BaseSystem {
+    private readonly TRACK_INTERVAL: number = 0.5; // 追踪更新间隔
+    private lastTrackTime: number = 0;
+
     update(deltaTime: number) {
+        const currentTime = Date.now() / 1000;
         const attackComponents = this.getComponents(AttackComponent);
+
         for (const attackComponent of attackComponents) {
-            if (attackComponent.canAttack(deltaTime)) {
-                const attacker = this.getEntity(attackComponent.entityId);
-                const target = attackComponent.getTarget();
-                if (target && this.shouldAttack(attacker, target)) {
-                    this.initiateAttack(attacker, target, attackComponent);
+            const attacker = this.getEntity(attackComponent.entityId);
+            const target = attackComponent.getTarget();
+
+            if (target) {
+                const distance = this.getDistanceBetweenEntities(attacker, target);
+
+                if (attackComponent.isInAttackRange(distance)) {
+                    if (attackComponent.canAttack(deltaTime)) {
+                        this.initiateAttack(attacker, target, attackComponent);
+                    }
+                } else if (attackComponent.isInAcquisitionRange(distance)) {
+                    if (currentTime - this.lastTrackTime >= this.TRACK_INTERVAL) {
+                        this.updateTracking(attacker, target);
+                        this.lastTrackTime = currentTime;
+                    }
+                } else {
+                    // 目标超出获取范围，可以选择停止追踪或继续追踪
+                    attackComponent.setTarget(null);
                 }
+            } else {
+                // 可以在这里添加寻找新目标的逻辑
             }
         }
     }
 
-    private shouldAttack(attacker: ECSEntity, target: ECSEntity): boolean {
-        const attackComponent = attacker.getComponent(AttackComponent);
-        const attackerTransform = attacker.getComponent(TransformComponent);
-        const targetTransform = target.getComponent(TransformComponent);
-
-        if (!attackComponent || !attackerTransform || !targetTransform) {
-            return false;
-        }
-
-        const distance = Vec2.distance(attackerTransform.position, targetTransform.position);
-        return distance <= attackComponent.getAttackRange();
-    }
-
     private initiateAttack(attacker: ECSEntity, target: ECSEntity, attackComponent: AttackComponent) {
         // 触发攻击开始事件
-        // this.enqueueEvent(new AttackEvent(attacker, target));
+        this.enqueueEvent(new AttackEvent(attacker, target));
 
         // 触发动画事件
-        this.enqueueEvent(new AnimationEvent(attacker));
+        this.enqueueEvent(new AnimationEvent(attacker, ActType.ACT_ATTACK));
 
         // 根据攻击类型决定是立即造成伤害还是延迟造成伤害
         if (attackComponent.attackCapability === AttackCapability.UNIT_CAP_MELEE_ATTACK) {
@@ -69,17 +78,41 @@ export class AttackSystem extends BaseSystem {
             this.enqueueEvent(new ProjectileEvent(attacker, target));
         }
 
-        // 重置攻击冷却
+        // 执行攻击
         attackComponent.performAttack();
     }
 
     private performAttack(attacker: ECSEntity, target: ECSEntity, attackComponent: AttackComponent) {
-        const damage = attackComponent.getBaseAttackDamage();
-        const damageType = DamageType.DAMAGE_TYPE_PHYSICAL; // 假设所有普通攻击都是物理伤害
+        const damage = attackComponent.getAttackDamage();
+        const damageType = attackComponent.getAttackDamageType();
 
         this.enqueueEvent(new ApplyDamageEvent(attacker, target, damage, damageType));
+    }
 
-        attackComponent.performAttack();
+    private updateTracking(attacker: ECSEntity, target: ECSEntity) {
+        const attackerTransform = attacker.getComponent(TransformComponent);
+        const targetTransform = target.getComponent(TransformComponent);
+
+        if (attackerTransform && targetTransform) {
+            attackerTransform.setTargetPosition(targetTransform.position);
+
+            // 更新寻路组件（如果有的话）
+            const pathfinding = attacker.getComponent(PathfindingComponent);
+            if (pathfinding) {
+                pathfinding.setTarget(targetTransform.position);
+            }
+        }
+    }
+
+    private getDistanceBetweenEntities(entity1: ECSEntity, entity2: ECSEntity): number {
+        const transform1 = entity1.getComponent(TransformComponent);
+        const transform2 = entity2.getComponent(TransformComponent);
+
+        if (transform1 && transform2) {
+            return Vec2.distance(transform1.position, transform2.position);
+        }
+
+        return Infinity; // 如果无法计算距离，返回无穷大
     }
 }
 

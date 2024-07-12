@@ -48,6 +48,11 @@ export class BaseSystem extends ECSSystem{
         return this.ecs.entities.getEntitiesWithComponent(constructor)
     }
 
+
+    protected getEntitiesWithComponents(...componentConstructors: Constructor<ECSComponent>[]): ECSEntity[]{
+        return this.ecs.entities.getEntitiesWithComponents(...componentConstructors)
+    }
+
     protected getComponents<T extends ECSComponent>(constructor: Constructor<T>): T[]{
         return this.ecs.components.all(constructor)
     }

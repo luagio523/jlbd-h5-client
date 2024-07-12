@@ -2,6 +2,7 @@ import { HeroData } from "../ability/HeroData";
 import { Cooldown } from "../base/CoolDown";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
+import { DamageType } from "../enum/Damage";
 import { AttackCapability, AttackType } from "../enum/Type";
 
 
@@ -15,10 +16,11 @@ export class AttackComponent extends ECSComponent {
     public attackAnimationPoint: number; // 这个属性在 HeroData 中没有,可能需要另外提供或设置默认值
     public attackAcquisitionRange: number; // 这个属性在 HeroData 中没有,可能需要另外提供或设置默认值
     public attackType: AttackType; // 这个属性在 HeroData 中没有,可能需要另外提供或设置默认值
-
+    public attackDamageType:DamageType;
     private target: ECSEntity | null = null;
     private attacksMade: number = 0;
     private attackCooldown: Cooldown;
+    
     // private baseAttackAbility: BaseAttackAbility | null = null;
 
     constructor(heroData: HeroData) {
@@ -42,7 +44,7 @@ export class AttackComponent extends ECSComponent {
         return attackRange > 150 ? AttackCapability.UNIT_CAP_RANGED_ATTACK : AttackCapability.UNIT_CAP_MELEE_ATTACK;
     }
 
-    public getBaseAttackDamage(): number {
+    public getAttackDamage(): number {
         return Math.random() * (this.baseAttackDamageMax - this.baseAttackDamageMin) + this.baseAttackDamageMin;
     }
 
@@ -95,6 +97,10 @@ export class AttackComponent extends ECSComponent {
 
     public getAttackType(): AttackType {
         return this.attackType;
+    }
+
+    public getAttackDamageType():DamageType{
+        return this.attackDamageType;
     }
 
     public getActualAttackInterval(attackSpeed: number): number {

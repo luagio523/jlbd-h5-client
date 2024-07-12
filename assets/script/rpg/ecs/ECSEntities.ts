@@ -73,6 +73,17 @@ export class ECSEntities  {
         return entitiesWithComponent; 
     }
 
+    getEntitiesWithComponents(...componentConstructors: Constructor<ECSComponent>[]): ECSEntity[] {
+        const entitiesWithComponents: ECSEntity[] = [];
+        
+        for (let entity of this.entities) {
+            if (componentConstructors.every(constructor => entity.hasComponent(constructor))) {
+                entitiesWithComponents.push(entity);
+            }
+        }
+        return entitiesWithComponents;
+    }
+
     /**
      * 添加实体
      *
