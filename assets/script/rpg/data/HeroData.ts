@@ -1,5 +1,6 @@
+import { DataReader } from "../ability/DataReader";
+import { DamageType } from "../enum/Damage";
 import { AttackType, Attributes } from "../enum/Type";
-import { DataReader } from "./DataReader";
 
 export class HeroData extends DataReader{
     // 基础属性
@@ -25,6 +26,8 @@ export class HeroData extends DataReader{
     protected baseMoveSpeed: number;
     protected attackDamageMin: number;
     protected attackDamageMax: number;
+
+    protected attackDamageType:DamageType
     protected attackRate: number;
     protected attackRange: number;
 
@@ -148,11 +151,6 @@ export class HeroData extends DataReader{
     public GetTalents(): string[] {
         return this.talents;
     }
-
-
-
-    
-
 
     public GetAttackAnimationPoint(): number {
         return this.attackAnimationPoint;

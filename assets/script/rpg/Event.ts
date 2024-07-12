@@ -1,5 +1,5 @@
 import { EntityIndex } from "./BaseEntity";
-import { DamageType } from "./enum/Type";
+import { DamageType } from "./enum/Damage";
 
 
 
@@ -23,26 +23,26 @@ class DamageFilterEvent {
 // }
 
 
-class AttackEvent {
-    constructor(
-        public readonly attacker: Entity,
-        public readonly target: Entity,
-        public readonly damage: number,
-        public readonly attackType: string
-    ) {}
-}
+// class AttackEvent {
+//     constructor(
+//         public readonly attacker: Entity,
+//         public readonly target: Entity,
+//         public readonly damage: number,
+//         public readonly attackType: string
+//     ) {}
+// }
 
 
-function performAttack(attacker: Entity, target: Entity) {
-    const attackDamage = calculateDamage(attacker, target);
-    const attackType = getAttackType(attacker);
+// function performAttack(attacker: Entity, target: Entity) {
+//     const attackDamage = calculateDamage(attacker, target);
+//     const attackType = getAttackType(attacker);
 
-    // 创建攻击事件
-    const attackEvent = new AttackEvent(attacker, target, attackDamage, attackType);
+//     // 创建攻击事件
+//     const attackEvent = new AttackEvent(attacker, target, attackDamage, attackType);
 
-    // 分发事件
-    fireEvent(attackEvent);
-}
+//     // 分发事件
+//     fireEvent(attackEvent);
+// }
 
 
 // class EventQueue {

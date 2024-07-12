@@ -1,6 +1,5 @@
-import { AbilityData } from "../ability/AbilityData";
 import { BaseAbility } from "../ability/BaseAbility";
-import { DamageCalculator } from "../combat/DamageCalculator";
+import { DamageCalculator } from "../calculator/DamageCalculator";
 import { AbilityComponent } from "../component/AbilityComponent";
 import { HealthComponent } from "../component/HealthComponent";
 import { ECSEntity } from "../ecs/ECSEntity";

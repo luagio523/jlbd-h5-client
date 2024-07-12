@@ -1,5 +1,5 @@
-import { AbilityData } from "../ability/AbilityData";
 import { AttributeComponent } from "../component/AttributeComponent";
+import { AbilityData } from "../data/AbilityData";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { DamageType } from "../enum/Damage";
 import { ModifierFunction } from "../enum/Modifier";

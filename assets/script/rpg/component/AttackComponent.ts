@@ -1,5 +1,5 @@
-import { HeroData } from "../ability/HeroData";
 import { Cooldown } from "../base/CoolDown";
+import { HeroData } from "../data/HeroData";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { DamageType } from "../enum/Damage";
