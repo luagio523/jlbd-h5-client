@@ -1,4 +1,4 @@
-import { _decorator,  Vec2,bezierByTime   } from 'cc';
+import { _decorator,  Vec2   } from 'cc';
 import { ECSEntity } from '../ecs/ECSEntity';
 import { UnitTargetFlag, UnitTargetTeam, UnitTargetType } from '../enum/Unit';
 import { TransformComponent } from '../component/TransformComponent';
@@ -146,243 +146,488 @@ export class Projectile {
 }
 
 
-export class LinearProjectile extends Projectile{
-
-    protected hitRadius:number
-    
-    protected onProjectile:(radius:number)=>{}
-
-    lerp(start: number, end: number, t: number): number {
-        return start + (end - start) * t;
-    }
+export class LinearProjectile extends Projectile {
+    protected hitRadius: number;
+    protected onProjectileHit: (target: ECSEntity | undefined, location: Vec2) => boolean | void;
 
     constructor(options: CreateLinearProjectileOptions) {
-        super(options)
-        
-        if(options.iMoveSpeed){
-            this.velocity = options.vTargetLoc.clone().subtract(options.vSpawnOrigin).normalize().multiplyScalar(options.iMoveSpeed)
-        }
-        if(options.curve){ //是曲线
-            if(options.curve.curveControlPoints.length<1 || options.curve.curveControlPoints.length>2){
-                throw new Error("bezier controlPoints should be (1 or 2) point")
-            }
+        super(options);
+        this.initializeProjectile(options);
+    }
+
+    private initializeProjectile(options: CreateLinearProjectileOptions): void {
+        this.position = options.vSpawnOrigin.clone();
+        this.hitRadius = options.fStartRadius;
+
+        if (options.iMoveSpeed) {
+            this.velocity = Vec2.subtract(new Vec2(), options.vTargetLoc, options.vSpawnOrigin)
+                .normalize()
+                .multiplyScalar(options.iMoveSpeed);
         }
 
         if (options.acceleration) {
-            this.maxSpeedSqr = options.acceleration.fMaxSpeed * options.acceleration.fMaxSpeed;
+            this.maxSpeedSqr = options.acceleration.fMaxSpeed ** 2;
         }
 
-        if(options.fStartRadius){
-            this.hitRadius = options.fStartRadius
+        if (!options.fDistance && !options.fExpireTime) {
+            options.fExpireTime = 5; // 默认5秒
         }
 
-        if(!options.fDistance && !options.fExpireTime){
-            options.fExpireTime = 5 //默认5秒
-        }
-        
+        this.onProjectileHit = options.listener?.OnProjectileHit?.bind(options.listener);
     }
 
-    protected calculateRadius(t:number){
-        let options = this.options
-        if(options.fStartRadius != options.fEndRadius){//会变化
-            this.hitRadius = this.lerp(options.fStartRadius,options.fEndRadius,t)
-        }
-    }
-
-    protected calculateVelocity(dt:number){
-        if(this.isMaxSpeed){
-            return 
-        }
-        let acceleration = this.options.acceleration
-        if (acceleration) { //处理加速度
-            let accEffect = acceleration.value.multiplyScalar(dt);
-            this.velocity.add(accEffect);
-            // 如果超过最大速度，重置为最大速度
-            if (this.maxSpeedSqr!=0 && this.velocity.lengthSqr() > this.maxSpeedSqr) {
-                this.velocity = this.velocity.normalize().multiplyScalar(this.options.acceleration.fMaxSpeed);
-                this.isMaxSpeed = true
-            }
-        }
-    }
-
-    public get options():CreateLinearProjectileOptions{
-        return this.options as CreateLinearProjectileOptions
-    }
-
-    update(dt: number) {
-        // 更新已经过去的时间
+    public update(dt: number): void {
         this.elapsedTime += dt;
+        this.updateVelocity(dt);
+        this.updatePosition(dt);
+        this.checkCollision();
+        this.checkExpiration();
+        this.updateRadius();
+        this.options.listener?.OnProjectileThink?.(this.position);
+        this.onProjectileUpdate?.(this);
+    }
 
-        this.calculateVelocity(dt) //计算当前速度
-
-        let bCurve = this.options.curve
- 
-        let ratio = 0 //变化进度
-
-        if(bCurve){ //如果是曲线
-            ratio = this.elapsedTime/this.options.curve.curveTime
-            this.position = this.getBezierPosition(ratio)
-        }else{
-            let displacement = this.velocity.multiplyScalar(dt);//计算当前时间段的加速度效应
-            this.position.add(displacement); // 通过速度计算位置变化
-            this.distance = Vec2.distance(this.position, this.getSourcePosition())
-            ratio = this.distance/this.options.fDistance
-        }
-
-        if(this.elapsedTime > this.options.fExpireTime){
-            if(this.onProjectileEnd){
-                this.onProjectileEnd(this)
+    private updateVelocity(dt: number): void {
+        if (this.isMaxSpeed) return;
+    
+        const acceleration = (this.options as CreateLinearProjectileOptions).acceleration;
+        if (acceleration) {
+            // 使用 add 和 multiplyScalar 替代 addScaled
+            this.velocity.add(acceleration.value.clone().multiplyScalar(dt));
+            if (this.maxSpeedSqr !== 0 && this.velocity.lengthSqr() > this.maxSpeedSqr) {
+                this.velocity.normalize().multiplyScalar(acceleration.fMaxSpeed);
+                this.isMaxSpeed = true;
             }
-            return 
         }
-
-        if (ratio > 1) { //进度大于1了说明已经达到
-            if(this.onProjectileEnd){
-                this.onProjectileEnd(this)
-            }
-            return 
+    }
+    
+    private updatePosition(dt: number): void {
+        const options = this.options as CreateLinearProjectileOptions;
+        if (options.curve) {
+            const ratio = this.elapsedTime / options.curve.curveTime;
+            this.position = this.getBezierPosition(ratio);
+        } else {
+            // 使用 add 和 multiplyScalar 替代 addScaled
+            this.position.add(this.velocity.clone().multiplyScalar(dt));
+            this.distance = Vec2.distance(this.position, options.vSpawnOrigin);
         }
-        
-        this.calculateRadius(ratio) //计算当前碰撞半径
-        if(this.onProjectileUpdate){
-            this.onProjectileUpdate(this)
+    }
+
+    private checkCollision(): void {
+        const options = this.options as CreateLinearProjectileOptions;
+        // 这里应该实现碰撞检测逻辑
+        // 例如，检查是否有实体在 this.hitRadius 范围内
+        // 如果有碰撞，调用 this.onProjectileHit
+        // 如果 onProjectileHit 返回 true，则结束投射物
+    }
+
+    private checkExpiration(): void {
+        const options = this.options as CreateLinearProjectileOptions;
+        const ratio = options.curve 
+            ? this.elapsedTime / options.curve.curveTime
+            : this.distance / (options.fDistance || 0);
+
+        if (this.elapsedTime > (options.fExpireTime || Infinity) || ratio > 1) {
+            this.endProjectile();
         }
-        //搜寻碰撞的逻辑
     }
 
-    //计算curve长度
-    public CalculeteEstimateCurveLength(): number {
-        let totalLength = 0;
-        let steps = 10; // 分割的段数，可根据需要调整以获得更高的精度
-        let t = 0;
-        let lastPosition = this.getBezierPosition(t);
-        let newPosition:Vec2;
-        for (let i = 1; i <= steps; i++) {
-            t = i / steps;
-            newPosition = this.getBezierPosition(t);
-            totalLength += Vec2.distance(lastPosition, newPosition);
-            lastPosition = newPosition;
+    private updateRadius(): void {
+        const options = this.options as CreateLinearProjectileOptions;
+        if (options.fStartRadius !== options.fEndRadius) {
+            const t = this.distance / (options.fDistance || 1);
+            this.hitRadius = this.lerp(options.fStartRadius, options.fEndRadius || options.fStartRadius, t);
         }
-        return totalLength;
     }
 
-    public UpdateDirection(direction: Vec2, speed: number){
-        this.velocity = direction.multiplyScalar(speed)
-    }
+    private getBezierPosition(t: number): Vec2 {
+        const options = this.options as CreateLinearProjectileOptions;
+        const curve = options.curve;
+        if (!curve) return this.position;
 
-    //获取目标位置
-    protected getTargetPosition():Vec2{
-        return this.options.vTargetLoc
-    }
-    //获取起始位置
-    protected getSourcePosition():Vec2{
-        return this.options.vSpawnOrigin
-    }
-
-
-    protected getBezierPosition(t:number):Vec2{
-        let controlPoints = this.options.curve.curveControlPoints
-        if(controlPoints.length == 1){
-            this.position = this.calculateBezierPoint2(t, this.getSourcePosition(), controlPoints[0], this.getTargetPosition());
-        }else{
-            this.position = this.calculateBezierPoint3(t, this.getSourcePosition(), controlPoints[0],controlPoints[1], this.getTargetPosition());
+        if (curve.curveControlPoints.length === 1) {
+            return this.quadraticBezier(options.vSpawnOrigin, curve.curveControlPoints[0], options.vTargetLoc, t);
+        } else if (curve.curveControlPoints.length === 2) {
+            return this.cubicBezier(options.vSpawnOrigin, curve.curveControlPoints[0], curve.curveControlPoints[1], options.vTargetLoc, t);
         }
-        return this.position
+        return this.position;
     }
 
-    calculateBezierPoint2(t: number, p0: Vec2, p1: Vec2, p2: Vec2): Vec2 {
-        const oneMinusT = 1 - t;
-        return p0.multiplyScalar(oneMinusT * oneMinusT)
-            .add(p1.multiplyScalar(2 * oneMinusT * t))
-            .add(p2.multiplyScalar(t * t));
+    private quadraticBezier(p0: Vec2, p1: Vec2, p2: Vec2, t: number): Vec2 {
+        const mt = 1 - t;
+        return new Vec2(
+            mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x,
+            mt * mt * p0.y + 2 * mt * t * p1.y + t * t * p2.y
+        );
     }
 
-    calculateBezierPoint3(t: number, p0: Vec2, p1: Vec2, p2: Vec2, p3: Vec2): Vec2 {
-        const oneMinusT = 1 - t;
-        return p0.multiplyScalar(oneMinusT * oneMinusT * oneMinusT)
-            .add(p1.multiplyScalar(3 * oneMinusT * oneMinusT * t))
-            .add(p2.multiplyScalar(3 * oneMinusT * t * t))
-            .add(p3.multiplyScalar(t * t * t));
+    private cubicBezier(p0: Vec2, p1: Vec2, p2: Vec2, p3: Vec2, t: number): Vec2 {
+        const mt = 1 - t;
+        return new Vec2(
+            mt * mt * mt * p0.x + 3 * mt * mt * t * p1.x + 3 * mt * t * t * p2.x + t * t * t * p3.x,
+            mt * mt * mt * p0.y + 3 * mt * mt * t * p1.y + 3 * mt * t * t * p2.y + t * t * t * p3.y
+        );
     }
-    endProjectile() {
-        // 结束投射物，触发相关事件
+
+    private lerp(a: number, b: number, t: number): number {
+        return a + (b - a) * t;
+    }
+
+    public endProjectile(): void {
+        this.onProjectileEnd?.(this);
+    }
+
+    public UpdateDirection(direction: Vec2, speed: number): void {
+        this.velocity = direction.normalize().multiplyScalar(speed);
     }
 }
 
-
-
 export class TrackingProjectile extends Projectile {
-    protected target: any;  // 追踪的目标
-    protected isDodgeable: boolean;
-    protected isAttack: boolean;
-    protected moveSpeed:number //当前移动速度
+    private target: ECSEntity;
+    private moveSpeed: number;
+    private maxSpeed: number;
+    private isAttack: boolean;
 
     constructor(options: CreateTrackingProjectileOptions) {
         super(options);
-        if(!options.vTarget){
-            throw new Error("options vTarget can not be null")
-        }
-        if(options.iMoveSpeed){
-            this.moveSpeed = options.iMoveSpeed
-        }
+        this.initializeProjectile(options);
     }
 
-    public get options():CreateTrackingProjectileOptions{
-        return this.options as CreateTrackingProjectileOptions
+    private initializeProjectile(options: CreateTrackingProjectileOptions): void {
+        this.position = options.vSourceLoc.clone();
+        this.target = options.vTarget;
+        this.moveSpeed = options.iMoveSpeed;
+        this.isAttack = options.bIsAttack || false;
+
+        if (options.acceleration) {
+            this.maxSpeed = options.acceleration.fMaxSpeed;
+        } else {
+            this.maxSpeed = this.moveSpeed;
+        }
+
+        this.velocity = this.calculateInitialVelocity();
     }
 
-    protected calculateVelocity(dt:number){
-        if(this.isMaxSpeed){
-            return 
-        }
-        let acceleration = this.options.acceleration
-        if (acceleration) { //处理加速度
-            let accEffect = acceleration.value.multiplyScalar(dt);
-            this.velocity.add(accEffect);
-            // 如果超过最大速度，重置为最大速度
-            if (this.maxSpeedSqr!=0 && this.velocity.lengthSqr() > this.maxSpeedSqr) {
-                this.velocity = this.velocity.normalize().multiplyScalar(this.options.acceleration.fMaxSpeed);
-                this.isMaxSpeed = true
-            }
-            this.moveSpeed = this.velocity.length()
-        }
-        
-    }
-
-    update(dt: number) {
-
+    public update(dt: number): void {
         this.elapsedTime += dt;
+        this.updateVelocity(dt);
+        this.updatePosition(dt);
+        this.checkCollision();
+        this.checkExpiration();
+        this.options.listener?.OnProjectileThink?.(this.position);
+        this.onProjectileUpdate?.(this);
+    }
 
-        // 在调用基类的更新处理之前，更新速度向量指向目标
-        if (this.target) {
-            const targetPosition = this.options.vTarget.getComponent(TransformComponent).position.clone();
-            this.velocity = targetPosition.subtract(this.position).normalize().multiplyScalar(this.moveSpeed);
+    private updateVelocity(dt: number): void {
+        const targetPosition = this.getTargetPosition();
+        const direction = targetPosition.subtract(this.position).normalize();
+        
+        const acceleration = (this.options as CreateTrackingProjectileOptions).acceleration;
+        if (acceleration) {
+            // 使用 add 方法替代 addScaled
+            this.velocity.add(acceleration.value.multiplyScalar(dt));
+            if (this.velocity.lengthSqr() > this.maxSpeed * this.maxSpeed) {
+                this.velocity.normalize().multiplyScalar(this.maxSpeed);
+            }
+        } else {
+            this.velocity = direction.multiplyScalar(this.moveSpeed);
         }
+    }
+    
+    private updatePosition(dt: number): void {
+        // 使用 add 方法替代 addScaled
+        this.position.add(this.velocity.multiplyScalar(dt));
+        this.distance += this.velocity.length() * dt;
+    }
 
-        this.calculateVelocity(dt) //计算当前速度
+    private checkCollision(): void {
+        const targetPosition = this.getTargetPosition();
+        const distanceToTarget = Vec2.distance(this.position, targetPosition);
+        
+        // 假设碰撞半径为 10，你可以根据需要调整这个值
+        if (distanceToTarget <= 10) {
+            this.onProjectileHit(this.target, this.position);
+        }
+    }
+
+    private checkExpiration(): void {
+        const options = this.options as CreateTrackingProjectileOptions;
+        if (options.fExpireTime && this.elapsedTime > options.fExpireTime) {
+            this.endProjectile();
+        }
+    }
+
+    private getTargetPosition(): Vec2 {
+        // 这里假设 ECSEntity 有一个 getPosition 方法来获取其位置
+        // 你可能需要根据你的 ECS 系统来调整这部分
+        return this.target.getComponent(TransformComponent).position.clone();
+        // return this.target.getPosition();
+    }
+
+    private calculateInitialVelocity(): Vec2 {
+        const targetPosition = this.getTargetPosition();
+        return Vec2.subtract(new Vec2(), targetPosition, this.position)
+            .normalize()
+            .multiplyScalar(this.moveSpeed);
+    }
+
+    private onProjectileHit(target: ECSEntity, location: Vec2): void {
+        const listener = this.options.listener;
+        if (listener) {
+            if (this.isAttack && listener.OnProjectileHitHandle) {
+                listener.OnProjectileHitHandle(target, location, this.projectileID);
+            } else if (listener.OnProjectileHit) {
+                listener.OnProjectileHit(target, location);
+            }
+        }
+        this.endProjectile();
+    }
+
+    public endProjectile(): void {
+        this.onProjectileEnd?.(this);
+    }
+}
+
+// export class TrackingProjectile extends Projectile {
+//     protected target: any;  // 追踪的目标
+//     protected isDodgeable: boolean;
+//     protected isAttack: boolean;
+//     protected moveSpeed:number //当前移动速度
+
+//     constructor(options: CreateTrackingProjectileOptions) {
+//         super(options);
+//         if(!options.vTarget){
+//             throw new Error("options vTarget can not be null")
+//         }
+//         if(options.iMoveSpeed){
+//             this.moveSpeed = options.iMoveSpeed
+//         }
+//     }
+
+//     public get options():CreateTrackingProjectileOptions{
+//         return this.options as CreateTrackingProjectileOptions
+//     }
+
+//     protected calculateVelocity(dt:number){
+//         if(this.isMaxSpeed){
+//             return 
+//         }
+//         let acceleration = this.options.acceleration
+//         if (acceleration) { //处理加速度
+//             let accEffect = acceleration.value.multiplyScalar(dt);
+//             this.velocity.add(accEffect);
+//             // 如果超过最大速度，重置为最大速度
+//             if (this.maxSpeedSqr!=0 && this.velocity.lengthSqr() > this.maxSpeedSqr) {
+//                 this.velocity = this.velocity.normalize().multiplyScalar(this.options.acceleration.fMaxSpeed);
+//                 this.isMaxSpeed = true
+//             }
+//             this.moveSpeed = this.velocity.length()
+//         }
+        
+//     }
+
+//     update(dt: number) {
+
+//         this.elapsedTime += dt;
+
+//         // 在调用基类的更新处理之前，更新速度向量指向目标
+//         if (this.target) {
+//             const targetPosition = this.options.vTarget.getComponent(TransformComponent).position.clone();
+//             this.velocity = targetPosition.subtract(this.position).normalize().multiplyScalar(this.moveSpeed);
+//         }
+
+//         this.calculateVelocity(dt) //计算当前速度
       
-            // 计算当前时间段的加速度效应
-        // 通过速度计算位置变化
-        let displacement = this.velocity.multiplyScalar(dt);
-        this.position.add(displacement);
+//             // 计算当前时间段的加速度效应
+//         // 通过速度计算位置变化
+//         let displacement = this.velocity.multiplyScalar(dt);
+//         this.position.add(displacement);
         
        
 
-        if(this.elapsedTime > this.options.fExpireTime){
-            if(this.onProjectileEnd){
-                this.onProjectileEnd(this)
-            }
-            return 
-        }
+//         if(this.elapsedTime > this.options.fExpireTime){
+//             if(this.onProjectileEnd){
+//                 this.onProjectileEnd(this)
+//             }
+//             return 
+//         }
 
-        if(this.onProjectileUpdate){
-            this.onProjectileUpdate(this)
-        }
+//         if(this.onProjectileUpdate){
+//             this.onProjectileUpdate(this)
+//         }
 
         
-    }
+//     }
     
-}
+// }
+
+
+// export class LinearProjectile extends Projectile{
+
+//     protected hitRadius:number
+    
+//     protected onProjectile:(radius:number)=>{}
+
+//     lerp(start: number, end: number, t: number): number {
+//         return start + (end - start) * t;
+//     }
+
+//     constructor(options: CreateLinearProjectileOptions) {
+//         super(options)
+        
+//         if(options.iMoveSpeed){
+//             this.velocity = options.vTargetLoc.clone().subtract(options.vSpawnOrigin).normalize().multiplyScalar(options.iMoveSpeed)
+//         }
+//         if(options.curve){ //是曲线
+//             if(options.curve.curveControlPoints.length<1 || options.curve.curveControlPoints.length>2){
+//                 throw new Error("bezier controlPoints should be (1 or 2) point")
+//             }
+//         }
+
+//         if (options.acceleration) {
+//             this.maxSpeedSqr = options.acceleration.fMaxSpeed * options.acceleration.fMaxSpeed;
+//         }
+
+//         if(options.fStartRadius){
+//             this.hitRadius = options.fStartRadius
+//         }
+
+//         if(!options.fDistance && !options.fExpireTime){
+//             options.fExpireTime = 5 //默认5秒
+//         }
+        
+//     }
+
+//     protected calculateRadius(t:number){
+//         let options = this.options
+//         if(options.fStartRadius != options.fEndRadius){//会变化
+//             this.hitRadius = this.lerp(options.fStartRadius,options.fEndRadius,t)
+//         }
+//     }
+
+//     protected calculateVelocity(dt:number){
+//         if(this.isMaxSpeed){
+//             return 
+//         }
+//         let acceleration = this.options.acceleration
+//         if (acceleration) { //处理加速度
+//             let accEffect = acceleration.value.multiplyScalar(dt);
+//             this.velocity.add(accEffect);
+//             // 如果超过最大速度，重置为最大速度
+//             if (this.maxSpeedSqr!=0 && this.velocity.lengthSqr() > this.maxSpeedSqr) {
+//                 this.velocity = this.velocity.normalize().multiplyScalar(this.options.acceleration.fMaxSpeed);
+//                 this.isMaxSpeed = true
+//             }
+//         }
+//     }
+
+//     public get options():CreateLinearProjectileOptions{
+//         return this.options as CreateLinearProjectileOptions
+//     }
+
+//     update(dt: number) {
+//         // 更新已经过去的时间
+//         this.elapsedTime += dt;
+
+//         this.calculateVelocity(dt) //计算当前速度
+
+//         let bCurve = this.options.curve
+ 
+//         let ratio = 0 //变化进度
+
+//         if(bCurve){ //如果是曲线
+//             ratio = this.elapsedTime/this.options.curve.curveTime
+//             this.position = this.getBezierPosition(ratio)
+//         }else{
+//             let displacement = this.velocity.multiplyScalar(dt);//计算当前时间段的加速度效应
+//             this.position.add(displacement); // 通过速度计算位置变化
+//             this.distance = Vec2.distance(this.position, this.getSourcePosition())
+//             ratio = this.distance/this.options.fDistance
+//         }
+
+//         if(this.elapsedTime > this.options.fExpireTime){
+//             if(this.onProjectileEnd){
+//                 this.onProjectileEnd(this)
+//             }
+//             return 
+//         }
+
+//         if (ratio > 1) { //进度大于1了说明已经达到
+//             if(this.onProjectileEnd){
+//                 this.onProjectileEnd(this)
+//             }
+//             return 
+//         }
+        
+//         this.calculateRadius(ratio) //计算当前碰撞半径
+//         if(this.onProjectileUpdate){
+//             this.onProjectileUpdate(this)
+//         }
+//         //搜寻碰撞的逻辑
+//     }
+
+//     //计算curve长度
+//     public CalculeteEstimateCurveLength(): number {
+//         let totalLength = 0;
+//         let steps = 10; // 分割的段数，可根据需要调整以获得更高的精度
+//         let t = 0;
+//         let lastPosition = this.getBezierPosition(t);
+//         let newPosition:Vec2;
+//         for (let i = 1; i <= steps; i++) {
+//             t = i / steps;
+//             newPosition = this.getBezierPosition(t);
+//             totalLength += Vec2.distance(lastPosition, newPosition);
+//             lastPosition = newPosition;
+//         }
+//         return totalLength;
+//     }
+
+//     public UpdateDirection(direction: Vec2, speed: number){
+//         this.velocity = direction.multiplyScalar(speed)
+//     }
+
+//     //获取目标位置
+//     protected getTargetPosition():Vec2{
+//         return this.options.vTargetLoc
+//     }
+//     //获取起始位置
+//     protected getSourcePosition():Vec2{
+//         return this.options.vSpawnOrigin
+//     }
+
+
+//     protected getBezierPosition(t:number):Vec2{
+//         let controlPoints = this.options.curve.curveControlPoints
+//         if(controlPoints.length == 1){
+//             this.position = this.calculateBezierPoint2(t, this.getSourcePosition(), controlPoints[0], this.getTargetPosition());
+//         }else{
+//             this.position = this.calculateBezierPoint3(t, this.getSourcePosition(), controlPoints[0],controlPoints[1], this.getTargetPosition());
+//         }
+//         return this.position
+//     }
+
+//     calculateBezierPoint2(t: number, p0: Vec2, p1: Vec2, p2: Vec2): Vec2 {
+//         const oneMinusT = 1 - t;
+//         return p0.multiplyScalar(oneMinusT * oneMinusT)
+//             .add(p1.multiplyScalar(2 * oneMinusT * t))
+//             .add(p2.multiplyScalar(t * t));
+//     }
+
+//     calculateBezierPoint3(t: number, p0: Vec2, p1: Vec2, p2: Vec2, p3: Vec2): Vec2 {
+//         const oneMinusT = 1 - t;
+//         return p0.multiplyScalar(oneMinusT * oneMinusT * oneMinusT)
+//             .add(p1.multiplyScalar(3 * oneMinusT * oneMinusT * t))
+//             .add(p2.multiplyScalar(3 * oneMinusT * t * t))
+//             .add(p3.multiplyScalar(t * t * t));
+//     }
+//     endProjectile() {
+//         // 结束投射物，触发相关事件
+//     }
+// }
+
+
+
+
 
 
 

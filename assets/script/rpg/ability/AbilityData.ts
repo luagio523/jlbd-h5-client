@@ -43,6 +43,10 @@ export class AbilityData {
     private precache: { [key: string]: string };
     private abilityValues: AbilityValues;
 
+    // 投射物相关属性
+    protected projectileSpeed: number;
+    protected projectileDistance: number;
+
     constructor(data: any) {
         this.baseClass = data.BaseClass;
         this.scriptFile = data.ScriptFile;
@@ -69,6 +73,10 @@ export class AbilityData {
 
         this.abilityCastPoint = this.parseNumberArray(data.AbilityCastPoint);
         this.abilityChannelTime = this.parseNumberArray(data.AbilityChannelTime);
+
+        // 投射物相关属性
+        this.projectileSpeed = data.ProjectileSpeed || 0;
+        this.projectileDistance = data.ProjectileDistance || 0;
     }
 
     private parseEnumValue<T>(enumObj: T, value: string): number {
@@ -131,12 +139,11 @@ export class AbilityData {
         return this.abilityManaCost[Math.min(level, this.abilityManaCost.length) - 1] ?? 0;
     }
 
-    public GetLevelSpecialValueFor(name: string, level: number = 1): number {
-        const propertyValues = this.abilitySpecials[name]?.propertyValues;
-        if (!propertyValues) {
-            throw new Error(`No such property name: ${name}`);
-        }
-        return propertyValues[Math.min(level, propertyValues.length) - 1] ?? 0;
+  
+    public GetLevelSpecialValueFor(name: string, level: number): number {
+        const special = this.abilitySpecials[name];
+        if (!special) throw new Error(`No such property name: ${name}`);
+        return this.getValueForLevel(special.propertyValues, level);
     }
 
     public GetCastPoint(level: number = 1): number {
@@ -145,6 +152,21 @@ export class AbilityData {
 
     public GetChannelTime(level: number = 1): number {
         return this.abilityChannelTime[Math.min(level, this.abilityChannelTime.length) - 1] ?? 0;
+    }
+
+
+    public GetProjectileSpeed(): number {
+        return this.projectileSpeed;
+    }
+
+    public GetProjectileDistance(): number {
+        return this.projectileDistance;
+    }
+
+    private getValueForLevel(values: number[], level: number): number {
+        if (level < 1) throw new Error("Level must be equal or greater than 1.");
+        level = Math.min(level, values.length);
+        return values[level - 1];
     }
 }
 

@@ -1,25 +1,36 @@
 import { Intersection2D, Rect } from "cc";
-import { EntityQueryManager } from "./EntityQueryManager";
+import { GameEntityManager } from "./GameEntityManager";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { TransformComponent } from "../component/TransformComponent";
 import { ShapeComponent } from "../component/ShapeComponent";
 import { ShapeUtil } from "../util/ShapeUtil";
 import { GameMap } from "../map/GameMap";
 
-export class ColliderManager{
+export class ColliderManager {
+    private static instance: ColliderManager;
+
+    private constructor() {}
+
+    public static getInstance(): ColliderManager {
+        if (!ColliderManager.instance) {
+            ColliderManager.instance = new ColliderManager();
+        }
+        return ColliderManager.instance;
+    }
+
     /**
      * 检测实体是否会被阻挡
      * @param entity 
      * @returns 
      */
-    public static checkEntityBlocked(entity:ECSEntity):boolean{
-        if(this.checkEntityStaticBlocked(entity)){
-            return true 
+    public checkEntityBlocked(entity: ECSEntity): boolean {
+        if (this.checkEntityStaticBlocked(entity)) {
+            return true;
         }
-        if(this.checkEntityDynamicBlocked(entity)){ //检测是否懂
-            return true 
+        if (this.checkEntityDynamicBlocked(entity)) {
+            return true;
         }
-        return false 
+        return false;
     }
 
     /**
@@ -27,10 +38,10 @@ export class ColliderManager{
      * @param entity 
      * @returns 
      */
-    public static checkEntityStaticBlocked(entity:ECSEntity):boolean{
-        let transformComponent = entity.getComponent(TransformComponent)
-        let position = transformComponent.position
-        return !GameMap.ins().isWalkable(position.x,position.y)
+    public checkEntityStaticBlocked(entity: ECSEntity): boolean {
+        let transformComponent = entity.getComponent(TransformComponent);
+        let position = transformComponent.position;
+        return !GameMap.ins().isWalkable(position.x, position.y);
     }
 
     /**
@@ -38,22 +49,22 @@ export class ColliderManager{
      * @param entity 
      * @returns 
      */
-    public static checkEntityDynamicBlocked(entity:ECSEntity):boolean{
-        let transformComponent = entity.getComponent(TransformComponent)
-        let shapeComponent = entity.getComponent(ShapeComponent)
-        let checkRect= shapeComponent.getFootSquare(transformComponent.position)
-        let entities = EntityQueryManager.queryNearyByEntitiesWithRect(checkRect);
+    public checkEntityDynamicBlocked(entity: ECSEntity): boolean {
+        let transformComponent = entity.getComponent(TransformComponent);
+        let shapeComponent = entity.getComponent(ShapeComponent);
+        let checkRect = shapeComponent.getFootSquare(transformComponent.position);
+        let entityManager = GameEntityManager.getInstance();
+        let entities = entityManager.queryEntitiesInAABB(checkRect);
         for (const queryEntity of entities) {
-            if(entity != queryEntity){ //不是自身
-                let transformComponent = queryEntity.getComponent(TransformComponent)
-                let shapeComponent = queryEntity.getComponent(ShapeComponent)
-                let entityRect = shapeComponent.getFootSquare(transformComponent.position)
-                if (ShapeUtil.rectRect(checkRect,entityRect)){
-                    return true 
+            if (entity != queryEntity) { // 不是自身
+                let queryTransformComponent = queryEntity.getComponent(TransformComponent);
+                let queryShapeComponent = queryEntity.getComponent(ShapeComponent);
+                let entityRect = queryShapeComponent.getFootSquare(queryTransformComponent.position);
+                if (ShapeUtil.rectRect(checkRect, entityRect)) {
+                    return true;
                 }
             }
         }
-        return false
+        return false;
     }
 }
-

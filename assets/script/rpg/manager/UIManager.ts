@@ -15,10 +15,9 @@ export class UIManager {
     constructor(abilitySystem: AbilitySystem) {
         this.abilitySystem = abilitySystem;
         this.inputManager = InputManager.getInstance();
-        this.initializeAbilityButtons();
     }
 
-    private initializeAbilityButtons() {
+    public initializeAbilityButtons(document) {
         // 假设我们有4个技能按钮
         for (let i = 0; i < 4; i++) {
             const button = document.getElementById(`ability-button-${i}`);

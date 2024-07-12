@@ -93,10 +93,7 @@ export class ModifierManager {
     }
 
 
-    private getNearbyEntities(entity: ECSEntity, radius: number): ECSEntity[] {
-        // 实现获取附近实体的逻辑
-        return []; // 简化示例
-    }
+   
 
     updateModifiers(entity: ECSEntity, deltaTime: number) {
         const modifierComponent = entity.getComponent(ModifierComponent);
