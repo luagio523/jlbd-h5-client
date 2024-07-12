@@ -7,7 +7,9 @@ export class AbilityComponent extends ECSComponent {
     private abilities: BaseAbility[] = [];
 
     
-  
+    getAbilityIndex(ability: BaseAbility): number {
+        return this.abilities.indexOf(ability);
+    }
 
     addAbility(ability: BaseAbility): void {
         this.abilities.push(ability);

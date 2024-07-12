@@ -3,16 +3,12 @@ import { AbilityComponent } from "../component/AbilityComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { AbilityBehavior } from "../enum/Type";
 import { AbilityEndEvent, AbilityPhaseInterruptedEvent, AbilityPhaseStartEvent, AbilityStartEvent, CastAbilityEvent, DelayedEvent } from "../event/Event";
-import { AbilityInputHandler } from "../input/AbilityInputHandler";
-import { AbilityInputHandlerFactory } from "../input/AbilityInputHandlerFactory";
-import { InputManager } from "../manager/InputManager";
 import { BaseSystem } from "./BaseSystem";
 
 
 export class AbilitySystem extends BaseSystem {
 
-    private  inputManager = InputManager.getInstance();
-    private activeInputHandler: AbilityInputHandler | null = null;
+
     update(deltaTime: number) {
         const abilityComponents = this.getComponents(AbilityComponent);
         for (const abilityComponent of abilityComponents) {
@@ -131,29 +127,9 @@ export class AbilitySystem extends BaseSystem {
         }
     }
     
- 
-    
-    private setActiveInputHandler(handler: AbilityInputHandler): void {
-        if (this.activeInputHandler) {
-            this.inputManager.removeListener(this.handleInput);
-        }
-    
-        this.activeInputHandler = handler;
-        this.inputManager.addListener(this.handleInput);
-    }
-    
-    private handleInput = (eventType: string, event: any) => {
-        if (this.activeInputHandler) {
-            const shouldTrigger = this.activeInputHandler.handleInput(eventType, event);
-            if (shouldTrigger) {
-                this.triggerAbility(this.activeInputHandler.getAbility());
-            }
-        }
-    }
 
     private startAbilityCast(ability: BaseAbility): void {
-        const inputHandler = AbilityInputHandlerFactory.createHandler(ability);
-        this.setActiveInputHandler(inputHandler);
+       //do something
     }
 
 }
