@@ -3,6 +3,7 @@ import { ECSComponent } from "../ecs/ECSComponent";
 
 
 export enum PathfindingState {
+    NONE,
     IDLE,
     FOLLOWING_PATH,
     REACHED_TARGET,

@@ -14,6 +14,9 @@ export class PathfindingSystem extends BaseSystem {
 
         for (const entity of entities) {
             const pathfinding = entity.getComponent(PathfindingComponent);
+            if (pathfinding.getState() === PathfindingState.NONE) {//没有进行寻路导航
+                return
+            }
             const transform = entity.getComponent(TransformComponent);
 
             if (pathfinding.getState() === PathfindingState.FOLLOWING_PATH) {
@@ -28,7 +31,7 @@ export class PathfindingSystem extends BaseSystem {
                 }
             }
 
-            if (pathfinding.isPathUpdateNeeded(currentTime)) {
+            if (pathfinding.isPathUpdateNeeded(currentTime)) {//每隔一段时间重新计算路径
                 // 使用A*算法或其他寻路算法更新路径
                 const newPath = this.calculatePath(transform.position, pathfinding.getTarget());
                 pathfinding.setPath(newPath);

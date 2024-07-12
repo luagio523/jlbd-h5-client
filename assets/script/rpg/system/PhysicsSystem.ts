@@ -51,10 +51,10 @@ export class PhysicsSystem extends BaseSystem{
         const input = entity.getComponent(InputComponent);
         let currentPosition = transform.position
         // 计算预期位置
-        let proposedPosition = transform.position.add(input.joystickDirection.multiplyScalar(movable.speed * deltaTime));
+        let proposedPosition = transform.position.add(input.joystickDirection.multiplyScalar(movable.getSpeed() * deltaTime));
 
         transform.position = proposedPosition
-        if(ColliderManager.checkEntityBlocked(entity)){ // 执行碰撞检测
+        if(ColliderManager.getInstance().checkEntityBlocked(entity)){ // 执行碰撞检测
             transform.position = currentPosition //还是当前位置
         }
 
