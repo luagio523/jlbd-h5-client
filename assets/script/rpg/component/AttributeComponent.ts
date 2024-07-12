@@ -1,5 +1,6 @@
 import { HeroData } from "../ability/HeroData";
 import { ECSComponent } from "../ecs/ECSComponent";
+import { Attributes } from "../enum/Type";
 
 // AttributeComponent.ts
 export class AttributeComponent extends ECSComponent {
@@ -39,11 +40,11 @@ export class AttributeComponent extends ECSComponent {
 
     public getPrimaryAttributeAsAttackPower(): number {
         switch (this.heroData.GetPrimaryAttribute()) {
-            case AttributeType.STRENGTH:
+            case Attributes.ATTRIBUTE_STRENGTH:
                 return this.strength;
-            case AttributeType.AGILITY:
+            case Attributes.ATTRIBUTE_AGILITY:
                 return this.agility;
-            case AttributeType.INTELLECT:
+            case Attributes.ATTRIBUTE_INTELLECT:
                 return this.intelligence;
             default:
                 return 0;
