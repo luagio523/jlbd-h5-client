@@ -1,3 +1,4 @@
+import { AttackComponent } from "../component/AttackComponent";
 import { AttributeComponent } from "../component/AttributeComponent";
 import { AbilityData } from "../data/AbilityData";
 import { ECSEntity } from "../ecs/ECSEntity";
@@ -32,6 +33,7 @@ export class DamageCalculator {
         if (damageType === DamageType.DAMAGE_TYPE_HP_REMOVAL) {
             return Math.floor(baseDamage);
         }
+        
 
         let totalDamage = baseDamage;
 
@@ -68,6 +70,26 @@ export class DamageCalculator {
         }
 
         return Math.max(0, Math.floor(totalDamage));
+    }
+
+    //计算普通攻击伤害
+    private calculateNormalAttackDamage(attacker: ECSEntity，target: ECSEntity): number {
+        const baseAttackDamage = this.calculateBaseAttackDamage(attacker);
+        return this.calculateDamage(attacker, target, baseAttackDamage, DamageType.DAMAGE_TYPE_PHYSICAL);
+    }
+       
+
+    private calculateBaseAttackDamage(entity: ECSEntity): number {
+        let baseAttackDamage = 0;
+        const attackComponent = entity.getComponent(AttackComponent);
+        if (attackComponent) {
+            baseAttackDamage = attackComponent.getAttackDamage();
+        }
+        const attributeComponent = entity.getComponent(AttributeComponent);
+        if (attributeComponent) {
+            baseAttackDamage += attributeComponent.getPrimaryAttributeAsAttackPower();
+        }
+        return baseAttackDamage;
     }
 
     private calculatePreAttackBonusDamage(entity: ECSEntity): number {

@@ -1,46 +1,66 @@
-import { IModifierValueGetter, ModifierMapping } from "../ability/Modifier";
+import { ItemData } from "../data/ItemData";
 import { ECSComponent } from "../ecs/ECSComponent";
-import { ModifierFunction } from "../enum/Modifier";
-import { Equipment } from "../item/Equipment";
-
-
+import { InventorySlot } from "../enum/Item";
 
 
 export class EquipmentComponent extends ECSComponent {
+    private equipment: Map<InventorySlot, ItemData | null> = new Map();
 
-    private modifierMapping = new ModifierMapping(); // 创建 ModifierMapping 实例
+    constructor() {
+        super();
+        this.initializeEquipment();
+    }
 
-
-    public equips: Array<Equipment> = [];
-
-    public addEquip(equip:Equipment):void{
-        if (!equip) return;
-        this.equips.push(equip);
-
-        // 使用 ModifierMapping 实例来管理 getter 的添加
-        let funcGetterPairs = equip.ListDeclareFunctions();
-        for (let [modFunc, modGetter] of funcGetterPairs) {
-            this.modifierMapping.add(modFunc, modGetter);
+    private initializeEquipment(): void {
+        for (const slot of Object.values(InventorySlot)) {
+            this.equipment.set(slot, null);
         }
     }
 
-
-    public removeBuff(equip:Equipment): void {
-        const index = this.equips.indexOf(equip);
-        if (index !== -1) {
-            // 从 buffs 数组中移除指定的 Buff
-            this.equips.splice(index, 1);
-
-            // 使用 ModifierMapping 实例来管理 getter 的移除
-            let funcGetterPairs = equip.ListDeclareFunctions();
-            for (let [modFunc, modGetter] of funcGetterPairs) {
-                this.modifierMapping.remove(modFunc, modGetter as IModifierValueGetter);
-            }
+    public equip(item: ItemData): boolean {
+        const slot = item.GetItemSlots()[0];
+        if (this.canEquip(slot)) {
+            this.unequip(slot);
+            this.equipment.set(slot, item);
+            return true;
         }
+        return false;
     }
 
-    public getModifierMapping(): ModifierMapping{
-        return this.modifierMapping
+    public unequip(slot: InventorySlot): void {
+        this.equipment.set(slot, null);
     }
 
+    public getEquippedItem(slot: InventorySlot): ItemData | null {
+        return this.equipment.get(slot) || null;
+    }
+
+    public canEquip(slot: InventorySlot): boolean {
+        return this.equipment.get(slot) === null;
+    }
+
+    // public updateHeroAttributes(heroData: HeroData): void {
+    //     for (const [slot, item] of this.equipment) {
+    //         if (item) {
+    //             this.applyItemAttributes(heroData, item);
+    //         }
+    //     }
+    // }
+
+    // private applyItemAttributes(heroData: HeroData, item: ItemData): void {
+    //     for (const { attribute, value } of item.GetItemAttributes()) {
+    //         switch (attribute) {
+    //             case ItemAttribute.STRENGTH:
+    //                 heroData.SetBaseStrength(heroData.GetBaseStrength() + value);
+    //                 break;
+    //             case ItemAttribute.AGILITY:
+    //                 heroData.SetBaseAgility(heroData.GetBaseAgility() + value);
+    //                 break;
+    //             case ItemAttribute.INTELLIGENCE:
+    //                 heroData.SetBaseIntelligence(heroData.GetBaseIntelligence() + value);
+    //                 break;
+    //             // 添加其他属性的应用逻辑
+    //         }
+    //     }
+    // }
 }
