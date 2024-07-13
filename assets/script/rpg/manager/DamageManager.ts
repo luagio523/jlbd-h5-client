@@ -1,5 +1,6 @@
 import { BaseAbility } from "../ability/BaseAbility";
-import { DamageCalculator } from "../calculator/DamageCalculator";
+import { AbilityDamageCalculator } from "../calculator/AbilityDamageCalculator";
+import { AttackDamageCalculator } from "../calculator/AttackDamageCalculator";
 import { AbilityComponent } from "../component/AbilityComponent";
 import { HealthComponent } from "../component/HealthComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
@@ -16,10 +17,12 @@ interface DamageInfo {
 
 export class DamageManager {
     private static instance: DamageManager;
-    private damageCalculator: DamageCalculator;
+    private abilityDamageCalculator: AbilityDamageCalculator;
+    private attackDamageCalculator: AttackDamageCalculator;
 
     private constructor(modifierManager: ModifierManager) {
-        this.damageCalculator = new DamageCalculator(modifierManager);
+        this.abilityDamageCalculator = new AbilityDamageCalculator(modifierManager);
+        this.attackDamageCalculator = new AttackDamageCalculator(modifierManager);
     }
 
     public static getInstance(modifierManager?: ModifierManager): DamageManager {
@@ -35,13 +38,11 @@ export class DamageManager {
    
 
     public ApplyDamage(damageInfo: DamageInfo): number {
-        const finalDamage = this.damageCalculator.calculateDamage(
-            damageInfo.attacker,
-            damageInfo.victim,
-            damageInfo.damage,
-            damageInfo.damageType,
-            damageInfo.ability?.GetAbilityData()
-        );
+
+        if (damageInfo.damage <= 0) {
+            return 0;
+        }
+        let finalDamage = damageInfo.damage;
 
         this.applyDamageToVictim(damageInfo.victim, finalDamage);
         this.notifyDamageDealt(damageInfo, finalDamage);

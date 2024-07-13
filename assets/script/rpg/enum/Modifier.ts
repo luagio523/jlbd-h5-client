@@ -30,6 +30,8 @@ export enum ModifierAttribute {
 
 
 export enum D2ModifierFunction {
+
+
     // `GetModifierPreAttack_BonusDamage`: 提供一直生效的额外攻击力 ,绿字攻击力
     MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE = 0,
 

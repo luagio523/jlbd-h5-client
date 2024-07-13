@@ -83,7 +83,7 @@ export class AttackSystem extends BaseSystem {
     }
 
     private performAttack(attacker: ECSEntity, target: ECSEntity, attackComponent: AttackComponent) {
-        const damage = attackComponent.getAttackDamage();
+        const damage = attackComponent.getBaseAttackDamage();
         const damageType = attackComponent.getAttackDamageType();
 
         this.enqueueEvent(new ApplyDamageEvent(attacker, target, damage, damageType));

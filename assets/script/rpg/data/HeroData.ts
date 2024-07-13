@@ -62,6 +62,8 @@ export class HeroData extends DataReader{
         this.baseMoveSpeed = parseFloat(data.MovementSpeed);
         this.attackDamageMin = parseFloat(data.AttackDamageMin);
         this.attackDamageMax = parseFloat(data.AttackDamageMax);
+        this.attackDamageType = this.parseEnumValue(DamageType, data.attackDamageType);
+
         this.attackRate = parseFloat(data.AttackRate);
         this.attackRange = parseFloat(data.AttackRange);
 
@@ -69,6 +71,7 @@ export class HeroData extends DataReader{
         this.attackAnimationPoint = parseFloat(data.AttackAnimationPoint);
         this.attackAcquisitionRange = parseFloat(data.AttackAcquisitionRange);
         this.attackType = this.parseEnumValue(AttackType, data.AttackType);
+        
 
         this.abilities = data.Ability1 ? [data.Ability1, data.Ability2, data.Ability3, data.Ability4] : [];
         this.talents = data.Talent1 ? [data.Talent1, data.Talent2, data.Talent3, data.Talent4, data.Talent5, data.Talent6, data.Talent7, data.Talent8] : [];
@@ -142,6 +145,10 @@ export class HeroData extends DataReader{
 
     public GetAttackRange(): number {
         return this.attackRange;
+    }
+
+    public GetAttackDamageType(): DamageType {
+        return this.attackDamageType;
     }
 
     public GetAbilities(): string[] {

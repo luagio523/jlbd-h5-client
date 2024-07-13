@@ -6,12 +6,35 @@
 // 护甲的影响在所有伤害修饰（暴击，伤害增加，减伤等）之后最后计算，因此，
 // MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE的伤害增加是在护甲系数应用之前计算的。
 
+
+
+// 作用方式:
+// MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE: 提供一直生效的额外攻击力,表现为绿色数字的攻击力加成.
+// MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE: 直接增加单位的基础攻击力.
+// 显示效果:
+// PREATTACK_BONUS_DAMAGE: 通常显示为绿色数字,表示额外的攻击力加成.
+// BASEATTACK_BONUSDAMAGE: 直接增加白色数字的基础攻击力.
+// 计算顺序:
+// PREATTACK_BONUS_DAMAGE: 在基础攻击力之后计算,属于额外加成.
+// BASEATTACK_BONUSDAMAGE: 直接增加基础攻击力,会影响到基于基础攻击力的其他计算.
+// 影响范围:
+// PREATTACK_BONUS_DAMAGE: 只影响攻击伤害.
+// BASEATTACK_BONUSDAMAGE: 可能会影响到其他基于基础攻击力的计算,如某些技能伤害或效果.
+// 使用场景:
+// PREATTACK_BONUS_DAMAGE: 适用于需要提供额外攻击力但不影响基础属性的情况,如临时性的攻击力增益.
+// BASEATTACK_BONUSDAMAGE: 适用于需要永久或长期提升单位基础攻击力的情况,如属性成长或核心装备效果.
+
+
+// Dota2的攻击力分为 基础攻击力 额外攻击力 两者组成，我们一般会称之为 白字攻击力 与 绿子攻击力。
+
+
+
 export enum ModifierFunction{
     // `GetModifierPreAttack_BonusDamage`: 提供在攻击前就有的额外攻击力 ,绿字攻击力，比如武器 攻击力
     MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE = 0,
     
 
-    // `GetModifierPreAttack_BonusDamagePostCrit`: 暴击后再添加一个伤害
+    // `GetModifierPreAttack_BonusDamagePostCrit`: 暴击后再添加一个伤害 暴击伤害计算完成后再加上去
     MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_POST_CRIT = 3,
 
     // `GetModifierBaseAttack_BonusDamage`: 获取到基础攻击额外的伤害。 直接增加基础攻击力，一般是技能buff
@@ -34,6 +57,12 @@ export enum ModifierFunction{
      */
      MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_PURE = 8,
 
+     /**
+     * 方法名称：`GetModifierProcAttack_BonusDamage_Magical_Target`
+     * 这个方法返回修饰器提供的对魔法伤害攻击目标的加成。
+     */
+    MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_MAGICAL_TARGET = 9,
+
 
     /**********************************提升百分比******************************** */
 
@@ -43,7 +72,7 @@ export enum ModifierFunction{
      // `GetModifierDamageOutgoing_Percentage`: 改变单位造成的总伤害的百分比。
      MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE = 41,
 
-      // `GetModifierTotalDamageOutgoing_Percentage`: 获取单位造成的总伤害的百分比。
+      // `GetModifierTotalDamageOutgoing_Percentage`: 单位造成的总伤害的百分比。
       MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE = 44,
  
      // `GetModifierDamageOutgoing_Percentage_Illusion`: 改变幻影造成的伤害的百分比。
@@ -51,6 +80,8 @@ export enum ModifierFunction{
  
      // `GetModifierDamageOutgoing_Percentage_Illusion_Amplify`: 提高幻影造成的伤害的百分比。
      MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE_ILLUSION_AMPLIFY = 43,
+
+     MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE = 57,
 
 
     /*****************************影响属性***************************************** */
@@ -77,18 +108,21 @@ export enum ModifierFunction{
     /******************************护甲**************************************** */
 
        // `GetModifierPhysicalArmorBase_Percentage`: 提供基础物理护甲的增加百分比。
-    MODIFIER_PROPERTY_PHYSICAL_ARMOR_BASE_PERCENTAGE = 71,
+   MODIFIER_PROPERTY_PHYSICAL_ARMOR_BASE_PERCENTAGE = 71,
     /**
      * 方法名称：`GetModifierPhysicalArmorTotal_Percentage`
      * 此方法返回物理护甲总的百分比修改值。
      */
-    MODIFIER_PROPERTY_PHYSICAL_ARMOR_TOTAL_PERCENTAGE = 72,
+   MODIFIER_PROPERTY_PHYSICAL_ARMOR_TOTAL_PERCENTAGE = 72,
 
      /**
       * 方法名称：`GetModifierPhysicalArmorBonus`
       * 此方法返回由修改器添加的额外物理护甲。
       */
-     MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS = 73,
+   MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS = 73,
+
+   //无视护甲
+   MODIFIER_PROPERTY_IGNORE_PHYSICAL_ARMOR = 78,
 
 
      // `GetModifierMagicalResistanceBonus`: 提供额外的魔法抗性加成。

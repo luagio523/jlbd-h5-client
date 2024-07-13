@@ -128,6 +128,9 @@ export abstract class BaseAbility {
         return this.abilityData.GetChannelTime(this.level);
     }
 
+    public GetAbilityDamage(): number { 
+        return this.abilityData.GetAbilityDamage(this.level); 
+    }
     
     
 
@@ -143,7 +146,7 @@ export abstract class BaseAbility {
     public OnSpellFinish(): void {}
     public RequiresFacing(): boolean { return true; }
     public CanBeExecuted(): boolean { return !this.IsInCooldown(); }
-    public GetAbilityDamage(): number { return 0; }
+    
     public GetAOERadius(): number { return 0; }
     public IsHidden(): boolean { return false; }
     public IsPassive(): boolean { return false; }
@@ -160,34 +163,34 @@ export abstract class BaseAbility {
 
 
 
-export class BaseAttackAbility extends BaseAbility {
-    constructor(abilityData: AbilityData) {
-        super("base_attack", 0, abilityData);
-    }
+// export class BaseAttackAbility extends BaseAbility {
+//     constructor(abilityData: AbilityData) {
+//         super("base_attack", 0, abilityData);
+//     }
 
-    public OnAttack(target: ECSEntity | null): void {
-        if (!target) return;
+//     public OnAttack(target: ECSEntity | null): void {
+//         if (!target) return;
 
-        const caster = this.GetCaster();
-        if (!caster) return;
+//         const caster = this.GetCaster();
+//         if (!caster) return;
 
-        const damage = this.GetAttackDamage();
-        const damageType = this.GetAbilityData().GetAbilityUnitDamageType();
+//         const damage = this.GetAttackDamage();
+//         const damageType = this.GetAbilityData().GetAbilityUnitDamageType();
 
-        // 这里可以添加特殊的攻击效果逻辑
+//         // 这里可以添加特殊的攻击效果逻辑
 
-        // 触发伤害事件
-        // this.DealDamage(caster, target, damage, damageType);
-    }
+//         // 触发伤害事件
+//         // this.DealDamage(caster, target, damage, damageType);
+//     }
 
-    private GetAttackDamage(): number {
-        const caster = this.GetCaster();
-        if (!caster) return 0;
+//     private GetAttackDamage(): number {
+//         const caster = this.GetCaster();
+//         if (!caster) return 0;
 
-        const attackComponent = caster.getComponent(AttackComponent) ;
-        return attackComponent.getAttackDamage();
-    }
-}
+//         const attackComponent = caster.getComponent(AttackComponent) ;
+//         return attackComponent.getBaseAttackDamage();
+//     }
+// }
 
 
 

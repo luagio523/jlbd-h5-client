@@ -13,19 +13,21 @@ export class AttackComponent extends ECSComponent {
     public baseAttackDamageMax: number;
     public attackRange: number;
     public attackRate: number;
-    public attackAnimationPoint: number; // 这个属性在 HeroData 中没有,可能需要另外提供或设置默认值
-    public attackAcquisitionRange: number; // 这个属性在 HeroData 中没有,可能需要另外提供或设置默认值
-    public attackType: AttackType; // 这个属性在 HeroData 中没有,可能需要另外提供或设置默认值
-    public attackDamageType:DamageType;
+    public attackAnimationPoint: number;
+    public attackAcquisitionRange: number;
+    public attackType: AttackType;
+    public attackDamageType: DamageType;
     private target: ECSEntity | null = null;
     private attacksMade: number = 0;
     private attackCooldown: Cooldown;
-    
-    // private baseAttackAbility: BaseAttackAbility | null = null;
 
     constructor(heroData: HeroData) {
         super();
-        
+        this.initializeAttack(heroData);
+    }
+   
+
+    private initializeAttack(heroData: HeroData): void {
         this.attackCapability = this.determineAttackCapability(heroData.GetAttackRange());
         [this.baseAttackDamageMin, this.baseAttackDamageMax] = heroData.GetAttackDamage();
         this.attackRange = heroData.GetAttackRange();
@@ -33,18 +35,15 @@ export class AttackComponent extends ECSComponent {
         this.attackAnimationPoint = heroData.GetAttackAnimationPoint();
         this.attackAcquisitionRange = heroData.GetAttackAcquisitionRange();
         this.attackType = heroData.GetAttackType();
-
+        this.attackDamageType = heroData.GetAttackDamageType();
         this.attackCooldown = new Cooldown(this.attackRate);
-            
-        // 创建基础攻击能力
-        // this.baseAttackAbility = new BaseAttackAbility(this);
     }
 
     private determineAttackCapability(attackRange: number): AttackCapability {
         return attackRange > 150 ? AttackCapability.UNIT_CAP_RANGED_ATTACK : AttackCapability.UNIT_CAP_MELEE_ATTACK;
     }
 
-    public getAttackDamage(): number {
+    public getBaseAttackDamage(): number {
         return Math.random() * (this.baseAttackDamageMax - this.baseAttackDamageMin) + this.baseAttackDamageMin;
     }
 
@@ -77,9 +76,6 @@ export class AttackComponent extends ECSComponent {
         if (this.canAttack(0)) {
             this.attacksMade++;
             this.attackCooldown.start();
-            // if (this.baseAttackAbility && this.target) {
-            //     this.baseAttackAbility.OnAttack(this.target);
-            // }
         }
     }
 
@@ -99,7 +95,7 @@ export class AttackComponent extends ECSComponent {
         return this.attackType;
     }
 
-    public getAttackDamageType():DamageType{
+    public getAttackDamageType(): DamageType {
         return this.attackDamageType;
     }
 
@@ -118,11 +114,8 @@ export class AttackComponent extends ECSComponent {
     public isInAttackRange(distance: number): boolean {
         return distance <= this.attackRange;
     }
-
-    // public getBaseAttackAbility(): BaseAttackAbility | null {
-    //     return this.baseAttackAbility;
-    // }
 }
+
 
 // export class AttackComponent extends ECSComponent {
 //     public attackCapability: AttackCapability;

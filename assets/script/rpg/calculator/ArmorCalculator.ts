@@ -13,7 +13,9 @@ export class ArmorCalculator {
 
     // 计算实体的最终护甲值
     calculateFinalArmor(entity: ECSEntity): number {
-        const baseArmor = entity.getComponent(AttributeComponent).getBaseArmor();
+        let baseArmor = entity.getComponent(AttributeComponent).getBaseArmor();
+        const baseArmorPercentage = 1 + this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PHYSICAL_ARMOR_BASE_PERCENTAGE) / 100;
+        baseArmor *= baseArmorPercentage;
         const bonusArmor = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS);
         const armorPercentage = 1 + this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PHYSICAL_ARMOR_TOTAL_PERCENTAGE) / 100;
         return (baseArmor + bonusArmor) * armorPercentage;

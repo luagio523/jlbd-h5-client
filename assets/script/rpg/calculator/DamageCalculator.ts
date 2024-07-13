@@ -1,182 +1,69 @@
-import { AttackComponent } from "../component/AttackComponent";
-import { AttributeComponent } from "../component/AttributeComponent";
-import { AbilityData } from "../data/AbilityData";
+
 import { ECSEntity } from "../ecs/ECSEntity";
 import { DamageType } from "../enum/Damage";
 import { ModifierFunction } from "../enum/ModifierFunction";
 import { ModifierManager } from "../manager/ModifierManager";
 import { ArmorCalculator } from "./ArmorCalculator";
-import { CriticalStrikeCalculator } from "./CriticalStrikeCalculator";
-import { EvasionAndBlockCalculator } from "./EvasionAndBlockCalculator";
+import { AttributeCalculator } from "./AttributeCalculator";
 import { MagicResistanceCalculator } from "./MagicResistanceCalculator";
 
+
 export class DamageCalculator {
-    private modifierManager: ModifierManager;
+    protected modifierManager: ModifierManager;
     private armorCalculator: ArmorCalculator;
     private magicResistanceCalculator: MagicResistanceCalculator;
-    private criticalStrikeCalculator: CriticalStrikeCalculator;
-    private evasionAndBlockCalculator: EvasionAndBlockCalculator;
+    protected attributeCalculator: AttributeCalculator;
 
     constructor(modifierManager: ModifierManager) {
         this.modifierManager = modifierManager;
         this.armorCalculator = new ArmorCalculator(modifierManager);
         this.magicResistanceCalculator = new MagicResistanceCalculator(modifierManager);
-        this.criticalStrikeCalculator = new CriticalStrikeCalculator(modifierManager);
-        this.evasionAndBlockCalculator = new EvasionAndBlockCalculator(modifierManager);
+        this.attributeCalculator = new AttributeCalculator(modifierManager);
     }
 
-   
-
-    //计算普通攻击伤害
-    public calculateNormalAttackDamage(attacker: ECSEntity, target: ECSEntity): number {
-        const baseAttackDamage = this.calculateBaseAttackDamage(attacker);
-        return this.calculateDamage(attacker, target, baseAttackDamage, DamageType.DAMAGE_TYPE_PHYSICAL);
+    /**
+     * 计算伤害增幅
+     * @param entity 
+     * @param damageType 
+     * @returns 
+     */
+    protected calculateDamageAmplification(entity: ECSEntity, damageType: DamageType): number {
+        let amplification = 1;
+        return amplification
     }
 
-
-    public calculateAbilityDamage(attacker: ECSEntity, target: ECSEntity, abilityData: AbilityData): number {
-        let baseDamage = abilityData.GetAbilityDamage();
-        // // 应用技能等级加成
-        // baseDamage += abilityData.getDamagePerLevel() * abilityData.getLevel();
-        
-        // 应用属性加成（如果有）
-        const attributeBonus = this.calculateAttributeBonus(attacker, abilityData);
-        baseDamage += attributeBonus;
-        
-        // 应用技能特定的伤害修正
-        baseDamage = this.applyAbilitySpecificModifiers(baseDamage, abilityData, attacker, target);
-        
-        // 计算最终伤害
-        const finalDamage = this.calculateDamage(attacker, target, baseDamage, abilityData.GetAbilityUnitDamageType(), abilityData);
-        
-        return finalDamage;
+    /**
+     * 计算伤害减免
+     * @param entity 
+     * @param damageType 
+     * @returns 
+     */
+    protected calculateDamageReduction(entity: ECSEntity, damageType: DamageType): number {
+        let reduction = 0;
+        return Math.min(reduction, 1); // 确保减免不超过100%
     }
 
 
-    private calculateAttributeBonus(attacker: ECSEntity, abilityData: AbilityData): number {
-        // const attributeComponent = attacker.getComponent(AttributeComponent);
-        // if (attributeComponent && abilityData.getAttributeGain()) {
-        //     const attribute = abilityData.getAttributeType();
-        //     const attributeValue = attributeComponent.getAttribute(attribute);
-        //     return attributeValue * abilityData.getAttributeGain();
-        // }
-        return 0;
-    }
-
-
-    calculateDamage(attacker: ECSEntity, target: ECSEntity, baseDamage: number, damageType: DamageType, abilityData?: AbilityData): number {
-        if (damageType === DamageType.DAMAGE_TYPE_NONE) {
-            return 0;
-        }
-
-        if (damageType === DamageType.DAMAGE_TYPE_HP_REMOVAL) {
-            return Math.floor(baseDamage);
-        }
-        
-
-        let totalDamage = baseDamage;
-
-        // 预处理阶段
-        totalDamage += this.calculatePreAttackBonusDamage(attacker);
-
-        // 基础攻击加成
-        totalDamage += this.calculateBaseAttackBonusDamage(attacker);
-
-        // 暴击检查
-        const critMultiplier = this.criticalStrikeCalculator.calculateFinalCriticalStrike(attacker);
-        totalDamage *= critMultiplier;
-
-        // 暴击后额外伤害
-        totalDamage += this.calculatePostCritBonusDamage(attacker);
-
-        // 伤害类型转换
-        damageType = this.checkDamageTypeConversion(attacker, damageType);
-
-        // 伤害百分比修改
-        totalDamage *= this.calculateDamagePercentageModifier(attacker);
-
-        // 应用护甲和魔法抗性
-        totalDamage = this.applyDefenses(target, totalDamage, damageType);
-
-        // 应用闪避和格挡（只对物理伤害有效）
-        if (damageType === DamageType.DAMAGE_TYPE_PHYSICAL) {
-            totalDamage = this.evasionAndBlockCalculator.calculateFinalEvasionAndBlock(target, totalDamage);
-        }
-
-        // 应用技能特定的伤害修正（如果有）
-        if (abilityData) {
-            totalDamage = this.applyAbilitySpecificModifiers(totalDamage, abilityData, attacker, target);
-        }
-
-        return Math.max(0, Math.floor(totalDamage));
-    }
-    
-   
-       
-
-    private calculateBaseAttackDamage(entity: ECSEntity): number {
-        let baseAttackDamage = 0;
-        const attackComponent = entity.getComponent(AttackComponent);
-        if (attackComponent) {
-            baseAttackDamage = attackComponent.getAttackDamage();
-        }
-        const attributeComponent = entity.getComponent(AttributeComponent);
-        if (attributeComponent) {
-            baseAttackDamage += attributeComponent.getPrimaryAttributeAsAttackPower();
-        }
-        return baseAttackDamage;
-    }
-
-    private calculatePreAttackBonusDamage(entity: ECSEntity): number {
-        return this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE);
-    }
-
-    private calculateBaseAttackBonusDamage(entity: ECSEntity): number {
-        return this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE);
-    }
-
-    private calculatePostCritBonusDamage(entity: ECSEntity): number {
-        return this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_POST_CRIT);
-    }
-
-    private checkDamageTypeConversion(entity: ECSEntity, originalType: DamageType): DamageType {
-        if (originalType === DamageType.DAMAGE_TYPE_PHYSICAL &&
-            this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PROCATTACK_CONVERT_PHYSICAL_TO_MAGICAL) > 0) {
-            return DamageType.DAMAGE_TYPE_MAGICAL;
-        }
-        return originalType;
-    }
-
-    private calculateDamagePercentageModifier(entity: ECSEntity): number {
-        const bonusDamage = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE) / 100;
-        const totalDamage = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE) / 100;
-        return 1 + bonusDamage + totalDamage;
-    }
-
-    private applyDefenses(target: ECSEntity, damage: number, damageType: DamageType): number {
+    protected applyDefenses(attacker: ECSEntity, target: ECSEntity, damage: number, damageType: DamageType): number {
         switch (damageType) {
             case DamageType.DAMAGE_TYPE_PHYSICAL:
+                if (this.modifierManager.getModifierValue(attacker,  ModifierFunction.MODIFIER_PROPERTY_IGNORE_PHYSICAL_ARMOR) == 1) {   // 忽略物理防御;
+                    return damage;
+                }
                 const armor = this.armorCalculator.calculateFinalArmor(target);
                 const armorReduction = 1 - (0.06 * armor) / (1 + 0.06 * Math.abs(armor));
                 return damage * armorReduction;
             case DamageType.DAMAGE_TYPE_MAGICAL:
                 const magicResistance = this.magicResistanceCalculator.calculateFinalMagicResistance(target);
-                return damage * (1 - magicResistance);
+                return damage * (1 - magicResistance/100);
             case DamageType.DAMAGE_TYPE_PURE:
             case DamageType.DAMAGE_TYPE_ABILITY_DEFINED:
-                return damage; // 纯粹伤害和技能定义的伤害不受防御影响
+                return damage;
             default:
                 return damage;
         }
     }
-
-    private applyAbilitySpecificModifiers(damage: number, abilityData: AbilityData, attacker: ECSEntity, target: ECSEntity): number {
-        // 这里可以根据技能的特殊效果来修改伤害
-        // 例如，某些技能可能会根据目标的当前生命值来增加伤害
-        // 或者根据技能等级来调整伤害
-        // 具体实现取决于游戏设计
-        return damage;
-    }
+   
 }
 
 

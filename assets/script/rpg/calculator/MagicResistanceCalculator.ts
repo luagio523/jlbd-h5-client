@@ -13,7 +13,8 @@ export class MagicResistanceCalculator {
     // 计算实体的最终魔法抗性
     calculateFinalMagicResistance(entity: ECSEntity): number {
         const baseMagicResistance = entity.getComponent(AttributeComponent).getBaseMagicResistance();
-        const bonusMagicResistance = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS) / 100;
+        const bonusMagicResistance = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS) ;
         return Math.min(1, baseMagicResistance + bonusMagicResistance);
     }
+    
 }

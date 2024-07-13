@@ -4,21 +4,40 @@ import { Attributes } from "../enum/Type";
 
 // AttributeComponent.ts
 export class AttributeComponent extends ECSComponent {
-    private heroData: HeroData;
     private level: number = 1;
+    private primaryAttribute: Attributes;
 
-    // 直接存储属性值
+    private baseStrength: number = 0;
+    private baseAgility: number = 0;
+    private baseIntelligence: number = 0;
+
+    private strengthGain: number = 0;
+    private agilityGain: number = 0;
+    private intelligenceGain: number = 0;
+
     private strength: number = 0;
     private agility: number = 0;
     private intelligence: number = 0;
+
     private baseArmor: number = 0;
     private baseMagicResistance: number = 0;
 
-
     constructor(heroData: HeroData) {
         super();
-        this.heroData = heroData;
+        this.initializeAttributes(heroData);
         this.updateAttributes();
+    }
+
+    private initializeAttributes(heroData: HeroData): void {
+        this.primaryAttribute = heroData.GetPrimaryAttribute();
+        this.baseStrength = heroData.GetBaseStrength();
+        this.baseAgility = heroData.GetBaseAgility();
+        this.baseIntelligence = heroData.GetBaseIntelligence();
+        this.strengthGain = heroData.GetStrengthGain();
+        this.agilityGain = heroData.GetAgilityGain();
+        this.intelligenceGain = heroData.GetIntelligenceGain();
+        this.baseArmor = heroData.GetBaseArmor();
+        this.baseMagicResistance = heroData.GetMagicResistance();
     }
 
     public getStrength(): number {
@@ -39,7 +58,7 @@ export class AttributeComponent extends ECSComponent {
     }
 
     public getPrimaryAttributeAsAttackPower(): number {
-        switch (this.heroData.GetPrimaryAttribute()) {
+        switch (this.primaryAttribute) {
             case Attributes.ATTRIBUTE_STRENGTH:
                 return this.strength;
             case Attributes.ATTRIBUTE_AGILITY:
@@ -51,6 +70,10 @@ export class AttributeComponent extends ECSComponent {
         }
     }
 
+    public getPrimaryAttribute(): Attributes {
+        return this.primaryAttribute;
+    }
+
     public getBaseArmor(): number {
         return this.baseArmor;
     }
@@ -60,10 +83,8 @@ export class AttributeComponent extends ECSComponent {
     }
 
     private updateAttributes(): void {
-        this.strength = this.heroData.GetBaseStrength() + (this.level - 1) * this.heroData.GetStrengthGain();
-        this.agility = this.heroData.GetBaseAgility() + (this.level - 1) * this.heroData.GetAgilityGain();
-        this.intelligence = this.heroData.GetBaseIntelligence() + (this.level - 1) * this.heroData.GetIntelligenceGain();
-        this.baseArmor = this.heroData.GetBaseArmor();
-        this.baseMagicResistance = this.heroData.GetMagicResistance();
+        this.strength = this.baseStrength + (this.level - 1) * this.strengthGain;
+        this.agility = this.baseAgility + (this.level - 1) * this.agilityGain;
+        this.intelligence = this.baseIntelligence + (this.level - 1) * this.intelligenceGain;
     }
 }
