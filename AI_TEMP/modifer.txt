@@ -1,0 +1,343 @@
+import { ECSComponent } from "../ecs/ECSComponent";
+import { ModifierFunction } from "../enum/ModifierFunction";
+import { Modifier, ModifierEventDispatcher } from "../ability/Modifier";
+import { ModifierEvent } from "../enum/ModifierEvent";
+
+export class ModifierComponent extends ECSComponent {
+
+    private modifierEventDispatcher: ModifierEventDispatcher = ModifierEventDispatcher.getInstance();
+
+    private modifiers: Modifier[] = [];
+    private dirty: boolean = true;
+    private cache: Map<ModifierFunction, number> = new Map();
+
+    onModifierEvent(event: ModifierEvent, data: any) {
+        this.modifierEventDispatcher.dispatchEvent(event, data);
+    }
+
+    addModifier(modifier: Modifier) {
+        modifier.ListListenEvents().forEach(event => {
+            this.modifierEventDispatcher.addEventListener(event,modifier.onModifierEvent);
+        });
+        this.modifiers.push(modifier);
+        this.modifiers.sort((a, b) => b.priority - a.priority);
+        this.markDirty();
+    }
+
+    removeModifier(modifierId: string) {
+        const index = this.modifiers.findIndex(m => m.id === modifierId);
+        const modifier = this.modifiers[index];
+        if (modifier) {
+            modifier.ListListenEvents()?.forEach(event => {
+                this.modifierEventDispatcher.removeEventListener(event,modifier.onModifierEvent);
+            });
+        }
+        if (index !== -1) {
+            this.modifiers.splice(index, 1);
+            this.markDirty();
+        }
+    }
+
+    getModifiers(): Modifier[] {
+        return this.modifiers;
+    }
+
+    markDirty() {
+        this.dirty = true;
+        this.cache.clear();
+    }
+
+    isDirty(): boolean {
+        return this.dirty;
+    }
+
+    getCache(): Map<ModifierFunction, number> {
+        return this.cache;
+    }
+
+    setCache(func: ModifierFunction, value: number) {
+        this.cache.set(func, value);
+    }
+
+    clearDirty() {
+        this.dirty = false;
+    }
+}
+
+export class ModifierEventDispatcher {
+
+    protected eventListeners: Map<ModifierEvent, Set<(event: ModifierEvent, params: any) => void>> = new Map();
+
+    public addEventListener(eventType: ModifierEvent, listener: (event: ModifierEvent, params: any) => void): void {
+        if (!this.eventListeners.has(eventType)) {
+            this.eventListeners.set(eventType, new Set());
+        }
+        this.eventListeners.get(eventType)!.add(listener);
+    }
+
+    public removeEventListener(eventType: ModifierEvent, listener: (event: ModifierEvent, params: any) => void): void {
+        if (this.eventListeners.has(eventType)) {
+            this.eventListeners.get(eventType)!.delete(listener);
+        }
+    }
+
+    public dispatchEvent(event: ModifierEvent, params: any): void {
+        if (this.eventListeners.has(event)) {
+            this.eventListeners.get(event)!.forEach((listener) => listener(event,params));
+        }
+    }
+
+    private constructor() {}
+
+    public static getInstance(): ModifierEventDispatcher {
+        if (!ModifierEventDispatcher.instance) {
+            ModifierEventDispatcher.instance = new ModifierEventDispatcher();
+        }
+        return ModifierEventDispatcher.instance;
+    }
+
+    private static instance: ModifierEventDispatcher;
+   
+}
+
+
+
+
+export abstract class Modifier {
+    public stackCount: number = 1;
+    public attribute: ModifierAttribute;
+
+    protected caster: ECSEntity | null = null;
+    protected ability: BaseAbility | null = null;
+    protected auraOwner: ECSEntity | null = null;
+    protected timer: Timer;
+
+    constructor(
+        public id: string,
+        public duration: number = Infinity,
+        public isHidden: boolean = false,
+        public isDebuff: boolean = false,
+        public purgable: boolean = true,
+        public priority: number = 0,
+        attribute: ModifierAttribute = ModifierAttribute.MODIFIER_ATTRIBUTE_NONE
+    ) {
+        this.attribute = attribute;
+    }
+
+    public update(deltaTime: number): void {
+        if (this.timer) {
+            this.timer.update(deltaTime);
+        }
+        if (this.duration !== Infinity) {
+            this.duration -= deltaTime;
+            if (this.duration <= 0) {
+                this.OnDestroy();
+            }
+        }
+    }
+
+    public IsHidden(): boolean { return this.isHidden; }
+    public IsDebuff(): boolean { return this.isDebuff; }
+    public IsPurgable(): boolean { return this.purgable; }
+
+    public OnCreated(): void {}
+    public OnRefresh(): void {}
+    public OnDestroy(): void {}
+
+    protected SetStackCount(count: number): void { this.stackCount = count; }
+    protected IncrementStackCount(): void { this.stackCount++; }
+
+    protected StartIntervalThink(thinkInterval: number) {
+        if (!this.timer) {
+            this.timer = new Timer(thinkInterval, this.OnIntervalThink.bind(this));
+        }
+        this.timer.setInterval(thinkInterval);
+    }
+
+    protected OnIntervalThink() {}
+
+    abstract ListDeclareFunctions(): ModifierFunction[];
+
+    abstract ListListenEvents(): ModifierEvent[];
+
+    getModifierValue(func: ModifierFunction, entity: ECSEntity): number {
+        const declaredFunctions = this.ListDeclareFunctions();
+        if (declaredFunctions.includes(func)) {
+            return this.getModifierValueInternal(func, entity);
+        }
+        return 0;
+    }
+
+    onModifierEvent(event: ModifierEvent, params: any): void{
+        this.onModifierEventInternal(event, params);
+    };
+
+    protected abstract onModifierEventInternal(event: ModifierEvent, params: any): void;
+
+    protected abstract getModifierValueInternal(func: ModifierFunction, entity: ECSEntity): number;
+
+    abstract checkState(): Map<ModifierState, boolean>;
+
+    getModifierState(state: ModifierState): boolean {
+        return this.checkState().get(state) || false;
+    }
+
+    public handleStacking(newModifier: Modifier) {
+        if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_MULTIPLE)) {
+            this.IncrementStackCount();
+        }
+        this.OnRefresh();
+    }
+
+    public setCaster(caster: ECSEntity): void { this.caster = caster; }
+    public getCaster(): ECSEntity | null { return this.caster; }
+    public setAbility(ability: BaseAbility): void { this.ability = ability; }
+    public getAbility(): BaseAbility | null { return this.ability; }
+    public setAuraOwner(owner: ECSEntity): void { this.auraOwner = owner; }
+    public getAuraOwner(): ECSEntity | null { return this.auraOwner; }
+
+    public isAura(): boolean { return false; }
+    public createAuraEffect(target: ECSEntity): Modifier | null { return null; }
+    public getAuraRadius(): number { return 0; }
+    public shouldApplyToTarget(target: ECSEntity): boolean { return true; }
+
+    public hasAttribute(attr: ModifierAttribute): boolean {
+        return (this.attribute & attr) !== 0;
+    }
+
+    public getRemainingDuration(): number { return this.duration; }
+    public isExpired(): boolean { return this.duration <= 0; }
+
+    public abstract getAffectedComponentTypes(): Set<Function>;
+    public abstract clone(): Modifier;
+}
+
+
+import { Modifier } from "../ability/Modifier";
+import {  ModifierComponent } from "../component/ModifierComponent";
+import { ECSEntity } from "../ecs/ECSEntity";
+import { ModifierEvent } from "../enum/ModifierEvent";
+import { ModifierFunction } from "../enum/ModifierFunction";
+import { ModifierState } from "../enum/ModifierState";
+
+
+export class ModifierManager {
+
+    private static instance: ModifierManager;
+    
+    private constructor() {
+    }
+
+    public static getInstance(): ModifierManager {
+        if (!ModifierManager.instance) {
+            ModifierManager.instance = new ModifierManager();
+        }
+        return ModifierManager.instance;
+    }
+
+    addModifier(entity: ECSEntity, newModifier: Modifier) {
+        const modifierComponent = entity.getComponent(ModifierComponent);
+        if (modifierComponent) {
+            const existingModifier = modifierComponent.getModifiers().find(mod => mod.id === newModifier.id);
+            if (existingModifier) {
+                existingModifier.handleStacking(newModifier);
+            } else {
+                modifierComponent.addModifier(newModifier);
+                newModifier.OnCreated();
+            }
+        } else {
+            console.error("Entity does not have a ModifierComponent");
+        }
+    }
+
+    removeModifier(entity: ECSEntity, modifierId: string) {
+        const modifierComponent = entity.getComponent(ModifierComponent);
+        if (modifierComponent) {
+            const modifier = modifierComponent.getModifiers().find(m => m.id === modifierId);
+            if (modifier) {
+                modifier.OnDestroy();
+                modifierComponent.removeModifier(modifierId);
+            }
+        }
+    }
+
+
+    triggerEvent(entity: ECSEntity, event: ModifierEvent, params: any): void {
+        const modifierComponent = entity.getComponent(ModifierComponent);
+        if (modifierComponent) {
+            modifierComponent.onModifierEvent(event, params);
+        }
+    }
+
+    getModifierValue(entity: ECSEntity, func: ModifierFunction): number {
+        const modifierComponent = entity.getComponent(ModifierComponent);
+        if (!modifierComponent) return 0;
+
+        if (modifierComponent.isDirty()) {
+            this.recalculateCache(entity, modifierComponent);
+        }
+
+        const cache = modifierComponent.getCache();
+        if (cache.has(func)) {
+            return cache.get(func)!;
+        }
+
+        return this.calculateModifierValue(entity, modifierComponent, func);
+    }
+
+    private recalculateCache(entity: ECSEntity, modifierComponent: ModifierComponent) {
+        for (const modifier of modifierComponent.getModifiers()) {
+            for (const func of modifier.ListDeclareFunctions()) {
+                const value = this.calculateModifierValue(entity, modifierComponent, func);
+                modifierComponent.setCache(func, value);
+            }
+        }
+        modifierComponent.clearDirty();
+    }
+
+    private calculateModifierValue(entity: ECSEntity, modifierComponent: ModifierComponent, func: ModifierFunction): number {
+        return modifierComponent.getModifiers().reduce((total, modifier) => {
+            return total + modifier.getModifierValue(func, entity);
+        }, 0);
+    }
+
+    getModifiers(entity: ECSEntity): Modifier[] {
+        const modifierComponent = entity.getComponent(ModifierComponent);
+        return modifierComponent ? modifierComponent.getModifiers() : [];
+    }
+
+    isInState(entity: ECSEntity, state: ModifierState): boolean {
+        const modifierComponent = entity.getComponent(ModifierComponent);
+        if (!modifierComponent) return false;
+
+        return modifierComponent.getModifiers().some(modifier => modifier.getModifierState(state));
+    }
+
+
+   
+
+    updateModifiers(entity: ECSEntity, deltaTime: number) {
+        const modifierComponent = entity.getComponent(ModifierComponent);
+        if (modifierComponent) {
+            const modifiers = modifierComponent.getModifiers();
+            for (let i = modifiers.length - 1; i >= 0; i--) {
+                const modifier = modifiers[i];
+                modifier.update(deltaTime);
+                if (modifier.isExpired()) {
+                    this.removeModifier(entity, modifier.id);
+                }
+            }
+        }
+    }
+}
+
+
+export enum ModifierAttribute {
+  MODIFIER_ATTRIBUTE_NONE = 0,   // 无特性。默认情况下，Modifier不具有任何属性。
+  MODIFIER_ATTRIBUTE_PERMANENT = 1 << 0, // 永久性。Modifier不会被驱散。
+  MODIFIER_ATTRIBUTE_MULTIPLE = 1 << 1,// 可叠加。允许多个相同的Modifier存在于一个单位上。
+  MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE = 1 << 2, // 忽略无敌。在施加Modifier时，会忽略目标单位的无敌状态。
+  MODIFIER_ATTRIBUTE_AURA_PRIORITY = 1 << 3,// 光环优先。在排序Modifier列表时，光环Modifier将总是排在非光环Modifier前面。
+  MODIFIER_ATTRIBUTE_IGNORE_DODGE = 1 << 4,// 忽略闪避。Modifier的效果不会被目标单位的闪避能力或异界混沌骑士的幻象效果影响。
+}
+

@@ -2,15 +2,24 @@
 
  
 
+
+
+
 export enum ModifierAttribute {
-  MODIFIER_ATTRIBUTE_NONE = 0,   // 无特性。默认情况下，Modifier不具有任何属性。
+  MODIFIER_ATTRIBUTE_NONE = 0, // 无特性。默认情况下，Modifier不具有任何属性。
   MODIFIER_ATTRIBUTE_PERMANENT = 1 << 0, // 永久性。Modifier不会被驱散。
-  MODIFIER_ATTRIBUTE_MULTIPLE = 1 << 1,// 可叠加。允许多个相同的Modifier存在于一个单位上。
-  MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE = 1 << 2, // 忽略无敌。在施加Modifier时，会忽略目标单位的无敌状态。
+  MODIFIER_ATTRIBUTE_MULTIPLE = 1 << 1,// 可叠加。允许多个相同的Modifier存在于一个单位上。允许多个相同的Modifier实例同时存在于一个单位上.  每个Modifier实例是独立的，有自己的持续时间和效果.通常用于可以多次施加的buff或debuff，每次施加都会创建一个新的实例
+
+  MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE = 1 << 2,// 忽略无敌。在施加Modifier时，会忽略目标单位的无敌状态。
   MODIFIER_ATTRIBUTE_AURA_PRIORITY = 1 << 3,// 光环优先。在排序Modifier列表时，光环Modifier将总是排在非光环Modifier前面。
   MODIFIER_ATTRIBUTE_IGNORE_DODGE = 1 << 4,// 忽略闪避。Modifier的效果不会被目标单位的闪避能力或异界混沌骑士的幻象效果影响。
+  MODIFIER_ATTRIBUTE_HIDDEN = 1 << 5,
+  MODIFIER_ATTRIBUTE_REMOVE_ON_DEATH = 1 << 6,
+  MODIFIER_ATTRIBUTE_IGNORE_TENACITY = 1 << 7,
+  MODIFIER_ATTRIBUTE_STACKABLE = 1 << 8,  //允许同一个Modifier的效果进行叠加，但只存在一个Modifier实例
+  MODIFIER_ATTRIBUTE_REFRESH_ON_STACK = 1 << 9,
+  MODIFIER_ATTRIBUTE_UNIQUE = 1 << 10,
 }
-
 
 
 

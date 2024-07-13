@@ -93,7 +93,7 @@ export abstract class Modifier {
         }
     }
 
-    public IsHidden(): boolean { return this.isHidden; }
+   
     public IsDebuff(): boolean { return this.isDebuff; }
     public IsPurgable(): boolean { return this.purgable; }
 
@@ -117,10 +117,10 @@ export abstract class Modifier {
 
     abstract ListListenEvents(): ModifierEvent[];
 
-    getModifierValue(func: ModifierFunction, entity: ECSEntity): number {
+    getModifierValue(func: ModifierFunction): number {
         const declaredFunctions = this.ListDeclareFunctions();
         if (declaredFunctions.includes(func)) {
-            return this.getModifierValueInternal(func, entity);
+            return this.getModifierValueInternal(func);
         }
         return 0;
     }
@@ -131,7 +131,7 @@ export abstract class Modifier {
 
     protected abstract onModifierEventInternal(event: ModifierEvent, params: any): void;
 
-    protected abstract getModifierValueInternal(func: ModifierFunction, entity: ECSEntity): number;
+    protected abstract getModifierValueInternal(func: ModifierFunction): number;
 
     abstract checkState(): Map<ModifierState, boolean>;
 
@@ -142,9 +142,20 @@ export abstract class Modifier {
     public handleStacking(newModifier: Modifier) {
         if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_MULTIPLE)) {
             this.IncrementStackCount();
+        } else if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_STACKABLE)) {
+            this.stackCount += newModifier.stackCount;
+        } else if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_REFRESH_ON_STACK)) {
+            this.duration = newModifier.duration;
+        } else if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_UNIQUE)) {
+        // 不做任何操作，保持唯一性
+        } else {
+        // 默认行为：刷新持续时间
+            this.duration = newModifier.duration;
         }
         this.OnRefresh();
     }
+
+    
 
     public setCaster(caster: ECSEntity): void { this.caster = caster; }
     public getCaster(): ECSEntity | null { return this.caster; }
@@ -156,7 +167,7 @@ export abstract class Modifier {
     public isAura(): boolean { return false; }
     public createAuraEffect(target: ECSEntity): Modifier | null { return null; }
     public getAuraRadius(): number { return 0; }
-    public shouldApplyToTarget(target: ECSEntity): boolean { return true; }
+    // public shouldApplyToTarget(target: ECSEntity): boolean { return true; }
 
     public hasAttribute(attr: ModifierAttribute): boolean {
         return (this.attribute & attr) !== 0;
@@ -167,6 +178,19 @@ export abstract class Modifier {
 
     public abstract getAffectedComponentTypes(): Set<Function>;
     public abstract clone(): Modifier;
+
+
+    public shouldRemoveOnDeath(): boolean {
+        return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_REMOVE_ON_DEATH);
+    }
+
+    public IsHidden(): boolean {
+        return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_HIDDEN);
+    }
+
+    public ignoreTenacity(): boolean {
+    return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_IGNORE_TENACITY);
+    }
 }
 
 
