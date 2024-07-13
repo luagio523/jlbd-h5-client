@@ -1,11 +1,26 @@
 
+import { AttributeComponent } from "../component/AttributeComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { DamageType } from "../enum/Damage";
 import { ModifierFunction } from "../enum/ModifierFunction";
+import { Attributes } from "../enum/Type";
 import { ModifierManager } from "../manager/ModifierManager";
 import { ArmorCalculator } from "./ArmorCalculator";
 import { AttributeCalculator } from "./AttributeCalculator";
+import { CriticalStrikeCalculator } from "./CriticalStrikeCalculator";
+import { EvasionAndBlockCalculator } from "./EvasionAndBlockCalculator";
 import { MagicResistanceCalculator } from "./MagicResistanceCalculator";
+
+
+// 普通攻击流程
+// -- 检查是否miss（闪避）
+// -- 处理miss效果
+// -- 计算基础攻击伤害
+// -- 检查暴击
+// -- 检查格挡
+// -- 应用伤害
+//    -- 防御等等
+
 
 
 export class DamageCalculator {
@@ -13,13 +28,72 @@ export class DamageCalculator {
     private armorCalculator: ArmorCalculator;
     private magicResistanceCalculator: MagicResistanceCalculator;
     protected attributeCalculator: AttributeCalculator;
+    private criticalStrikeCalculator: CriticalStrikeCalculator;
+    private evasionAndBlockCalculator: EvasionAndBlockCalculator;
 
     constructor(modifierManager: ModifierManager) {
         this.modifierManager = modifierManager;
         this.armorCalculator = new ArmorCalculator(modifierManager);
         this.magicResistanceCalculator = new MagicResistanceCalculator(modifierManager);
         this.attributeCalculator = new AttributeCalculator(modifierManager);
+        this.criticalStrikeCalculator = new CriticalStrikeCalculator(modifierManager);
+        this.evasionAndBlockCalculator = new EvasionAndBlockCalculator(modifierManager);
     }
+
+
+    public calculatePreDefenseAttackDamage(attacker: ECSEntity, target: ECSEntity, damageType: DamageType): number {
+
+
+        // 伤害类型转换
+        damageType = this.checkDamageTypeConversion(attacker, damageType);
+
+
+        if (damageType === DamageType.DAMAGE_TYPE_PHYSICAL) {
+            // 闪避检查
+            if (this.evasionAndBlockCalculator.calculateFinalEvasion(target) <=0){
+                return 0 ;
+            }
+        }
+
+        let baseAttackDamage =  this.calculateBaseAttackPower(attacker); //基础攻击
+        let baseDamagePercent = 1 + this.modifierManager.getModifierValue(attacker, ModifierFunction.MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE) / 100;
+        baseAttackDamage *= baseDamagePercent; // 基础伤害加成
+
+        let bonusAttackDamage = this.calculateBonusAttackPower(attacker); // 额外攻击力
+         
+        let totalAttackDamage = baseAttackDamage + bonusAttackDamage; // 总攻击力
+
+          // 暴击检查
+        if (damageType === DamageType.DAMAGE_TYPE_PHYSICAL) {
+            const critMultiplier = this.criticalStrikeCalculator.calculateFinalCriticalStrike(attacker); //暴击伤害 = (基础攻击力 + 额外攻击力) * 暴击倍数
+            totalAttackDamage *= critMultiplier;
+        }
+        //   // 暴击后额外伤害
+        // totalAttackDamage += this.calculatePostCritBonusDamage(attacker);
+
+         // 应用闪避和格挡（只对物理伤害有效）
+        if (damageType === DamageType.DAMAGE_TYPE_PHYSICAL) {
+            totalAttackDamage = this.evasionAndBlockCalculator.calculateFinalBlock(target, totalAttackDamage);
+        }
+
+        let totalDamagePercent = this.modifierManager.getModifierValue(attacker, ModifierFunction.MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE) / 100;
+        totalAttackDamage *= totalDamagePercent; // 总伤害加成
+
+    }
+
+    public calculateApplyDamage(attacker: ECSEntity, target: ECSEntity, damage: number, damageType: DamageType): number {
+        
+
+        // let totalDamagePercent = this.modifierManager.getModifierValue(attacker, ModifierFunction.MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE) / 100;
+        // damage *= totalDamagePercent; // 总伤害加成
+
+        damage = this.applyDefenses(attacker, target, damage, damageType);
+
+        damage = this.applyDamageReduction(attacker, damage, damageType);
+
+        return damage;
+    }
+
 
     /**
      * 计算伤害增幅
@@ -38,9 +112,8 @@ export class DamageCalculator {
      * @param damageType 
      * @returns 
      */
-    protected calculateDamageReduction(entity: ECSEntity, damageType: DamageType): number {
-        let reduction = 0;
-        return Math.min(reduction, 1); // 确保减免不超过100%
+    protected applyDamageReduction(entity: ECSEntity,  damage: number,damageType: DamageType): number {
+        return damage
     }
 
 
@@ -63,6 +136,115 @@ export class DamageCalculator {
                 return damage;
         }
     }
+
+
+    public calculatePreAttackBonusDamage(entity: ECSEntity, damageType: DamageType): number {
+        let bonusDamage = 0;
+        bonusDamage += this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE);
+        bonusDamage += this.calculateProcAttackBonusDamage(entity, damageType);
+        return bonusDamage; 
+    }
+
+
+    public calculateBaseAttackDamage(entity: ECSEntity): number {
+        let baseDamage =   this.calculateBaseAttackPower(entity);
+        let baseDamagePercent = 1 + this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE) / 100;
+        baseDamage *= baseDamagePercent;
+        return baseDamage;
+    }
+
+    public calculateBonusAttackDamage(entity: ECSEntity): number {
+        return  this.calculateBonusAttackPower(entity);
+    }
+
+
+    public calculateBaseAttackPercentage(entity: ECSEntity): number {
+        return  this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE) / 100;
+    }
+
+
+ 
+
+
+      // 计算白字攻击力
+     //白字攻击力 = 初始攻击力 + (力量值 × 1) + 等级成长攻击力 + MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE
+     public calculateBaseAttackPower(entity: ECSEntity): number {
+        // 获取基础攻击力
+        let baseAttackPower = this.calculateBaseAttackPower(entity);
+    
+        // 加上属性带来的攻击力
+        baseAttackPower += this.calculateAttributeAttackPower(entity);
+    
+        // 加上基础攻击力加成
+        baseAttackPower += this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE);
+    
+        // 向下取整并返回最终结果
+        return Math.floor(baseAttackPower);
+    }
+
+
+    // 计算绿字攻击力 额外加成
+    public calculateBonusAttackPower(entity: ECSEntity): number {
+        let bonusAttackPower = 0;
+        bonusAttackPower += this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE);
+        // 可能还有其他来源的绿字攻击力，根据需要添加
+        return Math.floor(bonusAttackPower);
+    }
+
+
+
+    //属性攻击力
+    private calculateAttributeAttackPower(entity: ECSEntity): number {
+        const attributeComponent = entity.getComponent(AttributeComponent);
+        const primaryAttribute = attributeComponent.getPrimaryAttribute();
+
+        switch (primaryAttribute) {
+            case Attributes.ATTRIBUTE_STRENGTH:
+                return this.attributeCalculator.calculateFinalStrength(entity);
+            case Attributes.ATTRIBUTE_AGILITY:
+                return this.attributeCalculator.calculateFinalAgility(entity);
+            case Attributes.ATTRIBUTE_INTELLECT:
+                return this.attributeCalculator.calculateFinalIntelligence(entity);
+            default:
+                return 0;
+        }
+        
+    }
+
+
+
+    private checkDamageTypeConversion(entity: ECSEntity, originalType: DamageType): DamageType {
+        if (originalType === DamageType.DAMAGE_TYPE_PHYSICAL &&
+            this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PROCATTACK_CONVERT_PHYSICAL_TO_MAGICAL) > 0) {
+            return DamageType.DAMAGE_TYPE_MAGICAL;
+        }
+        return originalType;
+    }
+
+   
+
+
+    public calculatePostCritBonusDamage(entity: ECSEntity): number {
+        return this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE_POST_CRIT);
+    }
+
+
+    public calculateProcAttackBonusDamage(entity: ECSEntity, damageType: DamageType): number {
+        let bonusDamage = 0;
+        switch (damageType) {
+            case DamageType.DAMAGE_TYPE_PHYSICAL:
+                bonusDamage += this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_PHYSICAL);
+                break;
+            case DamageType.DAMAGE_TYPE_MAGICAL:
+                bonusDamage += this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_MAGICAL);
+                break;
+            case DamageType.DAMAGE_TYPE_PURE:
+                bonusDamage += this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_PROCATTACK_BONUS_DAMAGE_PURE);
+                break;
+        }
+        return bonusDamage;
+    }
+    
    
 }
 
