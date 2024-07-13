@@ -25,6 +25,45 @@ export class DamageCalculator {
         this.evasionAndBlockCalculator = new EvasionAndBlockCalculator(modifierManager);
     }
 
+   
+
+    //计算普通攻击伤害
+    public calculateNormalAttackDamage(attacker: ECSEntity, target: ECSEntity): number {
+        const baseAttackDamage = this.calculateBaseAttackDamage(attacker);
+        return this.calculateDamage(attacker, target, baseAttackDamage, DamageType.DAMAGE_TYPE_PHYSICAL);
+    }
+
+
+    public calculateAbilityDamage(attacker: ECSEntity, target: ECSEntity, abilityData: AbilityData): number {
+        let baseDamage = abilityData.GetAbilityDamage();
+        // // 应用技能等级加成
+        // baseDamage += abilityData.getDamagePerLevel() * abilityData.getLevel();
+        
+        // 应用属性加成（如果有）
+        const attributeBonus = this.calculateAttributeBonus(attacker, abilityData);
+        baseDamage += attributeBonus;
+        
+        // 应用技能特定的伤害修正
+        baseDamage = this.applyAbilitySpecificModifiers(baseDamage, abilityData, attacker, target);
+        
+        // 计算最终伤害
+        const finalDamage = this.calculateDamage(attacker, target, baseDamage, abilityData.GetAbilityUnitDamageType(), abilityData);
+        
+        return finalDamage;
+    }
+
+
+    private calculateAttributeBonus(attacker: ECSEntity, abilityData: AbilityData): number {
+        // const attributeComponent = attacker.getComponent(AttributeComponent);
+        // if (attributeComponent && abilityData.getAttributeGain()) {
+        //     const attribute = abilityData.getAttributeType();
+        //     const attributeValue = attributeComponent.getAttribute(attribute);
+        //     return attributeValue * abilityData.getAttributeGain();
+        // }
+        return 0;
+    }
+
+
     calculateDamage(attacker: ECSEntity, target: ECSEntity, baseDamage: number, damageType: DamageType, abilityData?: AbilityData): number {
         if (damageType === DamageType.DAMAGE_TYPE_NONE) {
             return 0;
@@ -71,12 +110,8 @@ export class DamageCalculator {
 
         return Math.max(0, Math.floor(totalDamage));
     }
-
-    //计算普通攻击伤害
-    private calculateNormalAttackDamage(attacker: ECSEntity，target: ECSEntity): number {
-        const baseAttackDamage = this.calculateBaseAttackDamage(attacker);
-        return this.calculateDamage(attacker, target, baseAttackDamage, DamageType.DAMAGE_TYPE_PHYSICAL);
-    }
+    
+   
        
 
     private calculateBaseAttackDamage(entity: ECSEntity): number {

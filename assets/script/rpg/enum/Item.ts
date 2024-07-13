@@ -22,8 +22,24 @@ export enum ItemAttributeType {
 }
 
 export enum InventorySlot {
-    WEAPON = 0,
-    ARMOR = 1,
-    ACCESSORY = 2,
-    CONSUMABLE = 3
+    ITEM_SLOT_1 = 0,
+    ITEM_SLOT_2 = 1,
+    ITEM_SLOT_3 = 2,
+    ITEM_SLOT_4 = 3,
+    ITEM_SLOT_5 = 4,
+    ITEM_SLOT_6 = 5,
+    ITEM_SLOT_7 = 6,
+    ITEM_SLOT_8 = 7,
+    ITEM_SLOT_9 = 8,
+    STASH_SLOT_1 = 9,
+    STASH_SLOT_2 = 10,
+    STASH_SLOT_3 = 11,
+    STASH_SLOT_4 = 12,
+    STASH_SLOT_5 = 13,
+    STASH_SLOT_6 = 14,
+    ITEM_TP_SCROLL = 15,
+    ITEM_NEUTRAL_SLOT = 16,
+    ITEM_TRANSIENT_ITEM = 17,
+    ITEM_TRANSIENT_RECIPE = 18,
+    ITEM_TRANSIENT_CAST_ITEM = 20,
 }

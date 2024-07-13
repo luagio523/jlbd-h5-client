@@ -149,6 +149,12 @@ export abstract class Modifier {
         return 0;
     }
 
+    onModifierEvent(event: ModifierFunction, entity: ECSEntity): void{
+        this.onModifierEventInternal(event, entity);
+    };
+
+    protected abstract onModifierEventInternal(func: ModifierFunction, entity: ECSEntity): void;
+
     protected abstract getModifierValueInternal(func: ModifierFunction, entity: ECSEntity): number;
 
     abstract checkState(): Map<ModifierState, boolean>;

@@ -46,6 +46,13 @@ export class ModifierManager {
         }
     }
 
+
+    triggerEvent(event: ModifierFunction, entity: ECSEntity): void {
+        const modifiers = this.getModifiers(entity);
+        if (!modifiers || modifiers.length === 0) return;
+        modifiers.forEach((modifier) => modifier.onModifierEvent(event, entity));
+    }
+
     getModifierValue(entity: ECSEntity, func: ModifierFunction): number {
         const modifierComponent = entity.getComponent(ModifierComponent);
         if (!modifierComponent) return 0;

@@ -4,7 +4,7 @@ import { InventorySlot } from "../enum/Item";
 
 
 export class EquipmentComponent extends ECSComponent {
-    private equipment: Map<InventorySlot, ItemData | null> = new Map();
+    private equipment: Map<InventorySlot, ItemData | null> = new Map<InventorySlot, ItemData | null>();
 
     constructor() {
         super();
@@ -12,9 +12,12 @@ export class EquipmentComponent extends ECSComponent {
     }
 
     private initializeEquipment(): void {
-        for (const slot of Object.values(InventorySlot)) {
-            this.equipment.set(slot, null);
-        }
+        Object.keys(InventorySlot).forEach((key) => {
+            const slot = InventorySlot[key as keyof typeof InventorySlot];
+            if (typeof slot === 'number') {
+                this.equipment.set(slot, null);
+            }
+        });
     }
 
     public equip(item: ItemData): boolean {

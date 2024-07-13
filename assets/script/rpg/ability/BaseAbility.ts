@@ -117,7 +117,7 @@ export abstract class BaseAbility {
     }
 
     public GetBehavior(): AbilityBehavior {
-        return this.abilityData.GetBehavior();
+        return this.abilityData.GetAbilityBehavior();
     }
 
     public GetCastPoint(): number {
@@ -172,7 +172,7 @@ export class BaseAttackAbility extends BaseAbility {
         if (!caster) return;
 
         const damage = this.GetAttackDamage();
-        const damageType = this.GetAbilityData().GetAbilityDamageType();
+        const damageType = this.GetAbilityData().GetAbilityUnitDamageType();
 
         // 这里可以添加特殊的攻击效果逻辑
 
