@@ -1,7 +1,9 @@
 import { Modifier } from "../ability/Modifier";
 import { ModifierComponent } from "../component/ModifierComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
-import { ModifierFunction, ModifierState } from "../enum/Modifier";
+import { ModifierFunction } from "../enum/ModifierFunction";
+import { ModifierState } from "../enum/ModifierState";
+
 import { ModifierManager } from "../manager/ModifierManager";
 import { BaseSystem } from "./BaseSystem";
 

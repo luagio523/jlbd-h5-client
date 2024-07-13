@@ -2,13 +2,20 @@ import { AuraModifier } from "../ability/Aura";
 import { Modifier } from "../ability/Modifier";
 import {  ModifierComponent } from "../component/ModifierComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
-import { ModifierFunction, ModifierState } from "../enum/Modifier";
+import { ModifierEvent } from "../enum/ModifierEvent";
+import { ModifierFunction } from "../enum/ModifierFunction";
+import { ModifierState } from "../enum/ModifierState";
+
+
+
+
 
 export class ModifierManager {
 
     private static instance: ModifierManager;
-
-    private constructor() {}
+    
+    private constructor() {
+    }
 
     public static getInstance(): ModifierManager {
         if (!ModifierManager.instance) {
@@ -16,7 +23,6 @@ export class ModifierManager {
         }
         return ModifierManager.instance;
     }
-
 
     addModifier(entity: ECSEntity, newModifier: Modifier) {
         const modifierComponent = entity.getComponent(ModifierComponent);
@@ -46,12 +52,6 @@ export class ModifierManager {
         }
     }
 
-
-    triggerEvent(event: ModifierFunction, entity: ECSEntity): void {
-        const modifiers = this.getModifiers(entity);
-        if (!modifiers || modifiers.length === 0) return;
-        modifiers.forEach((modifier) => modifier.onModifierEvent(event, entity));
-    }
 
     getModifierValue(entity: ECSEntity, func: ModifierFunction): number {
         const modifierComponent = entity.getComponent(ModifierComponent);

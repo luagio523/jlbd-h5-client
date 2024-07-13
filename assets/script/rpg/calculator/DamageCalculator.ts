@@ -3,7 +3,7 @@ import { AttributeComponent } from "../component/AttributeComponent";
 import { AbilityData } from "../data/AbilityData";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { DamageType } from "../enum/Damage";
-import { ModifierFunction } from "../enum/Modifier";
+import { ModifierFunction } from "../enum/ModifierFunction";
 import { ModifierManager } from "../manager/ModifierManager";
 import { ArmorCalculator } from "./ArmorCalculator";
 import { CriticalStrikeCalculator } from "./CriticalStrikeCalculator";

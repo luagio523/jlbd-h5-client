@@ -33,6 +33,57 @@ import { Modifier } from "./Modifier";
 }
 
 
+// export class CommandAuraModifier extends AuraModifier {
+//     constructor() {
+//         super("command_aura", Infinity, false, false, false, 10, ModifierAttribute.MODIFIER_ATTRIBUTE_NONE, 900);
+//     }
+
+//     protected createAuraEffect(target: ECSEntity): Modifier {
+//         return new CommandAuraEffect(target);
+//     }
+
+//     protected shouldApplyToTarget(target: ECSEntity): boolean {
+//         // 实现检查逻辑，例如检查目标是否是友方单位
+//         return this.isAlly(target);
+//     }
+
+//     public getAuraEffectId(): string {
+//         return "command_aura_effect";
+//     }
+
+//     public applyAuraEffect(): void {
+//         if (!this.auraOwner) return;
+
+//         const modifierManager = ModifierManager.getInstance();
+//         const nearbyEntities = modifierManager.getNearbyEntities(this.auraOwner, this.getAuraRadius());
+
+//         for (const target of nearbyEntities) {
+//             if (this.shouldApplyToTarget(target)) {
+//                 const auraEffect = this.createAuraEffect(target);
+//                 if (auraEffect) {
+//                     modifierManager.addModifier(target, auraEffect);
+//                 }
+//             }
+//         }
+//     }
+
+//     public removeAuraEffect(): void {
+//         if (!this.auraOwner) return;
+
+//         const modifierManager = ModifierManager.getInstance();
+//         const nearbyEntities = modifierManager.getNearbyEntities(this.auraOwner, this.getAuraRadius());
+
+//         for (const target of nearbyEntities) {
+//             modifierManager.removeModifier(target, this.getAuraEffectId());
+//         }
+//     }
+
+//     private isAlly(target: ECSEntity): boolean {
+//         // 实现检查目标是否是友方的逻辑
+//         return true; // 简化示例
+//     }
+// }
+
 
 
 // -- 让光环自身也有视觉效果（比如光环发光或有某种特定标志）

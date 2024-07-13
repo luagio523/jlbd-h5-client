@@ -1,5 +1,5 @@
 import { ECSEntity } from "../ecs/ECSEntity";
-import { ModifierFunction } from "../enum/Modifier";
+import { ModifierFunction } from "../enum/ModifierFunction";
 import { ModifierManager } from "../manager/ModifierManager";
 
 // CriticalStrikeCalculator.ts

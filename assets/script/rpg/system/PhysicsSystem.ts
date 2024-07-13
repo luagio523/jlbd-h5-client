@@ -10,6 +10,8 @@ import { ShapeComponent } from "../component/ShapeComponent";
 import { ColliderManager } from "../manager/ColliderManager";
 import { Timer } from "../../core/common/timer/Timer";
 
+
+
 export class PhysicsSystem extends BaseSystem{
     private fixedDeltaTime: number; // 固定的时间步长
     private accumulatedTime: number = 0; // 时间累积器

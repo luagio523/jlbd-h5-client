@@ -1,7 +1,10 @@
 import { Timer } from "../../core/common/timer/Timer";
 import { ECSEntity } from "../ecs/ECSEntity";
-import { ModifierAttribute, ModifierFunction, ModifierState } from "../enum/Modifier";
+import { ModifierFunction } from "../enum/ModifierFunction";
+import { ModifierAttribute } from "../enum/Modifier";
 import { BaseAbility } from "./BaseAbility";
+import { ModifierEvent } from "../enum/ModifierEvent";
+import { ModifierState } from "../enum/ModifierState";
 
 
 // 例如，你可能想要把 value 当做基础的变化值，intensity 用来增强或者削弱这个基础效果。在这个框架里，
@@ -10,49 +13,6 @@ import { BaseAbility } from "./BaseAbility";
 // 然后用intensity来增强这个减速效果。例如，如果value是10，intensity是0.2
 // ，那么移动速度减缓为基础速度的10%，然后再额外减缓20%，即最终减缓比例为12%(=10% + 10%*0.2)。
 
-// import { ECSEntity } from "../ecs/ECSEntity";
-// import { Modifier } from "./Modifier";
-
-// export class BuffEffect {
-//     public effectType: EffectType
-//     public value: number
-//     public intensity: number
-
-//     // 新增一个属性保存应用的效果值
-//     public effectAppliedValue: number = 0;
-
-//     public applyEffect(entity: ECSEntity) {
-//         if (this.effectType == EffectType.moveSpeedBonusPercentage) {
-//             const movable = entity.getComponent(MovableComponent);
-//             if (movable) {
-//                 // 先减缓基础速度的百分比，再乘以强度
-//                 this.effectAppliedValue = movable.speed * this.value * (1 + this.intensity);
-//                 movable.speed -= this.effectAppliedValue;
-//             }
-//         }
-
-//         // TODO: Handle other effect types...
-//     }
-
-//     public expireEffect(entity: ECSEntity) {
-//         if (this.effectType == EffectType.moveSpeedBonusPercentage) {
-//             const movable = entity.getComponent(MovableComponent);
-//             if (movable) {
-//                 // Restore the speed to its original value
-//                 movable.speed += this.effectAppliedValue;
-//                 this.effectAppliedValue = 0;
-//             }
-//         }
-
-//         // TODO: Handle other effect expiration...
-//     }
-// }
-
-
-// export enum BuffType {
-//     BUFF = 0,
-//     DEBUFF = 1
-// }
 
 // 有很多种实现强度增益的方式，但是具体的实现方式取决于你的设计需求。以下是一些常见的方式：
 // **直接相加：**强度每次增加一个固定的值。比如初次Buff为10%移动速度，强度为1，下一次Buff叠加后，强度增加固定值1变为2，移动速度变为(1+1) * 10% = 20%。
@@ -61,26 +21,40 @@ import { BaseAbility } from "./BaseAbility";
 
 
 
-// EffectWithIntensity：这个名字表达了这个结构体包含了一个效果和一个强度。
-// BuffProperty：这个名字用了更通用的“属性”字样，可以代表各种不同的属性，比如移动速度奖励、暴击几率增加等。
-// BuffParameter：表示构成 Buff 的重要参数。
-// public healthRegenIncrease?: number;     // 增加的生命回复速度
-//     public manaRegenIncrease?: number;       // 增加的法力回复速度
-//     public damageIncrease?: number;          // 增加的伤害值
-//     public armorIncrease?: number;           // 增加的护甲值
-//     public magicResistanceIncrease?: number; // 增加的魔法抗性
+export class ModifierEventDispatcher {
 
-// export enum EffectType {
-//     moveSpeedBonusPercentage = 1,
-//     critChanceIncrease = 2,
-//     critMultiplierIncrease = 3,
-//     //...
-// }
+    protected eventListeners: Map<ModifierEvent, Set<(event: ModifierEvent, params: any) => void>> = new Map();
 
+    public addEventListener(eventType: ModifierEvent, listener: (event: ModifierEvent, params: any) => void): void {
+        if (!this.eventListeners.has(eventType)) {
+            this.eventListeners.set(eventType, new Set());
+        }
+        this.eventListeners.get(eventType)!.add(listener);
+    }
 
-export interface IModifierEffect {
-    applyEffect(entity: ECSEntity): void 
-    removeEffect(entity: ECSEntity): void 
+    public removeEventListener(eventType: ModifierEvent, listener: (event: ModifierEvent, params: any) => void): void {
+        if (this.eventListeners.has(eventType)) {
+            this.eventListeners.get(eventType)!.delete(listener);
+        }
+    }
+
+    public dispatchEvent(event: ModifierEvent, params: any): void {
+        if (this.eventListeners.has(event)) {
+            this.eventListeners.get(event)!.forEach((listener) => listener(event,params));
+        }
+    }
+
+    private constructor() {}
+
+    public static getInstance(): ModifierEventDispatcher {
+        if (!ModifierEventDispatcher.instance) {
+            ModifierEventDispatcher.instance = new ModifierEventDispatcher();
+        }
+        return ModifierEventDispatcher.instance;
+    }
+
+    private static instance: ModifierEventDispatcher;
+   
 }
 
 
@@ -141,6 +115,8 @@ export abstract class Modifier {
 
     abstract ListDeclareFunctions(): ModifierFunction[];
 
+    abstract ListListenEvents(): ModifierEvent[];
+
     getModifierValue(func: ModifierFunction, entity: ECSEntity): number {
         const declaredFunctions = this.ListDeclareFunctions();
         if (declaredFunctions.includes(func)) {
@@ -149,11 +125,11 @@ export abstract class Modifier {
         return 0;
     }
 
-    onModifierEvent(event: ModifierFunction, entity: ECSEntity): void{
-        this.onModifierEventInternal(event, entity);
+    onModifierEvent(event: ModifierEvent, params: any): void{
+        this.onModifierEventInternal(event, params);
     };
 
-    protected abstract onModifierEventInternal(func: ModifierFunction, entity: ECSEntity): void;
+    protected abstract onModifierEventInternal(event: ModifierEvent, params: any): void;
 
     protected abstract getModifierValueInternal(func: ModifierFunction, entity: ECSEntity): number;
 
@@ -369,55 +345,6 @@ export abstract class Modifier {
 
 // 	UTIL_Remove( self:GetParent() )
 // end
-
-
-//  属性修改类
-//  MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE：预攻击伤害。
-//  MODIFIER_PROPERTY_BASEATTACK_BONUSDAMAGE：基础攻击伤害。
-//  MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT：攻击速度。
-//  MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE：临时致命一击倍数。
-//  MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT：移动速度。
-//  MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE：移动速度百分比。
-//  MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS：物理护甲。
-//  MODIFIER_PROPERTY_SPELL_AMPLIFY_PERCENTAGE：魔法增强（百分比）。
-//  MODIFIER_PROPERTY_HEALTH_BONUS：生命值加成。
-//  MODIFIER_PROPERTY_MANA_BONUS：魔法值加成。
-//  MODIFIER_PROPERTY_MANA_REGEN_CONSTANT：固定魔法恢复。
-//  MODIFIER_PROPERTY_MANA_REGEN_PERCENTAGE：魔法恢复（百分比）。
-//  MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT：固定生命恢复。
-//  MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE：生命恢复（百分比）。
-//  MODIFIER_PROPERTY_MAGIC_RESISTANCE_BONUS：魔法抗性。
-//  MODIFIER_PROPERTY_MAGIC_RESISTANCE_DIRECT_MODIFICATION：直接修改的魔法抗性。
-//  MODIFIER_PROPERTY_COOLDOWN_REDUCTION_CONSTANT：冷却时间减少。
-//  状态修改类
-//  MODIFIER_PROPERTY_OVERRIDE_ANIMATION：覆盖动画。
-//  MODIFIER_PROPERTY_OVERRIDE_ANIMATION_WEIGHT：覆盖动画权重（高优先级）。
-//  MODIFIER_PROPERTY_OVERRIDE_ANIMATION_RATE：覆盖动画速率。
-//  MODIFIER_PROPERTY_INVISIBILITY_LEVEL：隐身等级。
-//  MODIFIER_PROPERTY_PERSISTENT_INVISIBILITY：持久隐身。
-//  效果添加类（效果添加到单位，用于影响单位的状态）
-//  MODIFIER_STATE_STUNNED：眩晕。
-//  MODIFIER_STATE_HEXED：妖术。
-//  MODIFIER_STATE_SILENCED：沉默。
-//  MODIFIER_STATE_ROOTED：定身。
-//  MODIFIER_STATE_DISARMED：缴械。
-//  MODIFIER_STATE_INVISIBLE：隐身。
-//  MODIFIER_STATE_MUTED：禁用物品。
-//  MODIFIER_STATE_BLIND：致盲。
-//  MODIFIER_STATE_BLOCK_DISABLED：无法进行伤害格挡。
-//  MODIFIER_STATE_NO_HEALTH_BAR：没有生命条显示。
-//  MODIFIER_STATE_FLYING：允许飞行动作。
-//  其他特殊功能
-//  MODIFIER_EVENT_ON_ATTACK_START：攻击开始时。
-//  MODIFIER_EVENT_ON_ATTACK_LANDED：攻击命中时。
-//  MODIFIER_EVENT_ON_ATTACK_FAIL：攻击失误时。
-//  MODIFIER_EVENT_ON_SPELL_TARGET_READY：施法目标就绪时。
-//  MODIFIER_EVENT_ON_SPELL_START：开始施法时。
-//  MODIFIER_EVENT_ON_DAMAGE_CALCULATED：伤害计算之后。
-//  MODIFIER_EVENT_ON_DEATH：单位死亡时。
-//  MODIFIER_EVENT_ON_RESPAWN：单位重生时。
-
-
 
 
 

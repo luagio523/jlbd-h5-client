@@ -23,8 +23,8 @@ export interface QueryFilter {
 export class GameEntityManager {
 
     private static instance: GameEntityManager;
-    private selectedHero: ECSEntity | null = null;
-    private playerControlledHero: ECSEntity | null = null;
+    private selectedEntity: ECSEntity | null = null;
+    private playerControlledEntity: ECSEntity | null = null;
 
     private constructor() {}
 
@@ -42,20 +42,20 @@ export class GameEntityManager {
         return this.queryEntitiesInCircle(center, radius);
     }
 
-    public setSelectedHero(hero: ECSEntity | null): void {
-        this.selectedHero = hero;
+    public setSelectedEntity(hero: ECSEntity | null): void {
+        this.selectedEntity = hero;
     }
 
-    public getSelectedHero(): ECSEntity | null {
-        return this.selectedHero;
+    public getSelectedEntity(): ECSEntity | null {
+        return this.selectedEntity;
     }
 
-    public setPlayerControlledHero(hero: ECSEntity | null): void {
-        this.playerControlledHero = hero;
+    public setPlayerControlledEntity(hero: ECSEntity | null): void {
+        this.playerControlledEntity = hero;
     }
 
     public getPlayerControlledEntity(): ECSEntity | null {
-        return this.playerControlledHero;
+        return this.playerControlledEntity;
     }
 
 
