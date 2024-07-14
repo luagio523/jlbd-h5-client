@@ -1,7 +1,9 @@
+import { AttributeComponent } from "../component/AttributeComponent";
 import { Constants } from "../constant/Constants";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { ModifierFunction } from "../enum/ModifierFunction";
 import { ModifierManager } from "../manager/ModifierManager";
+import { AttributeCalculator } from "./AttributeCalculator";
 // 定义：AttackRate 是单位在没有任何攻击速度加成的情况下，完成一次攻击所需的基础时间（以秒为单位）。
 //攻击速度Multiplier = Math.pow(2, 攻击速度加成 / 100)
 // 计算公式：实际攻击间隔 = AttackRate / 攻击速度Multiplier
@@ -18,9 +20,10 @@ import { ModifierManager } from "../manager/ModifierManager";
 
 export class AttackSpeedCalculator {
     private modifierManager: ModifierManager;
-
+    private attributeCalculator: AttributeCalculator;
     constructor(modifierManager: ModifierManager) {
         this.modifierManager = modifierManager;
+        this.attributeCalculator = new AttributeCalculator(this.modifierManager);
     }
 
     // 计算最终攻击速度
@@ -29,7 +32,7 @@ export class AttackSpeedCalculator {
         let finalBAT = this.calculateBAT(entity, baseAttackTime);
 
         // 计算攻击速度
-        let attackSpeedBonus = this.calculateAttackSpeedBonus(entity);
+        let attackSpeedBonus = this.calculateFinalAttackSpeedBonus(entity,0); //默认基础速度是0
 
         let multiplier = this.calculateAttackIntervalMultiplier(attackSpeedBonus);
         // 计算攻击时间
@@ -66,12 +69,13 @@ export class AttackSpeedCalculator {
     }
 
     // 计算攻击速度
-    private calculateAttackSpeedBonus(entity: ECSEntity): number {
-        let attackSpeed = 0; // 基础攻击速度为 100
+    public calculateFinalAttackSpeedBonus(entity: ECSEntity,baseAttackSpeed: number): number {
+        const agility = entity.getComponent(AttributeComponent).getAgility();
+        const attributeAttackSpped = this.attributeCalculator.calculateFinalAgility(entity,agility)*1 // 每点敏捷提供1点攻击速度
+        baseAttackSpeed += attributeAttackSpped // 加上属性加成
         // 应用常数加成
-        attackSpeed += this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT);
-
-        return attackSpeed;
+        baseAttackSpeed += this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT);
+        return baseAttackSpeed;
     }
 
     // 应用攻击速度限制

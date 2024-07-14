@@ -2,20 +2,26 @@ import { AttributeComponent } from "../component/AttributeComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { ModifierFunction } from "../enum/ModifierFunction";
 import { ModifierManager } from "../manager/ModifierManager";
+import { AttributeCalculator } from "./AttributeCalculator";
 
 export class MagicResistanceCalculator {
     private modifierManager: ModifierManager;
-
+    private attributeCalculator: AttributeCalculator;
     constructor(modifierManager: ModifierManager) {
         this.modifierManager = modifierManager;
+        this.attributeCalculator = new AttributeCalculator(this.modifierManager);
     }
 
     // 计算实体的最终魔法抗性
     calculateFinalMagicResistance(entity: ECSEntity,baseMagicalResistance: number,isIllusion?: boolean): number {
 
+        const intelligence = entity.getComponent(AttributeComponent).getIntelligence();
+        const attributeMagicalResistance = this.attributeCalculator.calculateFinalIntelligence(entity,intelligence)*0.001 // 假设每点智力提供0.1%的魔法抗性加成
+        baseMagicalResistance += attributeMagicalResistance;
+
         // 应用基础魔法抗性降低
         const baseReduction = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BASE_REDUCTION);
-        baseMagicalResistance -= baseReduction;
+        baseMagicalResistance += baseReduction;
 
         // 应用额外的魔法抗性加成
         let bonusResistance = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS);
