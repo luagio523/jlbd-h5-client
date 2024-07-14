@@ -104,3 +104,18 @@ export enum ClickBehavior {
     CLICK_BEHAVIOR_LAST = 12, // 代表列表的结束，并不代表实际的行为
 }
 
+
+
+
+
+export enum EntityType {
+    Default,
+    Hero,
+    NPC,
+    Monster,
+    Creep, // 野怪
+    Building,
+    Item
+    // 可以根据需要添加更多实体类型
+}
+

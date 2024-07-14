@@ -14,7 +14,7 @@ export class ItemData extends DataReader {
     protected itemComponents: string[];
     protected itemSlots: InventorySlot[];
 
-    protected parseJsonData(data: any): void {
+    public deserialize(data: any): void {
         this.itemName = data.ItemName;
         this.itemId = data.ItemID;
         this.itemType = this.parseEnumValue(ItemType, data.ItemType);

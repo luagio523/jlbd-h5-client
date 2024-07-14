@@ -41,7 +41,7 @@ export class HeroData extends DataReader{
     protected talents: string[];
 
 
-    protected parseJsonData(data: any): void {
+    protected parseFromData(data: any): void {
         this.heroName = data.HeroName;
         this.heroId = data.HeroID;
         this.team = data.Team;
@@ -75,6 +75,7 @@ export class HeroData extends DataReader{
 
         this.abilities = data.Ability1 ? [data.Ability1, data.Ability2, data.Ability3, data.Ability4] : [];
         this.talents = data.Talent1 ? [data.Talent1, data.Talent2, data.Talent3, data.Talent4, data.Talent5, data.Talent6, data.Talent7, data.Talent8] : [];
+
     }
 
     

@@ -1,6 +1,6 @@
 import { ECSComponent } from "../ecs/ECSComponent";
 
-class ComponentFactory {
+export class ComponentFactory {
     private static instance: ComponentFactory;
     private componentPools: Map<string, ECSComponent[]> = new Map();
   

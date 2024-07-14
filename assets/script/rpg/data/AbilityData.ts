@@ -57,7 +57,7 @@ export class AbilityData extends DataReader {
     private levelsBetweenUpgrades: number;
     private hotKeyOverride: string;
 
-    protected parseJsonData(data: any): void {
+    protected parseFromKVData(data: any): void {
         this.baseClass = data.BaseClass;
         this.scriptFile = data.ScriptFile;
         this.abilityTextureName = data.AbilityTextureName;

@@ -1,5 +1,6 @@
+
 import { Color, Graphics, Node, Rect, Vec2 } from "cc";
-import { MapLayer } from "../map/MapLayer";
+import { MapDisplayLayer } from "../map/MapDisplayLayer";
 import { GameMap } from "../map/GameMap";
 import EntityLayer from "../map/EntityLayer";
 
@@ -11,9 +12,10 @@ export enum LayerType {
 }
 
 export class SceneManager {
-
-
     private static instance: SceneManager;
+    private rootNode: Node;
+    private layers: Map<LayerType, Node> = new Map();
+    private graphics: Graphics;
 
     private constructor() {}
 
@@ -24,115 +26,63 @@ export class SceneManager {
         return SceneManager.instance;
     }
 
-    protected rootNode: Node
-    protected mapLayer: Node;
-    protected dropLayer: Node;
-    protected entityLayer: Node;
-    protected effectLayer: Node;
-
     public initLayers(root: Node): void {
         this.rootNode = root;
 
-        // 创建并添加地图层
-        this.mapLayer = new MapLayer(GameMap.ins());
-        this.addNewLayer(this.mapLayer, LayerType.MapLayer);
-
-        // 创建并添加掉落物层
-        this.dropLayer = new Node();
-        this.addNewLayer(this.dropLayer, LayerType.DropLayer);
-
-        // 创建并添加实体层
-        this.entityLayer = new EntityLayer();
-        this.addNewLayer(this.entityLayer, LayerType.EntityLayer);
-
-        // 创建并添加效果层
-        this.effectLayer = new Node();
-        this.addNewLayer(this.effectLayer, LayerType.EffectLayer);
+        this.addLayer(LayerType.MapLayer, new MapDisplayLayer(GameMap.ins()));
+        this.addLayer(LayerType.DropLayer, new Node());
+        this.addLayer(LayerType.EntityLayer, new EntityLayer());
+        this.addLayer(LayerType.EffectLayer, new Node());
     }
 
-    protected addNewLayer(layer: Node, layerType: LayerType): void {
-        layer.name = LayerType[layerType];
+    private addLayer(type: LayerType, layer: Node): void {
+        layer.name = LayerType[type];
         this.rootNode.addChild(layer);
+        this.layers.set(type, layer);
     }
 
-    public addToEntityLayer(entity: Node): void {
-        this.entityLayer.addChild(entity);
-    }
-
-    public addToEffectLayer(effect: Node): void {
-        this.effectLayer.addChild(effect);
-    }
-
-    public addToDropLayer(item: Node): void {
-        this.dropLayer.addChild(item);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /***********************************************************用于测试********************************************************************* */
-
-    protected getDrawGraphics() {
-        if (this.graphics) {
-            return this.graphics
+    public addToLayer(type: LayerType, node: Node): void {
+        const layer = this.layers.get(type);
+        if (layer) {
+            layer.addChild(node);
+        } else {
+            console.warn(`Layer ${LayerType[type]} not found`);
         }
-        let node = new Node()
-        this.addToDropLayer(node)
-        node.setSiblingIndex(1)
-        this.graphics = node.addComponent(Graphics)
-        return this.graphics
     }
 
-    protected graphics: Graphics
+    private getDrawGraphics(): Graphics {
+        if (!this.graphics) {
+            const node = new Node();
+            this.addToLayer(LayerType.DropLayer, node);
+            node.setSiblingIndex(1);
+            this.graphics = node.addComponent(Graphics);
+        }
+        return this.graphics;
+    }
 
-    public draw(points: Array<Vec2>, color: Color = Color.GREEN) {
+    public draw(points: Vec2[], color: Color = Color.GREEN): void {
+        const graphics = this.getDrawGraphics();
+        graphics.clear();
+        graphics.strokeColor = color;
+        graphics.lineWidth = 6;
 
-        let graphics = this.getDrawGraphics()
-        graphics.clear()
-
-        graphics.strokeColor = color
-        graphics.lineWidth = 6
-
-        for (let index = 0; index < points.length; index++) {
-            const element = points[index];
-            if (index == 0) {
-                graphics.moveTo(element.x, element.y)
+        points.forEach((point, index) => {
+            if (index === 0) {
+                graphics.moveTo(point.x, point.y);
             } else {
-                graphics.lineTo(element.x, element.y)
-
+                graphics.lineTo(point.x, point.y);
             }
-        }
-        graphics.stroke()
+        });
+
+        graphics.stroke();
     }
 
-    public draw3(rect: Rect, color: Color = Color.GREEN) {
-        let graphics = this.getDrawGraphics()
-        graphics.clear()
-
-        graphics.strokeColor = color
-        graphics.lineWidth = 4
-
-        graphics.rect(rect.x, rect.y, rect.width, rect.height)
-
-
-        graphics.stroke()
+    public drawRect(rect: Rect, color: Color = Color.GREEN): void {
+        const graphics = this.getDrawGraphics();
+        graphics.clear();
+        graphics.strokeColor = color;
+        graphics.lineWidth = 4;
+        graphics.rect(rect.x, rect.y, rect.width, rect.height);
+        graphics.stroke();
     }
 }

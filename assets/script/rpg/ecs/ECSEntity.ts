@@ -102,6 +102,17 @@ export class ECSEntity {
     }
 
     /**
+     * 检查指定的组件是否存在
+     *
+     * @param constructor
+     */
+    hasComponentByName<T extends ECSComponent>(
+        name: string
+    ): boolean {
+        return this.components.has(name);
+    }
+
+    /**
      * 取得指定名字的组件
      *
      * @param constructor

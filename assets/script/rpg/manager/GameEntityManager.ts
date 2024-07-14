@@ -2,8 +2,12 @@
 
 //怪物追踪，利用rvo移动，检测格子阻挡。如果A被阻挡，A找寻A*寻路。 顺便找到附近的符合条件怪物，加入移动群组，A作为群组领导。
 
+import { HeroData } from "../data/HeroData";
 import { ECSEntity } from "../ecs/ECSEntity";
+import GameEntity from "../entity/Entity";
+import { EntityType } from "../enum/Type";
 import EntityFactory from "../factory/EntityFactory";
+import KVFileManager from "./KVFileManager";
 
 
 
@@ -27,10 +31,14 @@ export class GameEntityManager {
     }
 
 
-    addEntity(entity: ECSEntity): void {
+    addEntity(name: string): void {
+        const heroEntity = this.entityFactory.createEntity(EntityType.Hero);
+        const kvData = KVFileManager.getInstance().getKVData(name);
+        const heroData = new HeroData()
+        heroData.deserialize(kvData); 
     }
     
-    removeEntity(entity: ECSEntity): void {
+    removeEntity(entity: GameEntity): void {
         // this.entities.delete(entity);
         this.entityFactory.recycleEntity(entity);
     }
