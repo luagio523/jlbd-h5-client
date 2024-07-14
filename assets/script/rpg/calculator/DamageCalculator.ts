@@ -42,11 +42,8 @@ export class DamageCalculator {
 
 
     public calculatePreDefenseAttackDamage(attacker: ECSEntity, target: ECSEntity, damageType: DamageType): number {
-
-
         // 伤害类型转换
         damageType = this.checkDamageTypeConversion(attacker, damageType);
-
 
         if (damageType === DamageType.DAMAGE_TYPE_PHYSICAL) {
             // 闪避检查

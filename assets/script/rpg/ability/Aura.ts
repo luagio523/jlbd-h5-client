@@ -20,6 +20,7 @@ import { Modifier } from "./Modifier";
     public isAura(): boolean { return true; }
     public abstract createAuraEffect(target: ECSEntity): Modifier | null;
     public getAuraRadius(): number { return this.auraRadius; }
+    public abstract shouldApplyToTarget(target: ECSEntity): boolean;
 
     // 新增：获取光环效果的唯一标识符
     public abstract getAuraEffectId(): string;

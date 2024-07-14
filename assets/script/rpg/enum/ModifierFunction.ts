@@ -182,20 +182,20 @@ export enum ModifierFunction{
      */
     MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT = 31,
 
-         // `GetModifierBaseAttackTimeConstant`: 获取单位的基础攻击间隔。
-    MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT = 36,
+    //      // `GetModifierBaseAttackTimeConstant`: 获取单位的基础攻击间隔。
+    // MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT = 36,
 
-    // `GetModifierBaseAttackTimeConstant_Adjust`: 调整单位的基础攻击间隔。
-    MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT_ADJUST = 37,
+    // // `GetModifierBaseAttackTimeConstant_Adjust`: 调整单位的基础攻击间隔。
+    // MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT_ADJUST = 37,
 
-    // `GetModifierBaseAttackTimePercentage`: 以百分比改变单位的基础攻击间隔。
-    MODIFIER_PROPERTY_BASE_ATTACK_TIME_PERCENTAGE = 38,
+    // // `GetModifierBaseAttackTimePercentage`: 以百分比改变单位的基础攻击间隔。
+    // MODIFIER_PROPERTY_BASE_ATTACK_TIME_PERCENTAGE = 38,
 
     // `GetModifierAttackSpeedBaseOverride`: 获取基础攻击速度的加成。
-    MODIFIER_PROPERTY_ATTACKSPEED_BASE_OVERRIDE = 29,
+    // MODIFIER_PROPERTY_ATTACKSPEED_BASE_OVERRIDE = 29,
 
     // `GetModifierFixedAttackRate`: 获取单位固定的攻击速度。
-    MODIFIER_PROPERTY_FIXED_ATTACK_RATE = 30,
+    // MODIFIER_PROPERTY_FIXED_ATTACK_RATE = 30,
 
     // `GetModifierAttackSpeed_Limit`: 这个方法应该类似于忽略最大攻击速度限制。
     MODIFIER_PROPERTY_IGNORE_ATTACKSPEED_LIMIT = 32,

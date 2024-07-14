@@ -5,6 +5,7 @@ import { ModifierAttribute } from "../enum/Modifier";
 import { BaseAbility } from "./BaseAbility";
 import { ModifierEvent } from "../enum/ModifierEvent";
 import { ModifierState } from "../enum/ModifierState";
+import { ModifierCategory } from "../enum/ModifierCategory";
 
 
 // 例如，你可能想要把 value 当做基础的变化值，intensity 用来增强或者削弱这个基础效果。在这个框架里，
@@ -113,12 +114,15 @@ export abstract class Modifier {
 
     protected OnIntervalThink() {}
 
-    abstract ListDeclareFunctions(): ModifierFunction[];
+    // abstract ListModifierCategory(): ModifierCategory[]; // 作用范围
+
+    abstract ListModifierFunctions(): ModifierFunction[]; // 作用属性
+
 
     abstract ListListenEvents(): ModifierEvent[];
 
     getModifierValue(func: ModifierFunction): number {
-        const declaredFunctions = this.ListDeclareFunctions();
+        const declaredFunctions = this.ListModifierFunctions();
         if (declaredFunctions.includes(func)) {
             return this.getModifierValueInternal(func);
         }
