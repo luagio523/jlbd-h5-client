@@ -207,11 +207,14 @@ export class DamageCalculator {
 
         switch (primaryAttribute) {
             case Attributes.ATTRIBUTE_STRENGTH:
-                return this.attributeCalculator.calculateFinalStrength(entity);
+                const strength = entity.getComponent(AttributeComponent).getStrength();
+                return this.attributeCalculator.calculateFinalStrength(entity,strength);
             case Attributes.ATTRIBUTE_AGILITY:
-                return this.attributeCalculator.calculateFinalAgility(entity);
+                const agility = entity.getComponent(AttributeComponent).getAgility();
+                return this.attributeCalculator.calculateFinalAgility(entity,agility);
             case Attributes.ATTRIBUTE_INTELLECT:
-                return this.attributeCalculator.calculateFinalIntelligence(entity);
+                const intelligence = entity.getComponent(AttributeComponent).getIntelligence();
+                return this.attributeCalculator.calculateFinalIntelligence(entity,intelligence);
             default:
                 return 0;
         }

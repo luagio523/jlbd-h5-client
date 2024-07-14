@@ -247,7 +247,7 @@ export enum ModifierFunction{
 
 
 
-
+    /****************************攻击范围**************************************** */
 
 
 
@@ -281,4 +281,65 @@ export enum ModifierFunction{
 	  */
 	 MODIFIER_PROPERTY_MAX_ATTACK_RANGE = 114,
 
+
+
+
+
+   /****************************生命值**************************************** */
+
+
+    MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT = 89,
+    /**
+     * 方法名称：`GetModifierHealthRegenPercentage`
+     * 此方法返回生命值再生百分比的修改值。
+     */
+    MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE = 90,
+
+    // `GetModifierHealthBonus`: 增加额外的生命值上限。
+    MODIFIER_PROPERTY_HEALTH_BONUS = 92,
+
+    //直接增加生命值
+    MODIFIER_PROPERTY_EXTRA_HEALTH_BONUS = 95,
+    //直接增加生命值百分比
+    MODIFIER_PROPERTY_EXTRA_HEALTH_PERCENTAGE = 98,
+
+   /****************************mana值**************************************** */
+
+    // `GetModifierManaBonus`: 增加法力值上限。
+    MODIFIER_PROPERTY_MANA_BONUS = 93,
+
+     /**
+     * 方法名称：`GetModifierBaseRegen`
+     * 此方法返回基础魔力再生值的修改值。
+     */
+     MODIFIER_PROPERTY_BASE_MANA_REGEN = 85,
+
+     /**
+      * 方法名称：`GetModifierConstantManaRegen`
+      * 此方法返回稳定魔力再生的修改值。
+      */
+     MODIFIER_PROPERTY_MANA_REGEN_CONSTANT = 86,
+ 
+     /**
+      * 方法名称：`GetModifierConstantManaRegenUnique`
+      * 此方法返回独特稳定魔力再生的修改值。
+      */
+     MODIFIER_PROPERTY_MANA_REGEN_CONSTANT_UNIQUE = 87,
+
+
+ 
+     /**
+      * 方法名称：`GetModifierTotalPercentageManaRegen`
+      * 此方法返回魔力再生总百分比的修改值。
+      */
+     MODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE = 88,
+
+      //直接增加魔法值
+      MODIFIER_PROPERTY_EXTRA_MANA_BONUS = 96,
+     
+      // MODIFIER_PROPERTY_EXTRA_MANA_BONUS_PERCENTAGE = 97,
+
+      //直接增加魔法值百分比
+      MODIFIER_PROPERTY_EXTRA_MANA_PERCENTAGE
+      
 }

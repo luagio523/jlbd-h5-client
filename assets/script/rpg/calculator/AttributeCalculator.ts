@@ -10,27 +10,24 @@ export class AttributeCalculator {
         this.modifierManager = modifierManager;
     }
 
-    calculateFinalStrength(entity: ECSEntity): number {
-        const strength = entity.getComponent(AttributeComponent).getStrength();
+    calculateFinalStrength(entity: ECSEntity,baseStrength:number): number {
         const bonusStrength = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_STATS_STRENGTH_BONUS);
         const strengthPercentage = 1 + this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_STATS_STRENGTH_BONUS_PERCENTAGE) / 100;
-        return (strength + bonusStrength) * strengthPercentage;
+        return (baseStrength + bonusStrength) * strengthPercentage;
     }
 
    
-    calculateFinalAgility(entity: ECSEntity): number {
-        const agility = entity.getComponent(AttributeComponent).getAgility();
+    calculateFinalAgility(entity: ECSEntity,baseAgility:number): number {
         const bonusAgility = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_STATS_AGILITY_BONUS);
         const agilityPercentage = 1 + this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_STATS_AGILITY_BONUS_PERCENTAGE) / 100;
-        return (agility + bonusAgility) * agilityPercentage;
+        return (baseAgility + bonusAgility) * agilityPercentage;
     }
     
 
-    calculateFinalIntelligence(entity: ECSEntity): number {
-        const intelligence = entity.getComponent(AttributeComponent).getIntelligence();
+    calculateFinalIntelligence(entity: ECSEntity,baseIntelligence:number): number {
         const bonusIntelligence = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_STATS_INTELLECT_BONUS);
         const intelligencePercentage = 1 + this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_STATS_INTELLECT_BONUS_PERCENTAGE) / 100;
-        return (intelligence + bonusIntelligence) * intelligencePercentage;
+        return (baseIntelligence + bonusIntelligence) * intelligencePercentage;
     }
     
 }
