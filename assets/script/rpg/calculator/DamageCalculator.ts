@@ -10,6 +10,7 @@ import { AttributeCalculator } from "./AttributeCalculator";
 import { CriticalStrikeCalculator } from "./CriticalStrikeCalculator";
 import { EvasionAndBlockCalculator } from "./EvasionAndBlockCalculator";
 import { MagicResistanceCalculator } from "./MagicResistanceCalculator";
+import { ProbabilityCalculator } from "./ProbabilityCalculator";
 
 
 // 普通攻击流程
@@ -30,6 +31,7 @@ export class DamageCalculator {
     protected attributeCalculator: AttributeCalculator;
     private criticalStrikeCalculator: CriticalStrikeCalculator;
     private evasionAndBlockCalculator: EvasionAndBlockCalculator;
+    private probabilityCalculator: ProbabilityCalculator;
 
     constructor(modifierManager: ModifierManager) {
         this.modifierManager = modifierManager;
@@ -38,6 +40,7 @@ export class DamageCalculator {
         this.attributeCalculator = new AttributeCalculator(modifierManager);
         this.criticalStrikeCalculator = new CriticalStrikeCalculator(modifierManager);
         this.evasionAndBlockCalculator = new EvasionAndBlockCalculator(modifierManager);
+        this.probabilityCalculator = ProbabilityCalculator.getInstance();
     }
 
 
@@ -46,9 +49,13 @@ export class DamageCalculator {
         damageType = this.checkDamageTypeConversion(attacker, damageType);
 
         if (damageType === DamageType.DAMAGE_TYPE_PHYSICAL) {
-            // 闪避检查
-            if (this.evasionAndBlockCalculator.calculateFinalEvasion(target) <=0){
-                return 0 ;
+
+            const evasion = this.evasionAndBlockCalculator.calculateFinalEvasion(target);
+
+            if (evasion >0) { //拥有闪避
+                if ( this.probabilityCalculator.roll(evasion)) {
+                    return 0; // 闪避成功
+                }
             }
         }
 
@@ -68,10 +75,7 @@ export class DamageCalculator {
         //   // 暴击后额外伤害
         // totalAttackDamage += this.calculatePostCritBonusDamage(attacker);
 
-         // 应用闪避和格挡（只对物理伤害有效）
-        if (damageType === DamageType.DAMAGE_TYPE_PHYSICAL) {
-            totalAttackDamage = this.evasionAndBlockCalculator.calculateFinalBlock(target, totalAttackDamage);
-        }
+        
 
         let totalDamagePercent = this.modifierManager.getModifierValue(attacker, ModifierFunction.MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE) / 100;
         totalAttackDamage *= totalDamagePercent; // 总伤害加成
@@ -80,16 +84,40 @@ export class DamageCalculator {
 
     public calculateApplyDamage(attacker: ECSEntity, target: ECSEntity, damage: number, damageType: DamageType): number {
         
-
         // let totalDamagePercent = this.modifierManager.getModifierValue(attacker, ModifierFunction.MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE) / 100;
         // damage *= totalDamagePercent; // 总伤害加成
 
-        damage = this.applyDefenses(attacker, target, damage, damageType);
+        // 计算伤害增幅
+
+        if (damageType === DamageType.DAMAGE_TYPE_PHYSICAL) {
+            if (this.modifierManager.getModifierValue(attacker,  ModifierFunction.MODIFIER_PROPERTY_IGNORE_PHYSICAL_ARMOR) != 1) {   // 没有忽略物理防御;
+                let attributeComponent = target.getComponent(AttributeComponent);
+                if (attributeComponent){
+                    const armorReduction = this.armorCalculator.calculateFinalArmorReduction(target,attributeComponent.getBaseArmor());
+                    damage = damage * armorReduction;
+                }
+            }
+        }else if (damageType === DamageType.DAMAGE_TYPE_MAGICAL) {
+            let attributeComponent = target.getComponent(AttributeComponent);
+            if (attributeComponent){
+                const magicResistanceReduction = this.magicResistanceCalculator.calculateFinalMagicResistanceReduction(target,attributeComponent.getBaseMagicResistance());
+                damage =damage * magicResistanceReduction;
+            }
+        }else if (damageType === DamageType.DAMAGE_TYPE_PURE) {
+            // 无视防御
+        }else if (damageType === DamageType.DAMAGE_TYPE_ABILITY_DEFINED) {
+            // 无视防御     
+        }
+
+        damage = this.evasionAndBlockCalculator.calculateFinalBlockDamage(attacker, damage,damageType) ; // 格挡伤害
 
         damage = this.applyDamageReduction(attacker, damage, damageType);
 
         return damage;
     }
+
+
+   
 
 
     /**
@@ -114,25 +142,7 @@ export class DamageCalculator {
     }
 
 
-    protected applyDefenses(attacker: ECSEntity, target: ECSEntity, damage: number, damageType: DamageType): number {
-        switch (damageType) {
-            case DamageType.DAMAGE_TYPE_PHYSICAL:
-                if (this.modifierManager.getModifierValue(attacker,  ModifierFunction.MODIFIER_PROPERTY_IGNORE_PHYSICAL_ARMOR) == 1) {   // 忽略物理防御;
-                    return damage;
-                }
-                const armor = this.armorCalculator.calculateFinalArmor(target);
-                const armorReduction = 1 - (0.06 * armor) / (1 + 0.06 * Math.abs(armor));
-                return damage * armorReduction;
-            case DamageType.DAMAGE_TYPE_MAGICAL:
-                const magicResistance = this.magicResistanceCalculator.calculateFinalMagicResistance(target);
-                return damage * (1 - magicResistance/100);
-            case DamageType.DAMAGE_TYPE_PURE:
-            case DamageType.DAMAGE_TYPE_ABILITY_DEFINED:
-                return damage;
-            default:
-                return damage;
-        }
-    }
+    
 
 
     public calculatePreAttackBonusDamage(entity: ECSEntity, damageType: DamageType): number {

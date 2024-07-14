@@ -124,9 +124,21 @@ export enum ModifierFunction{
    //无视护甲
    MODIFIER_PROPERTY_IGNORE_PHYSICAL_ARMOR = 78,
 
+    /******************************魔法抗性**************************************** */
 
-     // `GetModifierMagicalResistanceBonus`: 提供额外的魔法抗性加成。
-    MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS = 81,
+     // `GetModifierMagicalResistanceBaseReduction`: 提供基础魔法抗性的降低。
+	 MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BASE_REDUCTION = 79,
+	
+ 
+	 // `GetModifierMagicalResistanceBonus`: 提供额外的魔法抗性加成。
+	 MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS = 81,
+	 /**
+		  * 方法名称：`GetModifierMagicalResistanceBonusIllusions`
+		  * 此方法返回幻影魔法格挡的加值。
+		  */
+	 MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS_ILLUSIONS = 82,
+ 
+	
 
 
     /******************************闪避**************************************** */
@@ -134,9 +146,7 @@ export enum ModifierFunction{
      // `GetModifierEvasion_Constant`: 提供常规的闪避率。
      MODIFIER_PROPERTY_EVASION_CONSTANT = 63,
 
-     // `GetModifierNegativeEvasion_Constant`: 提供负的闪避率。
-     MODIFIER_PROPERTY_NEGATIVE_EVASION_CONSTANT = 64,
-
+    
 
     /******************************暴击**************************************** */
       /**
@@ -220,37 +230,7 @@ export enum ModifierFunction{
      * 这个方法返回一个百分比形式的移动速度加成。
      */
     MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE = 18,
-
-    /**
-     * 方法名称：`GetModifierMoveSpeedBonus_Percentage_Unique`
-     * 这个方法返回一个独特的移动速度百分比加成，不和其他百分比移动速度加成堆叠，只取最大的那个值。
-     */
-    MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE_UNIQUE = 19,
-
-    /**
-     * 方法名称：`GetModifierMoveSpeedBonus_Special_Boots`
-     * 这个方法会返回一个独特的移动速度加成，常常用于特殊的鞋类物品。
-     */
-    MODIFIER_PROPERTY_MOVESPEED_BONUS_UNIQUE = 20,
-
-    /**
-     * 方法名称：`GetModifierMoveSpeedBonus_Special_Boots_2`
-     * 此方法是对上述鞋类移动速度加成属性的补充，用于情况复杂或需要更多控制的物品。
-     */
-    MODIFIER_PROPERTY_MOVESPEED_BONUS_UNIQUE_2 = 21,
-
-    /**
-     * 方法名称：`GetModifierMoveSpeedBonus_Constant_Unique`
-     * 这个方法返回一个独特的固定值移动速度加成，它只应用最大的那个固定值加成。
-     */
-    MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT_UNIQUE = 22,
-
-    /**
-     * 方法名称：`GetModifierMoveSpeedBonus_Constant_Unique_2`
-     * 这个方法是对上述独特的固定值移动速度加成的补充,它是另一种特殊固定值加成.
-     */
-    MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT_UNIQUE_2 = 23,
-
+    
     /**
      * 方法名称：`GetModifierMoveSpeed_Absolute`
      * 这个方法会设定单位的移动速度为一个绝对值，无视所有其他移动速度加成或减少。
@@ -258,27 +238,47 @@ export enum ModifierFunction{
     MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE = 24,
 
     /**
-     * 方法名称：`GetModifierMoveSpeed_AbsoluteMin`
-     * 这个方法可以设定一个移动速度的绝对最小值，单位的移动速度不会低于这个数值。
-     */
-    MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE_MIN = 25,
-
-    /**
-     * 方法名称：`GetModifierMoveSpeed_AbsoluteMax`
-     * 这个方法可以设定一个移动速度的绝对最大值，单位的移动速度不会超过这个数值。
-     */
-    MODIFIER_PROPERTY_MOVESPEED_ABSOLUTE_MAX = 26,
-
-    /**
      * 方法名称：`GetModifierIgnoreMovespeedLimit`
      * 如果这个方法返回真，单位的移动速度将忽视游戏默认的350-550的移动速度限制，可以超过这个范围。
      */
     MODIFIER_PROPERTY_IGNORE_MOVESPEED_LIMIT = 27,
 
-    /**
-     * 方法名称：`GetModifierMoveSpeed_Limit`
-     * 这个方法可以设定一个移动速度上限，单位的移动速度不会超过这个数值。
+    
+
+
+
+
+
+
+
+	 /**
+     * 方法名称：`GetModifierAttackRangeOverride`
+     * 此方法返回攻击范围基础值的替代值。
      */
-    MODIFIER_PROPERTY_MOVESPEED_LIMIT = 28,
+	 MODIFIER_PROPERTY_ATTACK_RANGE_BASE_OVERRIDE = 110,
+
+	 /**
+	  * 方法名称：`GetModifierAttackRangeBonus`
+	  * 此方法返回攻击范围的加值。
+	  */
+	 MODIFIER_PROPERTY_ATTACK_RANGE_BONUS = 111,
+ 
+	//  /**
+	//   * 方法名称：`GetModifierAttackRangeBonusUnique`
+	//   * 此方法返回独特的攻击范围加值。
+	//   */
+	//  MODIFIER_PROPERTY_ATTACK_RANGE_BONUS_UNIQUE = 112,
+ 
+	 /**
+	  * 方法名称：`GetModifierAttackRangeBonusPercentage`
+	  * 此方法返回攻击范围的加值百分比。
+	  */
+	 MODIFIER_PROPERTY_ATTACK_RANGE_BONUS_PERCENTAGE = 113,
+ 
+	 /**
+	  * 方法名称：`GetModifierMaxAttackRange`
+	  * 此方法返回最大攻击范围。
+	  */
+	 MODIFIER_PROPERTY_MAX_ATTACK_RANGE = 114,
 
 }
