@@ -1,69 +1,3 @@
-import { ECSComponent } from "../ecs/ECSComponent";
-import { ModifierFunction } from "../enum/ModifierFunction";
-import { Modifier, ModifierEventDispatcher } from "../ability/Modifier";
-import { ModifierEvent } from "../enum/ModifierEvent";
-
-export class ModifierComponent extends ECSComponent {
-
-    private modifierEventDispatcher: ModifierEventDispatcher = ModifierEventDispatcher.getInstance();
-
-    private modifiers: Modifier[] = [];
-    private dirty: boolean = true;
-    private cache: Map<ModifierFunction, number> = new Map();
-
-    onModifierEvent(event: ModifierEvent, data: any) {
-        this.modifierEventDispatcher.dispatchEvent(event, data);
-    }
-
-    addModifier(modifier: Modifier) {
-        modifier.ListListenEvents().forEach(event => {
-            this.modifierEventDispatcher.addEventListener(event,modifier.onModifierEvent);
-        });
-        this.modifiers.push(modifier);
-        this.modifiers.sort((a, b) => b.priority - a.priority);
-        this.markDirty();
-    }
-
-    removeModifier(modifierId: string) {
-        const index = this.modifiers.findIndex(m => m.id === modifierId);
-        const modifier = this.modifiers[index];
-        if (modifier) {
-            modifier.ListListenEvents()?.forEach(event => {
-                this.modifierEventDispatcher.removeEventListener(event,modifier.onModifierEvent);
-            });
-        }
-        if (index !== -1) {
-            this.modifiers.splice(index, 1);
-            this.markDirty();
-        }
-    }
-
-    getModifiers(): Modifier[] {
-        return this.modifiers;
-    }
-
-    markDirty() {
-        this.dirty = true;
-        this.cache.clear();
-    }
-
-    isDirty(): boolean {
-        return this.dirty;
-    }
-
-    getCache(): Map<ModifierFunction, number> {
-        return this.cache;
-    }
-
-    setCache(func: ModifierFunction, value: number) {
-        this.cache.set(func, value);
-    }
-
-    clearDirty() {
-        this.dirty = false;
-    }
-}
-
 export class ModifierEventDispatcher {
 
     protected eventListeners: Map<ModifierEvent, Set<(event: ModifierEvent, params: any) => void>> = new Map();
@@ -136,7 +70,7 @@ export abstract class Modifier {
         }
     }
 
-    public IsHidden(): boolean { return this.isHidden; }
+   
     public IsDebuff(): boolean { return this.isDebuff; }
     public IsPurgable(): boolean { return this.purgable; }
 
@@ -156,14 +90,17 @@ export abstract class Modifier {
 
     protected OnIntervalThink() {}
 
-    abstract ListDeclareFunctions(): ModifierFunction[];
+    // abstract ListModifierCategory(): ModifierCategory[]; // 作用范围
+
+    abstract ListModifierFunctions(): ModifierFunction[]; // 作用属性
+
 
     abstract ListListenEvents(): ModifierEvent[];
 
-    getModifierValue(func: ModifierFunction, entity: ECSEntity): number {
-        const declaredFunctions = this.ListDeclareFunctions();
+    getModifierValue(func: ModifierFunction): number {
+        const declaredFunctions = this.ListModifierFunctions();
         if (declaredFunctions.includes(func)) {
-            return this.getModifierValueInternal(func, entity);
+            return this.getModifierValueInternal(func);
         }
         return 0;
     }
@@ -174,7 +111,7 @@ export abstract class Modifier {
 
     protected abstract onModifierEventInternal(event: ModifierEvent, params: any): void;
 
-    protected abstract getModifierValueInternal(func: ModifierFunction, entity: ECSEntity): number;
+    protected abstract getModifierValueInternal(func: ModifierFunction): number;
 
     abstract checkState(): Map<ModifierState, boolean>;
 
@@ -185,9 +122,20 @@ export abstract class Modifier {
     public handleStacking(newModifier: Modifier) {
         if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_MULTIPLE)) {
             this.IncrementStackCount();
+        } else if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_STACKABLE)) {
+            this.stackCount += newModifier.stackCount;
+        } else if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_REFRESH_ON_STACK)) {
+            this.duration = newModifier.duration;
+        } else if (this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_UNIQUE)) {
+        // 不做任何操作，保持唯一性
+        } else {
+        // 默认行为：刷新持续时间
+            this.duration = newModifier.duration;
         }
         this.OnRefresh();
     }
+
+    
 
     public setCaster(caster: ECSEntity): void { this.caster = caster; }
     public getCaster(): ECSEntity | null { return this.caster; }
@@ -199,7 +147,7 @@ export abstract class Modifier {
     public isAura(): boolean { return false; }
     public createAuraEffect(target: ECSEntity): Modifier | null { return null; }
     public getAuraRadius(): number { return 0; }
-    public shouldApplyToTarget(target: ECSEntity): boolean { return true; }
+    // public shouldApplyToTarget(target: ECSEntity): boolean { return true; }
 
     public hasAttribute(attr: ModifierAttribute): boolean {
         return (this.attribute & attr) !== 0;
@@ -210,134 +158,381 @@ export abstract class Modifier {
 
     public abstract getAffectedComponentTypes(): Set<Function>;
     public abstract clone(): Modifier;
+
+
+    public shouldRemoveOnDeath(): boolean {
+        return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_REMOVE_ON_DEATH);
+    }
+
+    public IsHidden(): boolean {
+        return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_HIDDEN);
+    }
+
+    public ignoreTenacity(): boolean {
+    return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_IGNORE_TENACITY);
+    }
 }
+export class ModifierComponent extends ECSComponent {
 
+    private modifierEventDispatcher: ModifierEventDispatcher = ModifierEventDispatcher.getInstance();
 
-import { Modifier } from "../ability/Modifier";
-import {  ModifierComponent } from "../component/ModifierComponent";
-import { ECSEntity } from "../ecs/ECSEntity";
-import { ModifierEvent } from "../enum/ModifierEvent";
-import { ModifierFunction } from "../enum/ModifierFunction";
-import { ModifierState } from "../enum/ModifierState";
+    private modifiers: Modifier[] = [];
+    private dirty: boolean = true;
+    private cache: Map<ModifierFunction, number> = new Map();
 
-
-export class ModifierManager {
-
-    private static instance: ModifierManager;
-    
-    private constructor() {
+    onModifierEvent(event: ModifierEvent, data: any) {
+        this.modifierEventDispatcher.dispatchEvent(event, data);
     }
 
-    public static getInstance(): ModifierManager {
-        if (!ModifierManager.instance) {
-            ModifierManager.instance = new ModifierManager();
-        }
-        return ModifierManager.instance;
-    }
+    addModifier(modifier: Modifier) {
+        modifier.ListListenEvents().forEach(event => {
+            this.modifierEventDispatcher.addEventListener(event, modifier.onModifierEvent);
+        });
+        this.modifiers.push(modifier);
+        // 处理光环优先级
+        if (modifier.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_AURA_PRIORITY)) {
+            this.modifiers.sort((a, b) => {
+                const aHasAuraPriority = a.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_AURA_PRIORITY);
+                const bHasAuraPriority = b.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_AURA_PRIORITY);
 
-    addModifier(entity: ECSEntity, newModifier: Modifier) {
-        const modifierComponent = entity.getComponent(ModifierComponent);
-        if (modifierComponent) {
-            const existingModifier = modifierComponent.getModifiers().find(mod => mod.id === newModifier.id);
-            if (existingModifier) {
-                existingModifier.handleStacking(newModifier);
-            } else {
-                modifierComponent.addModifier(newModifier);
-                newModifier.OnCreated();
-            }
+                if (aHasAuraPriority && !bHasAuraPriority) {
+                    return -1;
+                }
+                if (!aHasAuraPriority && bHasAuraPriority) {
+                    return 1;
+                }
+                return b.priority - a.priority;
+            });
         } else {
-            console.error("Entity does not have a ModifierComponent");
+            this.modifiers.sort((a, b) => b.priority - a.priority);
         }
-    }
-
-    removeModifier(entity: ECSEntity, modifierId: string) {
-        const modifierComponent = entity.getComponent(ModifierComponent);
-        if (modifierComponent) {
-            const modifier = modifierComponent.getModifiers().find(m => m.id === modifierId);
-            if (modifier) {
-                modifier.OnDestroy();
-                modifierComponent.removeModifier(modifierId);
-            }
-        }
+        this.markDirty();
     }
 
 
-    triggerEvent(entity: ECSEntity, event: ModifierEvent, params: any): void {
-        const modifierComponent = entity.getComponent(ModifierComponent);
-        if (modifierComponent) {
-            modifierComponent.onModifierEvent(event, params);
+    removeModifier(modifierId: string) {
+        const index = this.modifiers.findIndex(m => m.id === modifierId);
+        const modifier = this.modifiers[index];
+        if (modifier) {
+            modifier.ListListenEvents()?.forEach(event => {
+                this.modifierEventDispatcher.removeEventListener(event,modifier.onModifierEvent);
+            });
+        }
+        if (index !== -1) {
+            this.modifiers.splice(index, 1);
+            this.markDirty();
         }
     }
 
-    getModifierValue(entity: ECSEntity, func: ModifierFunction): number {
-        const modifierComponent = entity.getComponent(ModifierComponent);
-        if (!modifierComponent) return 0;
-
-        if (modifierComponent.isDirty()) {
-            this.recalculateCache(entity, modifierComponent);
-        }
-
-        const cache = modifierComponent.getCache();
-        if (cache.has(func)) {
-            return cache.get(func)!;
-        }
-
-        return this.calculateModifierValue(entity, modifierComponent, func);
+    getModifiers(): Modifier[] {
+        return this.modifiers;
     }
 
-    private recalculateCache(entity: ECSEntity, modifierComponent: ModifierComponent) {
-        for (const modifier of modifierComponent.getModifiers()) {
-            for (const func of modifier.ListDeclareFunctions()) {
-                const value = this.calculateModifierValue(entity, modifierComponent, func);
-                modifierComponent.setCache(func, value);
-            }
-        }
-        modifierComponent.clearDirty();
+    markDirty() {
+        this.dirty = true;
+        this.cache.clear();
     }
 
-    private calculateModifierValue(entity: ECSEntity, modifierComponent: ModifierComponent, func: ModifierFunction): number {
-        return modifierComponent.getModifiers().reduce((total, modifier) => {
-            return total + modifier.getModifierValue(func, entity);
+    isDirty(): boolean {
+        return this.dirty;
+    }
+
+
+    clearDirty() {
+        this.dirty = false;
+    }
+
+    private calculateModifierValue( func: ModifierFunction): number {
+        return this.getModifiers().reduce((total, modifier) => {
+            return total + modifier.getModifierValue(func);
         }, 0);
     }
 
-    getModifiers(entity: ECSEntity): Modifier[] {
-        const modifierComponent = entity.getComponent(ModifierComponent);
-        return modifierComponent ? modifierComponent.getModifiers() : [];
+
+    private recalculateCache(): void {
+        for (const modifier of this.getModifiers()) {
+            for (const func of modifier.ListModifierFunctions()) {
+                const value = this.calculateModifierValue(func);
+                this.cache.set(func, value);
+            }
+        }
+        this.clearDirty();
     }
 
-    isInState(entity: ECSEntity, state: ModifierState): boolean {
-        const modifierComponent = entity.getComponent(ModifierComponent);
-        if (!modifierComponent) return false;
 
-        return modifierComponent.getModifiers().some(modifier => modifier.getModifierState(state));
+    public getModifierValue(func: ModifierFunction): number {
+        if (this.isDirty()) {
+            this.recalculateCache();
+        }
+        return this.cache.get(func) || 0;
     }
 
 
+    public isInState(state: ModifierState): boolean {
+        return this.getModifiers().some(modifier => modifier.getModifierState(state));
+    }
+}
+
+
+
+export class AttackSpeedCalculator {
+    private modifierManager: ModifierManager;
+    private attributeCalculator: AttributeCalculator;
+    constructor(modifierManager: ModifierManager) {
+        this.modifierManager = modifierManager;
+        this.attributeCalculator = new AttributeCalculator(this.modifierManager);
+    }
+
+    // 计算最终攻击速度
+    calculateFinalAttackRate(entity: ECSEntity, baseAttackTime: number): number {
+        // 计算基础攻击时间 (BAT)
+        let finalBAT = this.calculateBAT(entity, baseAttackTime);
+
+        // 计算攻击速度
+        let attackSpeedBonus = this.calculateFinalAttackSpeedBonus(entity,0); //默认基础速度是0
+
+        let multiplier = this.calculateAttackIntervalMultiplier(attackSpeedBonus);
+        // 计算攻击时间
+        let attackTime = finalBAT / multiplier;
+        // 应用攻击速度限制
+        let ignoreLimit = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_IGNORE_ATTACKSPEED_LIMIT);
+        if (!ignoreLimit) {
+            attackTime = Math.max(Constants.MIN_ATTACK_TIME, Math.min(Constants.MAX_ATTACK_TIME, attackTime));
+        }
+        // 将攻击时间转换为每秒攻击次数
+        return attackTime;
+    }
+
+    calculateAttackIntervalMultiplier(attackSpeedBonus: number): number {
+        return Math.pow(2, attackSpeedBonus / 100);
+    }
+
+    // 计算基础攻击时间 (BAT)
+    private calculateBAT(entity: ECSEntity, baseAttackTime: number): number {
+        let bat = baseAttackTime;
+
+        // // 应用 BAT 常数修改器
+        // let batConstant = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT);
+        // if (batConstant > 0) {
+        //     bat = batConstant;
+        // }
+
+        // // 应用 BAT 调整
+        // let batAdjust = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT_ADJUST);
+        // bat += batAdjust;
+
+        // // 应用 BAT 百分比修改器
+        // let batPercentage = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_BASE_ATTACK_TIME_PERCENTAGE);
+        // bat *= (1 + batPercentage / 100);
+
+        return bat;
+    }
+
+    // 计算攻击速度
+    public calculateFinalAttackSpeedBonus(entity: ECSEntity,baseAttackSpeed: number): number {
+        const agility = entity.getComponent(AttributeComponent).getAgility();
+        const attributeAttackSpped = this.attributeCalculator.calculateFinalAgility(entity,agility)*1 // 每点敏捷提供1点攻击速度
+        baseAttackSpeed += attributeAttackSpped // 加上属性加成
+        // 应用常数加成
+        baseAttackSpeed += this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT);
+        return baseAttackSpeed;
+    }
+
+    
+}
+
+export class AttackComponent extends ECSComponent {
+    public attackCapability: AttackCapability;
+    public baseAttackDamageMin: number;
+    public baseAttackDamageMax: number;
+    public attackRange: number;
+    public attackRate: number;
+    public attackAnimationPoint: number;
+    public attackAcquisitionRange: number;
+    public attackType: AttackType;
+    public attackDamageType: DamageType;
+    private target: ECSEntity | null = null;
+    private attacksMade: number = 0;
+    private attackCooldown: Cooldown;
+
+    constructor(heroData: HeroData) {
+        super();
+        this.initializeAttack(heroData);
+    }
    
 
-    updateModifiers(entity: ECSEntity, deltaTime: number) {
-        const modifierComponent = entity.getComponent(ModifierComponent);
-        if (modifierComponent) {
-            const modifiers = modifierComponent.getModifiers();
-            for (let i = modifiers.length - 1; i >= 0; i--) {
-                const modifier = modifiers[i];
-                modifier.update(deltaTime);
-                if (modifier.isExpired()) {
-                    this.removeModifier(entity, modifier.id);
+    private initializeAttack(heroData: HeroData): void {
+        this.attackCapability = this.determineAttackCapability(heroData.GetAttackRange());
+        [this.baseAttackDamageMin, this.baseAttackDamageMax] = heroData.GetAttackDamage();
+        this.attackRange = heroData.GetAttackRange();
+        this.attackRate = heroData.GetAttackRate();
+        this.attackAnimationPoint = heroData.GetAttackAnimationPoint();
+        this.attackAcquisitionRange = heroData.GetAttackAcquisitionRange();
+        this.attackType = heroData.GetAttackType();
+        this.attackDamageType = heroData.GetAttackDamageType();
+        this.attackCooldown = new Cooldown(this.attackRate);
+    }
+
+    private determineAttackCapability(attackRange: number): AttackCapability {
+        return attackRange > 150 ? AttackCapability.UNIT_CAP_RANGED_ATTACK : AttackCapability.UNIT_CAP_MELEE_ATTACK;
+    }
+
+    public getBaseAttackDamage(): number {
+        return Math.random() * (this.baseAttackDamageMax - this.baseAttackDamageMin) + this.baseAttackDamageMin;
+    }
+
+    public getAttackRange(): number {
+        return this.attackRange;
+    }
+
+    
+
+    public setTarget(target: ECSEntity | null): void {
+        this.target = target;
+    }
+
+    public getTarget(): ECSEntity | null {
+        return this.target;
+    }
+
+    public canAttack(deltaTime: number): boolean {
+        return this.attackCooldown.check(deltaTime);
+    }
+
+    public updateAttackRate(attackRate: number): void {
+        this.attackRate = attackRate;
+        this.attackCooldown.resetCooldownRate(attackRate);
+    }
+
+    public performAttack(): void {
+        if (this.canAttack(0)) {
+            this.attacksMade++;
+            this.attackCooldown.start();
+        }
+    }
+
+    public getAttacksMade(): number {
+        return this.attacksMade;
+    }
+
+    public getAttackAnimationPoint(): number {
+        return this.attackAnimationPoint;
+    }
+
+    public getAttackAcquisitionRange(): number {
+        return this.attackAcquisitionRange;
+    }
+
+    public getAttackType(): AttackType {
+        return this.attackType;
+    }
+
+    public getAttackDamageType(): DamageType {
+        return this.attackDamageType;
+    }
+
+    
+
+    public resetAttacksMade(): void {
+        this.attacksMade = 0;
+    }
+
+    public isInAcquisitionRange(distance: number): boolean {
+        return distance <= this.attackAcquisitionRange;
+    }
+
+    public isInAttackRange(distance: number): boolean {
+        return distance <= this.attackRange;
+    }
+}
+
+export class AttackSystem extends BaseSystem {
+    private readonly TRACK_INTERVAL: number = 0.5; // 追踪更新间隔
+    private lastTrackTime: number = 0;
+
+    update(deltaTime: number) {
+        const currentTime = Date.now() / 1000;
+        const attackComponents = this.getComponents(AttackComponent);
+
+        for (const attackComponent of attackComponents) {
+            const attacker = this.getEntity(attackComponent.entityId);
+            const target = attackComponent.getTarget();
+
+            if (target) {
+                //是否每次都更新新的攻击间隔
+                const distance = this.getDistanceBetweenEntities(attacker, target);
+
+                if (attackComponent.isInAttackRange(distance)) {
+                    if (attackComponent.canAttack(deltaTime)) {
+                        this.initiateAttack(attacker, target, attackComponent);
+                    }
+                } else if (attackComponent.isInAcquisitionRange(distance)) {
+                    if (currentTime - this.lastTrackTime >= this.TRACK_INTERVAL) {
+                        this.updateTracking(attacker, target);
+                        this.lastTrackTime = currentTime;
+                    }
+                } else {
+                    // 目标超出获取范围，可以选择停止追踪或继续追踪
+                    attackComponent.setTarget(null);
                 }
+            } else {
+                // 可以在这里添加寻找新目标的逻辑
             }
         }
     }
+
+    private initiateAttack(attacker: ECSEntity, target: ECSEntity, attackComponent: AttackComponent) {
+        // 触发攻击开始事件
+        this.enqueueEvent(new AttackEvent(attacker, target));
+
+        // 触发动画事件
+        this.enqueueEvent(new AnimationEvent(attacker, ActType.ACT_ATTACK));
+
+        // 根据攻击类型决定是立即造成伤害还是延迟造成伤害
+        if (attackComponent.attackCapability === AttackCapability.UNIT_CAP_MELEE_ATTACK) {
+            this.enqueueEvent(new DelayedEvent(
+                () => this.performAttack(attacker, target, attackComponent),
+                attackComponent.getAttackAnimationPoint()
+            ));
+        } else if (attackComponent.attackCapability === AttackCapability.UNIT_CAP_RANGED_ATTACK) {
+            // 触发投射物事件
+            this.enqueueEvent(new ProjectileEvent(attacker, target));
+        }
+
+        // 执行攻击
+        attackComponent.performAttack();
+    }
+
+    private performAttack(attacker: ECSEntity, target: ECSEntity, attackComponent: AttackComponent) {
+        const damage = attackComponent.getBaseAttackDamage();
+        const damageType = attackComponent.getAttackDamageType();
+
+        this.enqueueEvent(new ApplyDamageEvent(attacker, target, damage, damageType));
+    }
+
+    private updateTracking(attacker: ECSEntity, target: ECSEntity) {
+        const attackerTransform = attacker.getComponent(TransformComponent);
+        const targetTransform = target.getComponent(TransformComponent);
+
+        if (attackerTransform && targetTransform) {
+            attackerTransform.setTargetPosition(targetTransform.position);
+
+            // 更新寻路组件（如果有的话）
+            const pathfinding = attacker.getComponent(PathfindingComponent);
+            if (pathfinding) {
+                pathfinding.setTarget(targetTransform.position);
+            }
+        }
+    }
+
+    private getDistanceBetweenEntities(entity1: ECSEntity, entity2: ECSEntity): number {
+        const transform1 = entity1.getComponent(TransformComponent);
+        const transform2 = entity2.getComponent(TransformComponent);
+
+        if (transform1 && transform2) {
+            return Vec2.distance(transform1.position, transform2.position);
+        }
+
+        return Infinity; // 如果无法计算距离，返回无穷大
+    }
 }
-
-
-export enum ModifierAttribute {
-  MODIFIER_ATTRIBUTE_NONE = 0,   // 无特性。默认情况下，Modifier不具有任何属性。
-  MODIFIER_ATTRIBUTE_PERMANENT = 1 << 0, // 永久性。Modifier不会被驱散。
-  MODIFIER_ATTRIBUTE_MULTIPLE = 1 << 1,// 可叠加。允许多个相同的Modifier存在于一个单位上。
-  MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE = 1 << 2, // 忽略无敌。在施加Modifier时，会忽略目标单位的无敌状态。
-  MODIFIER_ATTRIBUTE_AURA_PRIORITY = 1 << 3,// 光环优先。在排序Modifier列表时，光环Modifier将总是排在非光环Modifier前面。
-  MODIFIER_ATTRIBUTE_IGNORE_DODGE = 1 << 4,// 忽略闪避。Modifier的效果不会被目标单位的闪避能力或异界混沌骑士的幻象效果影响。
-}
-

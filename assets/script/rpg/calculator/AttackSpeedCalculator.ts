@@ -38,7 +38,10 @@ export class AttackSpeedCalculator {
         // 计算攻击时间
         let attackTime = finalBAT / multiplier;
         // 应用攻击速度限制
-        attackTime = this.applyAttackSpeedLimits(entity, attackTime);
+        let ignoreLimit = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_IGNORE_ATTACKSPEED_LIMIT);
+        if (!ignoreLimit) {
+            attackTime = Math.max(Constants.MIN_ATTACK_TIME, Math.min(Constants.MAX_ATTACK_TIME, attackTime));
+        }
         // 将攻击时间转换为每秒攻击次数
         return attackTime;
     }
@@ -78,15 +81,5 @@ export class AttackSpeedCalculator {
         return baseAttackSpeed;
     }
 
-    // 应用攻击速度限制
-    private applyAttackSpeedLimits(entity: ECSEntity, attackTime: number): number {
-
-        // 检查是否忽略攻击速度限制
-        let ignoreLimit = this.modifierManager.getModifierValue(entity, ModifierFunction.MODIFIER_PROPERTY_IGNORE_ATTACKSPEED_LIMIT);
-        if (!ignoreLimit) {
-            attackTime = Math.max(Constants.MIN_ATTACK_TIME, Math.min(Constants.MAX_ATTACK_TIME, attackTime));
-        }
-
-        return attackTime;
-    }
+    
 }

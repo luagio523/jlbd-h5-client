@@ -39,7 +39,7 @@ export class ModifierEventDispatcher {
         }
     }
 
-    public dispatchEvent(event: ModifierEvent, params: any): void {
+    public notifyEventListeners(event: ModifierEvent, params: any): void {
         if (this.eventListeners.has(event)) {
             this.eventListeners.get(event)!.forEach((listener) => listener(event,params));
         }
@@ -60,6 +60,46 @@ export class ModifierEventDispatcher {
 
 
 
+export class ModifierCategoryDispatcher {
+    private categoryListeners: Map<ModifierCategory, Set<(modifier: Modifier) => void>> = new Map();
+  
+    public addCategoryListener(category: ModifierCategory, listener: (modifier: Modifier) => void): void {
+        if (!this.categoryListeners.has(category)) {
+            this.categoryListeners.set(category, new Set());
+        }
+        this.categoryListeners.get(category)!.add(listener);
+    }
+  
+    public removeCategoryListener(category: ModifierCategory, listener: (modifier: Modifier) => void): void {
+        if (this.categoryListeners.has(category)) {
+            this.categoryListeners.get(category)!.delete(listener);
+        }
+    }
+  
+    public notifyCategoryListeners(category: ModifierCategory, modifier: Modifier): void {
+        if (this.categoryListeners.has(category)) {
+            this.categoryListeners.get(category)!.forEach(listener => listener(modifier));
+        }
+    }
+  
+    public getAffectedCategories(): ModifierCategory[] {
+        return Array.from(this.categoryListeners.keys());
+    }
+
+    private constructor() {}
+
+    public static getInstance(): ModifierCategoryDispatcher {
+        if (!ModifierCategoryDispatcher.instance) {
+            ModifierCategoryDispatcher.instance = new ModifierCategoryDispatcher();
+        }
+        return ModifierCategoryDispatcher.instance;
+    }
+
+    private static instance: ModifierCategoryDispatcher;
+}
+
+
+
 
 export abstract class Modifier {
     public stackCount: number = 1;
@@ -68,6 +108,7 @@ export abstract class Modifier {
     protected caster: ECSEntity | null = null;
     protected ability: BaseAbility | null = null;
     protected auraOwner: ECSEntity | null = null;
+    protected owner: ECSEntity | null = null;
     protected timer: Timer;
 
     constructor(
@@ -89,7 +130,7 @@ export abstract class Modifier {
         if (this.duration !== Infinity) {
             this.duration -= deltaTime;
             if (this.duration <= 0) {
-                this.OnDestroy();
+                // do nothings
             }
         }
     }
@@ -98,9 +139,30 @@ export abstract class Modifier {
     public IsDebuff(): boolean { return this.isDebuff; }
     public IsPurgable(): boolean { return this.purgable; }
 
-    public OnCreated(): void {}
-    public OnRefresh(): void {}
-    public OnDestroy(): void {}
+    public OnCreated(): void {
+        this.ListListenEvents().forEach(event => { //添加监听
+            ModifierEventDispatcher.getInstance().addEventListener(event, this.onModifierEvent.bind(this));
+        });
+        
+        this.ListModifierCategory().forEach(category => { //通知作用范围更新
+            ModifierCategoryDispatcher.getInstance().notifyCategoryListeners(category, this);
+        });
+
+    }
+    public OnRefresh(): void {
+        this.ListModifierCategory().forEach(category => { //通知作用范围更新
+            ModifierCategoryDispatcher.getInstance().notifyCategoryListeners(category, this);
+        });
+    }
+    public OnDestroy(): void {
+        this.ListListenEvents().forEach(event => { //移除监听
+            ModifierEventDispatcher.getInstance().removeEventListener(event, this.onModifierEvent.bind(this));
+        });
+
+        this.ListModifierCategory().forEach(category => {
+            ModifierCategoryDispatcher.getInstance().notifyCategoryListeners(category, this);
+        });
+    }
 
     protected SetStackCount(count: number): void { this.stackCount = count; }
     protected IncrementStackCount(): void { this.stackCount++; }
@@ -114,7 +176,7 @@ export abstract class Modifier {
 
     protected OnIntervalThink() {}
 
-    // abstract ListModifierCategory(): ModifierCategory[]; // 作用范围
+    abstract ListModifierCategory(): ModifierCategory[]; // 作用范围
 
     abstract ListModifierFunctions(): ModifierFunction[]; // 作用属性
 
@@ -159,18 +221,21 @@ export abstract class Modifier {
         this.OnRefresh();
     }
 
-    
-
+    public getOwner(): ECSEntity | null { return this.owner }
+    public setOwner(owner: ECSEntity): void { this.owner = owner; }
     public setCaster(caster: ECSEntity): void { this.caster = caster; }
     public getCaster(): ECSEntity | null { return this.caster; }
     public setAbility(ability: BaseAbility): void { this.ability = ability; }
     public getAbility(): BaseAbility | null { return this.ability; }
-    public setAuraOwner(owner: ECSEntity): void { this.auraOwner = owner; }
-    public getAuraOwner(): ECSEntity | null { return this.auraOwner; }
 
+    // public createAuraEffect(target: ECSEntity): Modifier | null { return null; }
+    // public getAuraRadius(): number { return 0; }
+    // public setAuraOwner(owner: ECSEntity): void { this.auraOwner = owner; }
+    // public getAuraOwner(): ECSEntity | null { return this.auraOwner; }
+    
     public isAura(): boolean { return false; }
-    public createAuraEffect(target: ECSEntity): Modifier | null { return null; }
-    public getAuraRadius(): number { return 0; }
+    
+    
     // public shouldApplyToTarget(target: ECSEntity): boolean { return true; }
 
     public hasAttribute(attr: ModifierAttribute): boolean {
@@ -179,21 +244,15 @@ export abstract class Modifier {
 
     public getRemainingDuration(): number { return this.duration; }
     public isExpired(): boolean { return this.duration <= 0; }
-
-    public abstract getAffectedComponentTypes(): Set<Function>;
-    public abstract clone(): Modifier;
-
+    
+    // public clone(): Modifier{return  this };
 
     public shouldRemoveOnDeath(): boolean {
         return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_REMOVE_ON_DEATH);
     }
 
-    public IsHidden(): boolean {
-        return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_HIDDEN);
-    }
-
     public ignoreTenacity(): boolean {
-    return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_IGNORE_TENACITY);
+        return this.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_IGNORE_TENACITY);
     }
 }
 

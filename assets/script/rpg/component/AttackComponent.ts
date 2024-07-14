@@ -51,9 +51,7 @@ export class AttackComponent extends ECSComponent {
         return this.attackRange;
     }
 
-    public getAttackSpeed(): number {
-        return 1 / this.attackRate;
-    }
+    
 
     public setTarget(target: ECSEntity | null): void {
         this.target = target;
@@ -99,9 +97,7 @@ export class AttackComponent extends ECSComponent {
         return this.attackDamageType;
     }
 
-    public getActualAttackInterval(attackSpeed: number): number {
-        return this.attackRate / (attackSpeed / 100);
-    }
+    
 
     public resetAttacksMade(): void {
         this.attacksMade = 0;

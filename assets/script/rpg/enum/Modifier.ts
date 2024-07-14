@@ -13,12 +13,12 @@ export enum ModifierAttribute {
   MODIFIER_ATTRIBUTE_IGNORE_INVULNERABLE = 1 << 2,// 忽略无敌。在施加Modifier时，会忽略目标单位的无敌状态。
   MODIFIER_ATTRIBUTE_AURA_PRIORITY = 1 << 3,// 光环优先。在排序Modifier列表时，光环Modifier将总是排在非光环Modifier前面。
   MODIFIER_ATTRIBUTE_IGNORE_DODGE = 1 << 4,// 忽略闪避。Modifier的效果不会被目标单位的闪避能力或异界混沌骑士的幻象效果影响。
-  MODIFIER_ATTRIBUTE_HIDDEN = 1 << 5,
-  MODIFIER_ATTRIBUTE_REMOVE_ON_DEATH = 1 << 6,
-  MODIFIER_ATTRIBUTE_IGNORE_TENACITY = 1 << 7,
-  MODIFIER_ATTRIBUTE_STACKABLE = 1 << 8,  //允许同一个Modifier的效果进行叠加，但只存在一个Modifier实例
-  MODIFIER_ATTRIBUTE_REFRESH_ON_STACK = 1 << 9,
-  MODIFIER_ATTRIBUTE_UNIQUE = 1 << 10,
+  MODIFIER_ATTRIBUTE_STACKABLE = 1 << 5,  //允许同一个Modifier的效果进行叠加，但只存在一个Modifier实例
+  MODIFIER_ATTRIBUTE_REFRESH_ON_STACK = 1 << 6,
+
+  MODIFIER_ATTRIBUTE_REMOVE_ON_DEATH = 1 << 7,
+  MODIFIER_ATTRIBUTE_IGNORE_TENACITY = 1 << 8,
+  MODIFIER_ATTRIBUTE_UNIQUE = 1 << 9,
 }
 
 

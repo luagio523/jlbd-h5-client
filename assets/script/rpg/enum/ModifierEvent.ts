@@ -29,7 +29,7 @@ export enum ModifierEvent {
 
     /**
      * 方法名称：`OnProcessUpgrade`
-     * 在处理升级时，此方法被调用。
+     * 在处理实体升级时，此方法被调用。
      */
     MODIFIER_EVENT_ON_PROCESS_UPGRADE = 195,
 
@@ -37,7 +37,7 @@ export enum ModifierEvent {
      * 方法名称：`OnRefresh`
      * 在刷新时，此方法被调用。
      */
-    MODIFIER_EVENT_ON_REFRESH = 196,
+    MODIFIER_EVENT_ON_REFRESH = 196,//已经弃用
 
     /**
      * 方法名称：`OnTakeDamage`
@@ -53,7 +53,7 @@ export enum ModifierEvent {
 
     /**
      * 方法名称：`OnStateChanged`
-     * 当状态改变时，此方法被调用。
+     * 当状态改变时，此方法被调用。  比如沉默眩晕等等
      */
     MODIFIER_EVENT_ON_STATE_CHANGED = 199,
 
@@ -202,5 +202,9 @@ export enum ModifierEvent {
     MODIFIER_EVENT_ON_FORCE_PROC_MAGIC_STICK = 287,
     // `OnDamageHPLoss`: 当单位承受伤害导致生命值降低时触发。
     MODIFIER_EVENT_ON_DAMAGE_HPLOSS = 289,
+
+
+
+	
 
 }

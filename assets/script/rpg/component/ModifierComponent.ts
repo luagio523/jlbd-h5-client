@@ -16,22 +16,23 @@ import { ModifierState } from "../enum/ModifierState";
 // 批量更新
 // ModifierManager并不会在每次Modifier发生变化时就立即重新计算所有受影响的属性值。相反,它会先记录下所有发生变化的Modifier,等到需要使用某个属性值时,再统一进行一次批量计算和更新。
 
+
+//当单位获得或失去影响攻击速度的buff时。
+// 当单位的属性发生显著变化时（如升级）。
+// 当单位装备或卸下影响攻击速度的物品时。
+
+
 export class ModifierComponent extends ECSComponent {
 
-    private modifierEventDispatcher: ModifierEventDispatcher = ModifierEventDispatcher.getInstance();
 
     private modifiers: Modifier[] = [];
     private dirty: boolean = true;
     private cache: Map<ModifierFunction, number> = new Map();
 
-    onModifierEvent(event: ModifierEvent, data: any) {
-        this.modifierEventDispatcher.dispatchEvent(event, data);
-    }
+   
 
     addModifier(modifier: Modifier) {
-        modifier.ListListenEvents().forEach(event => {
-            this.modifierEventDispatcher.addEventListener(event, modifier.onModifierEvent);
-        });
+        
         this.modifiers.push(modifier);
         // 处理光环优先级
         if (modifier.hasAttribute(ModifierAttribute.MODIFIER_ATTRIBUTE_AURA_PRIORITY)) {
@@ -56,12 +57,7 @@ export class ModifierComponent extends ECSComponent {
 
     removeModifier(modifierId: string) {
         const index = this.modifiers.findIndex(m => m.id === modifierId);
-        const modifier = this.modifiers[index];
-        if (modifier) {
-            modifier.ListListenEvents()?.forEach(event => {
-                this.modifierEventDispatcher.removeEventListener(event,modifier.onModifierEvent);
-            });
-        }
+        
         if (index !== -1) {
             this.modifiers.splice(index, 1);
             this.markDirty();
