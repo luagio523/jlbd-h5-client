@@ -12,7 +12,7 @@ export class MagicResistanceCalculator {
         this.attributeCalculator = new AttributeCalculator(this.modifierManager);
     }
 
-    // 计算实体的最终魔法抗性
+    // 计算实体的最终魔法抗性 （带属性加成）
     calculateFinalMagicResistance(entity: ECSEntity,baseMagicalResistance: number,isIllusion?: boolean): number {
 
         const intelligence = entity.getComponent(AttributeComponent).getIntelligence();
@@ -42,7 +42,7 @@ export class MagicResistanceCalculator {
 
 
 
-    // 计算实体的最终魔法抗性（带属性加成）
+    // 计算实体的最终魔法抗性减免（带属性加成）
     calculateFinalMagicResistanceReduction(entity: ECSEntity,baseMagicalResistance: number,isIllusion?: boolean): number {
         // 计算基础魔法抗性
         let finalMagicalResistance = this.calculateFinalMagicResistance(entity,baseMagicalResistance,isIllusion);

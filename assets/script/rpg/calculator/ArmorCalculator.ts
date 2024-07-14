@@ -30,6 +30,7 @@ export class ArmorCalculator {
         return totalArmor * armorPercentage;
     }
 
+    // 计算实体的最终护甲减免
     calculateFinalArmorReduction(entity: ECSEntity,baseArmor: number): number {
         let armor = this.calculateFinalArmor(entity,baseArmor);
         return ARMOR_CONSTANT_PLUS_ONE / (ARMOR_CONSTANT_PLUS_ONE + ARMOR_CONSTANT * armor);
