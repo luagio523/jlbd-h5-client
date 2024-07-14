@@ -10,6 +10,8 @@ import { PathfindingComponent } from "../component/PathfindingComponent";
 import { ActType } from "../enum/Act";
 import { Modifier, ModifierCategoryDispatcher } from "../ability/Modifier";
 import { ModifierCategory } from "../enum/ModifierCategory";
+import { AttackSpeedCalculator } from "../calculator/AttackSpeedCalculator";
+import { ModifierManager } from "../manager/ModifierManager";
 
 // CPU缓存的设计利用了两种主要的局部性原理：
 // 时间局部性（Temporal Locality）：如果一个数据项被访问，那么它很可能在不久的将来再次被访问。
@@ -31,13 +33,20 @@ import { ModifierCategory } from "../enum/ModifierCategory";
 export class AttackSystem extends BaseSystem {
     private readonly TRACK_INTERVAL: number = 0.5; // 追踪更新间隔
     private lastTrackTime: number = 0;
+    private attackSpeedCalculator: AttackSpeedCalculator 
     public constructor() {
         super();
-        ModifierCategoryDispatcher.getInstance().addCategoryListener(ModifierCategory.CATEGORY_ATTACK_SPEED, this.onModifierCategoryChanged.bind(this)); //监听攻击速度改变
+        ModifierCategoryDispatcher.getInstance().addCategoryListener(ModifierCategory.CATEGORY_ATTACK_SPEED, this.onAttackSpeedChanged.bind(this)); //监听攻击速度改变
+        this.attackSpeedCalculator = new AttackSpeedCalculator(ModifierManager.getInstance());
     }
 
     private onAttackSpeedChanged(modifier: Modifier) {
-        
+        let entity = modifier.getOwner();
+        let attackComponent = entity.getComponent(AttackComponent);
+        if (attackComponent) {
+            const attackRate = this.attackSpeedCalculator.calculateFinalAttackRate(entity, attackComponent.getBaseAttackRate())
+            attackComponent.updateAttackRate(attackRate)
+        }
        
     }
 

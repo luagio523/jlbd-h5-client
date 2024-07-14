@@ -1,7 +1,7 @@
 import { BaseAbility } from "../ability/BaseAbility";
 import { AbilityBehavior } from "../enum/Type";
-import { AbilityIndicator, DefaultAbilityIndicator, NoTargetAbilityIndicator, PassiveAbilityIndicator, ToggleAbilityIndicator, UnitTargetAbilityIndicator } from "./AbilityIndicator";
-import { PointTargetAbilityIndicator } from "./TargetPointAbilityIndicator";
+import { AbilityIndicator, DefaultAbilityIndicator, NoTargetAbilityIndicator, PassiveAbilityIndicator, ToggleAbilityIndicator, UnitTargetAbilityIndicator } from "../indicator/AbilityIndicator";
+import { PointTargetAbilityIndicator } from "../indicator/TargetPointAbilityIndicator";
 
 export class AbilityIndicatorFactory {
     static createIndicator(ability: BaseAbility): AbilityIndicator {
