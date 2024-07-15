@@ -1,3 +1,3 @@
-export const enum  Event {
+export const enum  MapEvent {
     MAP_DATA_INIT  = "MAP_DATA_INIT"
 }

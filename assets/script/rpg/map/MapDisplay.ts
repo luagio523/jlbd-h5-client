@@ -1,42 +1,38 @@
 import { Node, Vec2, tween, log, _decorator, Vec3, TiledMap } from "cc";
-import { GameMap, MapType } from "./GameMap";
+import { GameMap } from "./GameMap";
 import { MapVisualizer } from "./MapVisualizer";
 import { TrackLookAt } from "./TrackLookAt";
 const { ccclass, property } = _decorator;
 
 
-interface MapTweenOptions {
+export interface MapTweenOptions {
     time?: number;
     callback?: Function;
 }
 
 
-
-export class MapDisplayLayer extends Node {
+export class MapDisplay extends Node {
 	private gameMap: GameMap;
 	private mapVisualizer: MapVisualizer;
 	private trackLookAt: TrackLookAt;
 	private lastLookAt:Vec2 = new Vec2(0,0);
 	private offset:Vec2 = new Vec2(0,0);
 	private mapNode: Node = new Node("mapNode");
-
-	constructor(gameMap: GameMap) {
-		super();
-		this.gameMap = gameMap;
-		this.init();
-	}
-
+	
 	    /**
      * 初始化地图层
      */
-    public init() {
+    public init(gameMap: GameMap) {
+		this.gameMap = gameMap;
         this.addChild(this.mapNode = new Node());
-        this.mapNode.addComponent(TiledMap);
+		this.mapNode.addComponent(TiledMap)
         this.addChild(this.mapVisualizer = new MapVisualizer());
         this.trackLookAt = new TrackLookAt(0.2); // 每0.2秒检测下跟踪player
-		// this.changeMap();
     }
 
+	public getTiledMap():TiledMap{
+		return this.mapNode.getComponent(TiledMap);
+	}
 	
 	public takeLookAt(position:Vec2,option?:MapTweenOptions): void {
 		if (this.lastLookAt.equals(position)) return ;
@@ -64,27 +60,18 @@ export class MapDisplayLayer extends Node {
 	public changeMap(): void {
 		log("Change map for");
 		this.off(Node.EventType.TRANSFORM_CHANGED);
-		if (this.gameMap.mapType !== MapType.SLICE) {
+	
+		this.mapVisualizer.active = true;
+		this.mapNode.active = false;
 
-			this.mapVisualizer.active = false;
-			this.mapNode.active = true;
-
-			this.updateTileMap();
-			this.centerViewOnMap();
-		} else {
-			this.mapVisualizer.active = true;
-			this.mapNode.active = false;
-
-			this.on(Node.EventType.TRANSFORM_CHANGED, () => {
-				this.updateHDMap();
-			});
-
-			
-			this.calculateOffset();
-			this.adjustMapView();
-			this.updateMapImage(this.gameMap.getFileName());
-			this.centerViewOnMap();
-		}
+		this.on(Node.EventType.TRANSFORM_CHANGED, () => {
+			this.updateHDMap();
+		});
+		
+		this.calculateOffset();
+		this.adjustMapView();
+		this.updateMapImage(this.gameMap.getFileName());
+		this.centerViewOnMap();
 	}
 
 	private calculateOffset(): void {
@@ -104,9 +91,6 @@ export class MapDisplayLayer extends Node {
 		this.takeLookAt(new Vec2(this.gameMap.maxWidth / 2, this.gameMap.maxHeight / 2));
 	}
 
-	private updateTileMap(): void {
-		this.mapNode.setPosition(this.gameMap.maxWidth >> 1, this.gameMap.maxHeight >> 1);
-	}
 
 	private updateMapImage(mapName: string): void {
 		this.mapVisualizer.setLastUpdate(this.position.x, this.position.y);

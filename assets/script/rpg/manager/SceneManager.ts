@@ -1,14 +1,10 @@
-
 import { Color, Graphics, Node, Rect, Vec2 } from "cc";
-import { MapDisplayLayer } from "../map/MapDisplayLayer";
-import { GameMap } from "../map/GameMap";
-import EntityLayer from "../map/EntityLayer";
+
 
 export enum LayerType {
-    MapLayer,
-    DropLayer,
-    EntityLayer,
-    EffectLayer
+    Map,
+    Drop,
+    Entity,
 }
 
 export class SceneManager {
@@ -28,19 +24,18 @@ export class SceneManager {
 
     public initLayers(root: Node): void {
         this.rootNode = root;
-
-        this.addLayer(LayerType.MapLayer, new MapDisplayLayer(GameMap.ins()));
-        this.addLayer(LayerType.DropLayer, new Node());
-        this.addLayer(LayerType.EntityLayer, new EntityLayer());
-        this.addLayer(LayerType.EffectLayer, new Node());
+        this.createLayer(LayerType.Map);
+        this.createLayer(LayerType.Drop);
+        this.createLayer(LayerType.Entity);
     }
 
-    private addLayer(type: LayerType, layer: Node): void {
+    private createLayer(type: LayerType): void {
+        const layer = new Node();
         layer.name = LayerType[type];
         this.rootNode.addChild(layer);
         this.layers.set(type, layer);
     }
-
+ 
     public addToLayer(type: LayerType, node: Node): void {
         const layer = this.layers.get(type);
         if (layer) {
@@ -53,7 +48,7 @@ export class SceneManager {
     private getDrawGraphics(): Graphics {
         if (!this.graphics) {
             const node = new Node();
-            this.addToLayer(LayerType.DropLayer, node);
+            this.addToLayer(LayerType.Drop, node);
             node.setSiblingIndex(1);
             this.graphics = node.addComponent(Graphics);
         }
@@ -66,13 +61,8 @@ export class SceneManager {
         graphics.strokeColor = color;
         graphics.lineWidth = 6;
 
-        points.forEach((point, index) => {
-            if (index === 0) {
-                graphics.moveTo(point.x, point.y);
-            } else {
-                graphics.lineTo(point.x, point.y);
-            }
-        });
+        graphics.moveTo(points[0].x, points[0].y);
+        points.slice(1).forEach(point => graphics.lineTo(point.x, point.y));
 
         graphics.stroke();
     }

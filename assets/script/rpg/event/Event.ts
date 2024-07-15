@@ -137,7 +137,11 @@ export class AbilityEndEvent implements IEvent {
 
 
 
-
+export class EnterMapEvent implements IEvent {
+    public readonly type = Event.EnterMap
+    constructor(
+    ) {}
+}
 
 
 
@@ -154,4 +158,6 @@ export  enum  Event {
     CastAbility = "CastAbility",
     AbilityStart = "AbilityStart",
     AbilityEnd = "AbilityEnd",
+
+    EnterMap = "EnterMap",
 }

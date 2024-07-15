@@ -3,6 +3,7 @@ import { Node, Vec2, Size } from "cc";
 import { ResPathUtil } from "./ResPathUtil";
 import Thumbnail from "./Thumbnail";
 import TileImage from "./TileImage";
+import app from "../../App";
 
 
 export class MapVisualizer extends Node {
@@ -43,6 +44,7 @@ export class MapVisualizer extends Node {
   }
 
   private setupThumbnail(mapName: string,width: number, height: number): void {
+    app.log.logView({mapName,width, height}, ``);
     this.thumbnail.setSize(width, height);
     this.thumbnail.setPosition(width / 2, height / 2);
     this.thumbnail.source = ResPathUtil.GetMapThumbnailPath(mapName);

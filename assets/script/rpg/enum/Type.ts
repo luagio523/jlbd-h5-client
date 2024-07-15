@@ -119,3 +119,4 @@ export enum EntityType {
     // 可以根据需要添加更多实体类型
 }
 
+

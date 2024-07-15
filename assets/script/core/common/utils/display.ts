@@ -1,163 +1,125 @@
-import { Vec2, view } from "cc"
-import { MathUtil } from "./MathUtil"
+import { Vec2, view, Screen, sys, Size } from "cc";
+import { MathUtil } from "./MathUtil";
 
 /**
- * 兼容cocos display
+ * 兼容 Cocos Creator 3.6 的显示适配工具类
  */
-export default class display{
-    /////////////////////////////////////设计分辨率//////////////////////////////////////////////
-    private static  _width:any
-    public static get width():number{
-        if(!this._width){
-            this._width = winSize.width
+export default class Display {
+    private static _instance: Display;
+    private _designSize: Size;
+    private _frameSize: Size;
+    private _adaptRect: { width: number; height: number; x: number; y: number };
+    private _adaptCenter: Vec2;
+    private _maxDistance: number;
+
+    private constructor() {
+        this._designSize = view.getDesignResolutionSize();
+        this._frameSize = Screen.windowSize;
+        this._adaptRect = { width: this._designSize.width, height: this._designSize.height, x: 0, y: 0 };
+        this._adaptCenter = new Vec2(this._adaptRect.width / 2, this._adaptRect.height / 2);
+        this._maxDistance = MathUtil.getDistance(0, 0, this._adaptRect.width, this._adaptRect.height);
+    }
+
+    public static getInstance(): Display {
+        if (!Display._instance) {
+            Display._instance = new Display();
         }
-        return this._width
-    }
-    private static  _height:any
-    public static get height():number{
-        if(!this._height){
-            this._height = winSize.height
-        }
-        return this._height
+        return Display._instance;
     }
 
-    private static  _center:Vec2
-    public static get center():Vec2{
-        if(!display._center){
-            display._center = new Vec2(display.width/2, display.height/2)
-        }
-        return display._center
+    public get width(): number {
+        return this._designSize.width;
     }
 
-    public static get viewWidth():number {
-        return view.getFrameSize().width;
+    public get height(): number {
+        return this._designSize.height;
     }
 
-    public static get viewHeight():number {
-        return view.getFrameSize().height;
-    }
-    ////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * 更新适配
-     * @param adaptRect 
-     */
-    public static resetAdapt(adaptRect){
-        display._adaptWidth = adaptRect.width; //设置adaptWidth
-        display._adaptHeight = adaptRect.height;//设置 adaptHeight
-        display._skewX = adaptRect.x
-        display._skewY = adaptRect.y
-        display._adaptCenter = new Vec2(display.adaptWidth/2,display.adaptHeight/2)
-
-        display._adaptScaleX = adaptRect.width / display.width;
-        display._adaptScaleY = adaptRect.height / display.height;
-
-        display._maxDistance = MathUtil.getDistance(0, 0, display._adaptWidth, display._adaptHeight);
-
-        this._baseX = display._skewX;
-        this._baseY = display._skewY;
-        this._maxX = display._adaptWidth + display._skewX;
-        this._maxY = display._adaptHeight + display._skewY;
+    public get center(): Vec2 {
+        return new Vec2(this.width / 2, this.height / 2);
     }
 
-    //////////////////////////////////////////////适配之后///////////////////////////////////////////////////
-
-    private static _baseX:number;
-    public static get baseX() {
-        return this._baseX;
-    }
-    private static _baseY:number;
-    public static get baseY() {
-        return this._baseY;
-    }
-    private static _maxX:number;
-    public static get maxX() {
-        return this._maxX;
-    }
-    private static _maxY:number;
-    public static get maxY() {
-        return this._maxY;
+    public get viewWidth(): number {
+        return this._frameSize.width;
     }
 
-    private static _adaptWidth:any
-    public static set adaptWidth(value) {
-        this._adaptWidth = value
-    }
-    public static get adaptWidth() {
-        return this._adaptWidth || this.width;
+    public get viewHeight(): number {
+        return this._frameSize.height;
     }
 
-    private static _adaptHeight:any
-    public static set adaptHeight(value) {
-        this._adaptHeight = value
-    }
-    public static get adaptHeight() {
-        return this._adaptHeight|| this.height;
+    public resetAdapt(adaptRect: { width: number; height: number; x: number; y: number }): void {
+        this._adaptRect = adaptRect;
+        this._adaptCenter = new Vec2(adaptRect.width / 2, adaptRect.height / 2);
+        this._maxDistance = MathUtil.getDistance(0, 0, adaptRect.width, adaptRect.height);
     }
 
-    
-
-    private static  _adaptCenter:Vec2
-    public static get adaptCenter():Vec2{
-        if(!display._adaptCenter){
-            display._adaptCenter = new Vec2(display.adaptWidth/2,display.adaptHeight/2)
-        }
-        return display._adaptCenter
+    public get baseX(): number {
+        return this._adaptRect.x;
     }
 
-    
-    /**坐标 映射 X方向*/
-    private static _adaptScaleX:any
-    public static get scaleX() {
-        if(!this._adaptScaleX){
-            this._adaptScaleX = this.adaptWidth / this.width;
-        }
-        return this._adaptScaleX
+    public get baseY(): number {
+        return this._adaptRect.y;
     }
 
-    /**坐标 映射 Y方向*/
-    private static _adaptScaleY:any
-    public static get scaleY() {
-        if(!this._adaptScaleY){
-            this._adaptScaleY = this.adaptHeight / this.height;
-        }
-        return this._adaptScaleY
+    public get maxX(): number {
+        return this._adaptRect.width + this._adaptRect.x;
     }
 
-    /**实际屏幕偏移坐标 */
-    private static _skewX:any
-    public static set skewX(value) {
-        this._skewX = value
-    }
-    public static get skewX() {
-        if(!this._skewX) {
-            this._skewX = (this.width - this.adaptWidth) / 2;
-        }
-        return this._skewX
+    public get maxY(): number {
+        return this._adaptRect.height + this._adaptRect.y;
     }
 
-    /**实际屏幕偏移坐标 */
-    private static _skewY:any
-    public static set skewY(value) {
-        this._skewY = value
-    }
-    public static get skewY() {
-        if(!this._skewY) {
-            this._skewY = (this.height - this._adaptHeight) / 2;
-        }
-        return this._skewY
+    public get adaptWidth(): number {
+        return this._adaptRect.width;
     }
 
-    private static _maxDistance:number;
-    public static get maxDistance():number {
+    public get adaptHeight(): number {
+        return this._adaptRect.height;
+    }
+
+    public get adaptCenter(): Vec2 {
+        return this._adaptCenter;
+    }
+
+    public get scaleX(): number {
+        return this.adaptWidth / this.width;
+    }
+
+    public get scaleY(): number {
+        return this.adaptHeight / this.height;
+    }
+
+    public get skewX(): number {
+        return this._adaptRect.x;
+    }
+
+    public get skewY(): number {
+        return this._adaptRect.y;
+    }
+
+    public get maxDistance(): number {
         return this._maxDistance;
     }
 
-    private static _adaptOffset:number=20;
-    public static get AdaptOffset():number {
+    private _adaptOffset: number = 20;
+    public get adaptOffset(): number {
         return this._adaptOffset;
     }
-    public static set AdaptOffset(val) {
+    public set adaptOffset(val: number) {
         this._adaptOffset = Math.max(val, 20);
     }
 
+    // 新增方法：获取安全区域
+    public getSafeArea(): { top: number; bottom: number; left: number; right: number } {
+        if (sys.platform === sys.Platform.MOBILE_BROWSER || sys.platform === sys.Platform.ANDROID || sys.platform === sys.Platform.IOS) {
+            const safeArea = sys.getSafeAreaRect();
+            return {
+                top: safeArea.y,
+                bottom: this.viewHeight - (safeArea.y + safeArea.height),
+                left: safeArea.x,
+                right: this.viewWidth - (safeArea.x + safeArea.width)
+            };
+        }
+        return { top: 0, bottom: 0, left: 0, right: 0 };
+    }
 }

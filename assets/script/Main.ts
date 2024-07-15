@@ -10,7 +10,11 @@ import { oops } from './core/Oops';
 import { Root } from './core/Root';
 import { UIManager } from './core/ui/UIManager';
 import { UI_CONFIG } from './config/UIConfig';
-
+import { MapDisplay } from './rpg/map/MapDisplay';
+import { GameMap,MapType } from './rpg/map/GameMap';
+import MapManager from './rpg/manager/MapManager';
+import { EventListenerManager } from './rpg/event/EventListenerManager';
+import { Event } from './rpg/event/Event';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -30,9 +34,24 @@ export class Main extends Root {
     }
 
     protected initGUI() {
+        
+        // oops.gui = new UIManager(oops.facade)
+        // oops.gui.initialize(UI_CONFIG);
 
-        oops.gui = new UIManager(oops.facade)
-        oops.gui.initialize(UI_CONFIG);
+       
+        
+        let display = new MapDisplay();
+        oops.game.root.addChild(display);
+
+        MapManager.getInstance().initMapDisplay(display);
+
+        MapManager.getInstance().enterMap("map004");
+
+        EventListenerManager.getInstance().registerListener(Event.EnterMap, function (event) {
+            console.log("enter map", event);     
+            
+            display.changeMap();
+        });
     }
 
    

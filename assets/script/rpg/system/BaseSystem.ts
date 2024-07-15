@@ -13,7 +13,7 @@ export class BaseSystem extends ECSSystem{
     }
     /******************直接触发的事件*********************** */
     protected fireEvent(event: IEvent): void {
-        EventListenerManager.getInstance().dispatchEvent(event.type,event);
+        EventListenerManager.getInstance().dispatchEvent(event);
     }
 
     protected listenEvent(eventType: string, listener: (event: IEvent) => void): void {

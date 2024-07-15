@@ -1,4 +1,4 @@
-import { Node, Sprite, SpriteFrame,  assetManager, log } from "cc";
+import { Node, Sprite, SpriteFrame,  assetManager, log, resources } from "cc";
 import { EventDispatcher } from "../../core/common/event/EventDispatcher";
 import { ListenerFunc } from "../../core/common/event/EventMessage";
 
@@ -17,22 +17,20 @@ import { ListenerFunc } from "../../core/common/event/EventMessage";
     }
 
     public set source(url:string){
-        assetManager.loadBundle(url, SpriteFrame,  (err, bundle)=> {
-            if (err != null) {
-                console.log(err);
-                return;
-            }
-        
-            bundle.load(url, SpriteFrame, (err, spFrame) => {
-                if (err != null) {
-                    console.log(err);
-                    return;
-                }
-                // 使用加载的SpriteFrame
-                this.renderSprite.spriteFrame = spFrame;
-                this.eventDispatcher.dispatchEvent( "Complete");
-            });
-        });
+        log(`Thumbnail load ${url}`)
+
+        // resources.load(url, SpriteFrame,  (err, spFrame)=> {
+        //     if (err != null) {
+        //         console.log(err);
+        //         return;
+        //     }
+        //     // 使用加载的SpriteFrame
+        //     this.renderSprite.spriteFrame = spFrame;
+        //     this.eventDispatcher.dispatchEvent( "Complete");
+        // });
+
+
+      
     }
 
     public addEventListener(eventName:string,listener:ListenerFunc){

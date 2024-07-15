@@ -41,7 +41,7 @@ export class HeroData extends DataReader{
     protected talents: string[];
 
 
-    protected parseFromData(data: any): void {
+    public deserialize(data: any): void {
         this.heroName = data.HeroName;
         this.heroId = data.HeroID;
         this.team = data.Team;

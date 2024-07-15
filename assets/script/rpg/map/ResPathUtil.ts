@@ -17,7 +17,9 @@ export class ResPathUtil {
 	}
 	
 	public static GetMap(mapId:string){
-		return "map/"+mapId+"/"+mapId+".tmx"
+		return "map/"+mapId+"/"+mapId
+
+		// return "map/"+mapId+"/"+mapId+".tmx"
 	}
 
 

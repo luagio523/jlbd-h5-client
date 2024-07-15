@@ -1,107 +1,101 @@
-import { Rect, Texture2D, TiledLayer, TiledMap, TiledMapAsset, Vec2, log, resources, v2 } from "cc";
-import MapGrid from "./MapGrid";
-import { EventDispatcher } from "../../core/common/event/EventDispatcher";
-import { ListenerFunc } from "../../core/common/event/EventMessage";
-import { Event } from "./Event";
+import { Rect, Texture2D,  TiledMap, Vec2, log, v2 } from "cc";
 import { ResPathUtil } from "./ResPathUtil";
 import display from "../../core/common/utils/display";
+import TerrainMatrix from "./TerrainMatrix";
 
 export enum MapType {
     NONE = 0,
     SLICE = 1, // 切片地图
 }
 
+
+
 /**
  * 地图数据
  */
-export class GameMap extends EventDispatcher {
-    public static IMG_SIZE = 256; // 地图切割大小
-    public mapType: MapType = MapType.NONE; // 地图类型，默认为NONE
+export class GameMap  {
+
+    public static IMG_SIZE = 256;
+
     public MAP_PATH: string = "";
-    public mapID: string = "map005"; // 地图ID，默认为map005
-    public mapX: number = 0; // 地图X坐标
-    public mapY: number = 0; // 地图Y坐标
-    public cellSize: number; // 格子大小
-    public maxWidth: number; // 地图的最大宽度
-    public maxHeight: number; // 地图的最大高度
-    public col: number; // 地图的列数
-    public row: number; // 地图的行数
+    public mapID: string = "map004";
+    public mapX: number = 0;
+    public mapY: number = 0;
 
-    private static inst: GameMap;
 
-    private constructor() {
-        super();
+    //-----------------地图数据-----------------------------------
+    public cellSize: number;
+    public maxWidth: number;
+    public maxHeight: number;
+    public col: number;
+    public row: number;
+
+    public terrainMatrix:TerrainMatrix
+
+    public constructor() {
+        this.terrainMatrix = new TerrainMatrix();
     }
 
-    static ins(): GameMap {
-        if (!this.inst) {
-            this.inst = new GameMap();
+    public getMapPath(): string {
+        return ResPathUtil.GetMap( this.mapID);
+    }
+
+
+    private setTextureFilters(tileMap:TiledMap): void {
+        for (let frame of tileMap.tmxAsset?.spriteFrames ?? []) {
+            frame.texture.setFilters(Texture2D.Filter.NEAREST, Texture2D.Filter.NEAREST);
         }
-        return this.inst;
     }
 
-    /** 初始化 */
-    public init(mapType: MapType = MapType.NONE): void {
-        this.mapType = mapType;
-    }
-
-    public tileMap: TiledMap;
-
-    /** 更新数据 */
-    public async loadMap(mapID: string): Promise<void> {
+    public changeMap(mapID: string): void {
+        this.terrainMatrix.clear();     
         this.mapID = mapID;
-        const mapPath = ResPathUtil.GetMap(mapID);
-        try {
-            resources.load(mapPath, TiledMapAsset, (err, tiledMapAsset) => {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                this.tileMap.tmxAsset = tiledMapAsset;
-                for (let frame of this.tileMap.tmxAsset.spriteFrames) {
-                    frame.texture.setFilters(Texture2D.Filter.NEAREST, Texture2D.Filter.NEAREST);
-                }
-                this.handleMap(this.tileMap);
-            });
-        } catch (err) {
-            console.error(err);
-        }
     }
 
-    /** 解析流 */
-    public handleMap(tileMap: TiledMap): void {
-        const tileSize = tileMap.getTileSize();
-        const mapSize = tileMap.getMapSize();
-        this.cellSize = tileSize.width; // gridSize
-        this.maxWidth = mapSize.width * this.cellSize; // sizeWidth
-        this.maxHeight = mapSize.height * this.cellSize; // sizeHeight
-        this.col = mapSize.width; // col
-        this.row = mapSize.height; // row
-        log(tileSize, mapSize);
+    public initWithTiledMap(tiledMap: TiledMap): void {
 
-        let layers = this.tileMap.getLayers();
-        let collisionLayer: TiledLayer;
+        this.setTextureFilters(tiledMap);
 
-        if (this.mapType === MapType.NONE) {
-            collisionLayer = layers[layers.length - 1];
-        } else {
-            collisionLayer = tileMap.getLayer("road");
-            collisionLayer.node.parent = null;
-            collisionLayer.node.destroy();
+        const tileSize = tiledMap.getTileSize();
+        const mapSize = tiledMap.getMapSize();
+
+        log("initWithTiledMap",tileSize, mapSize);
+
+        this.cellSize = tileSize.width;
+        this.maxWidth = mapSize.width * this.cellSize;
+        this.maxHeight = mapSize.height * this.cellSize;
+        this.col = mapSize.width;
+        this.row = mapSize.height;
+
+        if(!this.terrainMatrix){
+            this.terrainMatrix = new TerrainMatrix();
         }
 
-        MapGrid.ins().initGrid(this.row, this.col, (x: number, y: number) => {
-            return collisionLayer.getTileGIDAt(x, this.row - y - 1); // 坐标系是左上角所以进行转换
+        // const layers = tiledMap.getLayers();
+        const roadLayer = tiledMap.getLayer("road");
+        if (roadLayer) {
+            roadLayer.node.parent = null;
+            roadLayer.node.destroy();
+        }
+  
+        this.terrainMatrix.initMatrix(this.row, this.col, (x: number, y: number) => {
+            return roadLayer.getTileGIDAt(x, this.row - y - 1);
         });
-
-        log("real enter map");
-        this.onComplete();
+       
     }
 
-    protected onComplete(): void {
-        this.dispatchEvent(Event.MAP_DATA_INIT);
-    }
-
+    // private getCollisionLayer(layers: TiledLayer[]): TiledLayer {
+    //     if (this.mapType === MapType.NONE) {
+    //         return layers[layers.length - 1];
+    //     } else {
+    //         const roadLayer = this.tileMap.getLayer("road");
+    //         if (roadLayer) {
+    //             roadLayer.node.parent = null;
+    //             roadLayer.node.destroy();
+    //         }
+    //         return roadLayer;
+    //     }
+    // }
 
     public mapWorldToMapNodePosition(worldPoint: Vec2, out: Vec2 = new Vec2()): Vec2 {
         const halfWidth = display.adaptWidth * 0.5;
@@ -113,40 +107,22 @@ export class GameMap extends EventDispatcher {
         return out;
     }
 
-
-    /**
-     * 获取格子点
-     * @param x 
-     * @param y 
-     * @returns 
-     */
     public getGridPoint(x: number, y: number): Vec2 {
         const tx = Math.floor(x / this.cellSize);
         const ty = Math.floor(y / this.cellSize);
         return v2(tx, ty);
     }
 
-    /**
-     * 转换左上角坐标系
-     * @param p 
-     */
     public transLPPoint(p: Vec2): void {
         p.y = this.maxHeight - p.y;
     }
 
-    /**
-     * 获取坐标像素点
-     * @param gridX 
-     * @param gridY 
-     * @returns 
-     */
     public getPixelPoint(gridX: number, gridY: number): Vec2 {
         const x = gridX * this.cellSize;
         const y = gridY * this.cellSize;
         return v2(x, y);
     }
 
-    // 地图坐标到像素坐标的转换
     public posToPixel(val: number): number {
         return val * this.cellSize;
     }
@@ -155,10 +131,6 @@ export class GameMap extends EventDispatcher {
         return Math.floor(val / this.cellSize);
     }
 
-    /**
-     * 像素矩形转换为格子矩形
-     * @param rect 
-     */
     public convertGDRect(rect: Rect): void {
         const left = Math.round(rect.x / this.cellSize);
         const right = Math.floor((rect.x + rect.width) / this.cellSize);
@@ -171,27 +143,15 @@ export class GameMap extends EventDispatcher {
         rect.yMax = up;
     }
 
-    /**
-     * 检查格子是否可走
-     * @param x X坐标
-     * @param y Y坐标
-     * @returns 返回是否可走
-     */
     public isWalkable(x: number, y: number): boolean {
         const sx = Math.floor(x / this.cellSize);
         const sy = Math.floor(y / this.cellSize);
         return this.checkWalkable(sx, sy);
     }
 
-    /**
-     * 检查格子是否不可移动
-     * @param gx x格子
-     * @param gy y格子
-     * @returns 返回是否可移动
-     */
     public checkWalkable(gx: number, gy: number): boolean {
-        const node = MapGrid.ins().getNodeAt(gx, gy);
-        return node ? node.walkable : false;
+        const node = this.terrainMatrix.getNodeAt(gx, gy);
+        return node?.walkable ?? false;
     }
 
     public getFileName(): string {
