@@ -1,392 +1,195 @@
-import { Asset, Node,  assetManager } from "cc";
-import { IAssetExpire, LRUCache } from "../../core/common/collection/LRUCache";
-import GameImage from "../../core/common/render/GameImage";
+export class MapDisplayLayer extends Node {
+    protected gameMap: GameMap;
 
-
-class AssetRelase implements IAssetExpire{
-    asset :Asset
-    public constructor(asset :Asset){
-        this.asset = asset
+    public constructor(gameMap: GameMap) {
+        super();
+        this.gameMap = gameMap;
     }
-    public onExpire(): void {
-        if(this.asset){
-            assetManager.releaseAsset(this.asset)  
+
+    private mapNode: Node;
+    private mapImage: MapVisualizer;
+
+    private offset: Vec2 = new Vec2(0, 0); // 由于图片的切割，可能有不足切割大小的图。
+
+    private lastLookX: number = Number.MAX_VALUE;
+    private lastLookY: number = Number.MAX_VALUE;
+
+    protected trackLookAt: TrackLookAt;
+
+    /**
+     * 初始化地图层
+     */
+    public init() {
+        this.addChild(this.mapNode = new Node());
+        this.mapNode.addComponent(TiledMap);
+        this.addChild(this.mapImage = new MapVisualizer());
+        this.trackLookAt = new TrackLookAt(0.2); // 每0.2秒检测下跟踪player
+    }
+
+    /**
+     * 获取瓦片地图组件
+     */
+    public get tileMap() {
+        return this.mapNode.getComponent(TiledMap);
+    }
+
+    /**
+     * 更新摄像机/视图位置
+     * @param dt 时间增量
+     */
+    public update(dt: number): void {
+        // 更新逻辑
+    }
+
+    /**
+     * 跟踪目标节点
+     * @param target 目标节点
+     */
+    public trackLookAtTarget(target: Node): void {
+        this.trackLookAt.lookAt(target, (callback) =>
+            this.syncViewWithTarget(target, 0.2, callback)
+        );
+    }
+
+    /**
+     * 使用缓动效果看向目标节点
+     * @param target 目标节点
+     * @param duration 缓动时间
+     */
+    public lookAtTargetWithTween(target: Node, duration: number = 0.2): void {
+        if (!target || duration <= 0) return;
+        if (!target.isValid) return;
+        this.syncViewWithTarget(target, duration);
+    }
+
+    /**
+     * 看向指定坐标点
+     * @param tx x坐标
+     * @param ty y坐标
+     */
+    public lookAtPoint(tx: number, ty: number): void {
+        if (tx == this.lastLookX && ty == this.lastLookY) {
+            return;
+        }
+        this.lastLookX = tx;
+        this.lastLookY = ty;
+
+        let p = new Vec2(tx, ty);
+        this.translateToMapCoordinates(p);
+        this.setPosition(p.x, p.y);
+    }
+
+    /**
+     * 同步视图与目标节点
+     * @param target 目标节点
+     * @param time 缓动时间
+     * @param callback 回调函数
+     */
+    public syncViewWithTarget(target: Node, time: number = 0.1, callback?: Function): Tween<Node> {
+        if (!target.isValid) return;
+
+        if (target.position.x == this.lastLookX && target.position.y == this.lastLookY) {
+            return;
+        }
+        this.lastLookX = target.position.x;
+        this.lastLookY = target.position.y;
+
+        let p = target.position;
+        this.translateToMapCoordinates(new Vec2(target.position.x, target.position.y));
+
+        return tween(<Node>this)
+            .to(time, { position: p })
+            .call(callback)
+            .start();
+    }
+
+    /**
+     * 将点转换为地图坐标
+     * @param point 点
+     */
+    private translateToMapCoordinates(point: Vec2): void {
+        point.x = -Math.min(Math.max(point.x - (display.adaptWidth >> 1), 0), this.gameMap.maxWidth - display.adaptWidth);
+        point.y = -Math.min(Math.max(point.y - (display.adaptHeight >> 1), 0), this.gameMap.maxHeight - display.adaptHeight);
+    }
+
+    /**
+     * 切换地图
+     */
+    public changeMap() {
+        log("Change map for");
+        this.off(Node.EventType.TRANSFORM_CHANGED);
+        // 提早返回的策略减少条件嵌套
+        if (this.gameMap.mapType !== MapType.SLICE) {
+            this.updateTileMap();
+            this.centerViewOnMap();
+            return;
+        } else { // 对于地图切块的
+            this.calculateOffset(); // 计算偏移的函数
+            this.adjustMapView(); // 调整地图视图的函数
+            this.updateMapImage(this.gameMap.getFileName());
+            this.centerViewOnMap(); // 中心视图到地图的函数
         }
     }
-}
 
-export default class TileImage extends GameImage {
-    static lruCache:LRUCache<String,AssetRelase> = new LRUCache<string,AssetRelase>(24)
-    public addTo(node:Node){
-        if(!this.parent){
-            node.addChild(this)
+    /**
+     * 计算偏移值
+     */
+    private calculateOffset() {
+        const remainderX = this.gameMap.maxWidth % GameMap.IMG_SIZE;
+        const remainderY = this.gameMap.maxHeight % GameMap.IMG_SIZE;
+        this.offset.x = remainderX > 0 ? GameMap.IMG_SIZE - remainderX : 0;
+        this.offset.y = remainderY > 0 ? GameMap.IMG_SIZE - remainderY : 0;
+    }
+
+    /**
+     * 调整地图视图
+     */
+    private adjustMapView() {
+        this.mapImage.setPosition(this.mapImage.position.x, -this.offset.y); // 切图导致的偏移 不满256的图 视觉上对y轴有影响（多出的黑块区）。不会影响地图本身
+    }
+
+    /**
+     * 中心视图到地图
+     */
+    private centerViewOnMap() {
+        // 首次加载地图时的视图定位
+        this.lookAtPoint(this.gameMap.mapX, this.gameMap.mapY);
+    }
+
+    /**
+     * 直接更新tileMap地图
+     */
+    private updateTileMap() {
+        this.mapImage.active = false;
+        this.mapNode.active = true;
+        this.mapNode.setPosition(this.gameMap.maxWidth >> 1, this.gameMap.maxHeight >> 1);
+    }
+
+    /**
+     * 更新切片地图
+     * @param mapName 地图文件名
+     */
+    private updateMapImage(mapName: string) {
+        this.mapNode.active = false;
+        this.mapImage.active = true;
+        this.on(Node.EventType.TRANSFORM_CHANGED, () => {
+            this.updateHDMap();
+        });
+       
+		this.mapImage.setLastUpdate(this.position.x, this.position.y);
+        this.mapImage.render(this.gameMap.maxWidth, this.gameMap.maxHeight, GameMap.IMG_SIZE, mapName);
+        this.updateHDMap();
+    }
+
+    /**
+     * 更新高清地图
+     * @param force 是否强制更新
+     */
+    private updateHDMap(force: boolean = false) {
+        if (this.mapImage != null) {
+            this.mapImage.updateHDMap(this.position, force);
         }
-        TileImage.lruCache.access(this.url) //再次利用时,队列标记为新入
     }
-
-    public removeFromParent(): void { //地图过大的时候，需要释放一些资源
-        //一段时间不用
-        TileImage.lruCache.set(this.url,new AssetRelase(this.renderSprite.spriteFrame)) //移除时丢入 释放队列
-        super.removeFromParent()
-    }
-
-}
-
-import {   Node,  log } from "cc";
-import Thumbnail from "./Thumbnail";
-import { ResPathUtil } from "./ResPathUtil";
-import display from "../../core/common/utils/display";
-import TileImage from "./TileImage";
-
-export class MapRender extends Node {
-	lastUpdateX: number; //上一次更新的指定X
-	lastUpdateY: number; //上一次更新的指定Y
-	thumbnail: Thumbnail; //缩略图
-	_imageList: Array<Array<TileImage>>; //地图切片列表
-	_showMap: {[key:string]:TileImage};
-	isThumbnailComplete: boolean; //是否已经加载完缩略图
-	mapName: string  //地图名字
-	maxImagX: number; //地图最大的宽
-	maxImagY: number; //地图最大的高
-	imgSize:number // 切片尺寸
-
-	public constructor() {
-		super();
-		this.lastUpdateX = 0;
-		this.lastUpdateY = 0;
-		this._imageList = [];
-		this._showMap = {};
-		this.thumbnail = new Thumbnail;
-		this.addChild(this.thumbnail)
-		this.thumbnail.addEventListener("Complete", this.onThumbnailComplete.bind(this));
-	}
-
-
-	public destroy():boolean{
-		super.destroy()
-		this.thumbnail.removeEventListener("Complete");
-		this.removeAllChildren();
-		this._imageList.length = 0;
-		this._showMap ={}
-		return true
-	};
-
-	//在缩略图加载完成之后开始显示高清图
-	public onThumbnailComplete(e) {
-		this.isThumbnailComplete = true;
-		this.updateHDMap({ x: this.lastUpdateX, y: this.lastUpdateY }, true);
-		//显示遮罩
-	};
-
-	public render(w:number, h:number, mapName:string) {
-		if (this.mapName != mapName) {
-			this.isThumbnailComplete = false;
-			this.clearHDMap();
-		}
-		log("mapName :",this.mapName)
-		this.mapName = mapName;
-		this.thumbnail.setSize(w,h)
-		this.thumbnail.setPosition(w>>1,h>>1)
-
-		// // 清除图片显示
-		// 清除图片显示
-		for (let i = 0; i < this._imageList.length; i++) {
-			let row = this._imageList[i];
-			if (Array.isArray(row)) {
-				for (let j = 0; j < row.length; j++) {
-					let img = row[j];
-					if (img instanceof TileImage) { // 确保img确实是GameImage的实例
-						img.clear()
-					}
-				}
-			}
-		}
-		var imgSize = this.imgSize;
-		this.maxImagX = Math.ceil(w / imgSize);
-		this.maxImagY = Math.ceil(h / imgSize);
-		this.thumbnail.source = ResPathUtil.GetMapThumbnailPath(this.mapName)
-	};
-
-
-	public clearHDMap() {
-		for (const key in this._showMap) {
-			const image = this._showMap[key];
-			image.clear()
-		}
-	};
-
-
-	public updateHDMap(point: any, force: boolean = false) {
-		var IMG_SIZE = this.imgSize;
-		var threshold = IMG_SIZE / 4;
-		if (force || Math.abs(this.lastUpdateX - point.x) > threshold || Math.abs(this.lastUpdateY - point.y) > threshold) {
-			this.lastUpdateX = point.x;
-			this.lastUpdateY = point.y;
-			
-			if (!this.isThumbnailComplete) return;
-	
-			var ww = display.adaptWidth;
-			var hh = display.adaptHeight;
-	
-			var imgX = Math.max(Math.floor(-point.x / IMG_SIZE), 0);
-			var imgY = Math.max(Math.floor(-point.y / IMG_SIZE), 0);
-	
-			var imgXCount = Math.min(imgX + Math.ceil(ww / IMG_SIZE) + 1, this.maxImagX);
-			var imgYCount = Math.min(imgY + Math.ceil(hh / IMG_SIZE) + 1, this.maxImagY);
-
-
-
-			var imgX = Math.max(Math.floor(-point.x / IMG_SIZE), 0);
-			var imgY = Math.max(Math.floor(-point.y / IMG_SIZE), 0);
-
-			var imgXCount = imgX + Math.ceil(ww / IMG_SIZE) + 1;
-			var imgYCount = imgY + Math.ceil(hh / IMG_SIZE) + 1;
-
-			imgX = Math.min(imgX,this.maxImagX)
-			imgY = Math.min(imgY ,this.maxImagY)
-
-	
-			var furtureMap = {};
-			for (var i = imgX; i < imgXCount; i++) {
-				for (var j = imgY; j < imgYCount; j++) {
-					let sourceName = ResPathUtil.GetTileImagePath(this.mapName, i, this.maxImagY - j - 1); // 地图切割是按左上角坐标系
-					this._imageList[j] = this._imageList[j] || [];
-	
-					var s = this._imageList[j][i] || new TileImage();
-					s.setAnchor(0, 0);
-					s.source = sourceName;
-					s.setPosition(i * IMG_SIZE, j * IMG_SIZE);
-					
-					s.addTo(this)
-					
-					
-					this._imageList[j][i] = s;
-					furtureMap[sourceName] = s;
-				}
-			}
-	
-			// 删除不再可视的图片并从dom中移除
-			Object.keys(this._showMap)
-				.filter(key => !furtureMap[key])
-				.forEach(key => {
-					var image = this._showMap[key];
-					image.removeFromParent()
-					delete this._showMap[key];
-				});
-			this._showMap = furtureMap;
-		}
-	};
-
-
-}
-
-
-
-import display from "../../core/common/utils/display";
-import { MapRender } from "./MapRender";
-import { Color, Component, Graphics, Node, Rect, Sprite, TiledMap, Tween, Vec2, Vec3, _decorator, log, tween } from "cc";
-import EntityLayer from "./EntityLayer";
-import { GameMap, MapType } from "./GameMap";
-
-const { ccclass, property } = _decorator;
-
-class TrackLookAt{
-	private fixedDeltaTime: number; // 固定的时间步长
-    private accumulatedTime: number = 0; // 时间累积器
-
-	protected target:Node 
-	protected lastPos:Vec3
-	protected syncViewWithTarget:(callback:Function)=>Tween<Node> 
-	protected isTweening:boolean
-	protected tween:Tween<Node>
-	
-	public constructor(fixedDeltaTime:number = 0.2){
-		this.fixedDeltaTime = fixedDeltaTime
-	}
-
-	public update(dt:number){
-		if(!this.target) return 
-		if(this.isTweening) return 
-		this.accumulatedTime += dt;
-		if(this.accumulatedTime < this.fixedDeltaTime){
-			return 
-		}
-		this.accumulatedTime = 0 
-		if(!this.lastPos.equals(this.target.position)){
-			this.syncOnce()
-		}
-	}
-
-	private syncOnce(){
-		this.isTweening = true 
-		this.tween = this.syncViewWithTarget(()=>{
-			this.isTweening = false 
-		})
-	}
-
-	public lookAt(target:Node,sync:(callback:Function)=>Tween<Node>){
-		this.target = target 
-		this.lastPos = Vec3.ZERO
-		this.syncViewWithTarget = sync 
-		this.syncOnce() //直接触发一次
-	}
-
-}
-
-/**
- * 地图显示
- */
-export class MapLayer extends Node {
-	protected gameMap: GameMap
-	public constructor(gameMap: GameMap) {
-		super();
-		this.gameMap = gameMap
-	}
-
-	private _mapNode: Node;
-	private _mapImage: MapRender;
-	private _entityLayer: EntityLayer;
-
-	private offset: Vec2 = new Vec2(0, 0) //由于图片的切割 可能有不足切割大小的 图。
-
-	private lastLookX:number = Number.MAX_VALUE
-	private lastLookY:number = Number.MAX_VALUE 
-
-	protected trackLookAt:TrackLookAt
-
-
-	public init() {
-		this.addChild(this._mapNode = new Node)
-		this._mapNode.addComponent(TiledMap)
-
-		this.addChild(this._mapImage = new MapRender)
-		
-
-		this.trackLookAt = new TrackLookAt(0.2) //每0.2秒检测下跟踪player
-	};
-
-	public get tileMap() {
-		return this._mapNode.getComponent(TiledMap)
-	}
-
-	// 在update方法中更新摄像机/视图位置
-	public update(dt: number): void {
-
-	}
-
-	public trackLookAtTarget(target: Node): void {
-		this.trackLookAt.lookAt(target,(callback)=>
-			this.syncViewWithTarget(target,0.2,callback)
-		)
-	}
-
-	public lookAtTargetWithTween(target: Node, duration: number = 0.2): void {
-		if (!target || duration <= 0) return;
-		if (!target.isValid) return;
-		this.syncViewWithTarget(target,duration)
-	}
-
-	public lookAtPoint(tx: number, ty: number): void {
-		if(tx == this.lastLookX && ty == this.lastLookY){
-			return 
-		}
-		this.lastLookX = tx 
-		this.lastLookY  =ty
-
-		let p = new Vec2(tx,ty)
-		this.translateToMapCoordinates(p)
-		this.setPosition(p.x,p.y)
-	}
-	
-
-	public syncViewWithTarget(target:Node,time:number = 0.1,callback?:Function):Tween<Node>{
-		if(!target.isValid) return 
-
-		if(target.position.x == this.lastLookX && target.position.y == this.lastLookY){
-			return 
-		}
-		this.lastLookX =  target.position.x 
-		this.lastLookY  = target.position.y
-
-		let p = target.position
-		this.translateToMapCoordinates(new Vec2(target.position.x ,target.position.y))
-
-		return tween(<Node>this)
-			.to(time, { position: p })
-			.call(callback)
-			.start();
-	}
-
-	private translateToMapCoordinates(point: Vec2): void {
-		point.x = -Math.min(Math.max(point.x - (display.adaptWidth >> 1), 0), this.gameMap.maxWidth - display.adaptWidth);
-		point.y = -Math.min(Math.max(point.y - (display.adaptHeight >> 1), 0), this.gameMap.maxHeight - display.adaptHeight);
-	}
-
-	public changeMap() {
-		log("Change map for");
-		this.off(Node.EventType.TRANSFORM_CHANGED)
-		// 提早返回的策略减少条件嵌套
-		if (this.gameMap.mapType !== MapType.SLICE) {
-			this.updateTileMap();
-			this.centerViewOnMap();
-			return;
-		} else { //对于地图切块的
-			this.calculateOffset(); // 计算偏移的函数
-			this.adjustMapView(); // 调整地图视图的函数
-			this.updateMapImage(this.gameMap.getFileName());
-			this.centerViewOnMap(); // 中心视图到地图的函数
-		}
-	};
-
-	private calculateOffset() {
-		// 计算偏移值的逻辑
-		const remainderX = this.gameMap.maxWidth % GameMap.IMG_SIZE;
-		const remainderY = this.gameMap.maxHeight % GameMap.IMG_SIZE;
-		this.offset.x = remainderX > 0 ? GameMap.IMG_SIZE - remainderX : 0;
-		this.offset.y = remainderY > 0 ? GameMap.IMG_SIZE - remainderY : 0;
-	}
-
-	private adjustMapView() {
-		// 调整地图视图
-		this._mapImage.setPosition(this._mapImage.position.x, -this.offset.y); //切图导致的偏移 不满256的图 视觉上对y轴有影响（多出的黑块区）。不会影响地图本身
-	}
-
-	private centerViewOnMap() {
-		// 首次加载地图时的视图定位
-		this.lookAtPoint(this.gameMap.mapX, this.gameMap.mapY);
-	}
-
-	/**
-	 * 直接更新tileMap地图
-	 */
-	private updateTileMap() {
-		this._mapImage.active = false
-		this._mapNode.active = true
-		this._mapNode.setPosition(this.gameMap.maxWidth >> 1, this.gameMap.maxHeight >> 1)
-	}
-
-	/**
-	 * 更新切片地图
-	 * @param mapName 
-	 */
-	private updateMapImage(mapName: string) {
-		this._mapNode.active = false
-		this._mapImage.active = true
-		this.on(Node.EventType.TRANSFORM_CHANGED, () => {
-			this.updateHDMap();
-		})
-		this._mapImage.lastUpdateX = this.position.x
-		this._mapImage.lastUpdateY = this.position.y
-		this._mapImage.render(this.gameMap.maxWidth, this.gameMap.maxHeight, mapName);
-		this.updateHDMap();
-	}
-
-	private updateHDMap(force: boolean = false) {
-		if (this._mapImage != null) {
-			this._mapImage.updateHDMap(this, force);
-		}
-	}
-
 }
 
 
@@ -399,49 +202,47 @@ import { ResPathUtil } from "./ResPathUtil";
 
 export enum MapType {
     NONE = 0,
-    SLICE = 1,//切片地图
+    SLICE = 1, // 切片地图
 }
-
-
 
 /**
  * 地图数据
  */
-export class GameMap extends EventDispatcher{
-    public static IMG_SIZE = 256; //地图切割大小
-    public mapType: MapType = MapType.NONE; //地图类型，默认为NONE
-    public MAP_PATH: ""; 
-    public mapID: string = "map005"; //地图ID，默认为map005
-    public mapX: number = 0; //地图X坐标
-    public mapY: number = 0; //地图Y坐标
-    public cellSize: number; //格子大小
-    public maxWidth: number; //地图的最大宽度
-    public maxHeight: number; //地图的最大高度
-    public col: number; //地图的列数
-    public row: number; //地图的行数
+export class GameMap extends EventDispatcher {
+    public static IMG_SIZE = 256; // 地图切割大小
+    public mapType: MapType = MapType.NONE; // 地图类型，默认为NONE
+    public MAP_PATH: string = "";
+    public mapID: string = "map005"; // 地图ID，默认为map005
+    public mapX: number = 0; // 地图X坐标
+    public mapY: number = 0; // 地图Y坐标
+    public cellSize: number; // 格子大小
+    public maxWidth: number; // 地图的最大宽度
+    public maxHeight: number; // 地图的最大高度
+    public col: number; // 地图的列数
+    public row: number; // 地图的行数
 
-    private static inst:GameMap;
+    private static inst: GameMap;
 
-    static ins():GameMap
-    {
-        if(!this.inst)
-        {
+    private constructor() {
+        super();
+    }
+
+    static ins(): GameMap {
+        if (!this.inst) {
             this.inst = new GameMap();
         }
         return this.inst;
     }
 
     /** 初始化 */
-    public init(mapType: MapType = MapType.NONE) {
-        this.mapType = mapType
+    public init(mapType: MapType = MapType.NONE): void {
+        this.mapType = mapType;
+    }
 
-    };
-
-    public tileMap: TiledMap
-
+    public tileMap: TiledMap;
 
     /** 更新数据 */
-    public async loadMap(mapID: string) {
+    public async loadMap(mapID: string): Promise<void> {
         this.mapID = mapID;
         const mapPath = ResPathUtil.GetMap(mapID);
         try {
@@ -456,46 +257,44 @@ export class GameMap extends EventDispatcher{
                 }
                 this.handleMap(this.tileMap);
             });
-
         } catch (err) {
             console.error(err);
         }
-    };
-
-    /** 解析流 */
-    public handleMap(tileMap: TiledMap) {
-        let tileSize = tileMap.getTileSize()
-        let mapSize = tileMap.getMapSize()
-        this.cellSize = tileSize.width; //gridSize
-        this.maxWidth = mapSize.width * this.cellSize; //sizeWidth
-        this.maxHeight = mapSize.height * this.cellSize; //sizeHeight
-        this.col = mapSize.width; //col
-        this.row = mapSize.height; //row
-        log(tileMap.getTileSize(), tileMap.getMapSize())
-
-        if (this.mapType == MapType.NONE) {
-            let layers = this.tileMap.getLayers()
-            let collisionLayer = layers[layers.length - 1]
-            MapGrid.ins().initGrid(this.row, this.col, (x: number, y: number) => {
-                return collisionLayer.getTileGIDAt(x, this.row - y - 1) //坐标系是左上角所以进行转换
-            })
-
-        } else {
-            let collisionLayer: TiledLayer = tileMap.getLayer("road")
-            MapGrid.ins().initGrid(this.row, this.col, (x: number, y: number) => {
-                return collisionLayer.getTileGIDAt(x, this.row - y - 1) //坐标系是左上角所以进行转换
-            })
-            collisionLayer.node.parent = null
-            collisionLayer.node.destroy()
-        }
-        log("real enter map")
-        this.onComplete()
-    };
-
-    protected onComplete():void{
-        this.dispatchEvent(Event.MAP_DATA_INIT)
     }
 
+    /** 解析流 */
+    public handleMap(tileMap: TiledMap): void {
+        const tileSize = tileMap.getTileSize();
+        const mapSize = tileMap.getMapSize();
+        this.cellSize = tileSize.width; // gridSize
+        this.maxWidth = mapSize.width * this.cellSize; // sizeWidth
+        this.maxHeight = mapSize.height * this.cellSize; // sizeHeight
+        this.col = mapSize.width; // col
+        this.row = mapSize.height; // row
+        log(tileSize, mapSize);
+
+        let layers = this.tileMap.getLayers();
+        let collisionLayer: TiledLayer;
+
+        if (this.mapType === MapType.NONE) {
+            collisionLayer = layers[layers.length - 1];
+        } else {
+            collisionLayer = tileMap.getLayer("road");
+            collisionLayer.node.parent = null;
+            collisionLayer.node.destroy();
+        }
+
+        MapGrid.ins().initGrid(this.row, this.col, (x: number, y: number) => {
+            return collisionLayer.getTileGIDAt(x, this.row - y - 1); // 坐标系是左上角所以进行转换
+        });
+
+        log("real enter map");
+        this.onComplete();
+    }
+
+    protected onComplete(): void {
+        this.dispatchEvent(Event.MAP_DATA_INIT);
+    }
 
     /**
      * 获取格子点
@@ -503,21 +302,18 @@ export class GameMap extends EventDispatcher{
      * @param y 
      * @returns 
      */
-    public getGridPoint(x:number, y:number) {
-        let tx = Math.floor(x / this.cellSize)
-        let ty = Math.floor(y / this.cellSize)
-        return v2(tx, ty)
+    public getGridPoint(x: number, y: number): Vec2 {
+        const tx = Math.floor(x / this.cellSize);
+        const ty = Math.floor(y / this.cellSize);
+        return v2(tx, ty);
     }
 
     /**
      * 转换左上角坐标系
-     * @param x 
-     * @param y 
-     * @returns 
+     * @param p 
      */
-    public transLPPoint(p: Vec2) {
-        p.y = this.maxHeight - p.y
-        return
+    public transLPPoint(p: Vec2): void {
+        p.y = this.maxHeight - p.y;
     }
 
     /**
@@ -526,60 +322,46 @@ export class GameMap extends EventDispatcher{
      * @param gridY 
      * @returns 
      */
-    public getPixelPoint(gridX: number, gridY: number) {
-        let x = gridX * this.cellSize
-
-        let y = gridY * this.cellSize
-        return v2(x, y)
+    public getPixelPoint(gridX: number, gridY: number): Vec2 {
+        const x = gridX * this.cellSize;
+        const y = gridY * this.cellSize;
+        return v2(x, y);
     }
-
-
 
     // 地图坐标到像素坐标的转换
     public posToPixel(val: number): number {
-        return val * this.cellSize
+        return val * this.cellSize;
     }
 
     public pixelToPos(val: number): number {
-        return Math.floor(val / this.cellSize)
+        return Math.floor(val / this.cellSize);
     }
-
 
     /**
-   * 像素矩形转换为格子矩形
-   * @param rect 
-   */
-    public convertGDRect(rect: Rect) {
-        let left = rect.x
-        let right = rect.x + rect.width
-        let up = rect.y + rect.height
-        let bottom = rect.y
+     * 像素矩形转换为格子矩形
+     * @param rect 
+     */
+    public convertGDRect(rect: Rect): void {
+        const left = Math.round(rect.x / this.cellSize);
+        const right = Math.floor((rect.x + rect.width) / this.cellSize);
+        const up = Math.floor((rect.y + rect.height) / this.cellSize);
+        const bottom = Math.round(rect.y / this.cellSize);
 
-        left = Math.round(left / this.cellSize) //  math.round 可能好点
-        right = Math.floor((right) / this.cellSize)
-        up = Math.floor((up) / this.cellSize)
-        bottom = Math.round((bottom) / this.cellSize)
-
-
-        rect.xMin = left
-        rect.xMax = right
-        rect.yMin = bottom
-        rect.yMax = up
+        rect.xMin = left;
+        rect.xMax = right;
+        rect.yMin = bottom;
+        rect.yMax = up;
     }
 
-  
-
-
-    
     /**
      * 检查格子是否可走
      * @param x X坐标
      * @param y Y坐标
      * @returns 返回是否可走
      */
-    public isWalkable(x: number, y: number) {
-        var sx = Math.floor(x / this.cellSize);
-        var sy = Math.floor(y / this.cellSize);
+    public isWalkable(x: number, y: number): boolean {
+        const sx = Math.floor(x / this.cellSize);
+        const sy = Math.floor(y / this.cellSize);
         return this.checkWalkable(sx, sy);
     }
 
@@ -589,17 +371,151 @@ export class GameMap extends EventDispatcher{
      * @param gy y格子
      * @returns 返回是否可移动
      */
-    public checkWalkable(gx: number, gy:number) {
-        let node = MapGrid.ins().getNodeAt(gx, gy)
-        if (node) {
-            return node.walkable
-        }
-        return false
+    public checkWalkable(gx: number, gy: number): boolean {
+        const node = MapGrid.ins().getNodeAt(gx, gy);
+        return node ? node.walkable : false;
     }
 
+    public getFileName(): string {
+        return this.mapID;
+    }
+}
 
-    public getFileName() {
-        return this.mapID
-    };
 
+
+import { Node, log } from "cc";
+import Thumbnail from "./Thumbnail";
+import { ResPathUtil } from "./ResPathUtil";
+import display from "../../core/common/utils/display";
+import TileImage from "./TileImage";
+
+export class MapVisualizer extends Node {
+    private lastUpdateX: number; // 上一次更新的指定X
+    private lastUpdateY: number; // 上一次更新的指定Y
+    private thumbnail: Thumbnail; // 缩略图
+    private imageList: Array<Array<TileImage>>; // 地图切片列表
+    private showMap: { [key: string]: TileImage };
+    private isThumbnailComplete: boolean; // 是否已经加载完缩略图
+    private mapName: string; // 地图名字
+    private maxImagX: number; // 地图最大的宽
+    private maxImagY: number; // 地图最大的高
+    private imgSize: number; // 切片尺寸
+
+
+    public constructor() {
+        super();
+        this.lastUpdateX = 0;
+        this.lastUpdateY = 0;
+        this.imageList = [];
+        this.showMap = {};
+        this.thumbnail = new Thumbnail();
+        this.addChild(this.thumbnail);
+        this.thumbnail.addEventListener("Complete", this.onThumbnailComplete.bind(this));
+    }
+
+    public setLastUpdate(x: number, y: number): void {
+        this.lastUpdateX = x;
+        this.lastUpdateY = y;
+    }
+
+    public destroy(): boolean {
+        super.destroy();
+        this.thumbnail.removeEventListener("Complete");
+        this.removeAllChildren();
+        this.imageList = [];
+        this.showMap = {};
+        return true;
+    }
+
+    // 在缩略图加载完成之后开始显示高清图
+    public onThumbnailComplete(e: any): void {
+        this.isThumbnailComplete = true;
+        this.updateHDMap({ x: this.lastUpdateX, y: this.lastUpdateY }, true);
+        // 显示遮罩
+    }
+
+    public render(w: number, h: number, imgSize: number, mapName: string): void {
+        if (this.mapName !== mapName) {
+            this.isThumbnailComplete = false;
+            this.clearHDMap();
+        }
+        log("mapName :", this.mapName);
+        this.mapName = mapName;
+        this.thumbnail.setSize(w, h);
+        this.thumbnail.setPosition(w >> 1, h >> 1);
+
+        // 清除图片显示
+        for (let i = 0; i < this.imageList.length; i++) {
+            let row = this.imageList[i];
+            if (Array.isArray(row)) {
+                for (let j = 0; j < row.length; j++) {
+                    let img = row[j];
+                    if (img instanceof TileImage) { // 确保img确实是TileImage的实例
+                        img.clear();
+                    }
+                }
+            }
+        }
+
+        this.imgSize = imgSize; // 假设切片尺寸为256
+        this.maxImagX = Math.ceil(w / this.imgSize);
+        this.maxImagY = Math.ceil(h / this.imgSize);
+        this.thumbnail.source = ResPathUtil.GetMapThumbnailPath(this.mapName);
+    }
+
+    public clearHDMap(): void {
+        for (const key in this.showMap) {
+            const image = this.showMap[key];
+            image.clear();
+        }
+        this.showMap = {};
+    }
+
+    public updateHDMap(point: { x: number, y: number }, force: boolean = false): void {
+        const imgSize = this.imgSize;
+        const threshold = imgSize / 4;
+        if (force || Math.abs(this.lastUpdateX - point.x) > threshold || Math.abs(this.lastUpdateY - point.y) > threshold) {
+            this.lastUpdateX = point.x;
+            this.lastUpdateY = point.y;
+
+            if (!this.isThumbnailComplete) return;
+
+            const ww = display.adaptWidth;
+            const hh = display.adaptHeight;
+
+            let imgX = Math.max(Math.floor(-point.x / imgSize), 0);
+            let imgY = Math.max(Math.floor(-point.y / imgSize), 0);
+
+            let imgXCount = Math.min(imgX + Math.ceil(ww / imgSize) + 1, this.maxImagX);
+            let imgYCount = Math.min(imgY + Math.ceil(hh / imgSize) + 1, this.maxImagY);
+
+            const futureMap: { [key: string]: TileImage } = {};
+            for (let i = imgX; i < imgXCount; i++) {
+                for (let j = imgY; j < imgYCount; j++) {
+                    const sourceName = ResPathUtil.GetTileImagePath(this.mapName, i, this.maxImagY - j - 1); // 地图切割是按左上角坐标系
+                    this.imageList[j] = this.imageList[j] || [];
+
+                    let s = this.imageList[j][i] || new TileImage();
+                    s.setAnchor(0, 0);
+                    s.source = sourceName;
+                    s.setPosition(i * imgSize, j * imgSize);
+
+                    s.addTo(this);
+
+                    this.imageList[j][i] = s;
+                    futureMap[sourceName] = s;
+                }
+            }
+
+            // 删除不再可视的图片并从dom中移除
+            Object.keys(this.showMap)
+                .filter(key => !futureMap[key])
+                .forEach(key => {
+                    const image = this.showMap[key];
+                    image.removeFromParent();
+                    delete this.showMap[key];
+                });
+            this.showMap = futureMap;
+        }
+    }
 }

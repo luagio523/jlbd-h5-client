@@ -1,61 +1,60 @@
-import { _decorator, Component, Node, Camera, Vec3, math } from 'cc';
+import { _decorator, Component, Node, Camera, Vec3, math, Tween } from 'cc';
 const { ccclass, property } = _decorator;
 const { clamp } = math;
 
-@ccclass('DelayedFollow')
-export class TrackLookAt extends Component {
+/**
+ * 跟踪目标的辅助类
+ */
+export class TrackLookAt {
+    private fixedDeltaTime: number; // 固定的时间步长
+    private accumulatedTime: number = 0; // 时间累积器
 
-    @property(Node)
-    target: Node = null;
+    protected target: Node;
+    protected lastPosition: Vec3;
+    protected syncViewWithTarget: (callback: Function) => Tween<Node>;
+    protected isTweening: boolean;
+    protected tween: Tween<Node>;
 
-    @property
-    followThreshold: number = 3.0;
+    public constructor(fixedDeltaTime: number = 0.2) {
+        this.fixedDeltaTime = fixedDeltaTime;
+    }
 
-    @property
-    followSpeed: number = 0.1;
-
-    @property
-    minX: number = -100;
-
-    @property
-    maxX: number = 100;
-
-    @property
-    minY: number = -100;
-
-    @property
-    maxY: number = 100;
-
-    private _camera: Camera = null;
-    private _tempVec3: Vec3 = new Vec3();
-
-    start () {
-        this._camera = this.getComponent(Camera);
-        if (!this._camera) {
-            console.error('Camera component not found on node.');
+    /**
+     * 更新跟踪逻辑
+     * @param dt 时间增量
+     */
+    public update(dt: number) {
+        if (!this.target) return;
+        if (this.isTweening) return;
+        this.accumulatedTime += dt;
+        if (this.accumulatedTime < this.fixedDeltaTime) {
+            return;
+        }
+        this.accumulatedTime = 0;
+        if (!this.lastPosition.equals(this.target.position)) {
+            this.syncOnce();
         }
     }
 
-    update (dt) {
-        if (this.target) {
-            const targetPos = this.target.worldPosition;
-            const cameraPos = this.node.worldPosition;
-            Vec3.subtract(this._tempVec3, targetPos, cameraPos);
+    /**
+     * 执行一次同步
+     */
+    private syncOnce() {
+        this.isTweening = true;
+        this.tween = this.syncViewWithTarget(() => {
+            this.isTweening = false;
+        });
+    }
 
-              // Add this line
-                // this._tempVec3.negative()//如果挂在 地图节点上 跟主角就运动相反
-
-            if (this._tempVec3.length() > this.followThreshold) {
-                this._tempVec3.normalize();
-                Vec3.scaleAndAdd(this._tempVec3, cameraPos, this._tempVec3, this.followSpeed * dt);
-
-                // Clamp camera position within boundaries
-                let x = clamp(this._tempVec3.x, this.minX, this.maxX);
-                let y = clamp(this._tempVec3.y, this.minY, this.maxY);
-                this._tempVec3.set(x, y, this._tempVec3.z);
-
-                this.node.setWorldPosition(this._tempVec3);
-            }
-        }
+    /**
+     * 设置跟踪目标
+     * @param target 目标节点
+     * @param sync 同步函数
+     */
+    public lookAt(target: Node, sync: (callback: Function) => Tween<Node>) {
+        this.target = target;
+        this.lastPosition = Vec3.ZERO;
+        this.syncViewWithTarget = sync;
+        this.syncOnce(); // 直接触发一次
     }
 }
