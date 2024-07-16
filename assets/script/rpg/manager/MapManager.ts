@@ -2,9 +2,8 @@ import { ImageAsset, Node, SpriteFrame, Texture2D, TiledMap, TiledMapAsset, log,
 import { GameMap } from "../map/GameMap";
 import { MapDisplay } from "../map/MapDisplay";
 import { EventDispatcher } from "../../core/common/event/EventDispatcher";
-import { MapEvent } from "../map/Event";
 import { EventListenerManager } from "../event/EventListenerManager";
-import { EnterMapEvent, Event } from "../event/Event";
+import { EnterMapEvent } from "../event/Event";
 import app from "../../App";
 
 export default class MapManager {
