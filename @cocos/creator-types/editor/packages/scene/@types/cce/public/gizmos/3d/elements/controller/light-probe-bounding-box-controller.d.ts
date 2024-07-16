@@ -1,5 +1,5 @@
 import { LightProbeGroup, Node, Vec3 } from 'cc';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import LightProbeEditModeListener from '../listener/light-probe-edit-mode-listener';
 import BoxController from './box-controller';
 import { TargetDelegate } from './light-probe-controller';

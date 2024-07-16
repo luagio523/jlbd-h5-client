@@ -2,7 +2,7 @@
 import ControllerBase from './controller-base';
 import { Color, LightProbeGroup, Node, Vec3 } from 'cc';
 import PositionGizmo from '../transform/position-gizmo';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import GizmoEventListener from '../listener/gizmo-event-listener';
 import LightProbeEditModeListener from '../listener/light-probe-edit-mode-listener';
 import GizmoOperationEventListener from '../listener/gizmo-operation-event-listener';

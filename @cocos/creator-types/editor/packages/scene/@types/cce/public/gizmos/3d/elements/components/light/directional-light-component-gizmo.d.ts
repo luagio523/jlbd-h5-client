@@ -1,8 +1,8 @@
 import Gizmo from '../../gizmo-base';
 declare class DirectionalLightComponentGizmo extends Gizmo {
-    private _lightGizmoColor;
     private _controller;
     private _frustumCtrl;
+    private _lightGizmoColor;
     init(): void;
     onShow(): void;
     onHide(): void;

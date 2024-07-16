@@ -1,6 +1,6 @@
 import TransformGizmo from './transform-gizmo';
 import { Node, Vec3 } from 'cc';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { ISceneKeyboardEvent } from '../../../../../../../@types/private';
 declare class ScaleGizmo extends TransformGizmo {
     private _localScaleList;

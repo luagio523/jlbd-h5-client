@@ -1,11 +1,10 @@
 import { Node, Vec3, Camera, Color } from 'cc';
-import ControllerBase from '../../../public/gizmos/3d/elements/controller/controller-base';
+import ControllerBase from '../../../public/gizmos/controller/base';
 export declare class PreviewWorldAxis extends ControllerBase {
     _sceneGizmoCamera: Camera;
     private _cameraOffset;
     private _textNodeMap;
     private synchronizeCamera;
-    shape: Node | null;
     constructor(rootNode: Node, synchronizeCamera: Camera);
     initShape(): void;
     private _hide;

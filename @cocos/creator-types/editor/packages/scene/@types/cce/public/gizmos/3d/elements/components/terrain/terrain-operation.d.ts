@@ -6,11 +6,11 @@ export declare class TerrainHeightData {
     value: number;
 }
 export declare class TerrainHeightOperation extends SceneUndoCommand {
-    protected _terrain?: Terrain;
+    protected _terrain: Terrain;
     constructor(terrain: Terrain);
     set terrain(terrain: Terrain);
     get terrain(): Terrain;
-    static addChangeList(changelist: TerrainBlock[], block: TerrainBlock): void;
+    static addChangeList(changeList: TerrainBlock[], block: TerrainBlock): void;
     data: TerrainHeightData[];
     push(x: number, y: number, value: number): void;
     apply(): void;
@@ -26,7 +26,7 @@ export declare class TerrainWeightData {
     value: Vec4;
 }
 export declare class TerrainLayerOperation {
-    protected _terrain?: Terrain;
+    protected _terrain: Terrain;
     protected _layers: [];
     constructor(terrain: Terrain);
     set terrain(terrain: Terrain);
@@ -40,11 +40,11 @@ export declare class TerrainLayerUndoRedo extends TerrainLayerOperation {
     redo(): void;
 }
 export declare class TerrainWeightOperation extends SceneUndoCommand {
-    protected _terrain?: Terrain;
+    protected _terrain: Terrain;
     constructor(terrain: Terrain);
     set terrain(terrain: Terrain);
     get terrain(): Terrain;
-    static addChangeList(changelist: TerrainBlock[], block: TerrainBlock): void;
+    static addChangeList(changeList: TerrainBlock[], block: TerrainBlock): void;
     data: TerrainWeightData[];
     push(x: number, y: number, value: Vec4): void;
     apply(): void;

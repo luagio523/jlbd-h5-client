@@ -1,9 +1,9 @@
 import Gizmo from '../../gizmo-base';
 import { Vec3 } from 'cc';
 declare class SphereColliderComponentGizmo extends Gizmo {
+    private _controller;
     private _radius;
     private _maxScale;
-    private _controller;
     private _propPath;
     init(): void;
     onShow(): void;

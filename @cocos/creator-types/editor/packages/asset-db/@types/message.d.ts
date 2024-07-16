@@ -1,4 +1,5 @@
-import { AssetInfo, QueryAssetsOption, AssetOperationOption, IAssetMeta, MissingAssetInfo } from './public';
+import { AssetInfo, QueryAssetsOption, AssetOperationOption, IAssetMeta, IAssetInfo } from './public';
+import { MissingAssetInfo } from '@editor/asset-db/libs/info';
 
 export interface message extends EditorMessageMap {
     'query-ready': {
@@ -125,9 +126,10 @@ export interface message extends EditorMessageMap {
         result: string | null,
     },
     'query-assets': {
-        params: [] | [
-            QueryAssetsOption,
-        ] | [QueryAssetsOption, string[]],
+        params: [
+            options?: QueryAssetsOption,
+            dataKeys?: (keyof IAssetInfo)[]
+        ],
         result: AssetInfo[],
     },
     'generate-available-url': {

@@ -1,4 +1,4 @@
-import { type } from "os";
+import { IDisplayOptions } from "./build-plugin";
 
 export type ITextureCompressType =
     | 'jpg'
@@ -44,9 +44,14 @@ export interface ITextureFormatConfig {
     childProcess?: boolean;
 }
 
+export interface ITextureCompressConfig {
+    name: string;
+    textureCompressConfig: PlatformCompressConfig;
+}
+
 export interface AllTextureCompressConfig {
-    // 平台的纹理压缩支持成都配置
-    platformConfig: Record<string, PlatformConfig>;
+    // 平台的纹理压缩支持配置
+    platformConfig: Record<string, ITextureCompressConfig>;
     // 所有支持的纹理压缩格式信息
     formatsInfo: Record<string, ITextureFormatInfo>;
     // 用户的自定义纹理压缩配置
@@ -57,7 +62,6 @@ export interface AllTextureCompressConfig {
     defaultSupport: ISupportFormat;
 
     textureFormatConfigs: Record<string, ITextureFormatConfig>;
-    formatsInfo: Record<string, ITextureFormatInfo>;
 }
 
 export interface UserCompressConfig {
@@ -69,15 +73,11 @@ export interface UserCompressConfig {
     userPreset: Record<string, {
         name: string;
         options: Record<string, Record<string, { quality: string | number}>>;
+        // 平台覆盖配置
+        overwrite?: Record<string, Record<string, { quality: string | number}>>;
     }>;
     genMipmaps: boolean;
 }
-
-export interface PlatformConfig {
-    name: string;
-    textureCompressConfig: PlatformCompressConfig;
-}
-
 
 export interface PlatformCompressConfig {
     platformType: ITextureCompressPlatform; // 注册的纹理压缩平台类型
@@ -119,9 +119,11 @@ export interface IConfigGroupsInfo {
     support: ISupportFormat,
     displayName: string;
     icon: string;
+    supportOverwrite?: boolean;
 }
 export type IConfigGroups = Record<ITextureCompressPlatform, IConfigGroupsInfo>;
 
 export type IPVRQuality = 'fastest' | 'fast' | 'normal' | 'high' | 'best';
 export type IETCQuality = 'slow' | 'fast';
 export type IASTCQuality = 'veryfast' | 'fast' | 'medium' | 'thorough' | 'exhaustive';
+export type ConfigType = 'options' | 'overwrite';

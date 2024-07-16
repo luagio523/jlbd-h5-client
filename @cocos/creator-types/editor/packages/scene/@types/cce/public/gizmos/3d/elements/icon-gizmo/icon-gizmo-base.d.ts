@@ -2,7 +2,7 @@ import GizmoBase from '../gizmo-base';
 import IconController from '../controller/icon-controller';
 import { IChangeNodeOptions } from '../../../../../../../@types/private';
 declare class IconGizmoBase extends GizmoBase {
-    protected _controller: IconController | null;
+    protected _controller: IconController;
     private _isIconGizmoVisible;
     /**
      * 用于控制选中某节点时是否隐藏icon

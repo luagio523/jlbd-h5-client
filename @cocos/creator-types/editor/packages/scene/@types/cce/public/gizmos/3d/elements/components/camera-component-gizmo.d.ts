@@ -1,5 +1,6 @@
 import Gizmo from '../gizmo-base';
 declare class CameraComponentGizmo extends Gizmo {
+    private _controller;
     private _fov;
     private _near;
     private _far;
@@ -8,7 +9,6 @@ declare class CameraComponentGizmo extends Gizmo {
     private _farHalfHeight;
     private _projection;
     private _fovAxis;
-    private _controller;
     private _onTargetResolutionChanged;
     init(): void;
     onShow(): void;

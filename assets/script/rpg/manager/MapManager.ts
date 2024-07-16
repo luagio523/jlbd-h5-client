@@ -75,22 +75,14 @@ export default class MapManager {
             app.log.logView({mapPath:mapPath},'loadTiledMapAsset');
             resources.load(`map/map004/small`, ImageAsset, (err, spFrame) => {
                 if (err) {
-                    console.error("Error loading sprite frame:", err);
+                    console.error("Error loading sprite ddframe:", err);
                     console.log("Attempted to load from path:", `map/map004/small`);
                     return;
                 }
                 log("Successfully loaded sprite frame");
                
             });
-            resources.load(`map/map004/small`, SpriteFrame, (err, spFrame) => {
-                if (err) {
-                    console.error("Error loading sprite frame:", err);
-                    console.log("Attempted to load from path:", `map/map004/small`);
-                    return;
-                }
-                log("Successfully loaded sprite frame");
-               
-            });
+          
 
         });
     }

@@ -1,10 +1,11 @@
 import ControllerBase from './controller-base';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Node } from 'cc';
 declare class TerrainController extends ControllerBase {
     private _quadNode;
     private _quadMR;
     private _size;
+    shape: Node;
     constructor(rootNode: Node, opts?: any);
     initShape(opts: any): void;
     onMouseDown(event: IControlMouseEvent): void;

@@ -1,5 +1,5 @@
 import ControllerBase from './controller-base';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Node, Vec3, Color, Quat } from 'cc';
 declare class EditableController extends ControllerBase {
     protected _editable: boolean;
@@ -25,7 +25,7 @@ declare class EditableController extends ControllerBase {
     setEditHandlesColor(color: Color): void;
     showEditHandles(): void;
     hideEditHandles(): void;
-    createEditHandle(handleName: string, color: Color): import("../../../defines").IHandleData;
+    createEditHandle(handleName: string, color: Color): import("../../../public/defines").IHandleData;
     initEditHandles(): void;
     _updateEditHandle(handleName: string): void;
     updateEditHandles(): void;

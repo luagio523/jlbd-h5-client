@@ -1,6 +1,6 @@
 import ControllerBase from './controller-base';
 import { Node, Vec3, Camera, Color, Texture2D } from 'cc';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 declare class WorldAxisController extends ControllerBase {
     private _defaultSize;
     private _sceneGizmoCamera;

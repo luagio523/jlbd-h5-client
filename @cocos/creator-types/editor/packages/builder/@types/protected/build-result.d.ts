@@ -79,6 +79,13 @@ export interface IBundleManager {
     runPluginTask(hookName: string): Promise<void>;
 }
 
+export class IBuildTemplate {
+    query(name: string): string | null;
+    initUrl(relativeUrl: string, name?: string): string | undefined;
+    copyTo(dest: string): Promise<void>;
+    findFile(dest: string): string | undefined;
+}
+
 export class InternalBuildResult {
     settings: ISettings;
 
@@ -94,7 +101,6 @@ export class InternalBuildResult {
     // 允许的自定义编译选项
     compileOptions?: any;
     staticsInfo: Record<string, any>;
-
     // addPlugin: (plugin: UUID) => void;
     // removePlugin: (plugin: UUID) => void;
 }
@@ -166,8 +172,9 @@ export class IBuilder {
     options: IInternalBuildOptions;
     bundleManager: IBundleManager;
     hooksInfo: IBuildHooksInfo;
+    buildTemplate: IBuildTemplate;
 
-    updateProcess: (message: string, increment?: number) => void;
+    updateProcess(message: string, increment?: number): void;
 }
 
 export interface IBuildHooksInfo {
@@ -182,12 +189,11 @@ export class IBundle {
     readonly scripts: UUID[]; // 该 bundle 中的所有参与编译的脚本（不包含插件脚本）
     readonly rootAssets: UUID[]; // 该 bundle 中的根资源，即直接放在 bundle 目录下的资源，包含重定向的资源
     readonly isSubpackage: boolean; // 该 bundle 是否是子包
-    pluginScript: Set<UUID>; // 插件脚本
     root: string; // bundle 的根目录, 开发者勾选的目录，如果是 main 包，这个字段为 ''
     dest: string; // bundle 的输出目录
     importBase: string;
     nativeBase: string;
-    scriptDest: string; // 脚本的输出目录
+    scriptDest: string; // 脚本的输出地址
     name: string; // bundle 的名称
     priority: number; // bundle 的优先级
     compressionType: BundleCompressionType; // bundle 的压缩类型
@@ -251,15 +257,4 @@ export interface IDefaultGroup {
     assetUuids: UUID[];
     scriptUuids: UUID[];
     jsonUuids: UUID[];
-}
-
-
-export interface BundleFilterConfig {
-    range: 'include' | 'exclude';
-    type: 'asset' | 'url';
-    patchOption?: {
-        patchType: 'glob' | 'beginWith' | 'endWith' | 'contain';
-        value: string;
-    };
-    assets?: string[];
 }

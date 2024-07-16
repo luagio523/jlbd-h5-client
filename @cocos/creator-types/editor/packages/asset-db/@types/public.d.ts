@@ -1,4 +1,57 @@
-import { IAssetInfo } from './protected';
+export interface IAssetMeta {
+    ver: string;
+    importer: string;
+    imported: boolean;
+    uuid: string;
+    files: string[];
+    subMetas: {
+        [index: string]: IAssetMeta;
+    };
+    userData: {
+        [index: string]: any;
+    };
+    displayName: string;
+    id: string;
+    name: string;
+}
+// 如果使用了 datakeys 过滤，请使用此接口定义
+export interface IAssetInfo {
+    name: string; // 资源名字
+    source: string; // url 地址
+    path: string; // loader 加载的层级地址
+    url: string; // loader 加载地址会去掉扩展名，这个参数不去掉
+    file: string; // 绝对路径
+    uuid: string; // 资源的唯一 ID
+    importer: string; // 使用的导入器名字
+    imported: boolean; // 是否结束导入过程
+    invalid: boolean; // 是否导入成功
+    type: string; // 类型
+    isDirectory: boolean; // 是否是文件夹
+    library: { [key: string]: string }; // 导入资源的 map
+
+    // dataKeys 作用范围
+    isBundle?: boolean; // 是否是文件夹
+    displayName?: string; // 资源用于显示的名字
+    readonly?: boolean; // 是否只读
+    visible?: boolean; // 是否显示
+    subAssets?: { [key: string]: IAssetInfo }; // 子资源 map
+    // 虚拟资源可以实例化成实体的话，会带上这个扩展名
+    instantiation?: string;
+    redirect?: IRedirectInfo; // 跳转指向资源
+    meta?: IAssetMeta,
+    fatherInfo?: any;
+    extends?: string[]; // 资源的继承链信息
+    mtime?: number; // 资源文件的 mtime
+    depends?: string[]; // 依赖的资源 uuid 信息
+    dependeds?: string[]; // 被依赖的资源 uuid 信息
+}
+
+export interface AssetOperationOption {
+    // 是否强制覆盖已经存在的文件，默认 false
+    overwrite?: boolean;
+    // 是否自动重命名冲突文件，默认 false
+    rename?: boolean;
+}
 
 // Basic information about the resource
 // 资源的基础信息
@@ -54,11 +107,14 @@ export interface IRedirectInfo {
 }
 
 export interface QueryAssetsOption {
-    pattern?: string;
-    ccType?: string;
-    extname?: string;
-    importer?: string;
-    isBundle?: boolean;
+    ccType?: string | string[], // 'cc.ImageAsset' 这类，多个用数组
+    isBundle?: boolean, // 筛选 asset bundle 信息，搜索子包只能与 pattern 选项共存
+    importer?: string | string[], // 导入名称，多个用数组
+    pattern?: string, // 路径匹配，globs 格式
+    extname?: string | string[], // 扩展名匹配，多个用数组
+
+    // 筛选一些符合 userData 配置的资源
+    userData?: Record<string, boolean | string | number>;
 }
 
 export interface AssetOperationOption {
@@ -93,21 +149,4 @@ export interface ExecuteAssetDBScriptMethodOptions {
     name: string;
     method: string;
     args?: any[];
-}
-
-export interface IAssetMeta {
-    ver: string;
-    importer: string;
-    imported: boolean;
-    uuid: string;
-    files: string[];
-    subMetas: {
-        [index: string]: IAssetMeta;
-    };
-    userData: {
-        [index: string]: any;
-    };
-    displayName: string;
-    id: string;
-    name: string;
 }

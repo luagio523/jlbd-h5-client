@@ -1,5 +1,6 @@
 import { Color, IVec3, Material, Node, Quat, Vec3 } from 'cc';
-import { IMeshPrimitive, IAddMeshToNodeOption, IAddQuadToNodeOptions, IAddLineToNodeOptions } from '../../../defines';
+import type { IAddMeshToNodeOption, IAddQuadToNodeOptions, IAddLineToNodeOptions } from '../../../public/defines';
+import { IMeshPrimitive } from '../../../public/defines';
 declare enum AxisName {
     x = "x",
     y = "y",

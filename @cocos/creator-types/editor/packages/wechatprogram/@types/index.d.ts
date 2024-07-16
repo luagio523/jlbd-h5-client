@@ -9,8 +9,6 @@ export type IOrientation = 'auto' | 'landscape' | 'portrait';
 export interface IOptions {
     appid: string;
     orientation: IOrientation;
-    wasm: 'js' | 'wasm' | boolean;
-    enabelWebGL2: 'off' | 'sameAsProjectSetting';
     globalVariable: string;
 }
 

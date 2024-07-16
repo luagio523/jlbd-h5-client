@@ -1,12 +1,12 @@
 import { Material, IMaterialInfo } from 'cc';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import GizmoBase from '../gizmo-base';
 declare class ReflectionProbeGizmo extends GizmoBase {
+    private _controller;
     static readonly SPHERE_NODE_NAME = "Reflection Probe Sphere";
     static readonly PLANE_NODE_NAME = "Reflection Probe Plane";
     private static _PLANE_PREFAB;
     private static _SPHERE_PREFAB;
-    private _controller;
     private _bbHalfSize;
     private _sphereMeshRenderer;
     private _planeMeshRenderer;

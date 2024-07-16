@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
-import GizmoOperationEventListener from '../gizmos/3d/elements/listener/gizmo-operation-event-listener';
+import GizmoOperationEventListener from '../gizmos/utils/gizmo-operation-event-listener';
 import GizmoSelectionLogic, { UUID } from './gizmo-selection-logic';
 import SimpleSet from '../gizmos/utils/set-util';
 /**

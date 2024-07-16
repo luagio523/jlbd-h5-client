@@ -14,7 +14,7 @@ export default class Display {
 
     private constructor() {
         this._designSize = view.getDesignResolutionSize();
-        this._frameSize = Screen.windowSize;
+        this._frameSize = view.getVisibleSize();
         this._adaptRect = { width: this._designSize.width, height: this._designSize.height, x: 0, y: 0 };
         this._adaptCenter = new Vec2(this._adaptRect.width / 2, this._adaptRect.height / 2);
         this._maxDistance = MathUtil.getDistance(0, 0, this._adaptRect.width, this._adaptRect.height);

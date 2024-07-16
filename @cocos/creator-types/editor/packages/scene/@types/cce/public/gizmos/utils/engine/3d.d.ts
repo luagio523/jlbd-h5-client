@@ -9,7 +9,7 @@ declare module 'cc' {
     }
 }
 import { Camera, Color, Component, geometry, gfx, IVec3Like, Light, math, MeshRenderer, ModelComponent, Node, primitives, Material, Mesh, Layers, physics } from 'cc';
-import { IAddMeshToNodeOption, ICreateMeshOption, IMeshPrimitive, DynamicMeshPrimitive } from '../../defines';
+import type { IAddMeshToNodeOption, ICreateMeshOption, IMeshPrimitive, DynamicMeshPrimitive } from '../defines';
 import EngineInterface from './engine-interface';
 export declare enum HighlightFace {
     NONE = 0,

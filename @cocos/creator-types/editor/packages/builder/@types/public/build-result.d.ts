@@ -111,6 +111,7 @@ export interface IJsonPathInfo extends IAssetPathBase {
 
 export interface IBuildPaths {
     dir: string; // 构建资源输出地址（ assets 所在的目录，并不一定与构建目录对应）
+    effectBin?: string; // effect.bin 输出地址
     settings: string; // settings.json 输出地址
     systemJs?: string; // system.js 生成地址
     engineDir?: string; // 引擎生成地址
@@ -122,8 +123,10 @@ export interface IBuildPaths {
     applicationJS: string; // application.js 的生成地址
     compileConfig?: string; // cocos.compile.config.json
     importMap: string; // import-map 文件地址
+    engineMeta: string; // 引擎构建结果的 meta 文件路径
 
     plugins: Record<string, string>;
+    hashedMap: Record<string, string>; // 用于记录被编辑器添加过 md5 hash 值的路径 map
 }
 
 export declare class IBuildResult {

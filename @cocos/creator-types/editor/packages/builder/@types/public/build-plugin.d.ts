@@ -17,7 +17,7 @@ export interface IBuildPluginProfile {
         options?: Record<string, Record<string, any>>;
         // id: options
         taskOptionsMap?: Record<string, any>;
-    }
+    };
     __version__: string;
 
     // 旧版本的数据格式，已废弃

@@ -26,7 +26,7 @@ declare class CameraController2D extends CameraControllerBase {
     _initGrid(): void;
     updateGrid(): void;
     set active(value: boolean);
-    _adjustToCenter(margin: number, contentBounds?: Rect | null, immediate?: boolean, forceScale?: number): void;
+    _adjustToCenter(marginPercentage: number, contentBounds?: Rect | null, immediate?: boolean, forceScale?: number): void;
     adjustCamera(immediate?: boolean): void;
     _updateGridData(positions: number[], colors: number[], lineColor: Color, lineEnd: number): void;
     _updateOrthoHeight(scale: number): void;

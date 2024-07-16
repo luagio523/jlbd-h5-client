@@ -1,10 +1,10 @@
 import Gizmo from '../gizmo-base';
 import ControllerBase from '../controller/controller-base';
 import { Node } from 'cc';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { ISceneKeyboardEvent } from '../../../../../../../@types/private';
 declare class TransformGizmo extends Gizmo {
-    protected _controller: ControllerBase | null;
+    protected _controller: ControllerBase;
     protected updateControllerTransform?(): void;
     constructor(target: any);
     onShow(): void;

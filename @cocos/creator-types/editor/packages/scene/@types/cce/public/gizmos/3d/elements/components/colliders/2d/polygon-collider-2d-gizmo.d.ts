@@ -1,7 +1,7 @@
 import GizmoBase from '../../../gizmo-base';
 import { Vec3 } from 'cc';
 import { IPolygonHandleData } from '../../../controller/polygon-controller';
-import { IControlMouseEvent } from '../../../../../../../../script/public/gizmos/defines';
+import type { IControlMouseEvent } from '../../../../../public/defines';
 import { ISceneKeyboardEvent } from '../../../../../../../../../@types/private';
 declare class PolygonCollider2DGizmo extends GizmoBase {
     private _controller;

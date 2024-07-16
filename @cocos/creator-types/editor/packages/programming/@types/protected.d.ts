@@ -1,3 +1,5 @@
+import { PluginScriptInfo } from '@editor/lib-programming/dist/executor'
+
 export interface SharedSettings {
     useDefineForClassFields: boolean;
     allowDeclareFields: boolean;
@@ -12,4 +14,15 @@ export interface SharedSettings {
         };
         url: string;
     };
+}
+
+export interface IPluginScriptInfo extends PluginScriptInfo {
+    url: string;
+}
+
+export interface FilterPluginOptions {
+    loadPluginInEditor?: boolean;
+    loadPluginInWeb?: boolean;
+    loadPluginInNative?: boolean;
+    loadPluginInMiniGame?: boolean;
 }

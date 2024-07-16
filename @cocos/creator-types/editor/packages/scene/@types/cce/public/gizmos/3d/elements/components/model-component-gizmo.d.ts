@@ -5,7 +5,7 @@ import { TargetDelegate } from '../controller/light-probe-controller';
 import LightProbeEditModeListener from '../listener/light-probe-edit-mode-listener';
 declare class ModelComponentGizmo extends Gizmo implements TargetDelegate<MeshRenderer>, LightProbeEditModeListener {
     private _controller;
-    tetrahedronController: LightProbeTetrahedronController | null;
+    tetrahedronController: LightProbeTetrahedronController;
     init(): void;
     lightProbeInfoChanged(): void;
     onShow(): void;

@@ -15,13 +15,12 @@ export class BuilderAssetCache {
 
     init: () => Promise<void>;
     hasAsset: (uuid: string) => Promise<boolean>;
-    addAsset: (asset: IAssetInfo) => void;
+    addAsset: (asset: IAsset) => void;
     addInstance: (instance: any) => void;
     clearAsset: (uuid: string) => void;
     removeAsset: (uuid: string) => void;
     getMeta: (uuid: string) => Promise<any>;
     addMeta: (uuid: string, meta: any) => void;
-    getAssetInfo: (uuid: string) => IAssetInfo;
     getDependUuids: (uuid: string) => Promise<readonly string[]>;
     getDependUuidsDeep: (uuid: string) => Promise<readonly string[]>;
 

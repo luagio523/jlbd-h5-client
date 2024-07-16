@@ -3,7 +3,7 @@ import LightProbeTetrahedronController from '../controller/light-probe-tetrahedr
 import LightProbeEditModeListener from '../listener/light-probe-edit-mode-listener';
 declare class SkinningModelComponentGizmo extends Gizmo implements LightProbeEditModeListener {
     private _controller;
-    tetrahedronController: LightProbeTetrahedronController | null;
+    tetrahedronController: LightProbeTetrahedronController;
     init(): void;
     lightProbeInfoChanged(): void;
     onShow(): void;

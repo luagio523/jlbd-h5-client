@@ -1,5 +1,10 @@
+/**
+ * 变换工具数据管理
+ * gizmo-manager 里面的一个负责管理变换工具及其数据的工具
+ */
+/// <reference types="node" />
 import { IVec3Like } from 'cc';
-declare const EventEmitter: any;
+import { EventEmitter } from 'events';
 export interface ISnapConfigData {
     position: IVec3Like;
     rotation: number;
@@ -8,56 +13,59 @@ export interface ISnapConfigData {
     isRotationSnapEnabled: boolean;
     isScaleSnapEnabled: boolean;
 }
-declare class SnapConfigs extends EventEmitter {
+export declare class SnapConfigs extends EventEmitter {
     private _position;
-    private _rotation;
-    private _scale;
-    private _isPositionSnapEnabled;
-    private _isRotationSnapEnabled;
-    private _isScaleSnapEnabled;
     get position(): IVec3Like;
     set position(value: IVec3Like);
+    private _rotation;
     get rotation(): number;
     set rotation(value: number);
+    private _scale;
     get scale(): number;
     set scale(value: number);
+    private _isPositionSnapEnabled;
     get isPositionSnapEnabled(): boolean;
     set isPositionSnapEnabled(value: boolean);
+    private _isRotationSnapEnabled;
     get isRotationSnapEnabled(): boolean;
     set isRotationSnapEnabled(value: boolean);
+    private _isScaleSnapEnabled;
     get isScaleSnapEnabled(): boolean;
     set isScaleSnapEnabled(value: boolean);
+    /**
+     * 获取配置数据
+     */
     getPureDataObject(): ISnapConfigData;
+    /**
+     * 从数据初始化
+     */
     initFromData(data: ISnapConfigData): void;
 }
-type TransformToolDataToolNameType = 'position' | 'rotation' | 'scale' | 'rect';
-type TransformToolDataCoordinateType = 'local' | 'global';
-type TransformToolDataPivotType = 'pivot' | 'center';
-declare class TransformToolData extends EventEmitter {
-    private _toolName;
-    private _coordinate;
-    private _pivot;
-    private _isLocked;
-    private _is2D;
-    private _scale2D;
-    private _snapConfigs;
+export type TransformToolDataToolNameType = 'position' | 'rotation' | 'scale' | 'rect';
+export type TransformToolDataCoordinateType = 'local' | 'global';
+export type TransformToolDataPivotType = 'pivot' | 'center';
+export declare class TransformToolData extends EventEmitter {
     constructor();
+    private _toolName;
     get toolName(): TransformToolDataToolNameType;
     set toolName(value: TransformToolDataToolNameType);
+    private _coordinate;
     get coordinate(): TransformToolDataCoordinateType;
     set coordinate(value: TransformToolDataCoordinateType);
+    private _pivot;
     get pivot(): TransformToolDataPivotType;
     set pivot(value: TransformToolDataPivotType);
+    private _isLocked;
     get isLocked(): boolean;
     set isLocked(value: boolean);
+    private _is2D;
     get is2D(): boolean;
     set is2D(value: boolean);
+    private _scale2D;
     get scale2D(): number;
     set scale2D(value: number);
+    snapConfigs: SnapConfigs;
     set cameraOrthoHeight(value: number);
-    get snapConfigs(): SnapConfigs;
-    set snapConfigs(value: SnapConfigs);
 }
-declare const transformToolData: TransformToolData;
-export { TransformToolData, transformToolData, SnapConfigs, TransformToolDataCoordinateType, TransformToolDataPivotType, TransformToolDataToolNameType };
+export declare const transformToolData: TransformToolData;
 //# sourceMappingURL=transform-tool-data.d.ts.map

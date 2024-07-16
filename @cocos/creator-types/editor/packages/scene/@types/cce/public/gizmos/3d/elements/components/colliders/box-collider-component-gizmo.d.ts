@@ -1,8 +1,8 @@
 import Gizmo from '../../gizmo-base';
 declare class BoxColliderComponentGizmo extends Gizmo {
+    private _controller;
     private _size;
     private _scale;
-    private _controller;
     private _propPath;
     init(): void;
     onShow(): void;

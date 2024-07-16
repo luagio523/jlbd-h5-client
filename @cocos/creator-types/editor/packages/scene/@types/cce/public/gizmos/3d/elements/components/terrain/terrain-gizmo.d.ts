@@ -2,7 +2,7 @@ import Gizmo from '../../gizmo-base';
 import { TerrainEditor } from './terrain-editor';
 import { eTerrainEditorMode } from './terrain-editor-mode';
 import { ISceneKeyboardEvent } from '../../../../../../../../@types/private';
-import { IControlMouseEvent } from '../../../../defines';
+import type { IControlMouseEvent } from '../../../../public/defines';
 interface IBrush {
     radius: number;
     strength: number;
@@ -15,15 +15,15 @@ interface ITerrainInfo {
     blockCount: number;
 }
 declare class TerrainGizmo extends Gizmo {
-    private _editor;
     private _controller;
+    private _editor;
     private _isEditorInit;
     private _isShiftDown;
     private _isConcave;
     private _isSmooth;
     private _isFlatten;
     private _isSetHeight;
-    get editor(): TerrainEditor | null;
+    get editor(): TerrainEditor;
     init(): void;
     get isConcave(): boolean;
     get isSmooth(): boolean;

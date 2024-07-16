@@ -1,4 +1,4 @@
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 export default interface GizmoEventListener {
     onControllerMouseDown?(event: IControlMouseEvent): void;
     onControllerMouseMove?(event: IControlMouseEvent): void;

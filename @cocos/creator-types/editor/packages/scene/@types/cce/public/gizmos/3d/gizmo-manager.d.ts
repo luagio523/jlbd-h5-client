@@ -67,7 +67,7 @@ export declare class GizmoManager extends EventEmitter implements ISceneEvents, 
     queryToolsVisibility3d(): boolean;
     setToolsVisibility3d(value: boolean): void;
     queryTransformSnapConfigs(): import("../utils/transform-tool-data").ISnapConfigData;
-    setTransformSnapConfigs(name: keyof (SnapConfigs), value: any): void;
+    setTransformSnapConfigs<K extends keyof SnapConfigs>(name: K, value: SnapConfigs[K]): void;
     queryRectSnappingConfigs(name?: keyof (IRectSnapConfigData)): number | boolean | IRectSnapConfigData;
     setRectSnappingConfigs(name: keyof (IRectSnapConfigData), value: any): void;
     init(): void;

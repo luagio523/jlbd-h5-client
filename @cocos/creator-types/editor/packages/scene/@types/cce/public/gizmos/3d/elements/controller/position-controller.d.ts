@@ -1,5 +1,5 @@
 import ControllerBase from './controller-base';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Vec3, Node, Color, Vec2 } from 'cc';
 declare class PositionController extends ControllerBase {
     private _deltaPosition;
@@ -29,7 +29,7 @@ declare class PositionController extends ControllerBase {
     /** 获取偏移值 */
     getDeltaPosition(): Vec3;
     onMouseDown(event: IControlMouseEvent): void;
-    getPanPlane(axisName: string): Node | null | undefined;
+    getPanPlane(axisName: string): Node | null;
     static isXYZ(controllerName: string): controllerName is 'x' | 'y' | 'z';
     static isPlane(controllerName: string): controllerName is 'xy' | 'yz' | 'xz';
     getAlignAxisDeltaPosition(axisName: string, curMouseDeltaPos: Vec2): any;
@@ -41,7 +41,7 @@ declare class PositionController extends ControllerBase {
     onHoverOut(): void;
     onShow(): void;
     onHide(): void;
-    isSnaping(): boolean;
+    isSnapping(): boolean;
     updateSnapUI(active: boolean): void;
 }
 export default PositionController;

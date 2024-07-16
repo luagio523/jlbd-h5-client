@@ -1,7 +1,7 @@
 export interface IDevices {
-    devices: IDeviceItem[];
+    deviceConfig: IDeviceItem[];
     custom: IDeviceItem[];
-    enable: string;
+    enableDevice: Record<string, boolean>;
 }
 
 export interface IDeviceItem {

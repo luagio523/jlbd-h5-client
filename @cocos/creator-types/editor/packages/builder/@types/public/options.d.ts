@@ -1,5 +1,6 @@
 import * as babel from '@babel/core';
-
+import { ITextureCompressPlatform, ITextureCompressType, PlatformCompressConfig } from './texture-compress';
+import { IPlatformType } from '../protected';
 export interface IPhysicsConfig {
     gravity: IVec3Like; // （0，-10， 0）
     allowSleep: boolean; // true
@@ -35,11 +36,20 @@ export interface IPhysicsMaterial {
 }
 export type IConsoleType = 'log' | 'warn' | 'error' | 'debug';
 
+export type BreakType = 'cancel' | 'crashed' | 'refreshed' | 'interrupted' | '';
+export type ICustomConsoleType = IConsoleType | 'group' | 'groupEnd' | 'groupCollapsed';
+
 export interface IConsoleMessage {
     type: ICustomConsoleType,
     value: string;
     num: number;
     time: string;
+}
+
+export interface IPlatformConfig {
+    texture: PlatformCompressConfig;
+    type: IPlatformType;
+    name: string;
 }
 
 export interface IBuildOptionBase {
@@ -92,6 +102,18 @@ export interface IBuildOptionBase {
 
     buildMode?: 'normal' | 'bundle' | 'script';
 }
+
+
+export interface BundleFilterConfig {
+    range: 'include' | 'exclude';
+    type: 'asset' | 'url';
+    patchOption?: {
+        patchType: 'glob' | 'beginWith' | 'endWith' | 'contain';
+        value: string;
+    };
+    assets?: string[];
+}
+
 export interface IBundleOptions {
     root: string, // bundle 的根目录, 开发者勾选的目录，如果是 main 包等内置 Bundle，这个字段任意字符串均可
     priority?: number, // bundle 的优先级
@@ -102,7 +124,7 @@ export interface IBundleOptions {
     // isEncrypted: boolean // bundle 中的代码是否加密，原生平台使用
 
     dest?: string, // bundle 的输出目录
-    scriptDest?: string, // 脚本的输出目录
+    scriptDest?: string, // 脚本的输出地址
     bundleFilterConfig?: BundleFilterConfig[];
 }
 
@@ -143,6 +165,20 @@ export interface IBuildTaskOption extends IBuildOptionBase {
     useBuildTextureCompressCache?: boolean;
     useBuildAutoAtlasCache?: boolean;
     __version__?: string;
+
+    overwriteProjectSettings?: {
+        macroConfig?: {
+            cleanupImageCache: string;
+        },
+        includeModules?: {
+            physics?: 'inherit-project-setting' | string;
+            'physics-2d'?: 'inherit-project-setting' | string;
+            'gfx-webgl2'?: 'inherit-project-setting' | 'on' | 'off';
+            [key: string]: 'inherit-project-setting' | string;
+        };
+    };
+    nativeCodeBundleMode:  'wasm' | 'asmjs' | 'both';
+    wasmCompressionMode?: 'brotli';
 }
 
 export interface IBundleTaskOption extends IBuildTaskOption {
@@ -304,7 +340,10 @@ export interface ITaskItemJSON {
     id: string;
     progress: number;
     state: ITaskState;
+    // 当前任务的主信息
     message: string;
+    // 当前任务的详细日志信息
+    detailMessage?: string;
     time: string;
 }
 

@@ -8,6 +8,8 @@ declare module 'tga-js' {
     }
 }
 
+declare const cce: any;
+
 declare module 'psd.js' {
     import PNG from 'pngjs';
     export default class PSD {

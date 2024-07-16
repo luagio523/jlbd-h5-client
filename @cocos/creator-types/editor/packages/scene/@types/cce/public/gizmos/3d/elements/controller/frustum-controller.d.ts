@@ -1,5 +1,5 @@
 import EditableController from './editable-controller';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Node } from 'cc';
 declare class FrustumController extends EditableController {
     private _aspect;

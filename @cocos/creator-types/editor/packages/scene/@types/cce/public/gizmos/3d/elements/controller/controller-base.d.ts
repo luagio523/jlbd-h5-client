@@ -1,11 +1,11 @@
 import { Color, Node, Quat, Vec2, Vec3 } from 'cc';
-import { IControlMouseEvent, IHandleData } from '../../../defines';
+import type { IControlMouseEvent, IHandleData } from '../../../public/defines';
 declare class ControllerBase {
     get is2D(): boolean;
     get scale2D(): number;
     get updated(): boolean;
-    get visible(): boolean | undefined;
-    shape: Node | null;
+    get visible(): boolean;
+    shape: Node;
     /** 如果 controller 锁死将不再响应拖拽 */
     isLock: boolean;
     onControllerMouseDown?(event: IControlMouseEvent): void;

@@ -1,6 +1,6 @@
 import { Color, Node, Vec2, Vec3 } from 'cc';
 import { ISceneKeyboardEvent } from '../../../../../../../@types/private';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { SnapGuidelineGroup } from '../../../utils/rect-transform-snapping';
 import LinesController from '../controller/lines-controller';
 import { RectangleController, RectHandleType as HandleType } from '../controller/rectangle-controller';

@@ -1,5 +1,5 @@
 import ControllerBase from './controller-base';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Node, Color } from 'cc';
 declare class QuadController extends ControllerBase {
     protected _quadNode: Node | null;

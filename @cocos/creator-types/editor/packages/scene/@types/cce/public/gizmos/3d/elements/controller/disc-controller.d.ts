@@ -1,6 +1,6 @@
 import EditableController from './editable-controller';
 import { Node, Vec3, Color } from 'cc';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 declare enum DiscHandleType {
     None = "none",
     Left = "neg_x",

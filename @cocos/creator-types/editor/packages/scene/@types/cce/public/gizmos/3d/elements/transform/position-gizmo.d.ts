@@ -1,7 +1,7 @@
 import { IVec3Like, Node, physics, Vec3 } from 'cc';
 import { ISceneKeyboardEvent, ISceneMouseEvent } from '../../../../../../../@types/private';
 import { IRaycastResult } from '../../../../../utils/raycast';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import PositionController from '../controller/position-controller';
 import GizmoEventListener from '../listener/gizmo-event-listener';
 import TransformGizmo from './transform-gizmo';

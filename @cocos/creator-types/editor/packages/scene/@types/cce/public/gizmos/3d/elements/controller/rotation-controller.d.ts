@@ -1,5 +1,5 @@
 import ControllerBase from './controller-base';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Node, Quat, Vec3, Color } from 'cc';
 declare class RotationController extends ControllerBase {
     private _deltaRotation;

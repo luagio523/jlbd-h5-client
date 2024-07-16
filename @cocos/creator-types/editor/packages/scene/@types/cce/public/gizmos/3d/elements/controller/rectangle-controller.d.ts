@@ -1,6 +1,6 @@
 import EditableController from './editable-controller';
 import { Node, Vec3, Vec2, Color } from 'cc';
-import { IRectangleControllerOption, IControlMouseEvent } from '../../../defines';
+import type { IRectangleControllerOption, IControlMouseEvent } from '../../../public/defines';
 declare enum RectHandleType {
     None = "none",
     TopLeft = "tl",

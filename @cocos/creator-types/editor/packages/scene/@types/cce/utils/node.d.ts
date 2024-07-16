@@ -1,9 +1,8 @@
-import { geometry, Mat4, MeshRenderer, Node, Quat, Rect, renderer, Size, UITransform, Vec2, Vec3, Vec4, LightProbeGroup } from 'cc';
+import { geometry, Mat4, MeshRenderer, Node, Quat, Rect, renderer, Size, UITransform, Vec2, Vec3, Vec4 } from 'cc';
 export declare class NodeUtils {
     getObbFromRect(mat: Mat4, rect: Rect, out_bl: Vec2, out_tl: Vec2, out_tr: Vec2, out_br: Vec2): Vec2[];
     getWorldBounds(node: Node, size?: Size, out?: Rect): any;
     getWorldOrientedBounds(node: Node, size?: Size | null, out_bl?: Vec2 | null, out_tl?: Vec2 | null, out_tr?: Vec2 | null, out_br?: Vec2 | null): Vec3[];
-    getObbFromLightProbeGroup(modelComp: LightProbeGroup, mat: Mat4): Vec3[];
     getObbFromUITransform(modelComp: UITransform, mat: Mat4): Vec3[];
     getObbFromMeshRenderer(modelComp: MeshRenderer, mat: Mat4): Vec3[];
     getObbFromBound(aabb: geometry.AABB): Vec3[];

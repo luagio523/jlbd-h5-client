@@ -1,3 +1,6 @@
+/**
+ * 用来管理日益复杂的 Gizmo 鼠标逻辑
+ */
 import { ISceneKeyboardEvent, ISceneMouseEvent } from '../../../../../@types/private';
 import GizmoOperationEventListener from './elements/listener/gizmo-operation-event-listener';
 import LightProbeEditModeListener from './elements/listener/light-probe-edit-mode-listener';
@@ -14,6 +17,12 @@ declare class GizmoOperation implements LightProbeEditModeListener {
     private _anyKeyDown;
     private _gizmoOperationEventListeners;
     private _gizmoSelection;
+    /**
+     * 检查命中了什么节点
+     * @param x
+     * @param y
+     * @returns
+     */
     private raycastGizmos;
     private _emitEventToNode;
     private _onNotGizmoMouseDown;

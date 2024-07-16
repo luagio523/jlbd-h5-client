@@ -10,7 +10,7 @@ declare class MeshColliderGizmo extends GizmoBase {
         points: number[];
         indices: number[];
     };
-    private _generateWireframeData;
+    private _generateWireFrameData;
     onTargetUpdate(): void;
     onNodeChanged(): void;
 }

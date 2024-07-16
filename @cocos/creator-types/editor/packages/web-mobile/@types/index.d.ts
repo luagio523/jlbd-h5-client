@@ -8,7 +8,6 @@ export interface IOptions {
     useWebGPU: boolean;
     orientation: IOrientation;
     embedWebDebugger: boolean;
-    cullEngineAsmJsModule: boolean;
 }
 export interface ITaskOption extends IInternalBuildOptions {
     packages: {

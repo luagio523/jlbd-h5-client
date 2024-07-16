@@ -7,7 +7,7 @@ import LightProbeEditModeListener from '../../listener/light-probe-edit-mode-lis
 import { IChangeNodeOptions, ISceneMouseEvent } from '../../../../../../../../@types/private';
 import '../../../../utils/set-util';
 import LightProbeBoundingBoxController from '../../controller/light-probe-bounding-box-controller';
-import { IControlMouseEvent } from '../../../../defines';
+import type { IControlMouseEvent } from '../../../../public/defines';
 import SimpleSet from '../../../../utils/set-util';
 export default class LightProbeGizmo extends GizmoBase implements TargetDelegate<LightProbeGroup>, LightProbeEditModeListener, GizmoOperationEventListener {
     shouldRegisterGizmoOperationEvent: boolean;

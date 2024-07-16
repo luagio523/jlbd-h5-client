@@ -1,12 +1,12 @@
 import EditableController from './editable-controller';
 import { Node, Vec3, Color } from 'cc';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 declare class BoxController extends EditableController {
     private _center;
     private _size;
     private _deltaSize;
-    private _wireframeBoxNode;
-    private _wireframeBoxMeshRenderer;
+    private _wireFrameBoxNode;
+    private _wireFrameBoxMeshRenderer;
     private _cubeNode;
     private _cubeNodeMR;
     private _mouseDeltaPos;

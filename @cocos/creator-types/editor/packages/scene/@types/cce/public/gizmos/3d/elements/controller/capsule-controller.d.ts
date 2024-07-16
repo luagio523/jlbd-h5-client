@@ -1,5 +1,5 @@
 import EditableController from './editable-controller';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Color, Node, Vec3, EAxisDirection } from 'cc';
 declare class CapsuleController extends EditableController {
     get radius(): number;

@@ -9,7 +9,7 @@ export class ResPathUtil {
 	}
 
 	public static GetMapThumbnailPath(name: string) {
-		return "map/" + name + "/small.jpg";
+		return "map/" + name + "/small";
 	}
 
 	public static GetMapMiniPath(name: string) {

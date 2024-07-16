@@ -1,5 +1,5 @@
 import ControllerBase from './controller-base';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Node, Vec3, Color, Vec2 } from 'cc';
 declare class ScaleController extends ControllerBase {
     private _deltaScale;
@@ -21,8 +21,8 @@ declare class ScaleController extends ControllerBase {
     createAxis(axisName: string, color: Color, rotation: Vec3): void;
     initShape(): void;
     onAxisSliderMove(axisName: string, deltaDist: number): void;
-    getAlignAxisDeltaScale(axisName: string, curMouseDeltaPos: Vec2): any;
-    getAllAxisDeltaScale(axisName: string, moveDelta: Vec2): any;
+    getAlignAxisDeltaScale(axisName: string, curMouseDeltaPos: Vec2): Vec3;
+    getAllAxisDeltaScale(axisName: string, moveDelta: Vec2): Vec3;
     onMouseDown(event: IControlMouseEvent): void;
     onMouseMove(event: IControlMouseEvent): void;
     onMouseUp(event: IControlMouseEvent): void;

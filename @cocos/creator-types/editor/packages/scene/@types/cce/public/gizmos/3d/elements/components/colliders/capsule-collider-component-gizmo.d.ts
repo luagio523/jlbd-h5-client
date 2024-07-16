@@ -1,9 +1,9 @@
 import Gizmo from '../../gizmo-base';
 declare class CapsuleColliderComponentGizmo extends Gizmo {
+    private _controller;
     private _maxScale;
     private _radius;
     private _height;
-    private _controller;
     private _propPath;
     init(): void;
     onShow(): void;

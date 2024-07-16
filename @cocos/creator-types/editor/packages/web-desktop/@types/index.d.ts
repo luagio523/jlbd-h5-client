@@ -9,7 +9,6 @@ export interface IOptions {
         designHeight: number;
         designWidth: number;
     };
-    cullEngineAsmJsModule: boolean;
 }
 export interface ITaskOption extends IInternalBuildOptions {
     packages: {

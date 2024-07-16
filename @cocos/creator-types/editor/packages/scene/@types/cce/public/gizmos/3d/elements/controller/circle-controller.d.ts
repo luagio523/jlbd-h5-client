@@ -1,6 +1,6 @@
 import EditableController from './editable-controller';
 import { Node, Vec3, Color } from 'cc';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 declare class CircleController extends EditableController {
     private _oriDir;
     private _center;

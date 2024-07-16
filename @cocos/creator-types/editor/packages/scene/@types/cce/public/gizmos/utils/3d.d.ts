@@ -1,5 +1,4 @@
 import UtilsInterface from './utils-interface';
-import type { Node } from 'cc';
 export declare class Utils3D extends UtilsInterface {
     constructor();
     requestPointerLock(): void;
@@ -7,7 +6,6 @@ export declare class Utils3D extends UtilsInterface {
     emitNodeMessage(message: string, ...params: any[]): void;
     broadcastMessage(message: string, ...params: any[]): void;
     onNodeChanged(node: any, ...param: any[]): void;
-    getGizmoRoot(): Node | null;
     repaintEngine(): void;
     recordChanges(nodes: string[]): string;
     commitChanges(undoID: string): void;

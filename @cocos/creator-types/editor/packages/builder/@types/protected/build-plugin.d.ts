@@ -18,7 +18,7 @@ import { IInternalBuildOptions, IConsoleType } from './options';
 import { ITextureCompressPlatform, ITextureCompressType } from '../public/texture-compress';
 import { BundleCompressionType } from './bundle-config';
 import { ImportMap } from './import-map';
-import { IImportMapOptions } from './options';
+import { IImportMapOptions, IPlatformType } from './options';
 
 export interface IQuickSpawnOption {
     cwd?: string;
@@ -126,6 +126,7 @@ export interface IBuildWorkerPluginInfo {
     customBuildStages?: {
         [platform: string]: ICustomBuildStageItem[];
     };
+    buildTemplate?: BuildTemplateConfig;
 }
 
 export type IPluginHookName =
@@ -138,6 +139,8 @@ export type IPluginHookName =
     | 'onBeforeCompressSettings'
     | 'onAfterCompressSettings'
     | 'onAfterBuild'
+    | 'onBeforeCopyBuildTemplate'
+    | 'onAfterCopyBuildTemplate'
     | 'onError';
 // | 'onBeforeCompile'
 // | 'compile'
@@ -148,6 +151,7 @@ export type IPluginHook = Record<IPluginHookName, IInternalBaseHooks>;
 export interface IInternalHook {
     throwError?: boolean; // 插件注入的钩子函数，在执行失败时是否直接退出构建流程
     title?: string; // 插件任务整体 title，支持 i18n 写法
+
     // ------------------ 钩子函数 --------------------------
     onBeforeBuild?: IInternalBaseHooks;
     onBeforeInit?: IInternalBaseHooks;
@@ -157,6 +161,9 @@ export interface IInternalHook {
     onBeforeCompressSettings?: IInternalBaseHooks;
     onAfterCompressSettings?: IInternalBaseHooks;
     onAfterBuild?: IInternalBaseHooks;
+    onBeforeCopyBuildTemplate?: IInternalBaseHooks;
+    onAfterCopyBuildTemplate?: IInternalBaseHooks;
+
     // ------------------ 其他操作函数 ---------------------
     // 内置插件才有可能触发这个函数
     run?: (dest: string, options: IBuildTaskOption) => Promise<boolean>;
@@ -176,7 +183,7 @@ export interface IBuildTask {
     name: string;
 }
 
-export type OverriteCommonOption =
+export type OverwriteCommonOption =
     | 'buildPath'
     | 'server'
     | 'polyfills'
@@ -186,33 +193,39 @@ export type OverriteCommonOption =
     | 'experimentalEraseModules'
     | 'buildStageGroup';
 
-// 允许对 build 重新定义，但指定 hookHandle 无效
+
+
 export interface ICustomBuildStageItem {
     name: string; // 阶段唯一名称，同平台不允许重名
-    hookHandle: string; // 执行当前插件内对应 hook 内的某个执行函数
     displayName?: string; // 阶段名称，显示在构建面板对应按钮以及一些报错提示上
     description?: string; // 构建阶段描述，将会作为构建面板对应按钮上的 tooltip
-    lockConfig?: {
-        platform?: 'all' | Platform[]; // 当前阶段任务执行时的锁定范围，不设置则不锁定，设为 all 则所有平台的阶段任务都不能并行，设为数组则为指定某些平台的阶段任务执行时不能并行
-        stage?: 'all' | [stageName: string][]; // 指定阶段执行时的锁定范围，不设置则不锁定
-    };
-    requestOptions?: boolean; // 是否需要构建选项，设为 true 则构建流程将会生成一份配置选项到包内，在执行任务时将会自动读取选项
-    supportCustomHook?: boolean; // 是否支持自定义钩子函数，开启后，将会调用其他插件内的 onBeforeXXX 或 onAfterXXX
-    showProgressBar?: boolean; // 是否显示进度条
-    showBuildButton?: boolean; // 是否显示指定的控制按钮在构建列表
+    hidden?: boolean; // 是否显示指定的控制按钮在构建列表，默认显示
+    parallelism?: 'none' | 'all' | 'other';
+}
+
+type IBuildStageItem<T> = T & ICustomBuildStageItem;
+export interface MessageStageItem {
+    message?: Editor.Message.MessageInfo;
+}
+
+export interface HookStageItem {
+    hook?: string;
 }
 
 export interface IInternalBuildPluginConfig extends IBuildPluginConfig {
     doc?: string; // 注册文档地址
     platformName?: string; // 平台名，可以指定为 i18n 写法, 只有官方构建插件的该字段有效
+    icon?: string; // 平台 icon
+    displayName?: string; // 在构建面板上的显示名称，默认为插件名
     hooks?: string; // 钩子函数的存储路径
     panel?: string; // relate url about custom panel
     // 仅对内部插件开放
     textureCompressConfig?: PlatformCompressConfig;
+    buildTemplateConfig?: BuildTemplateConfig;
     assetBundleConfig?: {
         // asset bundle 的配置
         supportedCompressionTypes: BundleCompressionType[];
-        platformType: 'native' | 'miniGame' | 'web';
+        platformType: IPlatformType;
     };
     priority?: number;
     wrapWithFold?: boolean; // 是否将选项显示在折叠框内（默认 true ）
@@ -221,13 +234,23 @@ export interface IInternalBuildPluginConfig extends IBuildPluginConfig {
     commonOptions?: Record<string, IConfigItem>; // 允许修改部分内置配置的界面显示方式
     debugConfig?: IDebugConfig;
     // 阶段性任务注册信息，由于涉及到按钮排序问题，需要指定为数组
-    customBuildStages?: ICustomBuildStageItem[];
-
+    customBuildStages?: Array<IBuildStageItem<MessageStageItem> | IBuildStageItem<HookStageItem>>;
     internal?: boolean; // 注册后，构建插件赋予的标记，插件指定无效
 }
 
-export interface ICustomBuildStageDisplayItem extends ICustomBuildStageItem {
-    groupItems: ICustomBuildStageItem[]; // 是否是复合按钮
+export interface BuildTemplateConfig {
+    // 构建模板的配置
+    templates: {
+        path: string;
+        // 输出地址的相对路径
+        destUrl: string;
+    }[];
+    displayName?: string;
+    version: string;
+}
+
+export interface ICustomBuildStageDisplayItem extends IBuildStageItem<MessageStageItem> {
+    groupItems: IBuildStageItem<MessageStageItem>[]; // 是否是复合按钮
     inGroup: boolean;
     lock?: boolean; // 是否锁定，用于界面防止重复点击
 }

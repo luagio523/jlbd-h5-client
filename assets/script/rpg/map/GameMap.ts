@@ -2,6 +2,7 @@ import { Rect, Texture2D,  TiledMap, Vec2, log, v2 } from "cc";
 import { ResPathUtil } from "./ResPathUtil";
 import display from "../../core/common/utils/display";
 import TerrainMatrix from "./TerrainMatrix";
+import Display from "../../core/common/utils/display";
 
 export enum MapType {
     NONE = 0,
@@ -98,6 +99,7 @@ export class GameMap  {
     // }
 
     public mapWorldToMapNodePosition(worldPoint: Vec2, out: Vec2 = new Vec2()): Vec2 {
+        const display = Display.getInstance();
         const halfWidth = display.adaptWidth * 0.5;
         const halfHeight = display.adaptHeight * 0.5;
         
@@ -106,6 +108,7 @@ export class GameMap  {
         
         return out;
     }
+
 
     public getGridPoint(x: number, y: number): Vec2 {
         const tx = Math.floor(x / this.cellSize);

@@ -1590,7 +1590,7 @@ declare module "cc/editor/new-gen-anim" {
      * @param constructor @zh 该绑定类的构造函数。@en The binding class's constructor.
      * @returns @zh 类型信息。@en Type info.
      */
-    export function getTCBindingTypeInfo(constructor: ___private._types_globals__Constructor<TCBinding<number>>): Readonly<TCBindingTypeInfo> | undefined;
+    export function getTCBindingTypeInfo(constructor: ___private.__types_globals__Constructor<TCBinding<number>>): Readonly<TCBindingTypeInfo> | undefined;
     export enum TCBindingTransitionSourceFilter {
         /** Motion states. */
         MOTION = 1,
@@ -2430,7 +2430,7 @@ declare module "cc/editor/new-gen-anim" {
             duration: number;
             copyTo(that: _cocos_animation_marionette_animation_graph__ProceduralPoseTransition): void;
         }
-        export type _cocos_animation_marionette_state_machine_state__StateMachineComponentConstructor<T extends animation.StateMachineComponent> = ___private._types_globals__Constructor<T>;
+        export type _cocos_animation_marionette_state_machine_state__StateMachineComponentConstructor<T extends animation.StateMachineComponent> = ___private.__types_globals__Constructor<T>;
         export class _cocos_animation_marionette_state_machine_state__InteractiveState extends State {
             get components(): Iterable<animation.StateMachineComponent>;
             addComponent<T extends animation.StateMachineComponent>(constructor: _cocos_animation_marionette_state_machine_state__StateMachineComponentConstructor<T>): T;
@@ -3348,28 +3348,9 @@ declare module "cc/editor/populate-internal-constants" {
      */
     export const WEBGPU: boolean;
     /**
-     * Whether support wasm, here we provide 3 options:
-     * 0: The platform doesn't support WASM
-     * 1: The platform supports WASM
-     * 2: The platform may support WASM, especially on Web platform
+     * Native code (wasm/asmjs) bundle mode, 0: asmjs, 1: wasm, 2: both
      */
-    export const WASM_SUPPORT_MODE: number;
-    /**
-     * Whether force banning using bullet wasm and use asmjs instead.
-     * This is an internal constant to be compatible with the editor's physical build option.
-     */
-    export const FORCE_BANNING_BULLET_WASM: boolean;
-    /**
-     * Whether cull the asm js module.
-     * The external modules ending with '.asm.js'. or '.js.mem' is culled if this constant is true.
-     */
-    export const CULL_ASM_JS_MODULE: boolean;
-    /**
-     * An internal constant to indicate whether need a fallback of wasm.
-     * If true, we build a wasm fallback module for the compatibility of wasm files compiled by different version of emscripten.
-     * This is useful when we use wasm on different version of Safari browsers.
-     */
-    export const WASM_FALLBACK: boolean;
+    export const NATIVE_CODE_BUNDLE_MODE: number;
     /**
      * An internal constant to indicate whether we use wasm assets as minigame subpackage.
      * This is useful when we need to reduce code size.

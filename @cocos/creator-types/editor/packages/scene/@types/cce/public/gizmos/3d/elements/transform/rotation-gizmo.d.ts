@@ -1,6 +1,6 @@
 import { Node, Vec3, Quat } from 'cc';
 import TransformGizmo from './transform-gizmo';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { ISceneKeyboardEvent } from '../../../../../../../@types/private';
 declare class RotationGizmo extends TransformGizmo {
     private _rotList;

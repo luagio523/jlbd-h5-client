@@ -1,5 +1,5 @@
 import { gfx, IVec3Like, Quat, Vec3 } from 'cc';
-import { IMeshPrimitive } from '../../../defines';
+import type { IMeshPrimitive } from '../../../public/defines';
 declare class ControllerShape {
     calcCylinderData(radiusTop?: number, radiusBottom?: number, height?: number, opts?: any): {
         positions: any[];

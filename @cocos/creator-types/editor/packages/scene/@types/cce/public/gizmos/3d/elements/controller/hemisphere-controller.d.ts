@@ -1,5 +1,5 @@
 import EditableController from './editable-controller';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Node, Vec3, MeshRenderer, Color } from 'cc';
 declare class SphereController extends EditableController {
     private _center;

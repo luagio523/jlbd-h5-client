@@ -1,4 +1,4 @@
-import { EngineInfo } from '../../../../../../engine/@types';
+import type { EngineInfo } from '../../../../../../engine/@types';
 import type { IGameConfig } from 'cc';
 export interface InitInfo extends EngineInfo {
     project: string;

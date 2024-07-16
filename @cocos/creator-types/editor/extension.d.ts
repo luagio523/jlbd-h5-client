@@ -30,6 +30,7 @@ declare namespace Editor {
                 custom?: string;
             }[];
             contributions?: {
+                messages?: Record<string, Message.MessageConfig>;
                 [key: string]: any;
                 builder?: string; // 构建插件注册脚本
             };

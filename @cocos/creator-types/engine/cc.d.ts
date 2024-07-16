@@ -59,10 +59,25 @@ declare module "cc" {
          */
         ORIENTATION_PORTRAIT: number;
         /**
-         * @en Oriented horizontally
-         * @zh 横屏朝向
+         * @en Inverted portrait orientation, with the device bottom facing upward.
+         * @zh 倒置竖屏，设备底部朝上
+         */
+        ORIENTATION_PORTRAIT_UPSIDE_DOWN: number;
+        /**
+         * @en Oriented horizontally. Users cannot directly listen to this value; they need to listen for ORIENTATION_LANDSCAPE_LEFT or ORIENTATION_LANDSCAPE_RIGHT.
+         * @zh 横屏朝向, 外部不能直接监听该值，需要监听 ORIENTATION_LANDSCAPE_LEFT 或 ORIENTATION_LANDSCAPE_RIGHT
          */
         ORIENTATION_LANDSCAPE: number;
+        /**
+         * @en Oriented horizontally, top side facing to the left. Supported only on mobile devices.
+         * @zh 水平方向，顶部朝向左侧;仅移动端支持
+         */
+        ORIENTATION_LANDSCAPE_LEFT: number;
+        /**
+         * @en Oriented horizontally, top side facing to the right. Supported only on mobile devices.
+         * @zh 水平方向，顶部朝向右侧;仅移动端支持
+         */
+        ORIENTATION_LANDSCAPE_RIGHT: number;
         /**
          * @en Oriented automatically
          * @zh 自动适配朝向
@@ -3343,6 +3358,7 @@ declare module "cc" {
         protected _textLayoutData: __private._cocos_2d_assembler_label_text_output_data__TextOutputLayoutData | null;
         constructor();
         onEnable(): void;
+        _onPreDestroy(): void;
         onDestroy(): void;
         /**
          * @en update render data.
@@ -3824,6 +3840,9 @@ declare module "cc" {
      * @deprecated since v3.7.2, this is an engine private interface that will be removed in the future.
      */
     export function safeMeasureText(ctx: CanvasRenderingContext2D, string: string, desc?: string): number;
+    export function getSymbolLength(str: string): number;
+    export function getSymbolAt(str: string, index: number): string;
+    export function getSymbolCodeAt(str: string, index: number): string;
     /**
      * @deprecated since v3.7.2, this is an engine private interface that will be removed in the future.
      */
@@ -4227,7 +4246,7 @@ declare module "cc" {
          * @returns @en Return null if not found or can't read, otherwise, will create a large enough typed array to contain all data of the attribute,
          * the array type will match the data type of the attribute. @zh 读取失败返回 null， 否则返回对应的类型数组
          */
-        readAttribute(primitiveIndex: number, attributeName: gfx.AttributeName): __private._types_globals__TypedArray | null;
+        readAttribute(primitiveIndex: number, attributeName: gfx.AttributeName): __private.__types_globals__TypedArray | null;
         /**
          * @en Read the requested attribute of the given sub mesh and fill into the given buffer.
          * @zh 读取子网格的指定属性到目标缓冲区中。
@@ -4801,12 +4820,12 @@ declare module "cc" {
          * @en Shadow projection mode.
          * @zh 阴影投射方式。
          */
-        export type ShadowCastingMode = __private._types_globals__EnumAlias<typeof __private._cocos_3d_framework_mesh_renderer__ModelShadowCastingMode>;
+        export type ShadowCastingMode = __private.__types_globals__EnumAlias<typeof __private._cocos_3d_framework_mesh_renderer__ModelShadowCastingMode>;
         /**
          * @en Shadow receive mode.
          * @zh 阴影接收方式。
          */
-        export type ShadowReceivingMode = __private._types_globals__EnumAlias<typeof __private._cocos_3d_framework_mesh_renderer__ModelShadowReceivingMode>;
+        export type ShadowReceivingMode = __private.__types_globals__EnumAlias<typeof __private._cocos_3d_framework_mesh_renderer__ModelShadowReceivingMode>;
     }
     /**
      * @en The directional light component, only one real time directional light is permitted in one scene, it act as the main light of the scene.
@@ -5017,8 +5036,8 @@ declare module "cc" {
         protected _onUpdateReceiveDirLight(): void;
     }
     export namespace Light {
-        export type Type = __private._types_globals__EnumAlias<typeof renderer.scene.LightType>;
-        export type PhotometricTerm = __private._types_globals__EnumAlias<typeof __private._cocos_3d_lights_light_component__PhotometricTerm>;
+        export type Type = __private.__types_globals__EnumAlias<typeof renderer.scene.LightType>;
+        export type PhotometricTerm = __private.__types_globals__EnumAlias<typeof __private._cocos_3d_lights_light_component__PhotometricTerm>;
     }
     /**
      * @en The sphere light component, multiple sphere lights can be added to one scene.
@@ -5109,6 +5128,13 @@ declare module "cc" {
          */
         get spotAngle(): number;
         set spotAngle(val: number);
+        /**
+         * @en The angle attenuation strength of the spot light.
+         * The larger the value, the softer the edge, and the smaller the value, the harder the edge.
+         * @zh 聚光灯角度衰减强度。值越大，边缘越柔和，值越小，边缘越硬。
+         */
+        get angleAttenuationStrength(): number;
+        set angleAttenuationStrength(val: number);
         /**
          * @en Whether activate shadow
          * @zh 是否启用阴影？
@@ -6601,7 +6627,7 @@ declare module "cc" {
              * @param constructor @en The constructor of the component. @zh 组件的构造函数。
              * @returns `this`
              */
-            toComponent<T extends Component>(constructor: __private._types_globals__Constructor<T> | string): TrackPath;
+            toComponent<T extends Component>(constructor: __private.__types_globals__Constructor<T> | string): TrackPath;
             /**
              * @internal Reserved for backward compatibility. DO NOT USE IT IN YOUR CODE.
              */
@@ -6819,7 +6845,7 @@ declare module "cc" {
         /**
          * @deprecated Since V3.3, use [[TrackPath]] instead.
          */
-        export function isCustomPath<T extends ICustomTargetPath>(path: TargetPath, constructor: __private._types_globals__Constructor<T>): path is T;
+        export function isCustomPath<T extends ICustomTargetPath>(path: TargetPath, constructor: __private.__types_globals__Constructor<T>): path is T;
         /**
          * @deprecated Since V3.3, use [[TrackPath]] instead.
          */
@@ -7603,7 +7629,7 @@ declare module "cc" {
     }
     export class AudioPCMDataView {
         constructor(arrayBufferView: __private._pal_audio_type__AudioBufferView, normalizeFactor: number);
-        constructor(arrayBuffer: ArrayBuffer, Ctor: __private._types_globals__Constructor<__private._pal_audio_type__AudioBufferView>, normalizeFactor: number);
+        constructor(arrayBuffer: ArrayBuffer, Ctor: __private.__types_globals__Constructor<__private._pal_audio_type__AudioBufferView>, normalizeFactor: number);
         get length(): number;
         getData(offset: number): number;
     }
@@ -8198,7 +8224,7 @@ declare module "cc" {
          * @param mips The target mip levels.
          */
         export function FormatSurfaceSize(format: Format, width: number, height: number, depth: number, mips: number): number;
-        export function getTypedArrayConstructor(info: FormatInfo): __private._types_globals__TypedArrayConstructor;
+        export function getTypedArrayConstructor(info: FormatInfo): __private.__types_globals__TypedArrayConstructor;
         export function formatAlignment(format: Format): FormatAlignment;
         export function alignTo(size: number, alignment: number): number;
         /**
@@ -11386,7 +11412,7 @@ declare module "cc" {
             }
             export interface IInstancedAttributeBlock {
                 buffer: Uint8Array;
-                views: __private._types_globals__TypedArray[];
+                views: __private.__types_globals__TypedArray[];
                 attributes: gfx.Attribute[];
             }
             /**
@@ -12525,6 +12551,7 @@ declare module "cc" {
                 protected _dir: math.Vec3;
                 protected _range: number;
                 protected _spotAngle: number;
+                protected _angleAttenuationStrength: number;
                 protected _pos: math.Vec3;
                 protected _aabb: geometry.AABB;
                 protected _frustum: geometry.Frustum;
@@ -12591,6 +12618,13 @@ declare module "cc" {
                  */
                 get spotAngle(): number;
                 set spotAngle(val: number);
+                /**
+                 * @en The angle attenuation strength of the spot light.
+                 * The larger the value, the softer the edge, and the smaller the value, the harder the edge.
+                 * @zh 聚光灯角度衰减强度。值越大，边缘越柔和，值越小，边缘越硬。
+                 */
+                get angleAttenuationStrength(): number;
+                set angleAttenuationStrength(val: number);
                 /**
                  * @en The cone angle of the lighting area
                  * @zh 聚光灯锥角
@@ -12935,7 +12969,7 @@ declare module "cc" {
             defines: MacroRecord;
             stateOverrides?: PassOverrides;
         }
-        export type PassOverrides = __private._types_globals__RecursivePartial<EffectAsset.IPassStates>;
+        export type PassOverrides = __private.__types_globals__RecursivePartial<EffectAsset.IPassStates>;
         export interface IMacroPatch {
             name: string;
             value: boolean | number | string;
@@ -13573,7 +13607,7 @@ declare module "cc" {
         export const CameraVisFlags: {};
         export const VisibilityFlags: {};
     }
-    export type Constructor<T = unknown> = __private._types_globals__Constructor<T>;
+    export type Constructor<T = unknown> = __private.__types_globals__Constructor<T>;
     export namespace math {
         export namespace bits {
             /**
@@ -13863,13 +13897,13 @@ declare module "cc" {
              * @zh 向量转数组
              * @param ofs Array Start Offset
              */
-            static toArray<Out extends __private._types_globals__IWritableArrayLike<number>>(out: Out, v: IVec2Like, ofs?: number): Out;
+            static toArray<Out extends __private.__types_globals__IWritableArrayLike<number>>(out: Out, v: IVec2Like, ofs?: number): Out;
             /**
              * @en Converts the given array to a vector
              * @zh 数组转向量
              * @param ofs Array Start Offset
              */
-            static fromArray<Out extends IVec2Like>(out: Out, arr: __private._types_globals__IWritableArrayLike<number>, ofs?: number): Out;
+            static fromArray<Out extends IVec2Like>(out: Out, arr: __private.__types_globals__IWritableArrayLike<number>, ofs?: number): Out;
             /**
              * @en Check the equality of the two given vectors
              * @zh 向量等价判断
@@ -14356,13 +14390,13 @@ declare module "cc" {
              * @zh 向量转数组
              * @param ofs Array Start Offset
              */
-            static toArray<Out extends __private._types_globals__IWritableArrayLike<number>>(out: Out, v: IVec3Like, ofs?: number): Out;
+            static toArray<Out extends __private.__types_globals__IWritableArrayLike<number>>(out: Out, v: IVec3Like, ofs?: number): Out;
             /**
              * @en Converts the given array to a vector
              * @zh 数组转向量
              * @param ofs Array Start Offset
              */
-            static fromArray<Out extends IVec3Like>(out: Out, arr: __private._types_globals__IWritableArrayLike<number>, ofs?: number): Out;
+            static fromArray<Out extends IVec3Like>(out: Out, arr: __private.__types_globals__IWritableArrayLike<number>, ofs?: number): Out;
             /**
              * @en Check the equality of the two given vectors
              * @zh 向量等价判断
@@ -14378,6 +14412,31 @@ declare module "cc" {
              * @zh 求两向量夹角弧度
              */
             static angle(a: IVec3Like, b: IVec3Like): number;
+            /**
+             * @zh 计算 `a`、`b` 两向量之间的有符号夹角。
+             *
+             * 不妨假设 `a`、`b` 是钟表上的两根指针，其中 `a` 指向 12 点整，`normal` 是任何从钟表正面指出的向量。
+             * 当 `b` **逆时针** 从 12 点走到 6 点的过程中，它们的角度变化范围为 (0°, 180°)；
+             * 当 `b` **顺时针** 从 12 点走到 6 点的过程中，它们的角度变化范围为 (0°, -180°)。
+             *
+             * 反之，如果 `normal` 是任何从钟表反面指出的向量，两种范围将对调。
+             *
+             * @en Calculates the signed angle between the two vectors `a`, `b`.
+             *
+             * Suppose that `a` and `b` are two hands on a clock, where pointing at 12 o'clock,
+             * and `normal` is arbitrary vector pointing out from the dial side of the clock.
+             * As `b` goes counterclockwise from 12 o'clock to 6 o'clock, their angle varies in the range (0°, 180°);
+             * As `b` goes clockwise from 12 o'clock to 6 o'clock, their angle varies in the range (0°, -180°).
+             *
+             * Instead, if `normal` is arbitrary vector pointing out from the opposite side of the clock,
+             * the two ranges would swap.
+             *
+             * @param a @zh 向量 `a`。 @en The vector `a`.
+             * @param b @zh 向量 `b`。 @en The vector `b`.
+             * @param normal @zh 参考向量。 @en The reference vector.
+             * @returns @zh 向量 `a` 和 `b` 之间的有符号夹角。 @en The signed angle between `a`, `b`.
+             */
+            static signedAngle: (a: Readonly<IVec3Like>, b: Readonly<IVec3Like>, normal: Readonly<IVec3Like>) => number;
             /**
              * @en Calculates the projection vector on the specified plane
              * @zh 计算向量在指定平面上的投影
@@ -14783,13 +14842,13 @@ declare module "cc" {
              * @zh 向量转数组
              * @param ofs Array Start Offset
              */
-            static toArray<Out extends __private._types_globals__IWritableArrayLike<number>>(out: Out, v: IVec4Like, ofs?: number): Out;
+            static toArray<Out extends __private.__types_globals__IWritableArrayLike<number>>(out: Out, v: IVec4Like, ofs?: number): Out;
             /**
              * @en Converts the given array to a vector
              * @zh 数组转向量
              * @param ofs Array Start Offset
              */
-            static fromArray<Out extends IVec4Like>(out: Out, arr: __private._types_globals__IWritableArrayLike<number>, ofs?: number): Out;
+            static fromArray<Out extends IVec4Like>(out: Out, arr: __private.__types_globals__IWritableArrayLike<number>, ofs?: number): Out;
             /**
              * @en Check the equality of the two given vectors
              * @zh 向量等价判断
@@ -15229,13 +15288,13 @@ declare module "cc" {
              * @zh 四元数转数组
              * @param ofs Array Start Offset
              */
-            static toArray<Out extends __private._types_globals__IWritableArrayLike<number>>(out: Out, q: IQuatLike, ofs?: number): Out;
+            static toArray<Out extends __private.__types_globals__IWritableArrayLike<number>>(out: Out, q: IQuatLike, ofs?: number): Out;
             /**
              * @en Array to a quaternion
              * @zh 数组转四元数
              * @param ofs Array Start Offset
              */
-            static fromArray(out: IQuatLike, arr: __private._types_globals__IWritableArrayLike<number>, ofs?: number): IQuatLike;
+            static fromArray(out: IQuatLike, arr: __private.__types_globals__IWritableArrayLike<number>, ofs?: number): IQuatLike;
             /**
              * @en Check whether two quaternions are equal
              * @zh 四元数等价判断
@@ -15471,13 +15530,13 @@ declare module "cc" {
              * @zh 矩阵转数组
              * @param ofs Array Start Offset
              */
-            static toArray<Out extends __private._types_globals__IWritableArrayLike<number>>(out: Out, m: IMat3Like, ofs?: number): Out;
+            static toArray<Out extends __private.__types_globals__IWritableArrayLike<number>>(out: Out, m: IMat3Like, ofs?: number): Out;
             /**
              * @en Generates or sets a matrix with a flat array
              * @zh 数组转矩阵
              * @param ofs Array Start Offset
              */
-            static fromArray<Out extends IMat3Like>(out: Out, arr: __private._types_globals__IWritableArrayLike<number>, ofs?: number): Out;
+            static fromArray<Out extends IMat3Like>(out: Out, arr: __private.__types_globals__IWritableArrayLike<number>, ofs?: number): Out;
             /**
              * @en Adds two matrices and save the results to out matrix
              * @zh 逐元素矩阵加法
@@ -15988,13 +16047,13 @@ declare module "cc" {
              * @zh 矩阵转数组
              * @param ofs Array Start Offset
              */
-            static toArray<Out extends __private._types_globals__IWritableArrayLike<number>>(out: Out, m: IMat4Like, ofs?: number): Out;
+            static toArray<Out extends __private.__types_globals__IWritableArrayLike<number>>(out: Out, m: IMat4Like, ofs?: number): Out;
             /**
              * @en Generates or sets a matrix with a flat array
              * @zh 数组转矩阵
              * @param ofs Array Start Offset
              */
-            static fromArray<Out extends IMat4Like>(out: Out, arr: __private._types_globals__IWritableArrayLike<number>, ofs?: number): Out;
+            static fromArray<Out extends IMat4Like>(out: Out, arr: __private.__types_globals__IWritableArrayLike<number>, ofs?: number): Out;
             /**
              * @en Adds two matrices and save the results to out matrix
              * @zh 逐元素矩阵加法
@@ -16831,13 +16890,13 @@ declare module "cc" {
              * @zh 颜色转数组
              * @param ofs Array Start Offset
              */
-            static toArray<Out extends __private._types_globals__IWritableArrayLike<number>>(out: Out, a: IColorLike, ofs?: number): Out;
+            static toArray<Out extends __private.__types_globals__IWritableArrayLike<number>>(out: Out, a: IColorLike, ofs?: number): Out;
             /**
              * @en Sets the given color with RGBA values in an array, and save the results to out color.
              * @zh 数组转颜色
              * @param ofs Array Start Offset
              */
-            static fromArray<Out extends IColorLike>(arr: __private._types_globals__IWritableArrayLike<number>, out: Out, ofs?: number): Out;
+            static fromArray<Out extends IColorLike>(arr: __private.__types_globals__IWritableArrayLike<number>, out: Out, ofs?: number): Out;
             /**
              * @zh 从无符号 32 位整数构造颜色，高 8 位为 alpha 通道，次高 8 位为蓝色通道，次低 8 位为绿色通道，低 8 位为红色通道。
              * @en Construct color from a unsigned 32 bit integer, the highest 8 bits is for alpha channel, the second highest 8 bits is for blue channel,
@@ -16970,15 +17029,18 @@ declare module "cc" {
              */
             toCSS(opt?: ("rgba" | "rgb" | "#rrggbb" | "#rrggbbaa")): string;
             /**
-             * @en Read hex string and store color data into the current color object, the hex string must be formatted as rgba or rgb.
-             * @zh 从十六进制颜色字符串中读入当前颜色。<br/>
-             * 十六进制颜色字符串应该以可选的 "#" 开头，紧跟最多 8 个代表十六进制数字的字符；<br/>
-             * 每两个连续字符代表的数值依次作为 Red、Green、Blue 和 Alpha 通道；<br/>
-             * 缺省的颜色通道将视为 0；缺省的透明通道将视为 255。<br/>
-             * @param hexString the hex string
+             * @en Converts the hexadecimal formal color into rgb formal and save the results to current color object.
+             *   the argument `hex` could be hex-string or hex-number (8-digit or 6-digit).
+             *   the hex-string should be like : '#12345678' '#123456', '123456', '12345678'.
+             *   the hex-number should be like : 0x12345678, 0x123456 .
+             * @zh 从十六进制颜色字符串中读入颜色到 当前color对象中
+             *   参数 hex 支持 16进制字符串 或者 16进制数值 (8位数字 或者 6位数字).
+             *   16进制字符串的格式应该类似: '#12345678' '#123456', '123456', '12345678'.
+             *   16进制数值的格式应该类似:  0x12345678, 0x123456 .
+             * @param hex the hex-string or hex-number
              * @returns `this`
              */
-            fromHEX(hexString: string): Color;
+            fromHEX(hex: string | number): Color;
             /**
              * @en convert Color to HEX color string.
              * @zh 转换当前颜色为十六进制颜色字符串。
@@ -17569,6 +17631,16 @@ declare module "cc" {
         }
     }
     export namespace geometry {
+        /**
+         * 几何工具模块
+         * @module geometry
+         */
+        /**
+         * @en
+         * The enum type of basic geometry.
+         * @zh
+         * 形状的类型值。
+         */
         export const enums: {
             SHAPE_RAY: number;
             SHAPE_LINE: number;
@@ -17649,16 +17721,16 @@ declare module "cc" {
             rayAABB: (ray: Ray, aabb: AABB) => number;
             rayOBB: (ray: Ray, obb: OBB) => number;
             rayPlane: (ray: Ray, plane: Plane) => number;
-            rayTriangle: (ray: Ray, triangle: Triangle, doubleSided?: boolean | undefined) => number;
+            rayTriangle: (ray: Ray, triangle: Triangle, doubleSided?: boolean) => number;
             rayCapsule: (ray: Ray, capsule: Capsule) => number;
-            raySubMesh: (ray: Ray, submesh: RenderingSubMesh, options?: IRaySubMeshOptions | undefined) => number;
-            rayMesh: (ray: Ray, mesh: Mesh, options?: IRayMeshOptions | undefined) => number;
-            rayModel: (r: Ray, model: renderer.scene.Model, options?: IRayMeshOptions | undefined) => number;
+            raySubMesh: (ray: Ray, submesh: RenderingSubMesh, options?: IRaySubMeshOptions) => number;
+            rayMesh: (ray: Ray, mesh: Mesh, options?: IRayMeshOptions) => number;
+            rayModel: (r: Ray, model: renderer.scene.Model, options?: IRayModelOptions) => number;
             lineSphere: typeof __private._cocos_core_geometry_intersect__lineSphere;
             lineAABB: typeof __private._cocos_core_geometry_intersect__lineAABB;
             lineOBB: typeof __private._cocos_core_geometry_intersect__lineOBB;
             linePlane: (line: Line, plane: Plane) => number;
-            lineTriangle: (line: Line, triangle: Triangle, outPt?: math.Vec3 | undefined) => number;
+            lineTriangle: (line: Line, triangle: Triangle, outPt?: math.Vec3) => number;
             sphereWithSphere: (sphere0: Sphere, sphere1: Sphere) => boolean;
             sphereAABB: (sphere: Sphere, aabb: AABB) => boolean;
             sphereOBB: (sphere: Sphere, obb: OBB) => boolean;
@@ -19448,7 +19520,7 @@ declare module "cc" {
             constructor();
         }
     }
-    export const VERSION = "3.8.2";
+    export const VERSION = "3.8.3";
     /**
      * @en
      * The main namespace of Cocos engine, all engine core classes, functions, properties and constants are defined in this namespace.
@@ -19850,9 +19922,9 @@ declare module "cc" {
             isChildClassOf: typeof isChildClassOf;
             clear: typeof clear;
             value: (object: Record<string | number, any>, propertyName: string, value_: any, writable?: boolean | undefined, enumerable?: boolean | undefined) => void;
-            getset: (object: Record<string | number, any>, propertyName: string, getter: __private._types_globals__Getter, setter?: boolean | __private._types_globals__Setter | undefined, enumerable?: boolean | undefined, configurable?: boolean | undefined) => void;
-            get: (object: Record<string | number, any>, propertyName: string, getter: __private._types_globals__Getter, enumerable?: boolean | undefined, configurable?: boolean | undefined) => void;
-            set: (object: Record<string | number, any>, propertyName: string, setter: __private._types_globals__Setter, enumerable?: boolean | undefined, configurable?: boolean | undefined) => void;
+            getset: (object: Record<string | number, any>, propertyName: string, getter: __private.__types_globals__Getter, setter?: boolean | __private.__types_globals__Setter | undefined, enumerable?: boolean | undefined, configurable?: boolean | undefined) => void;
+            get: (object: Record<string | number, any>, propertyName: string, getter: __private.__types_globals__Getter, enumerable?: boolean | undefined, configurable?: boolean | undefined) => void;
+            set: (object: Record<string | number, any>, propertyName: string, setter: __private.__types_globals__Setter, enumerable?: boolean | undefined, configurable?: boolean | undefined) => void;
             unregisterClass: typeof unregisterClass;
             getClassName: typeof getClassName;
             setClassName: typeof setClassName;
@@ -19878,7 +19950,7 @@ declare module "cc" {
              *
              * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
              */
-            _registeredClassNames: Record<string, __private._types_globals__Constructor<unknown>>;
+            _registeredClassNames: Record<string, __private.__types_globals__Constructor<unknown>>;
             /**
              * @en All classes registered in the engine, indexed by ID.
              * @zh 引擎中已注册的所有类型，通过 ID 进行索引。
@@ -19897,7 +19969,7 @@ declare module "cc" {
              *
              * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
              */
-            _registeredClassIds: Record<string, __private._types_globals__Constructor<unknown>>;
+            _registeredClassIds: Record<string, __private.__types_globals__Constructor<unknown>>;
             /**
              * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
              */
@@ -19906,7 +19978,7 @@ declare module "cc" {
             /**
              * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
              */
-            _setClassId: (id: string, constructor: __private._types_globals__Constructor<unknown>) => void;
+            _setClassId: (id: string, constructor: __private.__types_globals__Constructor<unknown>) => void;
             /**
              * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
              */
@@ -20117,7 +20189,7 @@ declare module "cc" {
          * @return @en True if sub class is child of super class, or they are the same type. False else.
          * @zh 如果子类类型是父类类型的子类，或者二者是相同类型，那么返回 true，否则返回 false。
          */
-        export function isChildClassOf<T extends __private._types_globals__Constructor>(subclass: unknown, superclass: T): subclass is T;
+        export function isChildClassOf<T extends __private.__types_globals__Constructor>(subclass: unknown, superclass: T): subclass is T;
         export function isChildClassOf(subclass: unknown, superclass: unknown): boolean;
         /**
          * @en Removes all enumerable properties from a object.
@@ -20132,7 +20204,7 @@ declare module "cc" {
          * @param className @en Class name to register. @zh 注册的类名。
          * @param constructor @en Constructor to register. @zh 注册的构造函数。
          */
-        export function setClassName(className: string, constructor: __private._types_globals__Constructor): void;
+        export function setClassName(className: string, constructor: __private.__types_globals__Constructor): void;
         /**
          * @en Sets an alias for a class.
          * After executing `setClassAlias(target, alias)`, `alias` will be a single way short cut for class `target`.
@@ -20145,7 +20217,7 @@ declare module "cc" {
          * @param alias @en Alias to set. The name shall not have been set as class name or alias of another class.
          * @zh 类的别名。别名不能重复，也不能是已有类的名字。
          */
-        export function setClassAlias(target: __private._types_globals__Constructor, alias: string): void;
+        export function setClassAlias(target: __private.__types_globals__Constructor, alias: string): void;
         /**
          * @en
          * Unregister some classes from engine.
@@ -20166,14 +20238,14 @@ declare module "cc" {
          * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
          * Please use `getClassById()` instead.
          */
-        export function _getClassById(classId: any): __private._types_globals__Constructor<unknown>;
+        export function _getClassById(classId: any): __private.__types_globals__Constructor<unknown>;
         /**
          * @en Gets the registered class by id.
          * @zh 通过 id 获取已注册的类型。
          * @param classId @en The class id used to get class. @zh 获取类的 id。
          * @returns @en The constructor of the registered class. @zh 注册的类构造函数。
          */
-        export function getClassById(classId: any): __private._types_globals__Constructor<unknown>;
+        export function getClassById(classId: any): __private.__types_globals__Constructor<unknown>;
         /**
          * @en
          * Gets the registered class by class name.
@@ -20182,7 +20254,7 @@ declare module "cc" {
          * @param classname @en The class name used to get class. @zh 获取类的类名。
          * @returns @en The constructor of the registered class. @zh 注册的类构造函数。
          */
-        export function getClassByName(classname: any): __private._types_globals__Constructor<unknown>;
+        export function getClassByName(classname: any): __private.__types_globals__Constructor<unknown>;
         /**
          * @en
          * Get class id of the object
@@ -20218,7 +20290,7 @@ declare module "cc" {
          * @param writable @en If the property is writable. @zh 属性是否可写。
          * @param enumerable @en If the property is enumerable. @zh 属性是否可枚举。
          */
-        export const value: (object: Record<string | number, any>, propertyName: string, value_: any, writable?: boolean | undefined, enumerable?: boolean | undefined) => void;
+        export const value: (object: Record<string | number, any>, propertyName: string, value_: any, writable?: boolean, enumerable?: boolean) => void;
         /**
          * @en A helper function to add or modify `get`, `set`, `enumerable` or `configurable` of a property.
          * @zh 添加或修改属性的 `get`, `set`, `enumerable` 或者 `configurable`。
@@ -20229,7 +20301,7 @@ declare module "cc" {
          * @param enumerable @en If the property is enumerable. @zh 属性是否可列举。
          * @param configurable @en If the property is configurable. @zh 属性是否可配置。
          */
-        export const getset: (object: Record<string | number, any>, propertyName: string, getter: __private._types_globals__Getter, setter?: boolean | __private._types_globals__Setter | undefined, enumerable?: boolean | undefined, configurable?: boolean | undefined) => void;
+        export const getset: (object: Record<string | number, any>, propertyName: string, getter: __private.__types_globals__Getter, setter?: __private.__types_globals__Setter | boolean, enumerable?: boolean, configurable?: boolean) => void;
         /**
          * @en A helper function to add or modify `get`, `enumerable` or `configurable` of a property.
          * @zh 添加或修改属性的 `get`, `enumerable` 或者 `configurable`。
@@ -20239,7 +20311,7 @@ declare module "cc" {
          * @param enumerable @en If the property is enumerable. @zh 属性是否可列举。
          * @param configurable @en If the property is configurable. @zh 属性是否可配置。
          */
-        export const get: (object: Record<string | number, any>, propertyName: string, getter: __private._types_globals__Getter, enumerable?: boolean | undefined, configurable?: boolean | undefined) => void;
+        export const get: (object: Record<string | number, any>, propertyName: string, getter: __private.__types_globals__Getter, enumerable?: boolean, configurable?: boolean) => void;
         /**
          * @en A helper function to add or modify `get`, `enumerable` or `configurable` of a property.
          * @zh 添加或修改属性的 `get`, `enumerable` 或者 `configurable`。
@@ -20249,15 +20321,15 @@ declare module "cc" {
          * @param enumerable @en If the property is enumerable. @zh 属性是否可列举。
          * @param configurable @en If the property is configurable. @zh 属性是否可配置。
          */
-        export const set: (object: Record<string | number, any>, propertyName: string, setter: __private._types_globals__Setter, enumerable?: boolean | undefined, configurable?: boolean | undefined) => void;
+        export const set: (object: Record<string | number, any>, propertyName: string, setter: __private.__types_globals__Setter, enumerable?: boolean, configurable?: boolean) => void;
         /**
          * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
          */
-        export const _idToClass: Record<string, __private._types_globals__Constructor>;
+        export const _idToClass: Record<string, __private.__types_globals__Constructor>;
         /**
          * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
          */
-        export const _nameToClass: Record<string, __private._types_globals__Constructor>;
+        export const _nameToClass: Record<string, __private.__types_globals__Constructor>;
         /**
          * @en
          * Register the class by specified id, if its classname is not defined, the class name will also be set.
@@ -20268,7 +20340,7 @@ declare module "cc" {
          * @param constructor
          * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
          */
-        export const _setClassId: (id: string, constructor: __private._types_globals__Constructor) => void;
+        export const _setClassId: (id: string, constructor: __private.__types_globals__Constructor) => void;
     }
     export namespace misc {
         /**
@@ -21712,7 +21784,7 @@ declare module "cc" {
          * @zh
          * 平台相关的特性枚举类型。
          */
-        export type Feature = __private._types_globals__EnumAlias<typeof __private._pal_system_info_enum_type_feature__Feature>;
+        export type Feature = __private.__types_globals__EnumAlias<typeof __private._pal_system_info_enum_type_feature__Feature>;
     }
     export interface ISchedulable {
         id?: string;
@@ -21858,7 +21930,7 @@ declare module "cc" {
          * @param callback @en The callback to be unscheduled @zh 被取消调度的回调。
          * @param target @en The target bound to the callback. @zh 回调所绑定的目标对象。
          */
-        unschedule(callback: __private._types_globals__AnyFunction, target: ISchedulable): void;
+        unschedule(callback: __private.__types_globals__AnyFunction, target: ISchedulable): void;
         /**
          * @en Unschedule the update callback for a given target.
          * @zh 取消指定对象的 update 定时器。
@@ -21903,7 +21975,7 @@ declare module "cc" {
          * @param target @en The target of the callback. @zh 回调的目标对象。
          * @returns @en True if the specified callback is invoked, false if not. @zh 返回true如果指定回调被调用, 否则返回false。
          */
-        isScheduled(callback: __private._types_globals__AnyFunction, target: ISchedulable): boolean;
+        isScheduled(callback: __private.__types_globals__AnyFunction, target: ISchedulable): boolean;
         /**
          * @en
          * Pause all selectors from all targets.
@@ -24109,9 +24181,9 @@ declare module "cc" {
          * @param node The node.
          */
         protected static _setScene(node: Node): void;
-        protected static _findComponent<T extends Component>(node: Node, constructor: __private._types_globals__Constructor<T> | __private._types_globals__AbstractedConstructor<T>): T | null;
-        protected static _findComponents<T extends Component>(node: Node, constructor: __private._types_globals__Constructor<T> | __private._types_globals__AbstractedConstructor<T>, components: Component[]): void;
-        protected static _findChildComponent<T extends Component>(children: Node[], constructor: __private._types_globals__Constructor<T> | __private._types_globals__AbstractedConstructor<T>): T | null;
+        protected static _findComponent<T extends Component>(node: Node, constructor: __private.__types_globals__Constructor<T> | __private.__types_globals__AbstractedConstructor<T>): T | null;
+        protected static _findComponents<T extends Component>(node: Node, constructor: __private.__types_globals__Constructor<T> | __private.__types_globals__AbstractedConstructor<T>, components: Component[]): void;
+        protected static _findChildComponent<T extends Component>(children: Node[], constructor: __private.__types_globals__Constructor<T> | __private.__types_globals__AbstractedConstructor<T>): T | null;
         protected static _findChildComponents(children: Node[], constructor: any, components: any): void;
         protected _parent: this | null;
         protected _children: this[];
@@ -24288,7 +24360,7 @@ declare module "cc" {
          * var sprite = node.getComponent(Sprite);
          * ```
          */
-        getComponent<T extends Component>(classConstructor: __private._types_globals__Constructor<T> | __private._types_globals__AbstractedConstructor<T>): T | null;
+        getComponent<T extends Component>(classConstructor: __private.__types_globals__Constructor<T> | __private.__types_globals__AbstractedConstructor<T>): T | null;
         /**
          * @en
          * Returns the component of supplied type if the node has one attached, null if it doesn't.
@@ -24309,7 +24381,7 @@ declare module "cc" {
          * @zh 返回节点上指定类型的所有组件。
          * @param classConstructor The class of the target component
          */
-        getComponents<T extends Component>(classConstructor: __private._types_globals__Constructor<T> | __private._types_globals__AbstractedConstructor<T>): T[];
+        getComponents<T extends Component>(classConstructor: __private.__types_globals__Constructor<T> | __private.__types_globals__AbstractedConstructor<T>): T[];
         /**
          * @en Returns all components of given type in the node.
          * @zh 返回节点上指定类型的所有组件。
@@ -24325,7 +24397,7 @@ declare module "cc" {
          * var sprite = node.getComponentInChildren(Sprite);
          * ```
          */
-        getComponentInChildren<T extends Component>(classConstructor: __private._types_globals__Constructor<T> | __private._types_globals__AbstractedConstructor<T>): T | null;
+        getComponentInChildren<T extends Component>(classConstructor: __private.__types_globals__Constructor<T> | __private.__types_globals__AbstractedConstructor<T>): T | null;
         /**
          * @en Returns the component of given type in any of its children using depth first search.
          * @zh 递归查找所有子节点中第一个匹配指定类型的组件。
@@ -24345,7 +24417,7 @@ declare module "cc" {
          * var sprites = node.getComponentsInChildren(Sprite);
          * ```
          */
-        getComponentsInChildren<T extends Component>(classConstructor: __private._types_globals__Constructor<T> | __private._types_globals__AbstractedConstructor<T>): T[];
+        getComponentsInChildren<T extends Component>(classConstructor: __private.__types_globals__Constructor<T> | __private.__types_globals__AbstractedConstructor<T>): T[];
         /**
          * @en Returns all components of given type in self or any of its children.
          * @zh 递归查找自身或所有子节点中指定类型的组件
@@ -24366,7 +24438,7 @@ declare module "cc" {
          * var sprite = node.addComponent(Sprite);
          * ```
          */
-        addComponent<T extends Component>(classConstructor: __private._types_globals__Constructor<T>): T;
+        addComponent<T extends Component>(classConstructor: __private.__types_globals__Constructor<T>): T;
         /**
          * @en Adds a component class to the node. You can also add component to node by passing in the name of the script.
          * @zh 向节点添加一个指定类型的组件类，你还可以通过传入脚本的名称来添加组件。
@@ -24392,7 +24464,7 @@ declare module "cc" {
          * node.removeComponent(Sprite);
          * ```
          */
-        removeComponent<T extends Component>(classConstructor: __private._types_globals__Constructor<T> | __private._types_globals__AbstractedConstructor<T>): void;
+        removeComponent<T extends Component>(classConstructor: __private.__types_globals__Constructor<T> | __private.__types_globals__AbstractedConstructor<T>): void;
         /**
          * @en
          * Removes a component identified by the given name or removes the component object given.
@@ -24450,7 +24522,7 @@ declare module "cc" {
          * node.on(NodeEventType.TOUCH_END, callback, this);
          * ```
          */
-        on(type: string | NodeEventType, callback: __private._types_globals__AnyFunction, target?: unknown, useCapture?: any): void;
+        on(type: string | NodeEventType, callback: __private.__types_globals__AnyFunction, target?: unknown, useCapture?: any): void;
         /**
          * @en
          * Removes the callback previously registered with the same type, callback, target and or useCapture.
@@ -24467,7 +24539,7 @@ declare module "cc" {
          * node.off(NodeEventType.TOUCH_START, callback, this.node);
          * ```
          */
-        off(type: string, callback?: __private._types_globals__AnyFunction, target?: unknown, useCapture?: any): void;
+        off(type: string, callback?: __private.__types_globals__AnyFunction, target?: unknown, useCapture?: any): void;
         /**
          * @en
          * Register an callback of a specific event type on the Node,
@@ -24480,7 +24552,7 @@ declare module "cc" {
          *                              The callback is ignored if it is a duplicate (the callbacks are unique).
          * @param target - The target (this object) to invoke the callback, can be null
          */
-        once(type: string, callback: __private._types_globals__AnyFunction, target?: unknown, useCapture?: any): void;
+        once(type: string, callback: __private.__types_globals__AnyFunction, target?: unknown, useCapture?: any): void;
         /**
          * @en
          * Trigger an event directly with the event name and necessary arguments.
@@ -24515,7 +24587,7 @@ declare module "cc" {
          * @param target - The callback callee of the event listener
          * @return True if a callback of the specified type is registered; false otherwise.
          */
-        hasEventListener(type: string, callback?: __private._types_globals__AnyFunction, target?: unknown): any;
+        hasEventListener(type: string, callback?: __private.__types_globals__AnyFunction, target?: unknown): any;
         /**
          * @en Removes all callbacks previously registered with the same target.
          * @zh 移除目标上的所有注册事件。
@@ -24553,7 +24625,7 @@ declare module "cc" {
          * @param constructor Constructor of the component.
          * @throws If one or more component of same type have been existed in this node.
          */
-        protected _checkMultipleComp?<T extends Component>(constructor: __private._types_globals__Constructor<T>): void;
+        protected _checkMultipleComp?<T extends Component>(constructor: __private.__types_globals__Constructor<T>): void;
         /**
          * @en Event types emitted by Node
          * @zh 节点可能发出的事件类型
@@ -25138,8 +25210,8 @@ declare module "cc" {
         static layerToName(bitNum: number): string;
     }
     export namespace Layers {
-        export type Enum = __private._types_globals__EnumAlias<typeof Layers.Enum>;
-        export type BitMask = __private._types_globals__EnumAlias<typeof Layers.BitMask>;
+        export type Enum = __private.__types_globals__EnumAlias<typeof Layers.Enum>;
+        export type BitMask = __private.__types_globals__EnumAlias<typeof Layers.BitMask>;
     }
     /**
      * @en
@@ -25342,7 +25414,7 @@ declare module "cc" {
          * const sprite = node.addComponent(Sprite);
          * ```
          */
-        addComponent<T extends Component>(classConstructor: __private._types_globals__Constructor<T>): T | null;
+        addComponent<T extends Component>(classConstructor: __private.__types_globals__Constructor<T>): T | null;
         /**
          * @en Adds a component class to the node. You can also add component to node by passing in the name of the script.
          * @zh 向节点添加一个指定类型的组件类，你还可以通过传入脚本的名称来添加组件。
@@ -25368,7 +25440,7 @@ declare module "cc" {
          * var sprite = node.getComponent(Sprite);
          * ```
          */
-        getComponent<T extends Component>(classConstructor: __private._types_globals__Constructor<T>): T | null;
+        getComponent<T extends Component>(classConstructor: __private.__types_globals__Constructor<T>): T | null;
         /**
          * @en
          * Returns the component of supplied type if the node has one attached, null if it doesn't.<br/>
@@ -25394,7 +25466,7 @@ declare module "cc" {
          * const sprites = node.getComponents(Sprite);
          * ```
          */
-        getComponents<T extends Component>(classConstructor: __private._types_globals__Constructor<T>): T[];
+        getComponents<T extends Component>(classConstructor: __private.__types_globals__Constructor<T>): T[];
         /**
          * @en Returns all components of supplied type in the node.
          * @zh 返回节点上指定类型的所有组件。
@@ -25415,7 +25487,7 @@ declare module "cc" {
          * const sprite = node.getComponentInChildren(Sprite);
          * ```
          */
-        getComponentInChildren<T extends Component>(classConstructor: __private._types_globals__Constructor<T>): T | null;
+        getComponentInChildren<T extends Component>(classConstructor: __private.__types_globals__Constructor<T>): T | null;
         /**
          * @en Returns the component of supplied type in any of its children using depth first search.
          * @zh 递归查找所有子节点中第一个匹配指定类型的组件。
@@ -25436,7 +25508,7 @@ declare module "cc" {
          * const sprites = node.getComponentsInChildren(Sprite);
          * ```
          */
-        getComponentsInChildren<T extends Component>(classConstructor: __private._types_globals__Constructor<T>): T[];
+        getComponentsInChildren<T extends Component>(classConstructor: __private.__types_globals__Constructor<T>): T[];
         /**
          * @en Returns all components of supplied type in self or any of its children.
          * @zh 递归查找自身或所有子节点中指定类型的组件。
@@ -27019,12 +27091,12 @@ declare module "cc" {
      * @internal
      */
     export namespace Camera {
-        export type ProjectionType = __private._types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__ProjectionType>;
-        export type FOVAxis = __private._types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__FOVAxis>;
-        export type ClearFlag = __private._types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__ClearFlag>;
-        export type Aperture = __private._types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__Aperture>;
-        export type Shutter = __private._types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__Shutter>;
-        export type ISO = __private._types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__ISO>;
+        export type ProjectionType = __private.__types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__ProjectionType>;
+        export type FOVAxis = __private.__types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__FOVAxis>;
+        export type ClearFlag = __private.__types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__ClearFlag>;
+        export type Aperture = __private.__types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__Aperture>;
+        export type Shutter = __private.__types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__Shutter>;
+        export type ISO = __private.__types_globals__EnumAlias<typeof __private._cocos_misc_camera_component__ISO>;
     }
     /**
      * @en Base class for all rendering components containing model.
@@ -27145,7 +27217,7 @@ declare module "cc" {
      * 包含无法加载的原始组件的临时回退。
      */
     export class MissingScript extends Component {
-        static safeFindClass(id: string): __private._types_globals__Constructor<unknown> | undefined;
+        static safeFindClass(id: string): __private.__types_globals__Constructor<unknown> | undefined;
         /**
          * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
          */
@@ -28212,7 +28284,7 @@ declare module "cc" {
         uuidTypeList: string[];
         static pool: js.Pool<Details>;
         assignAssetsBy: (getter: (uuid: string, options: {
-            type: __private._types_globals__Constructor<Asset>;
+            type: __private.__types_globals__Constructor<Asset>;
             owner: Record<string, unknown>;
             prop: string;
         }) => Asset) => void;
@@ -28266,7 +28338,6 @@ declare module "cc" {
      */
     export function instantiate<T>(original: T): T;
     export namespace instantiate {
-        export var _clone: typeof __private._cocos_serialization_instantiate__doInstantiate;
         export var _clone: typeof __private._cocos_serialization_instantiate__doInstantiate;
     }
     /**
@@ -30657,7 +30728,7 @@ declare module "cc" {
              * const info = bundle.getInfoWithPath('image/a', Texture2D);
              *
              */
-            getInfoWithPath(path: string, type?: __private._types_globals__Constructor<Asset> | null): __private._cocos_asset_asset_manager_config__IAddressableInfo | null;
+            getInfoWithPath(path: string, type?: __private.__types_globals__Constructor<Asset> | null): __private._cocos_asset_asset_manager_config__IAddressableInfo | null;
             /**
              * @en
              * Gets all asset's info within specific folder.
@@ -30676,7 +30747,7 @@ declare module "cc" {
              * const infos = [];
              * bundle.getDirWithPath('images', Texture2D, infos);
              */
-            getDirWithPath(path: string, type?: __private._types_globals__Constructor<Asset> | null, out?: __private._cocos_asset_asset_manager_config__IAddressableInfo[]): __private._cocos_asset_asset_manager_config__IAddressableInfo[];
+            getDirWithPath(path: string, type?: __private.__types_globals__Constructor<Asset> | null, out?: __private._cocos_asset_asset_manager_config__IAddressableInfo[]): __private._cocos_asset_asset_manager_config__IAddressableInfo[];
             /**
              * @en
              * Get asset's information with uuid.
@@ -30760,14 +30831,14 @@ declare module "cc" {
              * bundle2.load('imgs/cocos', SpriteFrame, null, (err, spriteFrame) => console.log(err));
              *
              */
-            load<T extends Asset>(paths: string, type: __private._types_globals__Constructor<T> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: T) => void) | null): void;
-            load<T extends Asset>(paths: string[], type: __private._types_globals__Constructor<T> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: T[]) => void) | null): void;
+            load<T extends Asset>(paths: string, type: __private.__types_globals__Constructor<T> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: T) => void) | null): void;
+            load<T extends Asset>(paths: string[], type: __private.__types_globals__Constructor<T> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: T[]) => void) | null): void;
             load<T extends Asset>(paths: string, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: T) => void) | null): void;
             load<T extends Asset>(paths: string[], onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: T[]) => void) | null): void;
             load<T extends Asset>(paths: string, onComplete?: ((err: Error | null, data: T) => void) | null): void;
             load<T extends Asset>(paths: string[], onComplete?: ((err: Error | null, data: T[]) => void) | null): void;
-            load<T extends Asset>(paths: string, type: __private._types_globals__Constructor<T> | null, onComplete?: ((err: Error | null, data: T) => void) | null): void;
-            load<T extends Asset>(paths: string[], type: __private._types_globals__Constructor<T> | null, onComplete?: ((err: Error | null, data: T[]) => void) | null): void;
+            load<T extends Asset>(paths: string, type: __private.__types_globals__Constructor<T> | null, onComplete?: ((err: Error | null, data: T) => void) | null): void;
+            load<T extends Asset>(paths: string[], type: __private.__types_globals__Constructor<T> | null, onComplete?: ((err: Error | null, data: T[]) => void) | null): void;
             /**
              * @en
              * Preloads the asset within this bundle by the path which is relative to bundle's path.
@@ -30817,10 +30888,10 @@ declare module "cc" {
              * bundle2.load('imgs/cocos', SpriteFrame, (err, spriteFrame) => {});
              *
              */
-            preload(paths: string | string[], type: __private._types_globals__Constructor<Asset> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: RequestItem[]) => void) | null): void;
+            preload(paths: string | string[], type: __private.__types_globals__Constructor<Asset> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: RequestItem[]) => void) | null): void;
             preload(paths: string | string[], onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: RequestItem[]) => void) | null): void;
             preload(paths: string | string[], onComplete?: ((err: Error | null, data: RequestItem[]) => void) | null): void;
-            preload(paths: string | string[], type: __private._types_globals__Constructor<Asset> | null, onComplete?: ((err: Error | null, data: RequestItem[]) => void) | null): void;
+            preload(paths: string | string[], type: __private.__types_globals__Constructor<Asset> | null, onComplete?: ((err: Error | null, data: RequestItem[]) => void) | null): void;
             /**
              * @en
              * Loads all assets under a folder inside the bundle folder.<br>
@@ -30863,10 +30934,10 @@ declare module "cc" {
              * bundle2.loadDir('skills', SpriteFrame, null, (err, spriteFrames) => console.log(err));
              *
              */
-            loadDir<T extends Asset>(dir: string, type: __private._types_globals__Constructor<T> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: T[]) => void) | null): void;
+            loadDir<T extends Asset>(dir: string, type: __private.__types_globals__Constructor<T> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: T[]) => void) | null): void;
             loadDir<T extends Asset>(dir: string, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: T[]) => void) | null): void;
             loadDir<T extends Asset>(dir: string, onComplete?: ((err: Error | null, data: T[]) => void) | null): void;
-            loadDir<T extends Asset>(dir: string, type: __private._types_globals__Constructor<T> | null, onComplete?: ((err: Error | null, data: T[]) => void) | null): void;
+            loadDir<T extends Asset>(dir: string, type: __private.__types_globals__Constructor<T> | null, onComplete?: ((err: Error | null, data: T[]) => void) | null): void;
             /**
              * @en
              * Preloads all assets under a folder inside the bundle folder.<br> After calling this method, you still need to
@@ -30910,10 +30981,10 @@ declare module "cc" {
              * // wait for while
              * bundle2.loadDir('skills', SpriteFrame, (err, spriteFrames) => {});
              */
-            preloadDir(dir: string, type: __private._types_globals__Constructor<Asset> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: RequestItem[]) => void) | null): void;
+            preloadDir(dir: string, type: __private.__types_globals__Constructor<Asset> | null, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: RequestItem[]) => void) | null): void;
             preloadDir(dir: string, onProgress: ((finished: number, total: number, item: RequestItem) => void) | null, onComplete: ((err: Error | null, data: RequestItem[]) => void) | null): void;
             preloadDir(dir: string, onComplete?: ((err: Error | null, data: RequestItem[]) => void) | null): void;
-            preloadDir(dir: string, type: __private._types_globals__Constructor<Asset> | null, onComplete?: ((err: Error | null, data: RequestItem[]) => void) | null): void;
+            preloadDir(dir: string, type: __private.__types_globals__Constructor<Asset> | null, onComplete?: ((err: Error | null, data: RequestItem[]) => void) | null): void;
             /**
              * @en
              * Loads the scene asset within this bundle by its name.
@@ -31015,7 +31086,7 @@ declare module "cc" {
              * @example
              * bundle1.get('music/hit', AudioClip);
              */
-            get<T extends Asset>(path: string, type?: __private._types_globals__Constructor<T> | null): T | null;
+            get<T extends Asset>(path: string, type?: __private.__types_globals__Constructor<T> | null): T | null;
             /**
              * @en
              * Releases the asset loaded by [[load]] or [[loadDir]].
@@ -31039,7 +31110,7 @@ declare module "cc" {
              * bundle1.release('misc/character/cocos');
              *
              */
-            release(path: string, type?: __private._types_globals__Constructor<Asset> | null): void;
+            release(path: string, type?: __private.__types_globals__Constructor<Asset> | null): void;
             /**
              * @en
              * Release all assets within this bundle. Refer to [[AssetManager.releaseAll]] for detailed information.
@@ -31628,8 +31699,8 @@ declare module "cc" {
          * });
          *
          */
-        loadRes<T extends Asset>(url: string, type: __private._types_globals__Constructor<T>, progressCallback: __private._cocos_asset_asset_manager_deprecated__LoadProgressCallback, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadCompleteCallback<T>): any;
-        loadRes<T extends Asset>(url: string, type: __private._types_globals__Constructor<T>, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadCompleteCallback<T>): any;
+        loadRes<T extends Asset>(url: string, type: __private.__types_globals__Constructor<T>, progressCallback: __private._cocos_asset_asset_manager_deprecated__LoadProgressCallback, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadCompleteCallback<T>): any;
+        loadRes<T extends Asset>(url: string, type: __private.__types_globals__Constructor<T>, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadCompleteCallback<T>): any;
         loadRes<T extends Asset>(url: string, progressCallback: __private._cocos_asset_asset_manager_deprecated__LoadProgressCallback, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadCompleteCallback<T>): any;
         loadRes<T extends Asset>(url: string, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadCompleteCallback<T>): any;
         /**
@@ -31664,7 +31735,7 @@ declare module "cc" {
          * });
          * ```
          */
-        loadResArray<T extends Asset>(urls: string[], type?: __private._types_globals__Constructor<T>, progressCallback?: __private._cocos_asset_asset_manager_deprecated__LoadProgressCallback, completeCallback?: __private._cocos_asset_asset_manager_deprecated__LoadCompleteCallback<T[]>): void;
+        loadResArray<T extends Asset>(urls: string[], type?: __private.__types_globals__Constructor<T>, progressCallback?: __private._cocos_asset_asset_manager_deprecated__LoadProgressCallback, completeCallback?: __private._cocos_asset_asset_manager_deprecated__LoadCompleteCallback<T[]>): void;
         /**
          * @en
          * Load all assets in a folder inside the "assets/resources" folder of your project.<br>
@@ -31713,8 +31784,8 @@ declare module "cc" {
          * });
          * ```
          */
-        loadResDir<T extends Asset>(url: string, type: __private._types_globals__Constructor<T>, progressCallback: __private._cocos_asset_asset_manager_deprecated__LoadProgressCallback, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadDirCompleteCallback<T>): any;
-        loadResDir<T extends Asset>(url: string, type: __private._types_globals__Constructor<T>, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadDirCompleteCallback<T>): any;
+        loadResDir<T extends Asset>(url: string, type: __private.__types_globals__Constructor<T>, progressCallback: __private._cocos_asset_asset_manager_deprecated__LoadProgressCallback, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadDirCompleteCallback<T>): any;
+        loadResDir<T extends Asset>(url: string, type: __private.__types_globals__Constructor<T>, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadDirCompleteCallback<T>): any;
         loadResDir<T extends Asset>(url: string, progressCallback: __private._cocos_asset_asset_manager_deprecated__LoadProgressCallback, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadDirCompleteCallback<T>): any;
         loadResDir<T extends Asset>(url: string, completeCallback: __private._cocos_asset_asset_manager_deprecated__LoadDirCompleteCallback<T>): any;
         /**
@@ -31733,7 +31804,7 @@ declare module "cc" {
          * @param type - Only asset of type will be returned if this argument is supplied.
          * @deprecated since v3.0 loader.getRes is deprecated, please use resources.get instead
          */
-        getRes<T extends Asset>(url: string, type?: __private._types_globals__Constructor<T>): T | null;
+        getRes<T extends Asset>(url: string, type?: __private.__types_globals__Constructor<T>): T | null;
         /**
          * @en Get total resources count in loader.
          * @zh 获取加载的总资源数量
@@ -31897,7 +31968,7 @@ declare module "cc" {
          *
          * @deprecated since v3.0 loader.releaseRes is deprecated, please use assetManager.releaseRes instead
          */
-        releaseRes(res: string, type?: __private._types_globals__Constructor<Asset>): void;
+        releaseRes(res: string, type?: __private.__types_globals__Constructor<Asset>): void;
         /**
          *
          * @en Resource all assets. Refer to [[release]] for detailed informations.
@@ -33835,7 +33906,7 @@ declare module "cc" {
         setAccelerometerInterval(intervalInMileSeconds: number): void;
     }
     export namespace Input {
-        export type EventType = __private._types_globals__EnumAlias<typeof __private._cocos_input_types_event_enum__InputEventType>;
+        export type EventType = __private.__types_globals__EnumAlias<typeof __private._cocos_input_types_event_enum__InputEventType>;
     }
     /**
      * @module cc
@@ -33913,7 +33984,7 @@ declare module "cc" {
          * @en The event type supported by SystemEvent and Node events
          * @zh SystemEvent 支持的事件类型以及节点事件类型
          */
-        export type EventType = __private._types_globals__EnumAlias<typeof SystemEventType>;
+        export type EventType = __private.__types_globals__EnumAlias<typeof SystemEventType>;
     }
     /**
      * @zh 该对象提供由原生绑定出来的 JavaScript 接口。
@@ -34490,7 +34561,7 @@ declare module "cc" {
              *
              * @return @en The deflated buffer. @zh 解压后的数据缓存区
              */
-            function inflateMemory(input: string | ArrayBuffer | __private._types_globals__TypedArray, outLengthHint?: number): ArrayBuffer | null;
+            function inflateMemory(input: string | ArrayBuffer | __private.__types_globals__TypedArray, outLengthHint?: number): ArrayBuffer | null;
             /**
              * @en Inflates a GZip file into memory.
              * @zh 将 GZip 压缩文件解压缩到内存中。
@@ -34517,7 +34588,7 @@ declare module "cc" {
              *
              * @return @en True is GZip format. false is not. @zh 返回true表示是 GZip 格式，否则不是。
              */
-            function isGZipBuffer(buffer: string | ArrayBuffer | __private._types_globals__TypedArray): boolean;
+            function isGZipBuffer(buffer: string | ArrayBuffer | __private.__types_globals__TypedArray): boolean;
             /**
              * @en Inflates a CCZ file into memory.
              * @zh 将 CCZ 格式压缩文件解压缩到内存中。
@@ -34534,7 +34605,7 @@ declare module "cc" {
              *
              * @return @en The deflated buffer. @zh 解压后的数据缓存区
              */
-            function inflateCCZBuffer(buffer: string | ArrayBuffer | __private._types_globals__TypedArray): ArrayBuffer | null;
+            function inflateCCZBuffer(buffer: string | ArrayBuffer | __private.__types_globals__TypedArray): ArrayBuffer | null;
             /**
              * @en Test a file is a CCZ format file or not.
              * @zh 判断一个文件是否是 CCZ 格式。
@@ -34550,7 +34621,7 @@ declare module "cc" {
              *
              * @return @en True is CCZ format. false is not. @zh 返回true表示是 CCZ 格式，否则不是。
              */
-            function isCCZBuffer(buffer: string | ArrayBuffer | __private._types_globals__TypedArray): boolean;
+            function isCCZBuffer(buffer: string | ArrayBuffer | __private.__types_globals__TypedArray): boolean;
             /**
              * @en
              * Sets the pvr.ccz encryption key parts separately for added security.
@@ -40278,7 +40349,7 @@ declare module "cc" {
              * @version DragonBones 5.0
              * @language zh_CN
              */
-            fadeOutMode: AnimationFadeOutMode;
+            fadeOutMode: __private.__node_modules_cocos_dragonbones_js_out_dragonBones__AnimationFadeOutMode;
             /**
              * @private
              */
@@ -42538,7 +42609,7 @@ declare module "cc" {
              * @version DragonBones 4.5
              * @language zh_CN
              */
-            fadeIn(animationName: string, fadeInTime?: number, playTimes?: number, layer?: number, group?: string | null, fadeOutMode?: AnimationFadeOutMode): AnimationState | null;
+            fadeIn(animationName: string, fadeInTime?: number, playTimes?: number, layer?: number, group?: string | null, fadeOutMode?: __private.__node_modules_cocos_dragonbones_js_out_dragonBones__AnimationFadeOutMode): AnimationState | null;
             /**
              * - Play a specific animation from the specific time.
              * @param animationName - The name of animation data.
@@ -42795,7 +42866,7 @@ declare module "cc" {
              * @deprecated
              * @language zh_CN
              */
-            gotoAndPlay(animationName: string, fadeInTime?: number, duration?: number, playTimes?: number, layer?: number, group?: string | null, fadeOutMode?: AnimationFadeOutMode, pauseFadeOut?: boolean, pauseFadeIn?: boolean): AnimationState | null;
+            gotoAndPlay(animationName: string, fadeInTime?: number, duration?: number, playTimes?: number, layer?: number, group?: string | null, fadeOutMode?: __private.__node_modules_cocos_dragonbones_js_out_dragonBones__AnimationFadeOutMode, pauseFadeOut?: boolean, pauseFadeIn?: boolean): AnimationState | null;
             /**
              * - Deprecated, please refer to {@link #gotoAndStopByTime()}.
              * @deprecated
@@ -46804,9 +46875,9 @@ declare module "cc" {
         set linearVelocity(v: math.Vec2);
         /**
          * @en
-         * The angular velocity of the body.
+         * The angular velocity of the body in radians/second.
          * @zh
-         * 刚体的角速度。
+         * 刚体的角速度，单位是 弧度/秒。
          */
         get angularVelocity(): number;
         set angularVelocity(v: number);
@@ -48419,8 +48490,8 @@ declare module "cc" {
             protected onDestroy(): void;
         }
         export namespace Collider {
-            export type Type = __private._types_globals__EnumAlias<typeof EColliderType>;
-            export type Axis = __private._types_globals__EnumAlias<typeof EAxisDirection>;
+            export type Type = __private.__types_globals__EnumAlias<typeof EColliderType>;
+            export type Axis = __private.__types_globals__EnumAlias<typeof EAxisDirection>;
         }
         /**
          * @en
@@ -48681,7 +48752,7 @@ declare module "cc" {
             updateVertices(): void;
         }
         export namespace SimplexCollider {
-            export type ESimplexType = __private._types_globals__EnumAlias<typeof physics.ESimplexType>;
+            export type ESimplexType = __private.__types_globals__EnumAlias<typeof physics.ESimplexType>;
         }
         /**
          * @en
@@ -48770,7 +48841,7 @@ declare module "cc" {
             protected onDestroy(): void;
         }
         export namespace Constraint {
-            export type Type = __private._types_globals__EnumAlias<typeof EConstraintType>;
+            export type Type = __private.__types_globals__EnumAlias<typeof EConstraintType>;
         }
         /**
          * @en Hinge constraint.
@@ -49348,7 +49419,7 @@ declare module "cc" {
             removeMask(v: number): void;
         }
         export namespace RigidBody {
-            export type Type = __private._types_globals__EnumAlias<typeof ERigidBodyType>;
+            export type Type = __private.__types_globals__EnumAlias<typeof ERigidBodyType>;
         }
         /**
          * @en
@@ -49769,7 +49840,7 @@ declare module "cc" {
              * @param height @en The cylinder height.  @zh 圆柱的高
              * @param opts @en The optional creation parameters of the cylinder.  @zh 圆柱参数选项。
              */
-            export function cylinder(radiusTop?: number, radiusBottom?: number, height?: number, opts?: __private._types_globals__RecursivePartial<__private._cocos_primitive_cylinder__ICylinderOptions>): primitives.IGeometry;
+            export function cylinder(radiusTop?: number, radiusBottom?: number, height?: number, opts?: __private.__types_globals__RecursivePartial<__private._cocos_primitive_cylinder__ICylinderOptions>): primitives.IGeometry;
             export const VEC3_0: math.Vec3;
             export const TriggerEventObject: {
                 type: TriggerEventType;
@@ -50208,7 +50279,7 @@ declare module "cc" {
          * @param height @zh 圆锥高度。 @en The height of cone
          * @param opts @zh 圆锥参数选项。@en The optional creation parameters of the cone
          */
-        export function cone(radius?: number, height?: number, opts?: __private._types_globals__RecursivePartial<__private._cocos_primitive_cone__IConeOptions>): IGeometry;
+        export function cone(radius?: number, height?: number, opts?: __private.__types_globals__RecursivePartial<__private._cocos_primitive_cone__IConeOptions>): IGeometry;
         /**
          * @en
          * This function generates a plane on XOZ plane with positive Y direction.
@@ -50233,7 +50304,7 @@ declare module "cc" {
          * @param radius @en The radius. @zh 球半径。
          * @param options @en The sphere creation options. @zh 参数选项。
          */
-        export function sphere(radius?: number, opts?: __private._types_globals__RecursivePartial<__private._cocos_primitive_sphere__ISphereOptions>): IGeometry;
+        export function sphere(radius?: number, opts?: __private.__types_globals__RecursivePartial<__private._cocos_primitive_sphere__ISphereOptions>): IGeometry;
         /**
          * @en
          * Generate a torus with radius 0.4, tube 0.1 and centered at origin.
@@ -50243,7 +50314,7 @@ declare module "cc" {
          * @param tube @zh 管形大小。@en The radius of tube
          * @param opts @zh 参数选项。@en The optional creation parameters of the torus
          */
-        export function torus(radius?: number, tube?: number, opts?: __private._types_globals__RecursivePartial<__private._cocos_primitive_torus__ITorusOptions>): {
+        export function torus(radius?: number, tube?: number, opts?: __private.__types_globals__RecursivePartial<__private._cocos_primitive_torus__ITorusOptions>): {
             positions: number[];
             normals: number[];
             uvs: number[];
@@ -50261,7 +50332,7 @@ declare module "cc" {
          * @param radiusBottom @zh 底部半径。@en The radius of bottom sphere
          * @param opts @zh 胶囊体参数选项。@en The optional creation parameters of the capsule
          */
-        export function capsule(radiusTop?: number, radiusBottom?: number, height?: number, opts?: __private._types_globals__RecursivePartial<__private._cocos_primitive_capsule__ICapsuteOptions>): {
+        export function capsule(radiusTop?: number, radiusBottom?: number, height?: number, opts?: __private.__types_globals__RecursivePartial<__private._cocos_primitive_capsule__ICapsuteOptions>): {
             positions: number[];
             normals: number[];
             uvs: number[];
@@ -50278,7 +50349,7 @@ declare module "cc" {
          * 生成一个圆，其半径是单位1，中心点在原点。
          * @param options @zh 参数选项。 @en The optional creation parameters of the circle
          */
-        export function circle(options?: __private._types_globals__RecursivePartial<__private._cocos_primitive_circle__ICircleOptions> | __private._cocos_primitive_circle__ICircleOptions): IGeometry;
+        export function circle(options?: __private.__types_globals__RecursivePartial<__private._cocos_primitive_circle__ICircleOptions> | __private._cocos_primitive_circle__ICircleOptions): IGeometry;
         /**
          * @en
          * Translate the geometry.
@@ -50335,7 +50406,7 @@ declare module "cc" {
          * @zh
          * 应用默认的几何参数选项。
          */
-        export function applyDefaultGeometryOptions<GeometryOptions = IGeometryOptions>(options?: __private._types_globals__RecursivePartial<IGeometryOptions>): GeometryOptions;
+        export function applyDefaultGeometryOptions<GeometryOptions = IGeometryOptions>(options?: __private.__types_globals__RecursivePartial<IGeometryOptions>): GeometryOptions;
         /**
          * @en
          * The definition of the parameter for building a primitive geometry.
@@ -50623,7 +50694,7 @@ declare module "cc" {
         onLoaded(): void;
     }
     export namespace Primitive {
-        export type PrimitiveType = __private._types_globals__EnumAlias<typeof __private._cocos_primitive_primitive__PrimitiveType>;
+        export type PrimitiveType = __private.__types_globals__EnumAlias<typeof __private._cocos_primitive_primitive__PrimitiveType>;
     }
     export class Profiler extends System {
         constructor();
@@ -52702,6 +52773,7 @@ declare module "cc" {
              * 的组件都将受影响。
              */
             setSlotTexture(slotName: string, tex2d: Texture2D, createNew?: boolean): void;
+            protected _applyLayer(): void;
         }
         /**
          * @en The skeleton data of spine.
@@ -53793,9 +53865,9 @@ declare module "cc" {
      * @extends Component
      */
     export class TiledLayer extends UIRenderer {
-        protected _userNodeGrid: __private._types_globals__SafeRecord<number, {
+        protected _userNodeGrid: __private.__types_globals__SafeRecord<number, {
             count: number;
-        } & __private._types_globals__SafeRecord<number, {
+        } & __private.__types_globals__SafeRecord<number, {
             count: number;
             list: (TiledUserNodeData | null)[];
         }>>;
@@ -53849,7 +53921,7 @@ declare module "cc" {
         vertices: SafeArray<{
             minCol: number;
             maxCol: number;
-        } & __private._types_globals__SafeRecord<number, {
+        } & __private.__types_globals__SafeRecord<number, {
             left: number;
             bottom: number;
             index: number;
@@ -55133,7 +55205,6 @@ declare module "cc" {
         protected _maxLength: number;
         __preload(): void;
         onEnable(): void;
-        update(): void;
         onDisable(): void;
         onDestroy(): void;
         /**
@@ -55554,6 +55625,7 @@ declare module "cc" {
         protected _totalLength: number;
         protected _progress: number;
         protected _reverse: boolean;
+        protected onLoad(): void;
         protected _initBarSprite(): void;
         protected _updateBarStatus(): void;
     }
@@ -56675,7 +56747,7 @@ declare module "cc" {
         protected _setDirtyByMode(): void;
     }
     export namespace Widget {
-        export type AlignMode = __private._types_globals__EnumAlias<typeof __private._cocos_ui_widget__AlignMode>;
+        export type AlignMode = __private.__types_globals__EnumAlias<typeof __private._cocos_ui_widget__AlignMode>;
     }
     /**
      * @en
@@ -57199,7 +57271,7 @@ declare module "cc" {
         remove(widget: Widget): void;
         onResized(): void;
         refreshWidgetOnResized(node: Node): void;
-        updateOffsetsToStayPut(widget: Widget, e?: __private._cocos_ui_widget__AlignFlags | undefined): void;
+        updateOffsetsToStayPut(widget: Widget, e?: __private._cocos_ui_widget__AlignFlags): void;
         updateAlignment: typeof __private._cocos_ui_widget_manager__updateAlignment;
         AlignMode: typeof __private._cocos_ui_widget__AlignMode;
         AlignFlags: typeof __private._cocos_ui_widget__AlignFlags;
@@ -58644,7 +58716,7 @@ declare module "cc" {
             protected doEvaluate(_evaluationContext: ____private._cocos_animation_marionette_animation_graph_context__AnimationGraphEvaluationContext): _cocos_animation_core_pose__Pose | null;
         }
         export const _cocos_serialization_deserialize_symbols__onAfterDeserializedTag: unique symbol;
-        export type _types_globals__Constructor<T = unknown> = new (...args: any[]) => T;
+        export type __types_globals__Constructor<T = unknown> = new (...args: any[]) => T;
         export type _editor_src_marionette_pose_graph_editor_api__Constructor<T = unknown> = new (...args: any[]) => T;
         export interface _editor_src_marionette_pose_graph_editor_api__PoseGraphOutputNodeCopyInfo {
             editorExtras: ____private._cocos_animation_marionette_pose_graph_graph_output_node__PoseGraphOutputNode[typeof editorExtrasTag];
@@ -59369,13 +59441,13 @@ declare module "cc" {
              */
             dpadCenter: number;
         };
-        export type _types_globals__TypedArray = Uint8Array | Uint8ClampedArray | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array | Float32Array | Float64Array;
+        export type __types_globals__TypedArray = Uint8Array | Uint8ClampedArray | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array | Float32Array | Float64Array;
         export class _cocos_2d_renderer_native_2d__NativeUIMeshBuffer {
             get vData(): Float32Array;
             set vData(val: Float32Array);
             get iData(): Uint16Array;
             set iData(val: Uint16Array);
-            syncSharedBufferToNative(data: _types_globals__TypedArray): any;
+            syncSharedBufferToNative(data: __types_globals__TypedArray): any;
             initialize(attrs: gfx.Attribute[]): any;
             reset(): any;
             destroy(): any;
@@ -59969,8 +60041,8 @@ declare module "cc" {
             get subNode(): Node;
             set subNode(node: Node);
             changeMeshBuffer(): any;
-            setRender2dBufferToNative(data: _types_globals__TypedArray): any;
-            syncSharedBufferToNative(data: _types_globals__TypedArray): any;
+            setRender2dBufferToNative(data: __types_globals__TypedArray): any;
+            syncSharedBufferToNative(data: __types_globals__TypedArray): any;
             getAttrSharedBufferForJS(): ArrayBufferLike;
         }
         export class _cocos_2d_renderer_native_2d__NativeRenderEntity {
@@ -60631,7 +60703,7 @@ declare module "cc" {
              */
             ON: number;
         };
-        export type _types_globals__EnumAlias<EnumT> = EnumT[keyof EnumT];
+        export type __types_globals__EnumAlias<EnumT> = EnumT[keyof EnumT];
         /**
          * @en Shadow receive mode.
          * @zh 阴影接收方式。
@@ -61810,7 +61882,7 @@ declare module "cc" {
             constructor(info: Readonly<gfx.BufferBarrierInfo>, hash: number);
             static computeHash(info: Readonly<gfx.BufferBarrierInfo>): number;
         }
-        export type _types_globals__TypedArrayConstructor = Uint8ArrayConstructor | Uint8ClampedArrayConstructor | Int8ArrayConstructor | Uint16ArrayConstructor | Int16ArrayConstructor | Uint32ArrayConstructor | Int32ArrayConstructor | Float32ArrayConstructor | Float64ArrayConstructor;
+        export type __types_globals__TypedArrayConstructor = Uint8ArrayConstructor | Uint8ClampedArrayConstructor | Int8ArrayConstructor | Uint16ArrayConstructor | Int16ArrayConstructor | Uint32ArrayConstructor | Int32ArrayConstructor | Float32ArrayConstructor | Float64ArrayConstructor;
         /**
          * @engineInternal
          */
@@ -61885,8 +61957,8 @@ declare module "cc" {
              */
             getGFXShader(device: gfx.Device, name: string, defines: renderer.MacroRecord, pipeline: _cocos_rendering_custom_pipeline__PipelineRuntime, key?: string): gfx.Shader;
         }
-        export type _types_globals__RecursivePartial<T> = {
-            [P in keyof T]?: T[P] extends Array<infer U> ? Array<_types_globals__RecursivePartial<U>> : T[P] extends ReadonlyArray<infer V> ? ReadonlyArray<_types_globals__RecursivePartial<V>> : _types_globals__RecursivePartial<T[P]>;
+        export type __types_globals__RecursivePartial<T> = {
+            [P in keyof T]?: T[P] extends Array<infer U> ? Array<__types_globals__RecursivePartial<U>> : T[P] extends ReadonlyArray<infer V> ? ReadonlyArray<__types_globals__RecursivePartial<V>> : __types_globals__RecursivePartial<T[P]>;
         };
         export interface _cocos_render_scene_core_pass__IPassDynamics {
             [type: number]: {
@@ -61923,7 +61995,7 @@ declare module "cc" {
             getTypedArray<K extends E[keyof E]>(handle: _cocos_render_scene_core_memory_pools__IHandle<P>, element: K): _cocos_render_scene_core_memory_pools__BufferArrayType;
             free(handle: _cocos_render_scene_core_memory_pools__IHandle<P>): void;
         }
-        export interface _types_globals__IWritableArrayLike<T> {
+        export interface __types_globals__IWritableArrayLike<T> {
             readonly length: number;
             [index: number]: T;
         }
@@ -62024,8 +62096,8 @@ declare module "cc" {
             }
         }
         export type _cocos_core_utils_pool__CleanUpFunction<T> = (value: T) => boolean | void;
-        export type _types_globals__Getter = () => any;
-        export type _types_globals__Setter = (value: any) => void;
+        export type __types_globals__Getter = () => any;
+        export type __types_globals__Setter = (value: any) => void;
         export type _cocos_core_platform_debug__StringSubstitution = number | string;
         export interface _cocos_core_utils_x_deprecated__IReplacement {
             /** Deprecated property name. */
@@ -62205,10 +62277,23 @@ declare module "cc" {
         namespace _cocos_core_data_utils_attribute {
             export const DELIMETER = "$_$";
             export function createAttrsSingle(owner: Object, superAttrs?: any): any;
+            /**
+             * @param subclass Should not have '__attrs__'.
+             */
             export function createAttrs(subclass: any): any;
+            /**
+             * Tag the class with any meta attributes, then return all current attributes assigned to it.
+             * This function holds only the attributes, not their implementations.
+             * @param constructor The class or instance. If instance, the attribute will be dynamic and only available for the specified instance.
+             * @param propertyName The name of the property or function, used to retrieve the attributes.
+             * @private
+             */
             export function attr(constructor: any, propertyName: string): {
                 [attributeName: string]: any;
             };
+            /**
+             * Returns a read-only meta-object.
+             */
             export function getClassAttrs(constructor: any): any;
             export function setClassAttr(ctor: any, propName: any, key: any, value: any): void;
             export class PrimitiveType<T> {
@@ -62217,9 +62302,80 @@ declare module "cc" {
                 constructor(name: string, defaultValue: T);
                 toString(): string;
             }
+            /**
+             * @en
+             * Indicates that the editor should treat this property or array element as an Integer value.
+             * @zh
+             * 指定编辑器以整数形式对待该属性或数组元素。
+             * @example
+             * ```ts
+             * import { CCInteger, _decorator } from "cc";
+             *
+             * // in the class definition:
+             *
+             * @_decorator.property({type: CCInteger})
+             * count = 0;
+             *
+             * @_decorator.property({type: [CCInteger]})
+             * array = [];
+             * ```
+             */
             export const CCInteger: _cocos_core_data_utils_attribute__PrimitiveType<number>;
+            /**
+             * @en
+             * Indicates that the editor should treat this property or array element as a Float value.
+             * @zh
+             * 指定编辑器以浮点数形式对待该属性或数组元素。
+             * @example
+             * ```ts
+             * import { CCFloat, _decorator } from "cc";
+             *
+             * // in the class definition:
+             *
+             * @_decorator.property({type: CCFloat})
+             * x = 0;
+             *
+             * @_decorator.property({type: [CCFloat]})
+             * array = [];
+             * ```
+             */
             export const CCFloat: _cocos_core_data_utils_attribute__PrimitiveType<number>;
+            /**
+             * @en
+             * Indicates that the editor should treat this property or array element as a Boolean value.
+             * @zh
+             * 指定编辑器以布尔值形式对待该属性或数组元素。
+             *
+             * @example
+             * ```ts
+             * import { CCBoolean, _decorator } from "cc";
+             * // in the class definition
+             * @_decorator.property({type: CCBoolean})
+             * isTrue = false;
+             *
+             * @_decorator.property({type: [CCBoolean]})
+             * array = [];
+             * ```
+             */
             export const CCBoolean: _cocos_core_data_utils_attribute__PrimitiveType<boolean>;
+            /**
+             * @en
+             * Indicates that the editor should treat this property or array element as a String value.
+             * @zh
+             * 指定编辑器以字符串形式对待该属性或数组元素。
+             * @example
+             * ```ts
+             * import { CCString, _decorator } from "cc";
+             *
+             * // in the class definition
+             *
+             * @_decorator.property({type: CCString})
+             * name = '';
+             *
+             * @_decorator.property({type: [CCString]})
+             * array = [];
+             * ```
+             */
             export const CCString: _cocos_core_data_utils_attribute__PrimitiveType<string>;
             export function getTypeChecker_ET(type: string, attributeName: string): (constructor: Function, mainPropertyName: string) => void;
             export function getObjTypeChecker_ET(typeCtor: any): (classCtor: any, mainPropName: any) => void;
@@ -62240,7 +62396,7 @@ declare module "cc" {
          * @returns Judge result.
          * @engineInternal
          */
-        export function _cocos_core_data_class__isCCClassOrFastDefined<T>(constructor: _types_globals__Constructor<T>): boolean;
+        export function _cocos_core_data_class__isCCClassOrFastDefined<T>(constructor: __types_globals__Constructor<T>): boolean;
         export enum _cocos_core_data_utils_compact_value_type_array__StorageUnit {
             Uint8 = 0,
             Uint16 = 1,
@@ -62355,9 +62511,9 @@ declare module "cc" {
              */
             EVENT_HANDHELD = "EVENT_HANDHELD",
             /**
-             * @en Check whether Webassembly is supported at runtime. Generally, it needs to be checked when the constant `WASM_SUPPORT_MODE` is 2.
+             * @en Check whether Webassembly is supported at runtime. Generally, it needs to be checked when the constant `NATIVE_CODE_BUNDLE_MODE` is 2.
              * If it is not supported, you need to fallback to the Asm solution.
-             * @zh 运行时检测是否支持 Webassembly，一般在宏 `WASM_SUPPORT_MODE` 为 2 时需要检测，如果不支持，需要回滚到 Asm 方案
+             * @zh 运行时检测是否支持 Webassembly，一般在宏 `NATIVE_CODE_BUNDLE_MODE` 为 2 时需要检测，如果不支持，需要回滚到 Asm 方案
              */
             WASM = "WASM"
         }
@@ -62677,7 +62833,7 @@ declare module "cc" {
          * Please avoid using it and explicitly specify function signatures as possible.
          */
         // eslint-disable-next-line @typescript-eslint/ban-types
-        export type _types_globals__AnyFunction = Function;
+        export type __types_globals__AnyFunction = Function;
         /**
          * @en
          * The parameter describing a real keyframe value.
@@ -63286,10 +63442,10 @@ declare module "cc" {
         }
         /// <reference types="./@types/globals" />
         export class _cocos_core_event_callbacks_invoker__CallbackInfo {
-            callback: _types_globals__AnyFunction;
+            callback: __types_globals__AnyFunction;
             target: unknown | undefined;
             once: boolean;
-            set(callback: _types_globals__AnyFunction, target?: unknown, once?: boolean): void;
+            set(callback: __types_globals__AnyFunction, target?: unknown, once?: boolean): void;
             reset(): void;
             check(): boolean;
         }
@@ -63307,7 +63463,7 @@ declare module "cc" {
              *
              * @param cb - The callback to be removed
              */
-            removeByCallback(cb: _types_globals__AnyFunction): void;
+            removeByCallback(cb: __types_globals__AnyFunction): void;
             /**
              * @zh 从列表中移除与指定目标相同调用者的事件。
              * @en Remove the event listeners with the given target from the list
@@ -63360,7 +63516,7 @@ declare module "cc" {
              * @param target - Callback callee
              * @param once - Whether invoke the callback only once (and remove it)
              */
-            on(key: EventTypeClass, callback: _types_globals__AnyFunction, target?: unknown, once?: boolean): _types_globals__AnyFunction;
+            on(key: EventTypeClass, callback: __types_globals__AnyFunction, target?: unknown, once?: boolean): __types_globals__AnyFunction;
             /**
              * @zh 检查指定事件是否已注册回调。
              * @en Checks whether there is correspond event listener registered on the given event
@@ -63368,7 +63524,7 @@ declare module "cc" {
              * @param callback - Callback function when event triggered
              * @param target - Callback callee
              */
-            hasEventListener(key: EventTypeClass, callback?: _types_globals__AnyFunction, target?: unknown): boolean;
+            hasEventListener(key: EventTypeClass, callback?: __types_globals__AnyFunction, target?: unknown): boolean;
             /**
              * @zh 移除在特定事件类型中注册的所有回调或在某个目标中注册的所有回调。
              * @en Removes all callbacks registered in a certain event type or all callbacks registered with a certain target
@@ -63382,7 +63538,7 @@ declare module "cc" {
              * @param callback - The callback function of the event listener, if absent all event listeners for the given type will be removed
              * @param target - The callback callee of the event listener
              */
-            off(key: EventTypeClass, callback?: _types_globals__AnyFunction, target?: unknown): void;
+            off(key: EventTypeClass, callback?: __types_globals__AnyFunction, target?: unknown): void;
             /**
              * @zh 派发一个指定事件，并传递需要的参数
              * @en Trigger an event directly with the event name and necessary arguments.
@@ -63534,7 +63690,7 @@ declare module "cc" {
             /**
              * @internal
              */
-            static _maskComp: _types_globals__Constructor<Component> | null;
+            static _maskComp: __types_globals__Constructor<Component> | null;
             /**
              * @internal
              */
@@ -63589,13 +63745,13 @@ declare module "cc" {
             setEnabled(value: boolean, recursive?: boolean): void;
             reattach(): void;
             destroy(): void;
-            on(type: NodeEventType, callback: _types_globals__AnyFunction, target?: unknown, useCapture?: boolean): _types_globals__AnyFunction;
-            once(type: NodeEventType, callback: _types_globals__AnyFunction, target?: unknown, useCapture?: boolean): _types_globals__AnyFunction;
-            off(type: NodeEventType, callback?: _types_globals__AnyFunction, target?: unknown, useCapture?: boolean): void;
+            on(type: NodeEventType, callback: __types_globals__AnyFunction, target?: unknown, useCapture?: boolean): __types_globals__AnyFunction;
+            once(type: NodeEventType, callback: __types_globals__AnyFunction, target?: unknown, useCapture?: boolean): __types_globals__AnyFunction;
+            off(type: NodeEventType, callback?: __types_globals__AnyFunction, target?: unknown, useCapture?: boolean): void;
             targetOff(target: unknown): void;
             emit(type: _cocos_input_types_event_enum__SystemEventTypeUnion, arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): void;
             dispatchEvent(event: Event): void;
-            hasEventListener(type: _cocos_input_types_event_enum__SystemEventTypeUnion, callback?: _types_globals__AnyFunction, target?: unknown): boolean;
+            hasEventListener(type: _cocos_input_types_event_enum__SystemEventTypeUnion, callback?: __types_globals__AnyFunction, target?: unknown): boolean;
             /**
              * @zh
              * 获得所提供的事件类型在目标捕获阶段监听的所有目标。
@@ -63618,7 +63774,7 @@ declare module "cc" {
             getBubblingTargets(type: string, targets: Node[]): void;
             onUpdatingSiblingIndex(): void;
         }
-        export type _types_globals__AbstractedConstructor<T = unknown> = new (...args: any[]) => T;
+        export type __types_globals__AbstractedConstructor<T = unknown> = new (...args: any[]) => T;
         /**
          * @en Node's UI properties abstraction
          * @zh 节点上 UI 相关的属性抽象类
@@ -63901,7 +64057,7 @@ declare module "cc" {
             clear(): void;
             deserialize(serializedData: _cocos_serialization_deserialize_dynamic__SerializedData | CCON): any;
         }
-        export type _cocos_serialization_deserialize_dynamic__CompiledDeserializeFn = (deserializer: _cocos_serialization_deserialize_dynamic___Deserializer, object: Record<string, unknown>, deserialized: Record<string, unknown>, constructor: _types_globals__AnyFunction) => void;
+        export type _cocos_serialization_deserialize_dynamic__CompiledDeserializeFn = (deserializer: _cocos_serialization_deserialize_dynamic___Deserializer, object: Record<string, unknown>, deserialized: Record<string, unknown>, constructor: __types_globals__AnyFunction) => void;
         export interface _cocos_serialization_deserialize__CCClassConstructor<T> extends _cocos_serialization_deserialize__Ctor<T> {
             __values__: string[];
             __deserialize__?: _cocos_serialization_deserialize_dynamic__CompiledDeserializeFn;
@@ -64455,13 +64611,69 @@ declare module "cc" {
             destroy(): void;
         }
         namespace _cocos_asset_asset_manager_helper {
+            /**
+             * @en
+             * Extracts uuid from url.
+             *
+             * @zh
+             * 从 url 中提取 uuid。
+             *
+             * @param url @en The url to be converted. @zh 待转换的 url。
+             * @returns @en The uuid extracted from url. @zh url 转换为的 uuid。
+             *
+             * @example
+             * var url = 'res/import/fc/fc991dd7-0033-4b80-9d41-c8a86a702e59.json';
+             * var uuid = getUuidFromURL(url); // fc991dd7-0033-4b80-9d41-c8a86a702e59
+             */
             export function getUuidFromURL(url: string): string;
+            /**
+             * @en
+             * Transforms uuid to url.
+             *
+             * @zh
+             * 转换 uuid 为 url。
+             *
+             * @param uuid @en The uuid of asset. @zh 资源的 uuid。
+             * @param options @en Some optional parameters. @zh 一些可选参数。
+             * @param options.isNative @en Indicates whether the path you want is a native resource path. @zh 需要转换的路径是否是原生资源路径。
+             * @param options.nativeExt @en Extension of the native resource path, it is required when isNative is true. @zh 原生资源路径的扩展名，如果 `isNative` 为 true，则需要。
+             * @returns @en The url converted from uuid. @zh 从 uuid 转换而来的 url.
+             *
+             * @example
+             * // json path, 'assets/main/import/fc/fc991dd7-0033-4b80-9d41-c8a86a702e59.json';
+             * var url = getUrlWithUuid('fcmR3XADNLgJ1ByKhqcC5Z', {isNative: false});
+             *
+             * // png path, 'assets/main/native/fc/fc991dd7-0033-4b80-9d41-c8a86a702e59.png';
+             * var url = getUrlWithUuid('fcmR3XADNLgJ1ByKhqcC5Z', {isNative: true, nativeExt: '.png'});
+             *
+             */
             export function getUrlWithUuid(uuid: string, options?: {
                 [k: string]: any;
                 isNative: boolean;
                 nativeExt?: string;
             } | null): string;
+            /**
+             * @en
+             * Checks if the type of asset is scene.
+             *
+             * @zh
+             * 检查资源类型是否是场景。
+             *
+             * @param asset @en The asset to be checked. @zh 待检查的资源。
+             * @returns @en Whether or not the asset is a SceneAsset. @zh 此资源是否是场景资源。
+             *
+             */
             export function isScene(asset: any): boolean;
+            /**
+             * @en
+             * Normalizes url, strip './' and '/'.
+             *
+             * @zh
+             * 标准化 url ，去除 './' 和 '/'。
+             *
+             * @param url @en The url to be normalized. @zh 待标准化的 url。
+             * @returns @en The normalized url. @zh 标准化后的 url。
+             */
             export function normalize(url: string): string;
             export function transform(input: string | string[] | Record<string, any> | Array<Record<string, any>>, options?: Record<string, any> | null): string | string[];
         }
@@ -64664,7 +64876,7 @@ declare module "cc" {
              * @en The type of the asset.
              * @zh 此资源的类型。
              */
-            ctor: _types_globals__Constructor<Asset>;
+            ctor: __types_globals__Constructor<Asset>;
         }
         /**
          * @en Information about the scene asset.
@@ -65282,23 +65494,116 @@ declare module "cc" {
         export interface _cocos_dragon_bones_ArmatureDisplay__BoneIndex extends Number {
             _any: number;
         }
-        export interface _types_webGLextras__EXT_color_buffer_half_float {
+        /**
+         * - Animation fade out mode.
+         * @version DragonBones 4.5
+         * @language en_US
+         */
+        /**
+         * - 动画淡出模式。
+         * @version DragonBones 4.5
+         * @language zh_CN
+         */
+        export enum __node_modules_cocos_dragonbones_js_out_dragonBones__AnimationFadeOutMode {
+            /**
+             * - Do not fade out of any animation states.
+             * @language en_US
+             */
+            /**
+             * - 不淡出任何的动画状态。
+             * @language zh_CN
+             */
+            None = 0,
+            /**
+             * - Fade out the animation states of the same layer.
+             * @language en_US
+             */
+            /**
+             * - 淡出同层的动画状态。
+             * @language zh_CN
+             */
+            SameLayer = 1,
+            /**
+             * - Fade out the animation states of the same group.
+             * @language en_US
+             */
+            /**
+             * - 淡出同组的动画状态。
+             * @language zh_CN
+             */
+            SameGroup = 2,
+            /**
+             * - Fade out the animation states of the same layer and group.
+             * @language en_US
+             */
+            /**
+             * - 淡出同层并且同组的动画状态。
+             * @language zh_CN
+             */
+            SameLayerAndGroup = 3,
+            /**
+             * - Fade out of all animation states.
+             * @language en_US
+             */
+            /**
+             * - 淡出所有的动画状态。
+             * @language zh_CN
+             */
+            All = 4,
+            /**
+             * - Does not replace the animation state with the same name.
+             * @language en_US
+             */
+            /**
+             * - 不替换同名的动画状态。
+             * @language zh_CN
+             */
+            Single = 5
+        }
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__EXT_color_buffer_half_float {
+            readonly FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE_EXT: GLenum;
+            readonly RGB16F_EXT: GLenum;
+            readonly RGBA16F_EXT: GLenum;
+            readonly UNSIGNED_NORMALIZED_EXT: GLenum;
+        }
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__EXT_color_buffer_half_float {
             readonly RGBA16F_EXT: GLenum;
             readonly RGB16F_EXT: GLenum;
             readonly FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE_EXT: GLenum;
             readonly UNSIGNED_NORMALIZED_EXT: GLenum;
         }
-        export interface _types_webGLextras__WEBGL_multi_draw {
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_multi_draw {
+            multiDrawArraysInstancedWEBGL(mode: GLenum, firstsList: Int32Array | GLint[], firstsOffset: GLuint, countsList: Int32Array | GLsizei[], countsOffset: GLuint, instanceCountsList: Int32Array | GLsizei[], instanceCountsOffset: GLuint, drawcount: GLsizei): void;
+            multiDrawArraysWEBGL(mode: GLenum, firstsList: Int32Array | GLint[], firstsOffset: GLuint, countsList: Int32Array | GLsizei[], countsOffset: GLuint, drawcount: GLsizei): void;
+            multiDrawElementsInstancedWEBGL(mode: GLenum, countsList: Int32Array | GLsizei[], countsOffset: GLuint, type: GLenum, offsetsList: Int32Array | GLsizei[], offsetsOffset: GLuint, instanceCountsList: Int32Array | GLsizei[], instanceCountsOffset: GLuint, drawcount: GLsizei): void;
+            multiDrawElementsWEBGL(mode: GLenum, countsList: Int32Array | GLsizei[], countsOffset: GLuint, type: GLenum, offsetsList: Int32Array | GLsizei[], offsetsOffset: GLuint, drawcount: GLsizei): void;
+        }
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_multi_draw {
             multiDrawArraysWEBGL(mode: GLenum, firstsList: GLint[] | Int32Array, firstsOffset: GLuint, countsList: GLsizei[] | Int32Array, countsOffset: GLuint, drawCount: GLsizei): void;
             multiDrawElementsWEBGL(mode: GLenum, countsList: GLint[] | Int32Array, countsOffset: GLuint, type: GLenum, offsetsList: GLsizei[] | Int32Array, OffsetsOffset: GLuint, drawCount: GLsizei): void;
             multiDrawArraysInstancedWEBGL(mode: GLenum, firstsList: GLint[] | Int32Array, firstsOffset: GLuint, countsList: GLsizei[] | Int32Array, countsOffset: GLuint, instanceCountsList: GLsizei[] | Int32Array, instanceCountsOffset: GLuint, drawCount: GLsizei): void;
             multiDrawElementsInstancedWEBGL(mode: GLenum, countsList: GLint[] | Int32Array, countsOffset: GLuint, type: GLenum, offsetsList: GLsizei[] | Int32Array, OffsetsOffset: GLuint, instanceCountsList: GLsizei[] | Int32Array, instanceCountsOffset: GLuint, drawCount: GLsizei): void;
         }
-        // note that ETC1 is not supported with the compressedTexSubImage2D() method
-        export interface _types_webGLextras__WEBGL_compressed_texture_etc1 {
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_compressed_texture_etc1 {
             readonly COMPRESSED_RGB_ETC1_WEBGL: GLenum;
         }
-        export interface _types_webGLextras__WEBGL_compressed_texture_etc {
+        // note that ETC1 is not supported with the compressedTexSubImage2D() method
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_compressed_texture_etc1 {
+            readonly COMPRESSED_RGB_ETC1_WEBGL: GLenum;
+        }
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_compressed_texture_etc {
+            readonly COMPRESSED_R11_EAC: GLenum;
+            readonly COMPRESSED_RG11_EAC: GLenum;
+            readonly COMPRESSED_RGB8_ETC2: GLenum;
+            readonly COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2: GLenum;
+            readonly COMPRESSED_RGBA8_ETC2_EAC: GLenum;
+            readonly COMPRESSED_SIGNED_R11_EAC: GLenum;
+            readonly COMPRESSED_SIGNED_RG11_EAC: GLenum;
+            readonly COMPRESSED_SRGB8_ALPHA8_ETC2_EAC: GLenum;
+            readonly COMPRESSED_SRGB8_ETC2: GLenum;
+            readonly COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2: GLenum;
+        }
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_compressed_texture_etc {
             readonly COMPRESSED_R11_EAC: GLenum;
             readonly COMPRESSED_SIGNED_R11_EAC: GLenum;
             readonly COMPRESSED_RG11_EAC: GLenum;
@@ -65310,7 +65615,7 @@ declare module "cc" {
             readonly COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2: GLenum;
             readonly COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2: GLenum;
         }
-        export interface _types_webGLextras__WEBGL_compressed_texture_pvrtc {
+        export interface __types_webGLextras__WEBGL_compressed_texture_pvrtc {
             readonly COMPRESSED_RGB_PVRTC_4BPPV1_IMG: GLenum;
             readonly COMPRESSED_RGBA_PVRTC_4BPPV1_IMG: GLenum;
             readonly COMPRESSED_RGB_PVRTC_2BPPV1_IMG: GLenum;
@@ -65323,12 +65628,12 @@ declare module "cc" {
             EXT_shader_texture_lod: EXT_shader_texture_lod | null;
             EXT_sRGB: EXT_sRGB | null;
             OES_vertex_array_object: OES_vertex_array_object | null;
-            EXT_color_buffer_half_float: _types_webGLextras__EXT_color_buffer_half_float | null;
-            WEBGL_multi_draw: _types_webGLextras__WEBGL_multi_draw | null;
+            EXT_color_buffer_half_float: __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__EXT_color_buffer_half_float | null;
+            WEBGL_multi_draw: __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_multi_draw | null;
             WEBGL_color_buffer_float: WEBGL_color_buffer_float | null;
-            WEBGL_compressed_texture_etc1: _types_webGLextras__WEBGL_compressed_texture_etc1 | null;
-            WEBGL_compressed_texture_etc: _types_webGLextras__WEBGL_compressed_texture_etc | null;
-            WEBGL_compressed_texture_pvrtc: _types_webGLextras__WEBGL_compressed_texture_pvrtc | null;
+            WEBGL_compressed_texture_etc1: __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_compressed_texture_etc1 | null;
+            WEBGL_compressed_texture_etc: __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_compressed_texture_etc | null;
+            WEBGL_compressed_texture_pvrtc: __types_webGLextras__WEBGL_compressed_texture_pvrtc | null;
             WEBGL_compressed_texture_astc: WEBGL_compressed_texture_astc | null;
             WEBGL_compressed_texture_s3tc: WEBGL_compressed_texture_s3tc | null;
             WEBGL_compressed_texture_s3tc_srgb: WEBGL_compressed_texture_s3tc_srgb | null;
@@ -65415,16 +65720,18 @@ declare module "cc" {
             destroy(): void;
             draw(gpuTextureSrc: _cocos_gfx_webgl_webgl_gpu_objects__IWebGLGPUTexture, gpuTextureDst: _cocos_gfx_webgl_webgl_gpu_objects__IWebGLGPUTexture, regions: gfx.TextureBlit[], filter: gfx.Filter): void;
         }
-        export interface _types_webGL2extras__EXT_color_buffer_float {
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__EXT_color_buffer_float {
+        }
+        export interface __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__EXT_color_buffer_float {
         }
         export interface _cocos_gfx_webgl2_webgl2_define__IWebGL2Extensions {
             EXT_texture_filter_anisotropic: EXT_texture_filter_anisotropic | null;
-            EXT_color_buffer_half_float: _types_webGLextras__EXT_color_buffer_half_float | null;
-            EXT_color_buffer_float: _types_webGL2extras__EXT_color_buffer_float | null;
-            WEBGL_multi_draw: _types_webGLextras__WEBGL_multi_draw | null;
-            WEBGL_compressed_texture_etc1: _types_webGLextras__WEBGL_compressed_texture_etc1 | null;
-            WEBGL_compressed_texture_etc: _types_webGLextras__WEBGL_compressed_texture_etc | null;
-            WEBGL_compressed_texture_pvrtc: _types_webGLextras__WEBGL_compressed_texture_pvrtc | null;
+            EXT_color_buffer_half_float: __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__EXT_color_buffer_half_float | null;
+            EXT_color_buffer_float: __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__EXT_color_buffer_float | null;
+            WEBGL_multi_draw: __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_multi_draw | null;
+            WEBGL_compressed_texture_etc1: __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_compressed_texture_etc1 | null;
+            WEBGL_compressed_texture_etc: __node_modules_cocos_ccbuild_node_modules_typescript_lib_libdom__WEBGL_compressed_texture_etc | null;
+            WEBGL_compressed_texture_pvrtc: __types_webGLextras__WEBGL_compressed_texture_pvrtc | null;
             WEBGL_compressed_texture_astc: WEBGL_compressed_texture_astc | null;
             WEBGL_compressed_texture_s3tc: WEBGL_compressed_texture_s3tc | null;
             WEBGL_compressed_texture_s3tc_srgb: WEBGL_compressed_texture_s3tc_srgb | null;
@@ -66541,11 +66848,30 @@ declare module "cc" {
             beforeRender(): void;
         }
         namespace _cocos_physics_2d_framework_utils_polygon_separator {
+            /**
+             * @en
+             * Decompose the polygon into several smaller non-concave polygon.
+             * If the polygon is already convex, it will return the original polygon, unless it is over Settings.MaxPolygonVertices.
+             * Precondition: Counter Clockwise polygon
+             * @zh
+             * 使用Mark Bayazit算法将输入多边形拆分成多个凸多边形。如果输入多边形是凸多边形，将返回原多边形。要求输入多边形是逆时针的。
+             * @param polygon @en one polygon. @zh 一个多边形。
+             * @return @en polygon array. @zh 多边形数组。
+             */
             export function ConvexPartition(vertices: math.IVec2Like[]): math.IVec2Like[][];
             export function ForceCounterClockWise(vertices: any): void;
             export function IsCounterClockWise(vertices: any): boolean;
         }
         namespace _cocos_physics_2d_framework_utils_polygon_partition {
+            /**
+             * @en
+             * Decompose the polygon into several convex polygon using Hertel-Mehlhorn algorithm.
+             * If the polygon is already convex, it will return the original polygon.
+             * @zh
+             * 使用Hertel-Mehlhorn算法将输入多边形拆分成多个凸多边形。如果输入多边形是凸多边形，将返回原多边形。
+             * @param polygon @en one polygon. @zh 一个多边形。
+             * @return @en polygon array. @zh 多边形数组。
+             */
             export function ConvexPartition(polygon: math.IVec2Like[]): math.IVec2Like[][] | null;
         }
         export type _cocos_physics_2d_framework_physics_selector__IPhysicsEngineId = "builtin" | "box2d" | "box2d-wasm" | string;
@@ -67124,23 +67450,23 @@ declare module "cc" {
             setHeight(value: number): void;
         }
         export interface _cocos_physics_framework_physics_selector__IPhysicsWrapperObject {
-            PhysicsWorld?: _types_globals__Constructor<_cocos_physics_spec_i_physics_world__IPhysicsWorld>;
-            RigidBody?: _types_globals__Constructor<_cocos_physics_spec_i_rigid_body__IRigidBody>;
-            BoxCharacterController?: _types_globals__Constructor<_cocos_physics_spec_i_character_controller__IBoxCharacterController>;
-            CapsuleCharacterController?: _types_globals__Constructor<_cocos_physics_spec_i_character_controller__ICapsuleCharacterController>;
-            BoxShape?: _types_globals__Constructor<_cocos_physics_spec_i_physics_shape__IBoxShape>;
-            SphereShape?: _types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ISphereShape>;
-            CapsuleShape?: _types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ICapsuleShape>;
-            TrimeshShape?: _types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ITrimeshShape>;
-            CylinderShape?: _types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ICylinderShape>;
-            ConeShape?: _types_globals__Constructor<_cocos_physics_spec_i_physics_shape__IConeShape>;
-            TerrainShape?: _types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ITerrainShape>;
-            SimplexShape?: _types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ISimplexShape>;
-            PlaneShape?: _types_globals__Constructor<_cocos_physics_spec_i_physics_shape__IPlaneShape>;
-            PointToPointConstraint?: _types_globals__Constructor<_cocos_physics_spec_i_physics_constraint__IPointToPointConstraint>;
-            HingeConstraint?: _types_globals__Constructor<_cocos_physics_spec_i_physics_constraint__IHingeConstraint>;
-            FixedConstraint?: _types_globals__Constructor<_cocos_physics_spec_i_physics_constraint__IFixedConstraint>;
-            ConfigurableConstraint?: _types_globals__Constructor<_cocos_physics_spec_i_physics_constraint__IConfigurableConstraint>;
+            PhysicsWorld?: __types_globals__Constructor<_cocos_physics_spec_i_physics_world__IPhysicsWorld>;
+            RigidBody?: __types_globals__Constructor<_cocos_physics_spec_i_rigid_body__IRigidBody>;
+            BoxCharacterController?: __types_globals__Constructor<_cocos_physics_spec_i_character_controller__IBoxCharacterController>;
+            CapsuleCharacterController?: __types_globals__Constructor<_cocos_physics_spec_i_character_controller__ICapsuleCharacterController>;
+            BoxShape?: __types_globals__Constructor<_cocos_physics_spec_i_physics_shape__IBoxShape>;
+            SphereShape?: __types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ISphereShape>;
+            CapsuleShape?: __types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ICapsuleShape>;
+            TrimeshShape?: __types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ITrimeshShape>;
+            CylinderShape?: __types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ICylinderShape>;
+            ConeShape?: __types_globals__Constructor<_cocos_physics_spec_i_physics_shape__IConeShape>;
+            TerrainShape?: __types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ITerrainShape>;
+            SimplexShape?: __types_globals__Constructor<_cocos_physics_spec_i_physics_shape__ISimplexShape>;
+            PlaneShape?: __types_globals__Constructor<_cocos_physics_spec_i_physics_shape__IPlaneShape>;
+            PointToPointConstraint?: __types_globals__Constructor<_cocos_physics_spec_i_physics_constraint__IPointToPointConstraint>;
+            HingeConstraint?: __types_globals__Constructor<_cocos_physics_spec_i_physics_constraint__IHingeConstraint>;
+            FixedConstraint?: __types_globals__Constructor<_cocos_physics_spec_i_physics_constraint__IFixedConstraint>;
+            ConfigurableConstraint?: __types_globals__Constructor<_cocos_physics_spec_i_physics_constraint__IConfigurableConstraint>;
         }
         export interface _cocos_physics_framework_physics_selector__IPhysicsBackend {
             [key: string]: _cocos_physics_framework_physics_selector__IPhysicsWrapperObject;
@@ -67209,7 +67535,7 @@ declare module "cc" {
          * @zh
          * 立方体参数选项。
          */
-        export interface _cocos_primitive_box__IBoxOptions extends _types_globals__RecursivePartial<primitives.IGeometryOptions> {
+        export interface _cocos_primitive_box__IBoxOptions extends __types_globals__RecursivePartial<primitives.IGeometryOptions> {
             /**
              * @en
              * Box extent on X-axis.
@@ -67260,7 +67586,7 @@ declare module "cc" {
          * @zh
          * 平面参数选项。
          */
-        export interface _cocos_primitive_plane__IPlaneOptions extends _types_globals__RecursivePartial<primitives.IGeometryOptions> {
+        export interface _cocos_primitive_plane__IPlaneOptions extends __types_globals__RecursivePartial<primitives.IGeometryOptions> {
             /**
              * Plane extent on X-axis.
              */
@@ -67343,7 +67669,7 @@ declare module "cc" {
             constructor(id: string, opts: _cocos_profiler_counter__ICounterOption, now: number);
             sample(now: number): void;
             human(): number;
-            alarm(): boolean | number | undefined;
+            alarm(): boolean;
             protected _average(v: number, now?: number): void;
         }
         export interface _cocos_profiler_counter__ICounterOption {
@@ -68351,7 +68677,7 @@ declare module "cc" {
          * To provide a safe Record type, if you want to enable checking index access on Object, please use SafeRecord instead of Record.
          * we provide this type because we don't want to enable `noUncheckedIndexedAccess` in tsconfig.json for it's noisy for a lot of code.
          */
-        export type _types_globals__SafeRecord<T extends (string | number | symbol), K> = Record<T, K | undefined>;
+        export type __types_globals__SafeRecord<T extends (string | number | symbol), K> = Record<T, K | undefined>;
         export interface _cocos_tiledmap_tiled_layer__TiledSubNodeData {
             subNodes: (null | TiledUserNodeData)[];
         }
@@ -68913,7 +69239,7 @@ declare module "cc" {
             _delegate: EditBox | null;
             init(delegate: EditBox): void;
             onEnable(): void;
-            update(): void;
+            beforeDraw(): void;
             onDisable(): void;
             clear(): void;
             setTabIndex(index: number): void;

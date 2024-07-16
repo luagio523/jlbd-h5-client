@@ -1,4 +1,4 @@
-import { Node, Sprite, SpriteFrame,  assetManager, log, resources } from "cc";
+import { ImageAsset, Node, Sprite, SpriteFrame,  Texture2D,  assetManager, log, resources } from "cc";
 import { EventDispatcher } from "../../core/common/event/EventDispatcher";
 import { ListenerFunc } from "../../core/common/event/EventMessage";
 
@@ -14,23 +14,33 @@ import { ListenerFunc } from "../../core/common/event/EventMessage";
         super()
         this.eventDispatcher = new EventDispatcher
         this.renderSprite = this.addComponent(Sprite)
+        
     }
 
     public set source(url:string){
         log(`Thumbnail load ${url}`)
 
-        // resources.load(url, SpriteFrame,  (err, spFrame)=> {
-        //     if (err != null) {
-        //         console.log(err);
-        //         return;
-        //     }
-        //     // 使用加载的SpriteFrame
-        //     this.renderSprite.spriteFrame = spFrame;
-        //     this.eventDispatcher.dispatchEvent( "Complete");
-        // });
+        resources.load(url, ImageAsset,  (err, asset)=> {
+            if (err != null) {
+                console.log(err);
+                return;
+            }
+
+            const texture = new Texture2D();
+            texture.image = asset;
+    
+            const spriteFrame = new SpriteFrame();
+            spriteFrame.texture = texture;
+
+            
+            this.renderSprite.spriteFrame = spriteFrame
+
+            // 使用加载的SpriteFrame
+            this.eventDispatcher.dispatchEvent( "Complete");
+        });
 
 
-      
+        
     }
 
     public addEventListener(eventName:string,listener:ListenerFunc){

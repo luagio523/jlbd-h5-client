@@ -1,5 +1,5 @@
 import { Node, Vec3, Color } from 'cc';
-import { IControlMouseEvent, IHandleData } from '../../../defines';
+import type { IControlMouseEvent, IHandleData } from '../../../public/defines';
 import EditableController from './editable-controller';
 declare enum PolygonHandleType {
     None = "none",
@@ -9,7 +9,7 @@ declare enum PolygonHandleType {
 }
 interface IPolygonHandleData {
     type: string;
-    deltaPos?: Vec3;
+    deltaPos: Vec3;
     index: number;
     hitPos?: Vec3;
 }

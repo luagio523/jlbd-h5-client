@@ -1,6 +1,6 @@
 /// <reference path="../../../../../../../../resources/3d/engine/bin/.declarations/cc.d.ts" />
 /// <reference path="../../../public/gizmos/utils/engine/3d.d.ts" />
-/// <reference path="../../../public/gizmos/3d/gizmo-manager.d.ts" />
+/// <reference path="../../../public/gizmos/manager/data.d.ts" />
 /// <reference path="../asset/asset-watcher.d.ts" />
 /// <reference types="@cocos/creator-types/engine/cc" />
 import { Node } from 'cc';

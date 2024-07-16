@@ -2,16 +2,16 @@ import { ParticleSystem, Vec3 } from 'cc';
 import BoxController from '../controller/box-controller';
 import CircleController from '../controller/circle-controller';
 import HemisphereController from '../controller/hemisphere-controller';
-import ConeController from '../controller/particlesystem-cone-controller';
+import ConeController from '../controller/particle-system-cone-controller';
 import SphereController from '../controller/sphere-controller';
 import Gizmo from '../gizmo-base';
 declare class ParticleSystemComponentGizmo extends Gizmo {
+    private _boundingBoxController;
     private _curEmitterShape;
     private _shapeControllers;
     private _PSGizmoColor;
     private _activeController;
     private _pSGizmoRoot;
-    private _boundingBoxController;
     private _scale;
     private _size;
     private _radius;

@@ -13,17 +13,18 @@ export interface IOptions {
     buildOpenDataContextTemplate: boolean;
     orientation: IOrientation;
     physX: {
-        use: 'physX' | 'project';
         notPackPhysXLibs: boolean;
         multiThread: boolean;
         subThreadCount: number;
         epsilon: number;
+        use?: boolean;
     };
 
     subpackages?: { name: string, root: string }[];
     wasmSubpackage: boolean;
 
     devToolsLaunchMethod: IDevToolsLaunchMethod;
+    generatePreloadJsFileList: boolean;
 }
 
 export interface ITaskOption extends IInternalBuildOptions {

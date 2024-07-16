@@ -19,8 +19,8 @@ import {
 import { Node, Vec3, Quat,Component } from 'cc';
 import type ParticleManager from '../source/script/3d/manager/particle';
 import type { ISceneEvents } from '../source/script/3d/manager/scene-events-interface';
-import { AnimationOperationOptions, AssetInfo, EditorCameraInfo, IAssetMeta, IPropCurveDumpData } from './private';
-import { IAssetInfo } from '../../builder/@types/protect';
+import { AnimationOperationOptions, AssetInfo, EditorCameraInfo, IPropCurveDumpData } from './private';
+import { IAssetInfo, IAssetMeta } from '@cocos/creator-types/editor/packages/asset-db/@types/public';
 
 interface ISceneFacade extends ISceneEvents {
     init(): void;
@@ -456,7 +456,7 @@ interface ISceneFacade extends ISceneEvents {
 
     assetChange(uuid: string, info: IAssetInfo, meta: IAssetMeta): Promise<void>;
 
-    assetDelete(uuid: string, info?: any): void;
+    assetDelete(uuid: string, info?: IAssetInfo): void;
 
     /**
      * 一个资源更新到场景的引用中后发出此消息
@@ -739,8 +739,8 @@ interface ISceneFacade extends ISceneEvents {
     queryScriptName(uuid: string): Promise<any>;
     queryScriptCid(uuid: string): Promise<any>;
     loadScript(uuid: string): Promise<void>;
-    removeScript(info: any): Promise<void>;
-    scriptChange(info: any): Promise<void>;
+    removeScript(info: IAssetInfo): Promise<void>;
+    scriptChange(info: IAssetInfo): Promise<void>;
 
     ///////////////
     // selection //
@@ -860,8 +860,6 @@ interface ISceneFacade extends ISceneEvents {
     duplicateCurrentSelectedProbes(): void;
 
     removeCurrentSelectedProbes(): void;
-
-    lightProbeInfoChanged(): void;
 
     changeTitle():Promise<void>;
 }

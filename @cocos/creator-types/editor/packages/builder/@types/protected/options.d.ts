@@ -1,10 +1,12 @@
 import { StatsQuery, ConfigInterface } from '@cocos/ccbuild';
-import { IBuildDesignResolution, IBuildOptionBase, IBuildTaskOption, ITaskItemJSON, BundleCompressionType, IPhysicsConfig, IBundleOptions } from '../public';
-import { IAssetInfo, IAssetMeta } from '../../../asset-db/@types/protected'
+import { IPolyFills, IBuildDesignResolution, IBuildOptionBase, IBuildTaskOption, ITaskItemJSON, BundleCompressionType, IPhysicsConfig, IBundleOptions } from '../public';
+import { IAssetInfo, IAssetMeta } from '../../../asset-db/@types/protected';
+
+import { EngineInfo } from '../../../engine/@types/index';
 
 export interface IBundleInternalOptions extends IBundleOptions {
     dest: string, // bundle 的输出目录
-    scriptDest: string, // 脚本的输出目录
+    scriptDest: string, // 脚本的输出地址
     priority: number, // bundle 的优先级
     compressionType: BundleCompressionType, // bundle 的压缩类型
     isRemote: boolean // bundle 是否是远程包
@@ -56,7 +58,7 @@ export interface IBundleInitOptions extends IBundleOptions {
     // isEncrypted: boolean // bundle 中的代码是否加密，原生平台使用
 
     dest: string, // bundle 的输出目录
-    scriptDest: string, // 脚本的输出目录
+    scriptDest: string, // 脚本的输出地址
 }
 
 export enum BuiltinBundleName {
@@ -158,6 +160,13 @@ export interface TransformOptions {
 
 }
 
+export interface IMD5Options {
+    // 填写需要过滤或者包含的路径匹配列表或者符合 glob 匹配规则的字符串 
+    excludes: string[];
+    includes: string[];
+    replaceOnly: string[];
+}
+
 export interface IScriptOptions {
     transform: TransformOptions;
     debug: boolean;
@@ -175,6 +184,8 @@ export interface IImportMapOptions {
     importMapFormat?: 'commonjs' | 'esm';
 }
 
+export type IPlatformType = 'native' | 'miniGame' | 'web';
+
 export interface IInternalBuildOptions extends IBuildTaskOption {
     dest: string;
     // 编译 application.js 参数配置
@@ -185,6 +196,8 @@ export interface IInternalBuildOptions extends IBuildTaskOption {
     buildScriptParam: IBuildScriptParam;
     // 序列化打包资源时的特殊处理
     assetSerializeOptions: AssetSerializeOptions;
+    // 配置添加 md5 后缀时需要过滤的路径匹配列表
+    md5CacheOptions: IMD5Options,
     updateOnly: boolean;
     generateCompileConfig?: boolean;
     recompileConfig?: IRecompileConfig;
@@ -200,6 +213,10 @@ export interface IInternalBuildOptions extends IBuildTaskOption {
     // 构建之前默认会清空构建目录，如不希望清空，请在 onBeforeInit 之前修改当前参数为 true
     useCache?: boolean;
     bundleConfigs?: IBundleInternalOptions[];
+
+    engineInfo: EngineInfo;
+
+    platformType: IPlatformType;
 }
 
 export interface appTemplateData {
@@ -233,7 +250,7 @@ export interface IBuildEngineParam {
     split?: boolean;
     targets?: ITransformTarget;
     skip?: boolean;
-    ammoJsWasm?: boolean | 'fallback';
+    nativeCodeBundleMode:  'wasm' | 'asmjs' | 'both';
     assetURLFormat?:
     | 'relative-from-out'
     | 'relative-from-chunk'
@@ -243,6 +260,8 @@ export interface IBuildEngineParam {
     output?: string;
     preserveType?: boolean;
     isNative?: boolean;
+    wasmCompressionMode?: 'brotli';
+    enableNamedRegisterForSystemJSModuleFormat?: boolean;
 }
 
 export type ITransformTarget = string | string[] | Record<string, string>;

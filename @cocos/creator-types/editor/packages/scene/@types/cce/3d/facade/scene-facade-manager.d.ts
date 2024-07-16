@@ -5,6 +5,7 @@ import type PreviewPlay from '../manager/preview-play';
 import { Node, Component } from 'cc';
 import * as cc from 'cc';
 import type { SceneUndoCommandID } from '../../export/undo';
+import { IAssetInfo } from '@cocos/creator-types/editor/packages/asset-db/@types/public';
 declare class SceneFacadeManager implements ISceneFacade {
     private _projectType;
     private _highQuality;
@@ -15,6 +16,11 @@ declare class SceneFacadeManager implements ISceneFacade {
     onNativeConfigChange(value: string): Promise<void>;
     initManager(): Promise<void>;
     initEventListener(): void;
+    /**
+     * 处理 Webgl 丢失上下文丢失时，提示用户是否重启
+     * @private
+     */
+    private addWebglcontextlostEventListener;
     /**
      * 退出命令，如果是场景模式，则返回 true
      * 其他模式，则执行退出模式操作，并返回 false
@@ -36,7 +42,7 @@ declare class SceneFacadeManager implements ISceneFacade {
     reloadScene(): Promise<boolean>;
     queryNodeTree(uuid: string): Promise<any>;
     queryNodesByAssetUuid(uuid: string): Promise<string[]>;
-    queryNodesMissAsset(): string[];
+    queryNodesMissAsset(): Promise<string[]>;
     querySceneSerializedData(): Promise<string>;
     querySceneDirty(): Promise<any>;
     queryClasses(options?: QueryClassesOptions): Promise<any>;
@@ -65,7 +71,6 @@ declare class SceneFacadeManager implements ISceneFacade {
     duplicateNode(uuids: string | string[]): string[];
     duplicateCurrentSelectedProbes(): void;
     removeCurrentSelectedProbes(): void;
-    lightProbeInfoChanged(): void;
     cutNode(uuids: string | string[]): void;
     pasteNode(options: PasteNodeOptions): Promise<string[]>;
     setNodeParent(options: CutNodeOptions): Promise<string[]>;
@@ -111,7 +116,7 @@ declare class SceneFacadeManager implements ISceneFacade {
     queryRenderPipeline(uuid: string): Promise<any>;
     previewMaterial(uuid: string, material: any, opts?: {
         emit?: boolean;
-    }): void;
+    }): Promise<void>;
     applyMaterial(uuid: string, materialDump: any): void;
     changePhysicsMaterial(dump: any): Promise<any>;
     applyPhysicsMaterial(uuid: string): Promise<void>;
@@ -145,7 +150,7 @@ declare class SceneFacadeManager implements ISceneFacade {
     setIconGizmo3D(is3D: boolean): void;
     setIconGizmoSize(size: number): void;
     setToolsVisibility3d(isVisibility: boolean): void;
-    queryTransformSnapConfigs(): import("../../public/gizmos/utils/transform-tool-data").ISnapConfigData;
+    queryTransformSnapConfigs(): import("../../public/gizmos/manager/transform-tool").ISnapConfigData;
     setTransformSnapConfigs(name: string, value: any): void;
     queryRectSnappingConfigs(): number | boolean | import("../../public/gizmos/utils/rect-transform-snapping").IRectSnapConfigData;
     setRectSnappingConfigs(name: any, value: any): void;
@@ -194,8 +199,8 @@ declare class SceneFacadeManager implements ISceneFacade {
     queryScriptName(uuid: string): Promise<any>;
     queryScriptCid(uuid: string): Promise<any>;
     loadScript(uuid: string): Promise<void>;
-    removeScript(info: any): Promise<void>;
-    scriptChange(info: any): Promise<void>;
+    removeScript(info: IAssetInfo): Promise<void>;
+    scriptChange(info: IAssetInfo): Promise<void>;
     investigatePackerDriver(): Promise<any>;
     querySelection(): string[];
     isSelectNode(uuid: string): boolean;

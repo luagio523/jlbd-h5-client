@@ -1,5 +1,5 @@
 import EditableController from './editable-controller';
-import { IControlMouseEvent } from '../../../defines';
+import type { IControlMouseEvent } from '../../../public/defines';
 import { Vec3, Node, Color, EAxisDirection } from 'cc';
 declare class ConeController extends EditableController {
     private _oriDir;
@@ -28,7 +28,7 @@ declare class ConeController extends EditableController {
     setColor(color: Color): void;
     _updateEditHandle(axisName: string): void;
     initShape(): void;
-    getSideLinesData(center: Vec3, radius: number, height: number): import("../../../defines").IMeshPrimitive;
+    getSideLinesData(center: Vec3, radius: number, height: number): import("../../../public/defines").IMeshPrimitive;
     getLowerCapData(center: Vec3, radius: number, height: number): any;
     updateSize(center: Vec3, radius: number, height: number): void;
     onMouseDown(event: IControlMouseEvent): void;

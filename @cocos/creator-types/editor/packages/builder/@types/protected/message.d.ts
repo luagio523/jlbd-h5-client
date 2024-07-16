@@ -1,5 +1,5 @@
 import { IBundleConfig, ISettings } from '../public/build-result';
-import { IBuildTaskItemJSON } from '../public/options';
+import { IBuildTaskItemJSON, Platform } from '../public/options';
 import { IPackOptions, PreviewPackResult } from './texture-packer';
 
 export interface message extends EditorMessageMap {
@@ -46,5 +46,13 @@ export interface message extends EditorMessageMap {
     'preview-bundle-config': {
         params: [config: CustomBundleConfigItem],
         result: Record<string, { compressionType: BundleCompressionType, isRemote: boolean} >,
+    },
+    'query-platform-config': {
+        params: [],
+        result: {
+            order: Platform[];
+            native: Platform[];
+            config: Record<string, PlatformConfig>;
+        },
     }
 }

@@ -113,10 +113,9 @@ export declare class NodeManager extends EventEmitter implements ISceneEvents {
     queryNodesByAssetUuid(uuid: string): string[];
     /**
      * 获取丢失资源的节点
-     * @param
      * @returns uuids[] 节点数组
      */
-    queryNodesMissAsset(): string[];
+    queryNodesMissAsset(): Promise<string[]>;
     /**
      * 预览设置属性后的效果，不进入undo堆栈
      * @param uuid

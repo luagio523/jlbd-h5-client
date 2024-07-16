@@ -1,3 +1,7 @@
+import { IInternalBuildOptions } from '../../builder/@types/protected';
+import { CategoryInfo, Features } from '@cocos/creator-types/engine/features';
+import { IModuleItem } from './module';
+
 export * from './module';
 export interface EngineInfo {
     typescript: {

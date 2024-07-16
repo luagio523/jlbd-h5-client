@@ -3,7 +3,7 @@ import GizmoBase from '../../gizmo-base';
 import PointController from '../../controller/point-controller';
 import LineController from '../../controller/line-controller';
 import TriangleController from '../../controller/triangle-controller';
-import TetrahedronController from '../../controller/tetrahedron-cotroller';
+import TetrahedronController from '../../controller/tetrahedron-controller';
 declare class SimplexColliderGizmo extends GizmoBase {
     private _shapeControllers;
     private _activeController;
