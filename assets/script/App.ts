@@ -17,6 +17,7 @@ import { RandomManager } from "./core/common/random/RandomManager"
 import {  MessageSubscriber } from "./core/common/event/MessageManager"
 import { HttpRequest } from "./libs/network/HttpRequest"
 import { NetManager } from "./libs/network/NetManager"
+import { LanguageManager } from "./core/common/i18n/LanguageManager"
 
 // const i18n = require("LanguageData");
 
@@ -38,6 +39,8 @@ export default class app extends oops{
     static timer:ITimerMgr = new HeapTimerMgr()
     /** SDK  */
     static sdk:SDKManager = SDKManager.getInstance()
+    /** 语言本地化管理 */
+    static language:LanguageManager = LanguageManager.getInstance()
     /** http */
     static http:HttpRequest = new HttpRequest() 
     /** net  */
