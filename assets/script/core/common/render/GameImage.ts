@@ -1,4 +1,4 @@
-import { Node, Sprite, SpriteFrame, Texture2D, UITransform, assetManager, resources } from "cc";
+import { ImageAsset, Node, Sprite, SpriteFrame, Texture2D, UITransform, assetManager, resources } from "cc";
 
 
 /**
@@ -29,28 +29,23 @@ export default class GameImage extends Node {
     public set source(url:string){
         if(this.isload(url))return 
         this.clear() //清除原有的
-        // assetManager.loadBundle(url, SpriteFrame,  (err, bundle)=> {
-        //     if (err != null) {
-        //         console.log(err);
-        //         return;
-        //     }
-        //     bundle.load(url, SpriteFrame, (err, spFrame) => {
-        //         if (err != null) {
-        //             console.log(err);
-        //             return;
-        //         }
-        //         // 使用加载的SpriteFrame
-        //         this.renderSprite.spriteFrame = spFrame;
-        //     });
-        // });
+       
+       
 
-        resources.load(url, SpriteFrame, (err, spFrame) => {
+        resources.load(url, ImageAsset, (err, asset) => {
             if (err != null) {
                 console.log(err);
                 return;
             }
-            // 使用加载的SpriteFrame
-            this.renderSprite.spriteFrame = spFrame;
+
+            const texture = new Texture2D();
+            texture.image = asset;
+    
+            const spriteFrame = new SpriteFrame();
+            spriteFrame.texture = texture;
+            
+            this.renderSprite.spriteFrame = spriteFrame
+           
         });
     }
 

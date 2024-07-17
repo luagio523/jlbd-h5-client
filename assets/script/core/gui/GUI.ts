@@ -1,13 +1,7 @@
-/*
- * @Author: dgflash
- * @Date: 2021-07-03 16:13:17
- * @LastEditors: dgflash
- * @LastEditTime: 2023-01-19 14:52:40
- */
 import { Camera, Component, ResolutionPolicy, UITransform, _decorator, math, screen, view } from "cc";
 import { oops } from "../Oops";
 
-const { ccclass, menu } = _decorator;
+const { ccclass, property } = _decorator;
 
 /** 游戏界面屏幕自适应管理 */
 @ccclass('GUI')
@@ -24,8 +18,11 @@ export class GUI extends Component {
     /** 横屏设计尺寸 */
     private landscapeDrz: math.Size = null!;
 
+    @property({ tooltip: '是否保留黑边,如果为false,将会裁切画面以适配屏幕' })
+    keepAspectRatio: boolean = true;
+
     onLoad() {
-        this.init();
+        // this.init(); 使用另外的方式
     }
 
     /** 初始化引擎 */
@@ -48,38 +45,54 @@ export class GUI extends Component {
     /** 游戏画布尺寸变化 */
     resize() {
         let dr;
+
+        
         if (view.getDesignResolutionSize().width > view.getDesignResolutionSize().height) {
             dr = this.landscapeDrz;
         }
         else {
-            dr = this.portraitDrz
+            dr = this.portraitDrz;
         }
 
-        var s = screen.windowSize;
-        var rw = s.width;
-        var rh = s.height;
-        var finalW = rw;
-        var finalH = rh;
+        const s = screen.windowSize;
+        const rw = s.width;
+        const rh = s.height;
+        let finalW = rw;
+        let finalH = rh;
 
-        if ((rw / rh) > (dr.width / dr.height)) {
-            // 如果更长，则用定高
-            finalH = dr.height;
-            finalW = finalH * rw / rh;
-            this.portrait = false;
-        }
-        else {
-            // 如果更短，则用定宽
-            finalW = dr.width;
-            finalH = finalW * rh / rw;
-            this.portrait = true;
+        if (this.keepAspectRatio) {
+            if ((rw / rh) > (dr.width / dr.height)) {
+                // 如果更长，则用定高
+                finalH = dr.height;
+                finalW = finalH * rw / rh;
+                this.portrait = false;
+            }
+            else {
+                // 如果更短，则用定宽
+                finalW = dr.width;
+                finalH = finalW * rh / rw;
+                this.portrait = true;
+            }
+        } else {
+            // 如果不保留黑边，直接使用窗口大小
+            finalW = rw;
+            finalH = rh;
         }
 
-        // 手工修改canvas和设计分辨率，这样反复调用也能生效。
-        view.setDesignResolutionSize(finalW, finalH, ResolutionPolicy.UNKNOWN);
+        // 手工修改 canvas 和设计分辨率，这样反复调用也能生效
+        if (this.keepAspectRatio) {
+            view.setDesignResolutionSize(finalW, finalH, ResolutionPolicy.UNKNOWN);
+        } else {
+            view.setDesignResolutionSize(finalW, finalH, ResolutionPolicy.SHOW_ALL);
+        }
+
         this.transform!.width = finalW;
         this.transform!.height = finalH;
+    }
 
-        oops.log.logView(dr, "设计尺寸");
-        oops.log.logView(s, "屏幕尺寸");
+    /** 切换是否保留黑边 */
+    public toggleKeepAspectRatio() {
+        this.keepAspectRatio = !this.keepAspectRatio;
+        this.resize();
     }
 }

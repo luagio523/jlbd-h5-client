@@ -5,7 +5,7 @@ export class ResPathUtil {
 
     // 获取地图资源路径
 	public static GetTileImagePath(name: string, x: number, y: number): string {
-		return "map/" + name + "/image/" + y + "_" + x + ".jpg";
+		return "map/" + name + "/image/" + y + "_" + x + "";
 	}
 
 	public static GetMapThumbnailPath(name: string) {
@@ -13,7 +13,7 @@ export class ResPathUtil {
 	}
 
 	public static GetMapMiniPath(name: string) {
-		return "map/" + name + "/pk_preview.jpg";
+		return "map/" + name + "/pk_preview";
 	}
 	
 	public static GetMap(mapId:string){

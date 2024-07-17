@@ -1,4 +1,4 @@
-import { ImageAsset, Node, SpriteFrame, Texture2D, TiledMap, TiledMapAsset, log, resources } from "cc";
+import { ImageAsset, Node, SpriteFrame, Texture2D, TiledMap, TiledMapAsset, assetManager, log, resources } from "cc";
 import { GameMap } from "../map/GameMap";
 import { MapDisplay } from "../map/MapDisplay";
 import { EventDispatcher } from "../../core/common/event/EventDispatcher";
@@ -62,6 +62,12 @@ export default class MapManager {
 
     private loadTiledMapAsset(mapPath: string): Promise<TiledMapAsset> {
         app.log.logView({mapPath},'');
+
+
+
+
+
+        
         return new Promise((resolve, reject) => {
             resources.load(mapPath, TiledMapAsset, (err, tiledMapAsset) => {
                 if (err) {
@@ -72,15 +78,23 @@ export default class MapManager {
             });
 
             app.log.logView({mapPath:mapPath},'loadTiledMapAsset');
-            resources.load(`map/map004/small`, ImageAsset, (err, spFrame) => {
-                if (err) {
-                    console.error("Error loading sprite ddframe:", err);
-                    console.log("Attempted to load from path:", `map/map004/small`);
-                    return;
-                }
-                log("Successfully loaded sprite frame");
-               
-            });
+           
+
+
+
+            // assetManager.loadBundle(`map/map004/small`, ImageAsset,  (err, bundle)=> {
+            //     if (err != null) {
+            //         console.log(err);
+            //         return;
+            //     }
+            //     bundle.load(`map/map004/small`, SpriteFrame, (err, spFrame) => {
+            //         if (err != null) {
+            //             console.log(err);
+            //             return;
+            //         }
+            //         console.log(spFrame,"================================");
+            //     });
+            // });
           
 
         });

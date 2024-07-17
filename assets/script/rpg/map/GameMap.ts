@@ -1,8 +1,6 @@
 import { Rect, Texture2D,  TiledMap, Vec2, log, v2 } from "cc";
 import { ResPathUtil } from "./ResPathUtil";
-import display from "../../core/common/utils/display";
 import TerrainMatrix from "./TerrainMatrix";
-import Display from "../../core/common/utils/display";
 
 export enum MapType {
     NONE = 0,

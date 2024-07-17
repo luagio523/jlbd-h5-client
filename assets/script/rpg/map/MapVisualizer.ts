@@ -4,6 +4,7 @@ import { ResPathUtil } from "./ResPathUtil";
 import Thumbnail from "./Thumbnail";
 import TileImage from "./TileImage";
 import app from "../../App";
+import Display from "../../core/common/utils/display";
 
 
 export class MapVisualizer extends Node {
@@ -14,13 +15,22 @@ export class MapVisualizer extends Node {
   private maxImageY: number;
   private imgSize: number;
   private lastUpdatePosition: Vec2 = new Vec2();
+  private isThumbnailComplete: boolean = false;
 
   constructor() {
     super();
     this.thumbnail = new Thumbnail();
     this.addChild(this.thumbnail);
+    this.thumbnail.addEventListener("Complete", this.onThumbnailComplete.bind(this));
     this.tileImages = new Map();
   }
+
+  //     // 在缩略图加载完成之后开始显示高清图
+    public onThumbnailComplete(e: any): void {
+        this.isThumbnailComplete = true;
+        this.updateHDMap(this.lastUpdatePosition, true);
+        // 显示遮罩
+    }
 
   public setLastUpdate(x: number, y: number): void {
     this.lastUpdatePosition.x = x;
@@ -28,6 +38,8 @@ export class MapVisualizer extends Node {
   }
 
   public render(width: number, height: number, imgSize: number, mapName: string): void {
+    app.log.logView({mapName,width, height,imgSize}, ``);
+
     this.clear();
     this.setupThumbnail(mapName,width, height);
     this.setupTileImages(mapName,width, height, imgSize);
@@ -44,7 +56,7 @@ export class MapVisualizer extends Node {
   }
 
   private setupThumbnail(mapName: string,width: number, height: number): void {
-    app.log.logView({mapName,width, height}, ``);
+    
     this.thumbnail.setSize(width, height);
     this.thumbnail.setPosition(width / 2, height / 2);
     this.thumbnail.source = ResPathUtil.GetMapThumbnailPath(mapName);
@@ -107,7 +119,7 @@ export class MapVisualizer extends Node {
   private getScreenSize(): Size {
     // Implement this method to return the current screen size
     // This could be a property of the class or obtained from a global display object
-    return new Size(1920, 1080); // Example values
+    return new Size(Display.getInstance().adaptWidth, Display.getInstance().adaptHeight); // Example values
   }
 }
 
