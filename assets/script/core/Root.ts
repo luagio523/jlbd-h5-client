@@ -89,7 +89,6 @@ export class Root extends Component {
 
         // 创建音频模块
         oops.audio = this.persistRootNode.addComponent(AudioManager);
-        oops.audio.load();
         oops.game = new GameManager(this.game);
         this.initGUI();
 
@@ -99,7 +98,6 @@ export class Root extends Component {
             oops.audio.resumeAll();
             director.resume();
             game.resume();
-            oops.message.dispatchEvent(EventMessage.GAME_ENTER);
         });
 
         // 游戏隐藏事件
@@ -108,24 +106,6 @@ export class Root extends Component {
             oops.audio.pauseAll();
             director.pause();
             game.pause();
-            oops.message.dispatchEvent(EventMessage.GAME_EXIT);
         });
-
-        // 游戏尺寸修改事件
-        var c_gui = this.gui.addComponent(GUI)!;
-        if (sys.isMobile == false) {
-            screen.on("window-resize", () => {
-                c_gui.resize();
-                oops.message.dispatchEvent(EventMessage.GAME_RESIZE);
-            }, this);
-
-            screen.on("fullscreen-change", () => {
-                oops.message.dispatchEvent(EventMessage.GAME_FULL_SCREEN);
-            }, this);
-        }
-
-        screen.on("orientation-change", () => {
-            oops.message.dispatchEvent(EventMessage.GAME_ORIENTATION);
-        }, this);
     }
 }

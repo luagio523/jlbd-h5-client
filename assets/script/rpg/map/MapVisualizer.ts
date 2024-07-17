@@ -58,7 +58,7 @@ export class MapVisualizer extends Node {
 		
 		this.thumbnail.setSize(width, height);
 		this.thumbnail.setPosition(width / 2, height / 2);
-		this.thumbnail.source = ResPathUtil.GetMapThumbnailPath(mapName);
+		this.thumbnail.source = ResPathUtil.getMapThumbnailPath(mapName);
 	}
 
 	private setupTileImages(mapName:string,width: number, height: number, imgSize: number): void {
@@ -93,7 +93,7 @@ export class MapVisualizer extends Node {
 			const [i, j] = tileKey.split(',').map(Number);
 			const tileImage = new TileImage();
 			tileImage.setAnchor(0, 0);
-			tileImage.source = ResPathUtil.GetTileImagePath(this.mapName, i, this.maxImageY - j - 1);
+			tileImage.source = ResPathUtil.getTileImagePath(this.mapName, i, this.maxImageY - j - 1);
 			tileImage.setPosition(i * this.imgSize, j * this.imgSize);
 			this.addChild(tileImage);
 			this.tileImages.set(tileKey, tileImage);

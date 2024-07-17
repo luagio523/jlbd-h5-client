@@ -29,15 +29,11 @@ export default class GameImage extends Node {
     public set source(url:string){
         if(this.isload(url))return 
         this.clear() //清除原有的
-       
-       
-
         resources.load(url, ImageAsset, (err, asset) => {
             if (err != null) {
                 console.log(err);
                 return;
             }
-
             const texture = new Texture2D();
             texture.image = asset;
     

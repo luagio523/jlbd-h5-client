@@ -27,7 +27,7 @@ export class oops {
     /** 全局消息 */
     static message: MessageManager = MessageManager.Inst;
     /** 随机工具 */
-    static random = RandomManager.Inst;
+    static random = RandomManager.getInstance();
   
     /** 游戏音乐管理 */
     static audio: AudioManager;

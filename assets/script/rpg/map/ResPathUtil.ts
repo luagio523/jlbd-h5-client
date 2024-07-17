@@ -1,69 +1,44 @@
-
 export class ResPathUtil {
-	public static DEFAULT_SHADOW = "images/shadow/1";
-	public static ANIM_PATH =  "anim/" // 角色躯体
+    private static readonly BASE_PATHS = {
+        MAP: "map/",
+        ANIM: "anim/",
+        SKILL_EFF: "anim/skillEff/",
+        UI_EFF: "anim/eff/",
+        DRAGON_BODY: "anim/dragonbody/",
+        BODY: "anim/body/"
+    };
 
-    // 获取地图资源路径
-	public static GetTileImagePath(name: string, x: number, y: number): string {
-		return "map/" + name + "/image/" + y + "_" + x + "";
-	}
+    public static readonly DEFAULT_SHADOW = "images/shadow/1";
 
-	public static GetMapThumbnailPath(name: string) {
-		return "map/" + name + "/small";
-	}
+    public static getTileImagePath(name: string, x: number, y: number): string {
+        return `${this.BASE_PATHS.MAP}${name}/image/${y}_${x}/spriteFrame`;
+    }
 
-	public static GetMapMiniPath(name: string) {
-		return "map/" + name + "/pk_preview";
-	}
-	
-	public static GetMap(mapId:string){
-		return "map/"+mapId+"/"+mapId
+    public static getMapThumbnailPath(name: string): string {
+        return `${this.BASE_PATHS.MAP}${name}/small/spriteFrame`;
+    }
 
-		// return "map/"+mapId+"/"+mapId+".tmx"
-	}
+    public static getMapMiniPath(name: string): string {
+        return `${this.BASE_PATHS.MAP}${name}/pk_preview/spriteFrame`;
+    }
 
+    public static getMap(mapId: string): string {
+        return `${this.BASE_PATHS.MAP}${mapId}/${mapId}`;
+    }
 
+    public static getSkillEffPath(effName: string = ""): string {
+        return `${this.BASE_PATHS.SKILL_EFF}${effName}`;
+    }
 
+    public static getUIEffPath(effName: string = ""): string {
+        return `${this.BASE_PATHS.UI_EFF}${effName}`;
+    }
 
-		/**
-	 * 获取技能特效
-	 * @param effName 
-	 * @returns 
-	 */
-		public static GetSkillEffPath(effName: string = ""): string {
-			return ResPathUtil.ANIM_PATH + "skillEff/" + effName 
-		}
-	
-		/**
-		 * 获取ui特效
-		 * @param effeName 
-		 * @returns 
-		 */
-		public static GetUIEffPath(effeName: string = ""): string {
-			return ResPathUtil.ANIM_PATH + "eff/" + effeName
-		}
-	
-	
-		/**
-		 * 获取龙骨身体
-		 * @param name 
-		 * @returns 
-		 */
-		public static GetDragonBodyPath(name:string){
-			return ResPathUtil.ANIM_PATH + "dragonbody/" + name
-		}
-	
-		/**
-		 * 获取序列帧身体
-		 * @param name 
-		 * @returns 
-		 */
-		 public static GetBodyPath(name:string){
-			return ResPathUtil.ANIM_PATH + "body/" + name
-		}
-	
-		
+    public static getDragonBodyPath(name: string): string {
+        return `${this.BASE_PATHS.DRAGON_BODY}${name}`;
+    }
 
-
-
+    public static getBodyPath(name: string): string {
+        return `${this.BASE_PATHS.BODY}${name}`;
+    }
 }

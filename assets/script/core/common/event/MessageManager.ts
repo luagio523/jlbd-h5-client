@@ -1,169 +1,135 @@
 import { log, warn } from "cc";
-import { ListenerFunc } from "./EventMessage";
 
-class EventData {
-    public event!: string;
-    public listener!: ListenerFunc;
-    public object: any;
+type MessageHandler = (data?: any) => void;
+
+interface Subscription {
+    handler: MessageHandler;
+    context: any;
+    once: boolean;
 }
-
-/**
- * 批量注册、移除全局事件对象
- */
-export class MessageEventData {
-    private events: any = {};
-
-    /**
-     * 注册全局事件
-     * @param event      事件名
-     * @param listener   处理事件的侦听器函数
-     * @param object     侦听函数绑定的作用域对象
-     */
-    on(event: string, listener: ListenerFunc, object: object) {
-        let list: Array<EventData> = this.events[event];
-        if (list == null) {
-            list = [];
-            this.events[event] = list;
-        }
-        let data: EventData = new EventData();
-        data.event = event;
-        data.listener = listener;
-        data.object = object;
-        list.push(data);
-
-        MessageManager.Inst.on(event, listener, object);
-    }
-
-    /**
-    * 移除全局事件
-     * @param event     事件名
-     */
-    off(event: string) {
-        let ebs: Array<EventData> = this.events[event];
-        if (!ebs) {
-            return;
-        }
-        for (let eb of ebs) {
-            MessageManager.Inst.off(event, eb.listener, eb.object);
-        }
-        delete this.events[event];
-    }
-
-    /** 
-     * 触发全局事件 
-     * @param event(string)      事件名
-     * @param args(any)          事件参数
-     */
-    dispatchEvent(event: string, arg: any = null) {
-        MessageManager.Inst.dispatchEvent(event, arg);
-    }
-
-    /** 清除所有的全局事件监听 */
-    clear() {
-        for (let event in this.events) {
-            this.off(event);
-        }
-    }
-}
-
 
 export class MessageManager {
-    static readonly Inst: MessageManager = new MessageManager();
+    private static instance: MessageManager;
+    private subscriptions: Map<string, Set<Subscription>> = new Map();
 
-    private events: any = {};
+    private constructor() {}
 
-    /**
-     * 注册全局事件
-     * @param event      事件名
-     * @param listener   处理事件的侦听器函数
-     * @param object     侦听函数绑定的作用域对象
-     */
-    on(event: string, listener: ListenerFunc, object: object) {
-        if (!event || !listener) {
-            warn(`注册【${event}】事件的侦听器函数为空`);
+    public static getInstance(): MessageManager {
+        if (!MessageManager.instance) {
+            MessageManager.instance = new MessageManager();
+        }
+        return MessageManager.instance;
+    }
+
+    public on(message: string, handler: MessageHandler, context: any = null): void {
+        if (!message || typeof handler !== 'function') {
+            warn(`Invalid message or handler for: ${message}`);
             return;
         }
 
-        let list: Array<EventData> = this.events[event];
-        if (list == null) {
-            list = [];
-            this.events[event] = list;
+        if (!this.subscriptions.has(message)) {
+            this.subscriptions.set(message, new Set());
         }
 
-        let length = list.length;
-        for (let i = 0; i < length; i++) {
-            let bin = list[i];
-            if (bin.listener == listener && bin.object == object) {
-                warn(`名为【${event}】的事件重复注册侦听器`);
-            }
-        }
-
-
-        let data: EventData = new EventData();
-        data.event = event;
-        data.listener = listener;
-        data.object = object;
-        list.push(data);
+        const subscription: Subscription = { handler, context, once: false };
+        this.subscriptions.get(message).add(subscription);
     }
 
-    /**
-     * 监听一次事件，事件响应后，该监听自动移除
-     * @param event     事件名
-     * @param listener  事件触发回调方法
-     * @param object    侦听函数绑定的作用域对象
-     */
-    once(event: string, listener: ListenerFunc, object: object) {
-        let _listener: any = ($event: string, $args: any) => {
-            this.off(event, _listener, object);
-            _listener = null;
-            listener.call(object, $event, $args);
-        }
-        this.on(event, _listener, object);
-    }
-
-    /**
-     * 移除全局事件
-     * @param event     事件名
-     * @param listener  处理事件的侦听器函数
-     * @param object    侦听函数绑定的作用域对象
-     */
-    off(event: string, listener: Function, object: object) {
-        let list: Array<EventData> = this.events[event];
-
-        if (!list) {
-            log(`名为【${event}】的事件不存在`);
+    public once(message: string, handler: MessageHandler, context: any = null): void {
+        if (!message || typeof handler !== 'function') {
+            warn(`Invalid message or handler for: ${message}`);
             return;
         }
 
-        let length = list.length;
-        for (let i = 0; i < length; i++) {
-            let bin: EventData = list[i];
-            if (bin.listener == listener && bin.object == object) {
-                list.splice(i, 1);
-                break;
-            }
+        if (!this.subscriptions.has(message)) {
+            this.subscriptions.set(message, new Set());
         }
 
-        if (list.length == 0) {
-            delete this.events[event];
+        const subscription: Subscription = { handler, context, once: true };
+        this.subscriptions.get(message).add(subscription);
+    }
+
+    public off(message: string, handler?: MessageHandler, context: any = null): void {
+        if (!this.subscriptions.has(message)) {
+            return;
+        }
+
+        const subscriptions = this.subscriptions.get(message);
+
+        if (handler) {
+            subscriptions.forEach(subscription => {
+                if (subscription.handler === handler && subscription.context === context) {
+                    subscriptions.delete(subscription);
+                }
+            });
+        } else {
+            this.subscriptions.delete(message);
         }
     }
 
-    /** 
-     * 触发全局事件 
-     * @param event(string)      事件名
-     * @param args(any)          事件参数
-     */
-    dispatchEvent(event: string, args: any = null) {
-        let list: Array<EventData> = this.events[event];
-
-        if (list != null) {
-            let temp: Array<EventData> = list.concat();
-            let length = temp.length;
-            for (let i = 0; i < length; i++) {
-                let eventBin = temp[i];
-                eventBin.listener.call(eventBin.object, event, args);
-            }
+    public emit(message: string, data?: any): void {
+        if (!this.subscriptions.has(message)) {
+            return;
         }
+
+        const subscriptions = this.subscriptions.get(message);
+        const toRemove: Subscription[] = [];
+
+        subscriptions.forEach(subscription => {
+            subscription.handler.call(subscription.context, data);
+            if (subscription.once) {
+                toRemove.push(subscription);
+            }
+        });
+
+        // Remove 'once' subscriptions
+        toRemove.forEach(subscription => subscriptions.delete(subscription));
+
+        // If all subscriptions are removed, delete the message entry
+        if (subscriptions.size === 0) {
+            this.subscriptions.delete(message);
+        }
+    }
+
+    public clear(): void {
+        this.subscriptions.clear();
+    }
+
+    public getSubscriptionCount(message: string): number {
+        return this.subscriptions.has(message) ? this.subscriptions.get(message).size : 0;
+    }
+}
+
+//另外再提供一个包装器,用于明确的订阅
+export class MessageSubscriber {
+    private manager: MessageManager = MessageManager.getInstance();
+    private subscribedMessages: Set<string> = new Set();
+
+    public on(message: string, handler: MessageHandler, context: any = null): void {
+        this.manager.on(message, handler, context);
+        this.subscribedMessages.add(message);
+    }
+
+    public once(message: string, handler: MessageHandler, context: any = null): void {
+        this.manager.once(message, handler, context);
+        this.subscribedMessages.add(message);
+    }
+
+    public off(message: string, handler?: MessageHandler, context: any = null): void {
+        this.manager.off(message, handler, context);
+        if (!handler) {
+            this.subscribedMessages.delete(message);
+        }
+    }
+
+    public emit(message: string, data?: any): void {
+        this.manager.emit(message, data);
+    }
+
+    public clear(): void {
+        this.subscribedMessages.forEach(message => {
+            this.manager.off(message);
+        });
+        this.subscribedMessages.clear();
     }
 }

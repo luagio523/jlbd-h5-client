@@ -1,0 +1,129 @@
+import { _decorator, BufferAsset, Component, resources, TextAsset } from 'cc';
+
+const { ccclass, property } = _decorator;
+
+@ccclass('ConfigManager')
+export class ConfigManager extends Component {
+    private static instance: ConfigManager = null;
+    private configs: Map<string, any> = new Map();
+
+    public static getInstance(): ConfigManager {
+        if (!ConfigManager.instance) {
+            ConfigManager.instance = new ConfigManager();
+        }
+        return ConfigManager.instance;
+    }
+
+    public async loadConfig(path: string): Promise<void> {
+        if (path.endsWith('.zip')) {
+            await this.loadZipConfig(path);
+        } else if (path.endsWith('.json') || path.endsWith('.kv')) {
+            await this.loadSingleConfig(path);
+        } else {
+            await this.loadDirectory(path);
+        }
+    }
+
+    private async loadSingleConfig(path: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            resources.load(path, TextAsset, (err, asset) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                const data = this.parseConfig(asset.text, path);
+                this.configs.set(path, data);
+                resolve();
+            });
+        });
+    }
+
+    private async loadZipConfig(path: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            resources.load(path, BufferAsset, async (err, asset) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                try {
+                    const zip = await JSZip.loadAsync(asset.buffer());
+                    const promises = [];
+
+                    zip.forEach((relativePath, file) => {
+                        if (!file.dir && (relativePath.endsWith('.json') || relativePath.endsWith('.kv'))) {
+                            promises.push(
+                                file.async('text').then(content => {
+                                    const data = this.parseConfig(content, relativePath);
+                                    this.configs.set(relativePath, data);
+                                })
+                            );
+                        }
+                    });
+                    await Promise.all(promises);
+                    resolve();
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        });
+    }
+
+    
+
+    private async loadDirectory(path: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            resources.loadDir(path, TextAsset, (err, assets) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                assets.forEach(asset => {
+                    const assetPath = `${path}/${asset.name}`;
+                    if (assetPath.endsWith('.json') || assetPath.endsWith('.kv')) {
+                        const data = this.parseConfig(asset.text, assetPath);
+                        this.configs.set(assetPath, data);
+                    }
+                });
+
+                resolve();
+            });
+        });
+    }
+
+    private parseConfig(content: string, path: string): any {
+        if (path.endsWith('.json')) {
+            return JSON.parse(content);
+        } else if (path.endsWith('.kv')) {
+            return this.parseKV(content);
+        } else {
+            throw new Error(`Unsupported file format: ${path}`);
+        }
+    }
+
+    private parseKV(content: string): any {
+        const lines = content.split('\n');
+        const result = {};
+        for (const line of lines) {
+            const [key, value] = line.split('=');
+            if (key && value) {
+                result[key.trim()] = value.trim();
+            }
+        }
+        return result;
+    }
+
+    public getConfig(path: string): any {
+        return this.configs.get(path);
+    }
+
+    public getAllConfigs(): Map<string, any> {
+        return new Map(this.configs);
+    }
+
+    public clear(): void {
+        this.configs.clear();
+    }
+}

@@ -30,6 +30,7 @@ export class AdaptionManager extends EventTarget {
         view.on('design-resolution-changed', this.onDesignResolutionChanged, this);
         view.on('window-resize', this.onWindowResize, this);
         view.on('orientation-change', this.onOrientationChange, this);
+        //fullscreen-change
     }
 
    

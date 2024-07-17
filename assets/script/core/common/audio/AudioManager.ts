@@ -1,203 +1,288 @@
-import { Component } from "cc";
-import { AudioEffect } from "./AudioEffect";
-import { AudioMusic } from "./AudioMusic";
-import StorageManager from "../storage/StorageManager";
+import { _decorator, Component, AudioClip, AudioSource, game, sys, resources,  director } from 'cc';
 
-const LOCAL_STORE_KEY = "game_audio";
+const { ccclass, property } = _decorator;
 
-/** 
- * 音频管理
- * @example 
-// 模块功能通过 oops.audio 调用
-oops.audio.playMusic("audios/nocturne");
- */
+@ccclass('AudioManager')
 export class AudioManager extends Component {
-
-    private local_data: any = {};
-
-    private music!: AudioMusic;
-    private effect!: AudioEffect;
-
-    private _volume_music: number = 1;
-    private _volume_effect: number = 1;
-    private _switch_music: boolean = true;
-    private _switch_effect: boolean = true;
-
-    /**
-     * 设置背景音乐播放完成回调
-     * @param callback 背景音乐播放完成回调
-     */
-    setMusicComplete(callback: Function | null = null) {
-        this.music.onComplete = callback;
+    private static instance: AudioManager;
+    public static getInstance(): AudioManager {
+        if (!AudioManager.instance) {
+            AudioManager.instance = new AudioManager();
+        }
+        return AudioManager.instance;
     }
 
-    /**
-     * 播放背景音乐
-     * @param url        资源地址
-     * @param callback   音乐播放完成事件
-     */
-    playMusic(url: string, callback?: Function) {
-        if (this._switch_music) {
-            this.music.load(url, callback);
+    @property(AudioSource)
+    private bgmSource: AudioSource = null;
+
+    @property([AudioSource])
+    private sfxPool: AudioSource[] = [];
+
+    @property
+    private maxSfxInstances: number = 5;
+
+    private bgmVolume: number = 1;
+    private sfxVolume: number = 1;
+    private isMuted: boolean = false;
+    private bgmPaused: boolean = false;
+
+    private currentBGMPath: string = '';
+    private loadedSFX: Map<string, AudioClip> = new Map();
+
+    
+
+    onLoad() {
+        if (AudioManager.instance) {
+            this.node.destroy();
+        } else {
+            AudioManager.instance = this;
+            director.addPersistRootNode(this.node);
+            this.initAudioSources();
+            this.loadSettings();
         }
     }
 
-    /** 循环播放背景音乐 */
-    playerMusicLoop(url: string) {
-        if (this._switch_music) {
-            this.music.loop = true;
-            this.music.load(url);
+    private initAudioSources() {
+        this.bgmSource = this.addComponent(AudioSource);
+
+        for (let i = 0; i < this.maxSfxInstances; i++) {
+            const source = this.addComponent(AudioSource);
+            this.sfxPool.push(source);
         }
     }
 
-    /**
-     * 获取背景音乐播放进度
-     */
-    get progressMusic(): number {
-        return this.music.progress;
-    }
-    /**
-     * 设置背景乐播放进度
-     * @param value     播放进度值
-     */
-    set progressMusic(value: number) {
-        this.music.progress = value;
+    private loadSettings() {
+        const bgmVolume = sys.localStorage.getItem('bgmVolume');
+        const sfxVolume = sys.localStorage.getItem('sfxVolume');
+        const isMuted = sys.localStorage.getItem('isMuted');
+
+        this.bgmVolume = bgmVolume ? parseFloat(bgmVolume) : 1;
+        this.sfxVolume = sfxVolume ? parseFloat(sfxVolume) : 1;
+        this.isMuted = isMuted ? (isMuted === 'true') : false;
+
+        this.applySettings();
     }
 
-    /**
-     * 获取背景音乐音量
-     */
-    get volumeMusic(): number {
-        return this._volume_music;
-    }
-    /** 
-     * 设置背景音乐音量
-     * @param value     音乐音量值
-     */
-    set volumeMusic(value: number) {
-        this._volume_music = value;
-        this.music.volume = value;
+    private applySettings() {
+        this.bgmSource.volume = this.isMuted ? 0 : this.bgmVolume;
+        this.sfxPool.forEach(source => source.volume = this.isMuted ? 0 : this.sfxVolume);
     }
 
-    /** 
-     * 获取背景音乐开关值 
-     */
-    get switchMusic(): boolean {
-        return this._switch_music;
-    }
-    /** 
-     * 设置背景音乐开关值
-     * @param value     开关值
-     */
-    set switchMusic(value: boolean) {
-        this._switch_music = value;
-
-        if (value == false)
-            this.music.stop();
+    private saveSettings() {
+        sys.localStorage.setItem('bgmVolume', this.bgmVolume.toString());
+        sys.localStorage.setItem('sfxVolume', this.sfxVolume.toString());
+        sys.localStorage.setItem('isMuted', this.isMuted.toString());
     }
 
-    /**
-     * 播放音效
-     * @param url        资源地址
-     */
-    playEffect(url: string) {
-        if (this._switch_effect) {
-            this.effect.load(url);
+    public async playBGM(path: string, fade: boolean = false) {
+        if (this.currentBGMPath === path && this.bgmSource.playing) {
+            return;
         }
-    }
 
-    /** 
-     * 获取音效音量 
-     */
-    get volumeEffect(): number {
-        return this._volume_effect;
-    }
-    /**
-     * 设置获取音效音量
-     * @param value     音效音量值
-     */
-    set volumeEffect(value: number) {
-        this._volume_effect = value;
-        this.effect.volume = value;
-    }
+        this.stopBGM();
 
-    /** 
-     * 获取音效开关值 
-     */
-    get switchEffect(): boolean {
-        return this._switch_effect;
-    }
-    /**
-     * 设置音效开关值
-     * @param value     音效开关值
-     */
-    set switchEffect(value: boolean) {
-        this._switch_effect = value;
-        if (value == false)
-            this.effect.stop();
-    }
+        try {
+            const clip = await this.loadAudioClip(path);
+            this.bgmSource.clip = clip;
+            this.bgmSource.loop = true;
 
-    /** 恢复当前暂停的音乐与音效播放 */
-    resumeAll() {
-        if (this.music) {
-            this.music.play();
-            this.effect.play();
-        }
-    }
-
-    /** 暂停当前音乐与音效的播放 */
-    pauseAll() {
-        if (this.music) {
-            this.music.pause();
-            this.effect.pause();
-        }
-    }
-
-    /** 停止当前音乐与音效的播放 */
-    stopAll() {
-        if (this.music) {
-            this.music.stop();
-            this.effect.stop();
-        }
-    }
-
-    /** 保存音乐音效的音量、开关配置数据到本地 */
-    save() {
-        this.local_data.volume_music = this._volume_music;
-        this.local_data.volume_effect = this._volume_effect;
-        this.local_data.switch_music = this._switch_music;
-        this.local_data.switch_effect = this._switch_effect;
-
-        let data = JSON.stringify(this.local_data);
-        StorageManager.Inst.setObjectForKey(LOCAL_STORE_KEY, data);
-    }
-
-
-    /** 本地加载音乐音效的音量、开关配置数据并设置到游戏中 */
-    load() {
-        this.music = this.getComponent(AudioMusic) || this.addComponent(AudioMusic)!;
-        this.effect = this.getComponent(AudioEffect) || this.addComponent(AudioEffect)!;
-
-        let data = StorageManager.Inst.getObjectForKey(LOCAL_STORE_KEY);
-
-        if (data) {
-            try {
-                this.local_data = JSON.parse(data);
-                this._volume_music = this.local_data.volume_music;
-                this._volume_effect = this.local_data.volume_effect;
-                this._switch_music = this.local_data.switch_music;
-                this._switch_effect = this.local_data.switch_effect;
+            if (fade) {
+                this.bgmSource.volume = 0;
+                this.bgmSource.play();
+                this.fadeBGM(this.bgmVolume, 2);
+            } else {
+                this.bgmSource.volume = this.bgmVolume;
+                this.bgmSource.play();
             }
-            catch (e) {
-                this.local_data = {};
-                this._volume_music = 1;
-                this._volume_effect = 1;
-                this._switch_music = true;
-                this._switch_effect = true;
-            }
-
-            if (this.music) this.music.volume = this._volume_music;
-            if (this.effect) this.effect.volume = this._volume_effect;
+            this.bgmPaused = false;
+            this.currentBGMPath = path;
+        } catch (error) {
+            console.error(`Failed to load BGM: ${path}`, error);
         }
+    }
+
+    public stopBGM(fade: boolean = false) {
+        if (fade) {
+            this.fadeBGM(0, 2, () => {
+                this.bgmSource.stop();
+                this.unloadBGM();
+            });
+        } else {
+            this.bgmSource.stop();
+            this.unloadBGM();
+        }
+        this.bgmPaused = false;
+    }
+
+    public pauseBGM() {
+        if (this.bgmSource.playing) {
+            this.bgmSource.pause();
+            this.bgmPaused = true;
+        }
+    }
+
+    public resumeBGM() {
+        if (this.bgmPaused) {
+            this.bgmSource.play();
+            this.bgmPaused = false;
+        }
+    }
+
+    public isBGMPaused(): boolean {
+        return this.bgmPaused;
+    }
+
+    private async fadeBGM(targetVolume: number, duration: number, onComplete?: () => void) {
+        const startVolume = this.bgmSource.volume;
+        const volumeDiff = targetVolume - startVolume;
+        const startTime = Date.now();
+
+        while (Date.now() - startTime < duration * 1000) {
+            const elapsed = (Date.now() - startTime) / 1000;
+            const t = elapsed / duration;
+            this.bgmSource.volume = startVolume + volumeDiff * t;
+            await new Promise(resolve => setTimeout(resolve, 16));
+        }
+
+        this.bgmSource.volume = targetVolume;
+        if (onComplete) onComplete();
+    }
+
+    public async playSFX(path: string) {
+        try {
+            const clip = await this.loadAudioClip(path);
+            const source = this.getAvailableSFXSource();
+            if (!source) return;
+
+            source.clip = clip;
+            source.loop = false;
+            source.volume = this.sfxVolume;
+            source.play();
+        } catch (error) {
+            console.error(`Failed to load SFX: ${path}`, error);
+        }
+    }
+
+    public pauseAllSFX() {
+        this.sfxPool.forEach(source => {
+            if (source.playing) {
+                source.pause();
+            }
+        });
+    }
+
+    public resumeAllSFX() {
+        this.sfxPool.forEach(source => {
+            if (!source.playing) {
+                source.play();
+            }
+        });
+    }
+
+    private getAvailableSFXSource(): AudioSource {
+        for (const source of this.sfxPool) {
+            if (!source.playing) {
+                return source;
+            }
+        }
+        return null;
+    }
+
+    public setBGMVolume(volume: number) {
+        this.bgmVolume = Math.max(0, Math.min(1, volume));
+        this.bgmSource.volume = this.isMuted ? 0 : this.bgmVolume;
+        this.saveSettings();
+    }
+
+    public setSFXVolume(volume: number) {
+        this.sfxVolume = Math.max(0, Math.min(1, volume));
+        this.sfxPool.forEach(source => source.volume = this.isMuted ? 0 : this.sfxVolume);
+        this.saveSettings();
+    }
+
+    public setMute(mute: boolean) {
+        this.isMuted = mute;
+        this.applySettings();
+        this.saveSettings();
+    }
+
+    private async loadAudioClip(path: string): Promise<AudioClip> {
+        return new Promise((resolve, reject) => {
+            if (this.loadedSFX.has(path)) {
+                resolve(this.loadedSFX.get(path));
+            } else {
+                resources.load(path, AudioClip, (err, clip) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        this.loadedSFX.set(path, clip);
+                        resolve(clip);
+                    }
+                });
+            }
+        });
+    }
+
+    private unloadBGM() {
+        if (this.currentBGMPath) {
+            resources.release(this.currentBGMPath);
+            this.currentBGMPath = '';
+        }
+    }
+
+    public unloadSFX(path: string) {
+        if (this.loadedSFX.has(path)) {
+            const clip = this.loadedSFX.get(path);
+            this.loadedSFX.delete(path);
+            this.sfxPool.forEach(source => {
+                if (source.clip === clip) {
+                    source.stop();
+                    source.clip = null;
+                }
+            });
+            resources.release(path);
+        }
+    }
+
+    public unloadAllSFX() {
+        this.loadedSFX.forEach((clip, path) => {
+            resources.release(path);
+        });
+        this.loadedSFX.clear();
+        this.sfxPool.forEach(source => {
+            source.stop();
+            source.clip = null;
+        });
+    }
+
+
+    public pauseAll() {
+        // 暂停背景音乐
+        if (this.bgmSource.playing) {
+            this.bgmSource.pause();
+            this.bgmPaused = true;
+        }
+
+        // 暂停所有音效
+        this.sfxPool.forEach(source => {
+            if (source.playing) {
+                source.pause();
+            }
+        });
+    }
+
+    public resumeAll() {
+        // 恢复背景音乐
+        if (this.bgmPaused) {
+            this.bgmSource.play();
+            this.bgmPaused = false;
+        }
+
+        // 恢复所有音效
+        this.sfxPool.forEach(source => {
+            if (!source.playing) {
+                source.play();
+            }
+        });
     }
 }

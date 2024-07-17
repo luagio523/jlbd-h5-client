@@ -14,33 +14,20 @@ import { ListenerFunc } from "../../core/common/event/EventMessage";
         super()
         this.eventDispatcher = new EventDispatcher
         this.renderSprite = this.addComponent(Sprite)
-        
     }
 
     public set source(url:string){
         log(`Thumbnail load ${url}`)
 
-        resources.load(url, ImageAsset,  (err, asset)=> {
+        resources.load(url, SpriteFrame,  (err, spriteFrame)=> {
             if (err != null) {
                 console.log(err);
                 return;
             }
-
-            const texture = new Texture2D();
-            texture.image = asset;
-    
-            const spriteFrame = new SpriteFrame();
-            spriteFrame.texture = texture;
-
-            
             this.renderSprite.spriteFrame = spriteFrame
-
             // 使用加载的SpriteFrame
             this.eventDispatcher.dispatchEvent( "Complete");
         });
-
-
-        
     }
 
     public addEventListener(eventName:string,listener:ListenerFunc){

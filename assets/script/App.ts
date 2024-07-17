@@ -8,30 +8,37 @@
 import { oops } from "./core/Oops"
 import PoolMgr from "./core/common/pool/PoolMgr"
 import { HeapTimerMgr, ITimerMgr } from "./core/common/timer/TimerMgr"
-import ConfigMgr from "./manager/ConfigMgr"
+import  { ConfigManager } from "./manager/ConfigManager"
 import { AdaptionManager } from "./core/common/Adaption/AdaptionManager"
 import { Facade } from "./core/mvc/init"
-import StorageManager from "./core/common/storage/StorageManager"
 import SDKManager from "./core/common/sdk/SDKManager"
+import { StorageManager } from "./core/common/storage/StorageManager"
+import { RandomManager } from "./core/common/random/RandomManager"
+import {  MessageSubscriber } from "./core/common/event/MessageManager"
 
 // const i18n = require("LanguageData");
 
 export default class app extends oops{
+
+    /** 全局消息订阅 */
+    static message: MessageSubscriber = new MessageSubscriber;
+    /** 随机工具 */
+    static random:RandomManager = RandomManager.getInstance();
     /** 本地存储 */
     static storage: StorageManager = StorageManager.getInstance();
-    /** mvc facade */
-    static facade:Facade = Facade.getInstance()
+   
     /** 屏幕适配 */
     static adaption:AdaptionManager = AdaptionManager.getInstance()
     /** 配置 */
-    static config:ConfigMgr = ConfigMgr.getInstance()
+    static config:ConfigManager = ConfigManager.getInstance()
     /** 对象池管理 */
     static pool:PoolMgr = PoolMgr.getInstance()
     /** 定时器 */
     static timer:ITimerMgr = new HeapTimerMgr()
     /** SDK  */
     static sdk:SDKManager = SDKManager.getInstance()
-  
+     /** mvc facade */
+     static facade:Facade = Facade.getInstance()
 }
 
 

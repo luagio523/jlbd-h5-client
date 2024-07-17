@@ -37,7 +37,7 @@ export class GameMap  {
     }
 
     public getMapPath(): string {
-        return ResPathUtil.GetMap( this.mapID);
+        return ResPathUtil.getMap( this.mapID);
     }
 
 

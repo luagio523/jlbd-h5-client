@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"crypto-js@^4.2.0":
+  "integrity" "sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q=="
+  "resolved" "https://registry.npmmirror.com/crypto-js/-/crypto-js-4.2.0.tgz"
+  "version" "4.2.0"
+
 "prettier@^3.2.5":
   "integrity" "sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A=="
   "resolved" "https://registry.npmmirror.com/prettier/-/prettier-3.2.5.tgz"
