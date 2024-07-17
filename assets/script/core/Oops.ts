@@ -21,8 +21,6 @@ export class oops {
     /** ----------核心模块---------- */
     /** 日志管理 */
     static log = Logger;
-   
- 
   
     /** 游戏音乐管理 */
     static audio: AudioManager;

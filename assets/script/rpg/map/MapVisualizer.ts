@@ -14,19 +14,18 @@ export class MapVisualizer extends Node {
   private maxImageY: number;
   private imgSize: number;
   private lastUpdatePosition: Vec2 = new Vec2();
-  private isThumbnailComplete: boolean = false;
 
   constructor() {
     super();
     this.thumbnail = new Thumbnail();
     this.addChild(this.thumbnail);
-    this.thumbnail.addEventListener("Complete", this.onThumbnailComplete.bind(this));
+    this.thumbnail.onLoad = this.onThumbnailComplete.bind(this);
     this.tileImages = new Map();
   }
 
   //     // 在缩略图加载完成之后开始显示高清图
-    public onThumbnailComplete(e: any): void {
-        this.isThumbnailComplete = true;
+    public onThumbnailComplete(url: string): void {
+
         this.updateHDMap(this.lastUpdatePosition, true);
         // 显示遮罩
     }
@@ -71,7 +70,7 @@ export class MapVisualizer extends Node {
 	private getVisibleTiles(viewPosition: Vec2): Set<string> {
 		const visibleTiles = new Set<string>();
 		const { x, y } = viewPosition;
-		const screenSize =   app.adaption.getSafeSize();;
+		const screenSize =   this.getScreenSize();
 
 		const startX = Math.max(Math.floor(-x / this.imgSize), 0);
 		const startY = Math.max(Math.floor(-y / this.imgSize), 0);
@@ -79,9 +78,9 @@ export class MapVisualizer extends Node {
 		const endY = Math.min(startY + Math.ceil(screenSize.height / this.imgSize) + 1, this.maxImageY);
 
 		for (let i = startX; i < endX; i++) {
-		for (let j = startY; j < endY; j++) {
-			visibleTiles.add(`${i},${j}`);
-		}
+			for (let j = startY; j < endY; j++) {
+				visibleTiles.add(`${i},${j}`);
+			}
 		}
 
 		return visibleTiles;
@@ -115,6 +114,9 @@ export class MapVisualizer extends Node {
 		this.tileImages.clear();
 	}
 
+	private getScreenSize(): Size {
+		return app.adaption.getSafeSize();	
+	}
   
 }
 

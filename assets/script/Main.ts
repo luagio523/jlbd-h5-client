@@ -4,15 +4,17 @@
  * @LastEditors: dgflash
  * @LastEditTime: 2023-01-19 15:28:28
  */
-import { DynamicAtlasManager, Node, ResolutionPolicy, _decorator, log, macro, profiler, screen, tween, view } from 'cc';
+import { DynamicAtlasManager, Game, Node, ResolutionPolicy, _decorator, director, game, log, macro, profiler, screen, tween, view } from 'cc';
 import { DEBUG, JSB } from 'cc/env';
-import { oops } from './core/Oops';
 import { Root } from './core/Root';
 import { MapDisplay } from './rpg/map/MapDisplay';
 import MapManager from './rpg/manager/MapManager';
-import { EventListenerManager } from './rpg/event/EventListenerManager';
 import { Event } from './rpg/event/Event';
-import { AdaptionManager } from './core/common/Adaption/AdaptionManager';
+import {  UIAnchorPoint } from './core/common/Adaption/AdaptionManager';
+import { EventManager } from './rpg/event/EventListenerManager';
+import { GameManager } from './core/game/GameManager';
+import { AudioManager } from './core/common/audio/AudioManager';
+import app from './App';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -24,70 +26,81 @@ export class Main extends Root {
     start() {
         if (DEBUG) profiler.showStats();
     }
-
     protected run() {
         if (JSB) {
-            oops.gui.toast("热更新后新程序的提示");
+            app.gui.toast("热更新后新程序的提示");
         }
+        this.init();
     }
 
-    protected initGUI() {
-        
-        // oops.gui = new UIManager(oops.facade)
-        // oops.gui.initialize(UI_CONFIG);
-        // console.log("initGUI",screen.windowSize);
-        
+    protected init() {
+        this.initUI();
+        this.test();
+        // 游戏显示事件
+        game.on(Game.EVENT_SHOW, () => {
+            app.time.resume();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
+            app.audio.resumeAll();
+            director.resume();
+            game.resume();
+        });
 
-        // screen.on("window-resize", () => {
-        //     Display.initDisplayData();
-        // }, this);
+        // 游戏隐藏事件
+        game.on(Game.EVENT_HIDE, () => {
+            app.time.pause();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
+            app.audio.pauseAll();
+            director.pause();
+            game.pause();
+        });
+    }
+
+    protected async preload():Promise<any>{
+        // app.config.loadConfig();
+        return null 
+    }
+
+    /** 初始化游戏UI */
+    protected initUI() {
+        // 创建持久根节点
+        this.persistRootNode = new Node("PersistRootNode");
+        director.addPersistRootNode(this.persistRootNode);
+        // 创建音频模块
+        app.audio = this.persistRootNode.addComponent(AudioManager);
+        //创建游戏节点管理器
+        app.game = new GameManager(this.game);
+        // 适配管理器添加游戏根节点，并设置锚点左下角
+        app.adaption.addRootNode(app.game.getGameRoot(),UIAnchorPoint.BottomLeft) 
+    }
+
+   
+   
+    protected test() {
+      
 
         console.log("screen",screen.resolution);
 
-        AdaptionManager.getInstance();
-          
-
-        // screen.on("orientation-change", () => {
-            
-        // }, this);
-
-        // view.on("orientation-change", () => {
-        //     console.log("orientation-change");
-        // }, this);
-
-        // view.on("design-resolution-changed", () => {
-        //     console.log("design-resolution-changed");
-        // }, this);
-
-        // view.on("resize", () => {            
-        //     console.log("resize");
-        // }, this);
-
-        // view.on("canvas-resize", () => {
-        //     console.log("canvas-resize");
-        // }, this);
-
-        // view.on("window-resize", () => {
-        //     console.log("window-resize");
-        // }, this);
-
-        // screen.on("fullscreen-change", () => {
-        // }, this);
+         
 
         
         let display = new MapDisplay();
-        oops.game.root.addChild(display);
+        app.game.getGameRoot().addChild(display);
 
         MapManager.getInstance().initMapDisplay(display);
 
         MapManager.getInstance().enterMap("map004");
 
-        EventListenerManager.getInstance().registerListener(Event.EnterMap, function (event) {
+        EventManager.getInstance().registerListener(Event.EnterMap, function (event) {
             console.log("enter map", event);     
             
             display.changeMap();
         });
     }
+
+
+    update(dt: number) {
+        app.game.update(dt);
+        // app.ecs.execute(dt);
+    }
+    
 
    
 }

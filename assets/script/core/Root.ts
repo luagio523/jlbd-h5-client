@@ -7,7 +7,6 @@
 import { Component, Game, JsonAsset, Node, _decorator, director, game, screen, sys } from "cc";
 import { oops, version } from "./Oops";
 import { AudioManager } from "./common/audio/AudioManager";
-import { EventMessage } from "./common/event/EventMessage";
 import { GameManager } from "./game/GameManager";
 import { GUI } from "./gui/GUI";
 
@@ -39,73 +38,36 @@ export class Root extends Component {
             isInited = true;      // 注：这里是规避cc3.8在编辑器模式下运行时，关闭游戏会两次初始化报错
 
             console.log(`Oops Framework v${version}`);
-            // this.enabled = false;
+            this.enabled = false;
+            await this.preload()
+            this.enabled = true;
+            this.run();
+        }
+    }
+
+   
+    /** 加载完引擎配置文件后执行 */
+    protected run() {
+       
+    }
+
+    protected async  preload():Promise<any>{
+        // this.enabled = false;
 
             // let config_name = "config";
-            // oops.res.load(config_name, JsonAsset, () => {
-            //     var config = oops.res.get(config_name);
-            //     // oops.config.btc = new BuildTimeConstants();
-            //     oops.config.query = new GameQueryConfig();
-            //     oops.config.game = new GameConfig(config);
-            //     oops.http.server = oops.config.game.httpServer;                                      // Http 服务器地址
-            //     oops.http.timeout = oops.config.game.httpTimeout;                                    // Http 请求超时时间
-            //     oops.storage.init(oops.config.game.localDataKey, oops.config.game.localDataIv);      // 初始化本地存储加密
-            //     game.frameRate = oops.config.game.frameRate;                                         // 初始化每秒传输帧数
+            // app.res.load(config_name, JsonAsset, () => {
+            //     var config = app.res.get(config_name);
+            //     // app.config.btc = new BuildTimeConstants();
+            //     app.config.query = new GameQueryConfig();
+            //     app.config.game = new GameConfig(config);
+            //     app.http.server = app.config.game.httpServer;                                      // Http 服务器地址
+            //     app.http.timeout = app.config.game.httpTimeout;                                    // Http 请求超时时间
+            //     app.storage.init(app.config.game.localDataKey, app.config.game.localDataIv);      // 初始化本地存储加密
+            //     game.frameRate = app.config.game.frameRate;                                         // 初始化每秒传输帧数
 
             //     this.enabled = true;
             //     this.init();
             //     this.run();
             // });
-
-            await this.preload()
-            this.enabled = true;
-            this.init();
-            this.run();
-        }
-    }
-
-    update(dt: number) {
-        // oops.ecs.execute(dt);
-    }
-
-    /** 初始化游戏界面 */
-    protected initGUI() {
-
-    }
-
-    protected async  preload():Promise<any>{
-        return null 
-    }
-
-    /** 加载完引擎配置文件后执行 */
-    protected run() {
-
-    }
-
-    protected init() {
-        // 创建持久根节点
-        this.persistRootNode = new Node("PersistRootNode");
-        director.addPersistRootNode(this.persistRootNode);
-
-        // 创建音频模块
-        oops.audio = this.persistRootNode.addComponent(AudioManager);
-        oops.game = new GameManager(this.game);
-        this.initGUI();
-
-        // 游戏显示事件
-        game.on(Game.EVENT_SHOW, () => {
-            oops.time.resume();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
-            oops.audio.resumeAll();
-            director.resume();
-            game.resume();
-        });
-
-        // 游戏隐藏事件
-        game.on(Game.EVENT_HIDE, () => {
-            oops.time.pause();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
-            oops.audio.pauseAll();
-            director.pause();
-            game.pause();
-        });
     }
 }

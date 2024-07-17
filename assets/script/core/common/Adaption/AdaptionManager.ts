@@ -1,10 +1,15 @@
-import { _decorator, view, screen, UITransform, Node, Size, Rect, sys, EventTarget, log } from "cc";
+import { _decorator, Component, Node, EventTarget, Rect, Size, view, screen, UITransform } from 'cc';
 
-const { ccclass, property } = _decorator;
-/**
- * 适配管理器
- * 不出现黑边的方式fixedHeight或是fixedWidth，取决于设计分辨率的宽高比和屏幕的宽高比。
- */
+const { ccclass } = _decorator;
+
+export enum UIAnchorPoint {
+    Center = 'Center',
+    TopLeft = 'TopLeft',
+    BottomLeft = 'BottomLeft',
+    TopRight = 'TopRight',
+    BottomRight = 'BottomRight'
+}
+
 @ccclass('AdaptionManager')
 export class AdaptionManager extends EventTarget {
     private static instance: AdaptionManager;
@@ -18,9 +23,9 @@ export class AdaptionManager extends EventTarget {
 
     private safeArea: Rect = new Rect();
     private isFixedHeight: boolean = false;
-    private designToScreenRatio: number = 1; // 设计分辨率 到 屏幕分辨率 的缩放比例
+    private designToScreenRatio: number = 1;
     private designSize: Size = new Size();
-    private rootNodes: Node[] = [];
+    private rootNodes: Map<UIAnchorPoint, Node> = new Map();
 
     private constructor() {
         super();
@@ -30,10 +35,7 @@ export class AdaptionManager extends EventTarget {
         view.on('design-resolution-changed', this.onDesignResolutionChanged, this);
         view.on('window-resize', this.onWindowResize, this);
         view.on('orientation-change', this.onOrientationChange, this);
-        //fullscreen-change
     }
-
-   
 
     private onDesignResolutionChanged = () => {
         console.log('design-resolution-changed');
@@ -71,15 +73,15 @@ export class AdaptionManager extends EventTarget {
             ? screenSize.height / this.designSize.height 
             : screenSize.width / this.designSize.width;
         this.designToScreenRatio = scale;
-        // 计算设计分辨率下的安全区域
+
         const visibleWidth = screenSize.width / scale;
         const visibleHeight = screenSize.height / scale;
 
         this.safeArea.set(
             (this.designSize.width - visibleWidth) * 0.5,
             (this.designSize.height - visibleHeight) * 0.5,
-            this.safeArea.width = visibleWidth,
-            this.safeArea.height = visibleHeight
+            visibleWidth,
+            visibleHeight
         );
 
         console.log(`designSize: ${this.designSize.width}, ${this.designSize.height}`);
@@ -87,16 +89,12 @@ export class AdaptionManager extends EventTarget {
         console.log(`isFixedHeight: ${this.isFixedHeight}`);
         console.log(`scale: ${scale}`);
         console.log(`safeArea: ${this.safeArea.x}, ${this.safeArea.y}, ${this.safeArea.width}, ${this.safeArea.height}`);
-        // 考虑系统安全区域
-        // const sysSafeArea = sys.getSafeAreaRect();
-        // this.safeArea.intersects(sysSafeArea);
     }
-    
-    // safeArea: 0, 72, 1280, 576
 
     public getSafeArea(): Rect {
         return this.safeArea.clone();
     }
+
     public getSafeSize(): Size {
         return this.safeArea.size;
     }
@@ -105,17 +103,14 @@ export class AdaptionManager extends EventTarget {
         return this.isFixedHeight;
     }
 
-     // 获取设计分辨率到屏幕分辨率的缩放比例
-     public getDesignToScreenRatio(): number {
+    public getDesignToScreenRatio(): number {
         return this.designToScreenRatio;
     }
 
-    // 获取屏幕分辨率到设计分辨率的缩放比例
     public getScreenToDesignRatio(): number {
         return 1 / this.designToScreenRatio;
     }
 
-    //获取设计分辨率下实际坐标
     public getActualDesignPosition(designX: number, designY: number): { x: number, y: number } {
         return {
             x: designX - this.safeArea.x,
@@ -123,7 +118,6 @@ export class AdaptionManager extends EventTarget {
         };
     }
 
-    // 获取设计分辨率下的坐标对应的屏幕坐标
     public getActualScreenPosition(designX: number, designY: number): { x: number, y: number } {
         const actualPos = this.getActualDesignPosition(designX, designY);
         return {
@@ -144,40 +138,62 @@ export class AdaptionManager extends EventTarget {
         this.emit('adaption-updated', 'force');
     }
 
-    
-
-
     private adaptRootNodes(): void {
-        this.rootNodes.forEach(rootNode => {
+        this.rootNodes.forEach((rootNode, anchorPoint) => {
             const uiTransform = rootNode.getComponent(UITransform);
             if (uiTransform) {
                 uiTransform.setContentSize(this.safeArea.width, this.safeArea.height);
-                rootNode.setPosition(this.safeArea.x + this.safeArea.width / 2, this.safeArea.y + this.safeArea.height / 2);
+                this.setNodePositionByAnchor(rootNode, anchorPoint);
             }
         });
     }
 
-    
-    public addRootNode(node: Node): void {
-        if (!this.rootNodes.includes(node)) {
-            this.rootNodes.push(node);
+    private setNodePositionByAnchor(node: Node, anchorPoint: UIAnchorPoint): void {
+        let x = this.safeArea.x;
+        let y = this.safeArea.y;
+
+        switch (anchorPoint) {
+            case UIAnchorPoint.Center:
+                x += this.safeArea.width / 2;
+                y += this.safeArea.height / 2;
+                break;
+            case UIAnchorPoint.TopLeft:
+                y += this.safeArea.height;
+                break;
+            case UIAnchorPoint.TopRight:
+                x += this.safeArea.width;
+                y += this.safeArea.height;
+                break;
+            case UIAnchorPoint.BottomRight:
+                x += this.safeArea.width;
+                break;
+            // BottomLeft is default (x, y)
+        }
+
+        node.setPosition(x, y);
+    }
+
+    public addRootNode(node: Node,anchorPoint?: UIAnchorPoint): void {
+        anchorPoint = anchorPoint || UIAnchorPoint.Center;
+        if (!this.rootNodes.has(anchorPoint)) {
+            this.rootNodes.set(anchorPoint, node);
             this.adaptRootNodes();
         }
     }
 
-    public removeRootNode(node: Node): void {
-        const index = this.rootNodes.indexOf(node);
-        if (index !== -1) {
-            this.rootNodes.splice(index, 1);
-        }
+    public removeRootNode(anchorPoint: UIAnchorPoint): void {
+        this.rootNodes.delete(anchorPoint);
+    }
+
+    public getRootNode(anchorPoint: UIAnchorPoint): Node | undefined {
+        return this.rootNodes.get(anchorPoint);
     }
 
     public destroy(): void {
         view.off('design-resolution-changed', this.onDesignResolutionChanged, this);
         view.off('window-resize', this.onWindowResize, this);
         view.off('orientation-change', this.onOrientationChange, this);
-        this.rootNodes = [];
+        this.rootNodes.clear();
         AdaptionManager.instance = null;
     }
-
 }

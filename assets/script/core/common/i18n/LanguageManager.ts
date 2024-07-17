@@ -18,9 +18,10 @@ export class LanguageManager extends Component {
 
     public static getInstance(): LanguageManager {
         if (!LanguageManager.instance) {
-            const node = new Node('LanguageManager');
-            LanguageManager.instance = node.addComponent(LanguageManager);
-            director.addPersistRootNode(node);
+            // const node = new Node('LanguageManager');
+            // LanguageManager.instance = node.addComponent(LanguageManager);
+            // director.addPersistRootNode(node);
+            LanguageManager.instance = new LanguageManager();
         }
         return LanguageManager.instance;
     }
