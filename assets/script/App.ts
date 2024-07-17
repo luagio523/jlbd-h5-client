@@ -15,6 +15,8 @@ import SDKManager from "./core/common/sdk/SDKManager"
 import { StorageManager } from "./core/common/storage/StorageManager"
 import { RandomManager } from "./core/common/random/RandomManager"
 import {  MessageSubscriber } from "./core/common/event/MessageManager"
+import { HttpRequest } from "./libs/network/HttpRequest"
+import { NetManager } from "./libs/network/NetManager"
 
 // const i18n = require("LanguageData");
 
@@ -26,7 +28,6 @@ export default class app extends oops{
     static random:RandomManager = RandomManager.getInstance();
     /** 本地存储 */
     static storage: StorageManager = StorageManager.getInstance();
-   
     /** 屏幕适配 */
     static adaption:AdaptionManager = AdaptionManager.getInstance()
     /** 配置 */
@@ -37,8 +38,12 @@ export default class app extends oops{
     static timer:ITimerMgr = new HeapTimerMgr()
     /** SDK  */
     static sdk:SDKManager = SDKManager.getInstance()
+    /** http */
+    static http:HttpRequest = new HttpRequest() 
+    /** net  */
+    static net:NetManager = NetManager.getInstance()
      /** mvc facade */
-     static facade:Facade = Facade.getInstance()
+    static facade:Facade = Facade.getInstance()
 }
 
 
