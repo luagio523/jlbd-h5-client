@@ -10,7 +10,14 @@ import { sys } from "cc";
 export default class StorageManager{
     // private listeners:any;          //Consts.EventName => cb[]
 
-    public static readonly  Inst = new StorageManager();
+    private static  instance:StorageManager = null ;
+    public static getInstance(): StorageManager {
+        if (!StorageManager.instance) {
+            StorageManager.instance = new StorageManager();
+        }
+        return StorageManager.instance;
+    }
+
 
     private encryption:boolean = false //for test
     private fjalfjdlajfadsljf:string //mima

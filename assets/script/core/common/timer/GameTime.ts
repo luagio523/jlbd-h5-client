@@ -3,7 +3,7 @@
 import { Timer } from './Timer'; // 假定Timer类在'Timer.ts'文件中
 
 // 游戏计时器类定义
-export class GameTimer {
+export class GameTime {
     private gameStartTime: number;
     private pausedTime: number;
     private pausedAt: number | null;

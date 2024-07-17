@@ -3,9 +3,15 @@ import { ObjectPoolMap, ObjectPool } from "./ObjectPool";
 export default class PoolMgr extends ObjectPoolMap<any> {
     private static inst: PoolMgr = new PoolMgr();
 
-    static ins(): PoolMgr {
-        return this.inst;
+    private static instance: PoolMgr;
+
+    public static getInstance(): PoolMgr {
+        if (!PoolMgr.instance) {
+            PoolMgr.instance = new PoolMgr();
+        }
+        return PoolMgr.instance;
     }
+    
 
     // 注册方法现在使用泛型参数
     register<T>(id: string, creator: () => T, destructor?: (object: T) => void, refresh?: (object: T) => void, repool?: (object: T) => void): ObjectPool<T> {

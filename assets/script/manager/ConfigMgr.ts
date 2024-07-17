@@ -4,6 +4,14 @@ import { Asset, BufferAsset, JsonAsset, error, resources } from "cc";
  * 配置文件管理
  */
 export default class ConfigMgr{
+    private static instance: ConfigMgr;
+    public static getInstance(): ConfigMgr {
+        if (!ConfigMgr.instance) {
+            ConfigMgr.instance = new ConfigMgr();
+        }
+        return ConfigMgr.instance;
+    }
+
 
      /**
      * 加载zip文件
@@ -90,21 +98,12 @@ export default class ConfigMgr{
      ///////////////////////////业务耦合////////////////////////////////////////
 
 
-     private static inst:ConfigMgr;
 
      private constructor()
      {
      }
  
-     static ins():ConfigMgr
-     {
-         if(!this.inst)
-         {
-             this.inst = new ConfigMgr();
-         }
-         return this.inst;
-     }
-
+   
 
      private configTextMap:any = null
      private configMap:any = {}

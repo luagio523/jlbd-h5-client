@@ -9,6 +9,13 @@ const { ccclass, property } = _decorator;
 export class AdaptionManager extends EventTarget {
     private static instance: AdaptionManager;
 
+    public static getInstance(): AdaptionManager {
+        if (!AdaptionManager.instance) {
+            AdaptionManager.instance = new AdaptionManager();
+        }
+        return AdaptionManager.instance;
+    }
+
     private safeArea: Rect = new Rect();
     private isFixedHeight: boolean = false;
     private designToScreenRatio: number = 1; // 设计分辨率 到 屏幕分辨率 的缩放比例
@@ -25,12 +32,7 @@ export class AdaptionManager extends EventTarget {
         view.on('orientation-change', this.onOrientationChange, this);
     }
 
-    public static getInstance(): AdaptionManager {
-        if (!AdaptionManager.instance) {
-            AdaptionManager.instance = new AdaptionManager();
-        }
-        return AdaptionManager.instance;
-    }
+   
 
     private onDesignResolutionChanged = () => {
         console.log('design-resolution-changed');
@@ -84,41 +86,18 @@ export class AdaptionManager extends EventTarget {
         console.log(`isFixedHeight: ${this.isFixedHeight}`);
         console.log(`scale: ${scale}`);
         console.log(`safeArea: ${this.safeArea.x}, ${this.safeArea.y}, ${this.safeArea.width}, ${this.safeArea.height}`);
-    
-    
         // 考虑系统安全区域
         // const sysSafeArea = sys.getSafeAreaRect();
         // this.safeArea.intersects(sysSafeArea);
     }
-
-
-    private adaptRootNodes(): void {
-        this.rootNodes.forEach(rootNode => {
-            const uiTransform = rootNode.getComponent(UITransform);
-            if (uiTransform) {
-                uiTransform.setContentSize(this.safeArea.width, this.safeArea.height);
-                rootNode.setPosition(this.safeArea.x + this.safeArea.width / 2, this.safeArea.y + this.safeArea.height / 2);
-            }
-        });
-    }
+    
     // safeArea: 0, 72, 1280, 576
-
-    public addRootNode(node: Node): void {
-        if (!this.rootNodes.includes(node)) {
-            this.rootNodes.push(node);
-            this.adaptRootNodes();
-        }
-    }
-
-    public removeRootNode(node: Node): void {
-        const index = this.rootNodes.indexOf(node);
-        if (index !== -1) {
-            this.rootNodes.splice(index, 1);
-        }
-    }
 
     public getSafeArea(): Rect {
         return this.safeArea.clone();
+    }
+    public getSafeSize(): Size {
+        return this.safeArea.size;
     }
 
     public isFixedHeightMode(): boolean {
@@ -164,6 +143,34 @@ export class AdaptionManager extends EventTarget {
         this.emit('adaption-updated', 'force');
     }
 
+    
+
+
+    private adaptRootNodes(): void {
+        this.rootNodes.forEach(rootNode => {
+            const uiTransform = rootNode.getComponent(UITransform);
+            if (uiTransform) {
+                uiTransform.setContentSize(this.safeArea.width, this.safeArea.height);
+                rootNode.setPosition(this.safeArea.x + this.safeArea.width / 2, this.safeArea.y + this.safeArea.height / 2);
+            }
+        });
+    }
+
+    
+    public addRootNode(node: Node): void {
+        if (!this.rootNodes.includes(node)) {
+            this.rootNodes.push(node);
+            this.adaptRootNodes();
+        }
+    }
+
+    public removeRootNode(node: Node): void {
+        const index = this.rootNodes.indexOf(node);
+        if (index !== -1) {
+            this.rootNodes.splice(index, 1);
+        }
+    }
+
     public destroy(): void {
         view.off('design-resolution-changed', this.onDesignResolutionChanged, this);
         view.off('window-resize', this.onWindowResize, this);
@@ -171,4 +178,5 @@ export class AdaptionManager extends EventTarget {
         this.rootNodes = [];
         AdaptionManager.instance = null;
     }
+
 }

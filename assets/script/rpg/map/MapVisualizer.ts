@@ -4,7 +4,6 @@ import { ResPathUtil } from "./ResPathUtil";
 import Thumbnail from "./Thumbnail";
 import TileImage from "./TileImage";
 import app from "../../App";
-import Display from "../../core/common/utils/display";
 
 
 export class MapVisualizer extends Node {
@@ -32,95 +31,91 @@ export class MapVisualizer extends Node {
         // 显示遮罩
     }
 
-  public setLastUpdate(x: number, y: number): void {
-    this.lastUpdatePosition.x = x;
-    this.lastUpdatePosition.y = y;
-  }
+	public setLastUpdate(x: number, y: number): void {
+		this.lastUpdatePosition.x = x;
+		this.lastUpdatePosition.y = y;
+	}
 
-  public render(width: number, height: number, imgSize: number, mapName: string): void {
-    app.log.logView({mapName,width, height,imgSize}, ``);
+	public render(width: number, height: number, imgSize: number, mapName: string): void {
+		app.log.logView({mapName,width, height,imgSize}, ``);
 
-    this.clear();
-    this.setupThumbnail(mapName,width, height);
-    this.setupTileImages(mapName,width, height, imgSize);
-  }
+		this.clear();
+		this.setupThumbnail(mapName,width, height);
+		this.setupTileImages(mapName,width, height, imgSize);
+	}
 
-  public updateHDMap(viewPosition: Vec2, force: boolean = false): void {
-    if (!force && this.lastUpdatePosition.equals(viewPosition)) return;
+	public updateHDMap(viewPosition: Vec2, force: boolean = false): void {
+		if (!force && this.lastUpdatePosition.equals(viewPosition)) return;
 
-    this.lastUpdatePosition.set(viewPosition);
+		this.lastUpdatePosition.set(viewPosition);
 
-    const visibleTiles = this.getVisibleTiles(viewPosition);
-    this.updateVisibleTiles(visibleTiles);
-    this.removeInvisibleTiles(visibleTiles);
-  }
+		const visibleTiles = this.getVisibleTiles(viewPosition);
+		this.updateVisibleTiles(visibleTiles);
+		this.removeInvisibleTiles(visibleTiles);
+	}
 
-  private setupThumbnail(mapName: string,width: number, height: number): void {
-    
-    this.thumbnail.setSize(width, height);
-    this.thumbnail.setPosition(width / 2, height / 2);
-    this.thumbnail.source = ResPathUtil.GetMapThumbnailPath(mapName);
-  }
+	private setupThumbnail(mapName: string,width: number, height: number): void {
+		
+		this.thumbnail.setSize(width, height);
+		this.thumbnail.setPosition(width / 2, height / 2);
+		this.thumbnail.source = ResPathUtil.GetMapThumbnailPath(mapName);
+	}
 
-  private setupTileImages(mapName:string,width: number, height: number, imgSize: number): void {
-    this.mapName = mapName;
-    this.imgSize = imgSize;
-    this.maxImageX = Math.ceil(width / imgSize);
-    this.maxImageY = Math.ceil(height / imgSize);
-  }
+	private setupTileImages(mapName:string,width: number, height: number, imgSize: number): void {
+		this.mapName = mapName;
+		this.imgSize = imgSize;
+		this.maxImageX = Math.ceil(width / imgSize);
+		this.maxImageY = Math.ceil(height / imgSize);
+	}
 
-  private getVisibleTiles(viewPosition: Vec2): Set<string> {
-    const visibleTiles = new Set<string>();
-    const { x, y } = viewPosition;
-    const screenSize = this.getScreenSize();
+	private getVisibleTiles(viewPosition: Vec2): Set<string> {
+		const visibleTiles = new Set<string>();
+		const { x, y } = viewPosition;
+		const screenSize =   app.adaption.getSafeSize();;
 
-    const startX = Math.max(Math.floor(-x / this.imgSize), 0);
-    const startY = Math.max(Math.floor(-y / this.imgSize), 0);
-    const endX = Math.min(startX + Math.ceil(screenSize.width / this.imgSize) + 1, this.maxImageX);
-    const endY = Math.min(startY + Math.ceil(screenSize.height / this.imgSize) + 1, this.maxImageY);
+		const startX = Math.max(Math.floor(-x / this.imgSize), 0);
+		const startY = Math.max(Math.floor(-y / this.imgSize), 0);
+		const endX = Math.min(startX + Math.ceil(screenSize.width / this.imgSize) + 1, this.maxImageX);
+		const endY = Math.min(startY + Math.ceil(screenSize.height / this.imgSize) + 1, this.maxImageY);
 
-    for (let i = startX; i < endX; i++) {
-      for (let j = startY; j < endY; j++) {
-        visibleTiles.add(`${i},${j}`);
-      }
-    }
+		for (let i = startX; i < endX; i++) {
+		for (let j = startY; j < endY; j++) {
+			visibleTiles.add(`${i},${j}`);
+		}
+		}
 
-    return visibleTiles;
-  }
+		return visibleTiles;
+	}
 
-  private updateVisibleTiles(visibleTiles: Set<string>): void {
-    visibleTiles.forEach((tileKey) => {
-      if (!this.tileImages.has(tileKey)) {
-        const [i, j] = tileKey.split(',').map(Number);
-        const tileImage = new TileImage();
-        tileImage.setAnchor(0, 0);
-        tileImage.source = ResPathUtil.GetTileImagePath(this.mapName, i, this.maxImageY - j - 1);
-        tileImage.setPosition(i * this.imgSize, j * this.imgSize);
-        this.addChild(tileImage);
-        this.tileImages.set(tileKey, tileImage);
-      }
-    });
-  }
+	private updateVisibleTiles(visibleTiles: Set<string>): void {
+		visibleTiles.forEach((tileKey) => {
+		if (!this.tileImages.has(tileKey)) {
+			const [i, j] = tileKey.split(',').map(Number);
+			const tileImage = new TileImage();
+			tileImage.setAnchor(0, 0);
+			tileImage.source = ResPathUtil.GetTileImagePath(this.mapName, i, this.maxImageY - j - 1);
+			tileImage.setPosition(i * this.imgSize, j * this.imgSize);
+			this.addChild(tileImage);
+			this.tileImages.set(tileKey, tileImage);
+		}
+		});
+	}
 
-  private removeInvisibleTiles(visibleTiles: Set<string>): void {
-    this.tileImages.forEach((tileImage, key) => {
-      if (!visibleTiles.has(key)) {
-        tileImage.removeFromParent();
-        this.tileImages.delete(key);
-      }
-    });
-  }
+	private removeInvisibleTiles(visibleTiles: Set<string>): void {
+		this.tileImages.forEach((tileImage, key) => {
+		if (!visibleTiles.has(key)) {
+			tileImage.removeFromParent();
+			this.tileImages.delete(key);
+		}
+		});
+	}
 
-  private clear(): void {
-    this.tileImages.forEach(tileImage => tileImage.removeFromParent());
-    this.tileImages.clear();
-  }
+	private clear(): void {
+		this.tileImages.forEach(tileImage => tileImage.removeFromParent());
+		this.tileImages.clear();
+	}
 
-  private getScreenSize(): Size {
-    // Implement this method to return the current screen size
-    // This could be a property of the class or obtained from a global display object
-    return new Size(Display.getInstance().adaptWidth, Display.getInstance().adaptHeight); // Example values
-  }
+  
 }
 
 // export class MapVisualizer extends Node {

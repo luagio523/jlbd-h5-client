@@ -420,7 +420,7 @@ export class EgretNative implements INative{
 }
 
 
-export default class NativeHelper implements INative{
+export default class SDKManager implements INative{
     private native:INative
 
 	public constructor(){
@@ -441,9 +441,7 @@ export default class NativeHelper implements INative{
 			}else{
 				this.native = new H5Native()
 			}
-			
 		}
-		
 	}
 	/**
 	 * 注册事件
@@ -478,14 +476,13 @@ export default class NativeHelper implements INative{
 		}
 	}
 
-    static ins():NativeHelper
-    {
-        if(!this.inst)
-        {
-            this.inst = new NativeHelper();
-        }
-        return this.inst;
-    }
 
-    private static inst:NativeHelper;
+	private static instance: SDKManager;
+
+    public static getInstance(): SDKManager {
+        if (!SDKManager.instance) {
+            SDKManager.instance = new SDKManager();
+        }
+        return SDKManager.instance;
+    }
 }
