@@ -18,6 +18,7 @@ import {  MessageSubscriber } from "./core/common/event/MessageManager"
 import { HttpRequest } from "./libs/network/HttpRequest"
 import { NetManager } from "./libs/network/NetManager"
 import { LanguageManager } from "./core/common/i18n/LanguageManager"
+import { LocationManager } from "./core/common/location/LocationMgr"
 
 // const i18n = require("LanguageData");
 
@@ -37,6 +38,8 @@ export default class app extends oops{
     static pool:PoolMgr = PoolMgr.getInstance()
     /** 定时器 */
     static timer:ITimerMgr = new HeapTimerMgr()
+    /** 本地参数 */
+    static location:LocationManager = LocationManager.getInstance()
     /** SDK  */
     static sdk:SDKManager = SDKManager.getInstance()
     /** 语言本地化管理 */

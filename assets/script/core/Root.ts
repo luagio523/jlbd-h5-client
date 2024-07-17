@@ -1,5 +1,5 @@
 import { Component, Node, _decorator, director} from "cc";
-import { version } from "./Oops";
+
 const {  property } = _decorator;
 
 export class Root extends Component {
@@ -15,8 +15,9 @@ export class Root extends Component {
     async onLoad() {
         if (Root.isInitialized) return;
         Root.isInitialized = true;
-
-        console.log(`Oops Framework v${version}`);
+        // 创建持久根节点
+        this.createPersistRootNode()
+        
         this.enabled = false;
         await this.preload();
         this.enabled = true;
@@ -43,7 +44,7 @@ export class Root extends Component {
     update(dt: number) {
     }
 
-    public getPersistRootNode(): Node {
+    public createPersistRootNode(): Node {
         if (!this.persistRootNode) {
             this.persistRootNode = new Node('PersistRoot');
             director.addPersistRootNode(this.persistRootNode);

@@ -13,8 +13,6 @@ import { ViewModelMgr } from "./vm/vm";
 import { UIManager } from "./ui/UIManager";
 import { GameTime  } from "./common/timer/GameTime";
 
-/** 框架版本号 */
-export var version: string = "1.1.5";
 
 /** 框架核心模块访问入口 */
 export class oops {

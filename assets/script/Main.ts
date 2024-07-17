@@ -1,15 +1,14 @@
 
-import { DynamicAtlasManager, Game,  _decorator, director, game, macro, profiler, screen  } from 'cc';
+import { Component, DynamicAtlasManager, Game,  _decorator, director, game, macro, profiler, screen  } from 'cc';
 import { DEBUG, JSB } from 'cc/env';
 import { Root } from './core/Root';
+import app from './App';
+import { GameManager } from './core/game/GameManager';
+import { UIAnchorPoint } from './core/common/Adaption/AdaptionManager';
 import { MapDisplay } from './rpg/map/MapDisplay';
 import MapManager from './rpg/manager/MapManager';
-import { Event } from './rpg/event/Event';
-import {  UIAnchorPoint } from './core/common/Adaption/AdaptionManager';
 import { EventManager } from './rpg/event/EventListenerManager';
-import { GameManager } from './core/game/GameManager';
-import { AudioManager } from './core/common/audio/AudioManager';
-import app from './App';
+import { Event } from './rpg/event/Event';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -55,10 +54,10 @@ export class Main extends Root {
 
     /** 初始化游戏UI */
     protected initUI() {
-        // 创建持久根节点
-        this.getPersistRootNode();
-        // 创建音频模块
-        app.audio = this.persistRootNode.addComponent(AudioManager);
+        
+        
+        // // 创建音频模块
+        // app.audio = this.persistRootNode.addComponent(AudioManager);
         //创建游戏节点管理器
         app.game = new GameManager(this.getGameNode);
         // 适配管理器添加游戏根节点，并设置锚点左下角
@@ -68,30 +67,26 @@ export class Main extends Root {
    
    
     protected test() {
-      
 
         console.log("screen",screen.resolution);
-
-         
-
         
-        // let display = new MapDisplay();
-        // app.game.getGameRoot().addChild(display);
+        let display = new MapDisplay();
+        app.game.getGameRoot().addChild(display);
 
-        // MapManager.getInstance().initMapDisplay(display);
+        MapManager.getInstance().initMapDisplay(display);
 
-        // MapManager.getInstance().enterMap("map004");
+        MapManager.getInstance().enterMap("map004");
 
-        // EventManager.getInstance().registerListener(Event.EnterMap, function (event) {
-        //     console.log("enter map", event);     
+        EventManager.getInstance().registerListener(Event.EnterMap, function (event) {
+            console.log("enter map", event);     
             
-        //     display.changeMap();
-        // });
+            display.changeMap();
+        });
     }
 
 
     update(dt: number) {
-        app.game.update(dt);
+        // app.game.update(dt);
         // app.ecs.execute(dt);
     }
 }

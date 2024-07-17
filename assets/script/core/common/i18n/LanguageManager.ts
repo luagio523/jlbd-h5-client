@@ -1,4 +1,5 @@
 import { _decorator, Component, sys, resources, JsonAsset } from 'cc';
+import { LocalizedLabel } from './LocalizedLabel';
 
 const { ccclass, property } = _decorator;
 
@@ -95,45 +96,9 @@ export class LanguageManager extends Component {
     private updateFairyGUIComponents() {
         // 假设 FairyGUI 有一个全局方法来更新所有UI组件的语言
         // 这里需要根据实际的 FairyGUI 实现来调整
-        if (window['fairygui'] && typeof window['fairygui'].updateAllLanguages === 'function') {
-            window['fairygui'].updateAllLanguages();
-        }
+        // if (window['fairygui'] && typeof window['fairygui'].updateAllLanguages === 'function') {
+        //     window['fairygui'].updateAllLanguages();
+        // }
     }
 }
 
-@ccclass('LocalizedLabel')
-export class LocalizedLabel extends Component {
-    @property
-    private textKey: string = '';
-
-    @property(Component)
-    private targetLabel: Component = null;
-
-    onLoad() {
-        this.updateLanguage();
-        LanguageManager.getInstance().node.on('language-changed', this.updateLanguage, this);
-    }
-
-    updateLanguage() {
-        if (this.targetLabel && this.textKey) {
-            const translatedText = LanguageManager.getInstance().translate(this.textKey);
-            if ('string' in this.targetLabel) {
-                this.targetLabel['string'] = translatedText;
-            }
-        }
-    }
-
-    onDestroy() {
-        LanguageManager.getInstance().node.off('language-changed', this.updateLanguage, this);
-    }
-}
-
-
-
-// languageManager.setLanguage('zh');
-// const translatedText = languageManager.translate('greeting', { name: 'John' });
-// {
-//     "greeting": "你好，{name}！",
-//     "menu.start": "开始游戏",
-//     "menu.options": "选项"
-// }
