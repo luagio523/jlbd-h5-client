@@ -6,10 +6,8 @@
  */
 import { DEBUG } from "cc/env";
 import { AudioManager } from "./common/audio/AudioManager";
-import { MessageManager } from "./common/event/MessageManager";
 import { ResLoader } from "./common/loader/ResLoader";
 import { Logger } from "./common/log/Logger";
-import { RandomManager } from "./common/random/RandomManager";
 import { GameManager } from "./game/GameManager";
 import { ViewModelMgr } from "./vm/vm";
 import { UIManager } from "./ui/UIManager";
@@ -24,10 +22,7 @@ export class oops {
     /** 日志管理 */
     static log = Logger;
    
-    /** 全局消息 */
-    static message: MessageManager = MessageManager.Inst;
-    /** 随机工具 */
-    static random = RandomManager.getInstance();
+ 
   
     /** 游戏音乐管理 */
     static audio: AudioManager;
