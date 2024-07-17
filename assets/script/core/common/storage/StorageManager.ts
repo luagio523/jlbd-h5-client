@@ -8,12 +8,6 @@ const { ccclass } = _decorator;
 @ccclass('StorageManager')
 export class StorageManager {
     private static instance: StorageManager;
-    private encryptionKey: string;
-
-    private constructor() {
-        this.encryptionKey = 'your-encryption-key'; // 请替换为您的加密密钥
-    }
-
     public static getInstance(): StorageManager {
         if (!StorageManager.instance) {
             StorageManager.instance = new StorageManager();
@@ -21,6 +15,14 @@ export class StorageManager {
         return StorageManager.instance;
     }
 
+    
+    private encryptionKey: string;
+
+    private constructor() {
+        this.encryptionKey = 'your-encryption-key'; // 请替换为您的加密密钥
+    }
+
+   
     private async fetchEncryptionKey(): Promise<string> {
         // 实现从安全服务器获取密钥的逻辑
         // 返回获取到的密钥

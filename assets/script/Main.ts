@@ -8,14 +8,10 @@ import { DynamicAtlasManager, Node, ResolutionPolicy, _decorator, log, macro, pr
 import { DEBUG, JSB } from 'cc/env';
 import { oops } from './core/Oops';
 import { Root } from './core/Root';
-import { UIManager } from './core/ui/UIManager';
-import { UI_CONFIG } from './config/UIConfig';
 import { MapDisplay } from './rpg/map/MapDisplay';
-import { GameMap,MapType } from './rpg/map/GameMap';
 import MapManager from './rpg/manager/MapManager';
 import { EventListenerManager } from './rpg/event/EventListenerManager';
 import { Event } from './rpg/event/Event';
-import Display from './core/common/utils/display';
 import { AdaptionManager } from './core/common/Adaption/AdaptionManager';
 const { ccclass, property } = _decorator;
 
