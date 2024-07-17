@@ -1,10 +1,5 @@
-/*
- * @Author: dgflash
- * @Date: 2021-07-03 16:13:17
- * @LastEditors: dgflash
- * @LastEditTime: 2023-01-19 15:28:28
- */
-import { DynamicAtlasManager, Game, Node, ResolutionPolicy, _decorator, director, game, log, macro, profiler, screen, tween, view } from 'cc';
+
+import { DynamicAtlasManager, Game,  _decorator, director, game, macro, profiler, screen  } from 'cc';
 import { DEBUG, JSB } from 'cc/env';
 import { Root } from './core/Root';
 import { MapDisplay } from './rpg/map/MapDisplay';
@@ -61,12 +56,11 @@ export class Main extends Root {
     /** 初始化游戏UI */
     protected initUI() {
         // 创建持久根节点
-        this.persistRootNode = new Node("PersistRootNode");
-        director.addPersistRootNode(this.persistRootNode);
+        this.getPersistRootNode();
         // 创建音频模块
         app.audio = this.persistRootNode.addComponent(AudioManager);
         //创建游戏节点管理器
-        app.game = new GameManager(this.game);
+        app.game = new GameManager(this.getGameNode);
         // 适配管理器添加游戏根节点，并设置锚点左下角
         app.adaption.addRootNode(app.game.getGameRoot(),UIAnchorPoint.BottomLeft) 
     }
@@ -81,18 +75,18 @@ export class Main extends Root {
          
 
         
-        let display = new MapDisplay();
-        app.game.getGameRoot().addChild(display);
+        // let display = new MapDisplay();
+        // app.game.getGameRoot().addChild(display);
 
-        MapManager.getInstance().initMapDisplay(display);
+        // MapManager.getInstance().initMapDisplay(display);
 
-        MapManager.getInstance().enterMap("map004");
+        // MapManager.getInstance().enterMap("map004");
 
-        EventManager.getInstance().registerListener(Event.EnterMap, function (event) {
-            console.log("enter map", event);     
+        // EventManager.getInstance().registerListener(Event.EnterMap, function (event) {
+        //     console.log("enter map", event);     
             
-            display.changeMap();
-        });
+        //     display.changeMap();
+        // });
     }
 
 
@@ -100,7 +94,4 @@ export class Main extends Root {
         app.game.update(dt);
         // app.ecs.execute(dt);
     }
-    
-
-   
 }

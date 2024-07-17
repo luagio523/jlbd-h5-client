@@ -3,8 +3,6 @@ const { ccclass } = _decorator;
 /** 游戏世界管理 */
 @ccclass('GameManager')
 export class GameManager extends Component {
-
-    
     /** 游戏根节点 */
     private gameRoot: Node;
     private timeScale: number = 1;

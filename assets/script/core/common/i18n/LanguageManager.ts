@@ -1,4 +1,4 @@
-import { _decorator, Component, sys, director, Node, resources, JsonAsset } from 'cc';
+import { _decorator, Component, sys, resources, JsonAsset } from 'cc';
 
 const { ccclass, property } = _decorator;
 
@@ -13,7 +13,7 @@ export class LanguageManager extends Component {
     @property
     private defaultLanguage: string = 'en';
 
-    @property([String])
+    @property([])
     private supportedLanguages: string[] = ['en', 'zh', 'ja'];
 
     public static getInstance(): LanguageManager {
