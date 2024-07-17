@@ -1,70 +1,72 @@
-import { ImageAsset, Node, Sprite, SpriteFrame, Texture2D, UITransform, assetManager, resources } from "cc";
-
+import { Node, Sprite, UITransform, resources, SpriteFrame, Texture2D, assetManager } from 'cc';
 
 /**
  * 游戏图片
  */
 export default class GameImage extends Node {
     
-    protected renderSprite:Sprite //渲染精灵
-    protected url:string //
-    public constructor(){
-        super()
-        this.renderSprite = this.addComponent(Sprite)
+    protected renderSprite: Sprite; // 渲染精灵
+    protected url: string = ""; // 图片 URL
+    public onLoad?: (url: string) => void; // 加载完成回调
+
+    public constructor() {
+        super();
+        this.renderSprite = this.addComponent(Sprite);
     }
 
-    public setAnchor(x:number,y:number){
-        let transform = this.getComponent(UITransform)
-        transform.anchorX = x 
-        transform.anchorY = y 
+    public setAnchor(x: number, y: number) {
+        let transform = this.getComponent(UITransform);
+        transform.anchorX = x;
+        transform.anchorY = y;
     }
 
-    public isload(url:string){
-        if(this.url == url && this.renderSprite.spriteFrame){
-            return true 
-        }
-        return false 
+    public isLoad(url: string): boolean {
+        return this.url === url && !!this.renderSprite.spriteFrame;
     }
 
-    public set source(url:string){
-        if(this.isload(url))return 
-        this.clear() //清除原有的
-        resources.load(url, ImageAsset, (err, asset) => {
-            if (err != null) {
-                console.log(err);
+    public set source(url: string) {
+        if (this.isLoad(url)) return;
+        this.clear(); // 清除原有的
+        this.url = url;
+        resources.load(url, SpriteFrame, (err, frame) => {
+            if (err) {
+                console.error(err);
                 return;
             }
-            const texture = new Texture2D();
-            texture.image = asset;
-    
-            const spriteFrame = new SpriteFrame();
-            spriteFrame.texture = texture;
-            
-            this.renderSprite.spriteFrame = spriteFrame
-           
+            this.renderSprite.spriteFrame = frame;
+            if (this.onLoad) {
+                this.onLoad(url);
+            }
         });
     }
 
-    public setTexture(texture:Texture2D){
-        if(this.renderSprite.spriteFrame){
-            this.renderSprite.spriteFrame.texture = texture
+    public setTexture(texture: Texture2D) {
+        if (this.renderSprite.spriteFrame) {
+            this.renderSprite.spriteFrame.texture = texture;
         }
     }
 
-    public clear(){
-        this.url = ""
-        if(this.renderSprite.spriteFrame){
-            this.renderSprite.spriteFrame = null 
+    public clear() {
+        if (this.renderSprite.spriteFrame) {
+            assetManager.releaseAsset(this.renderSprite.spriteFrame);
+            this.renderSprite.spriteFrame = null;
+        }
+        if (this.url) {
+            this.url = "";
         }
     }
     
-    public clone():GameImage{
-        let image = new GameImage
-        image.source = this.url
-        return image
+    public clone(): GameImage {
+        let image = new GameImage();
+        image.source = this.url;
+        return image;
     }
-   
+
+    
+
+    // 释放资源
+    public dispose() {
+        this.clear();
+        this.onLoad = undefined;
+    }
 }
-
-
-

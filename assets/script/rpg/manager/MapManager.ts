@@ -1,10 +1,9 @@
 import { ImageAsset, Node, SpriteFrame, Texture2D, TiledMap, TiledMapAsset, assetManager, log, resources } from "cc";
 import { GameMap } from "../map/GameMap";
 import { MapDisplay } from "../map/MapDisplay";
-import { EventDispatcher } from "../../core/common/event/EventDispatcher";
-import { EventListenerManager } from "../event/EventListenerManager";
 import { EnterMapEvent } from "../event/Event";
 import app from "../../App";
+import { EventDispatcher } from "../event/EventListenerManager";
 
 export default class MapManager {
     private static instance: MapManager;
@@ -47,7 +46,7 @@ export default class MapManager {
             let tiledMap: TiledMap = this.mapDisplay.getTiledMap();
             tiledMap.tmxAsset = tiledMapAsset;
             this.gameMap.initWithTiledMap(tiledMap);
-            EventListenerManager.getInstance().dispatchEvent(new EnterMapEvent());
+            this.eventDispatcher.trigger(new EnterMapEvent());
 
             app.log.logView({mapID: mapID},'');
         } catch (err) {

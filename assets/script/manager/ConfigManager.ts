@@ -6,6 +6,7 @@ const { ccclass, property } = _decorator;
 export class ConfigManager extends Component {
     private static instance: ConfigManager = null;
     private configs: Map<string, any> = new Map();
+    private static readonly CONFIG_PATH = 'configs/';
 
     public static getInstance(): ConfigManager {
         if (!ConfigManager.instance) {
@@ -14,14 +15,23 @@ export class ConfigManager extends Component {
         return ConfigManager.instance;
     }
 
-    public async loadConfig(path: string): Promise<void> {
-        if (path.endsWith('.zip')) {
+    public async loadConfig(name?: string): Promise<void> {
+        let path = this.getConfigPath(name);
+        if (name.endsWith('.zip')) {
             await this.loadZipConfig(path);
-        } else if (path.endsWith('.json') || path.endsWith('.kv')) {
+        } else if (name.endsWith('.json') || path.endsWith('.kv')) {
             await this.loadSingleConfig(path);
         } else {
             await this.loadDirectory(path);
         }
+    }
+
+    public getConfigPath(name: string): string {
+        return `${ConfigManager.CONFIG_PATH}${name}`;
+    }
+
+    public get(configName: string): any {
+        return this.configs.get(configName) || null;
     }
 
     private async loadSingleConfig(path: string): Promise<void> {
@@ -56,7 +66,7 @@ export class ConfigManager extends Component {
                             promises.push(
                                 file.async('text').then(content => {
                                     const data = this.parseConfig(content, relativePath);
-                                    this.configs.set(relativePath, data);
+                                    this.configs.set(file.name, data);
                                 })
                             );
                         }

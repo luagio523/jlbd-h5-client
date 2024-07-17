@@ -7,7 +7,6 @@ import GameObject from "./GameObject";
 import GameRenderObject from "./GameRenderObject";
 import MovieClip from "./MovieClip";
 import FrameManager from "../manager/FrameManager";
-import { EventDispatcher } from "../../core/common/event/EventDispatcher";
 import app from "../../App";
 import FrameUtil from "../util/FrameUtil";
 

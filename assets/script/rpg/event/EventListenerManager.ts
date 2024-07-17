@@ -1,14 +1,14 @@
 import { IEvent } from "./Event";
 
-export class EventListenerManager {
-    private static instance: EventListenerManager;
+export class EventManager {
+    private static instance: EventManager;
     private listeners: Map<string, ((event: IEvent) => void)[]> = new Map();
 
     private constructor() {}
 
-    public static getInstance(): EventListenerManager {
+    public static getInstance(): EventManager {
         if (!this.instance) {
-            this.instance = new EventListenerManager();
+            this.instance = new EventManager();
         }
         return this.instance;
     }
@@ -48,3 +48,28 @@ export class EventListenerManager {
     }
 }
 
+
+
+export class EventDispatcher {
+    private eventManager: EventManager;
+
+    constructor() {
+        this.eventManager = EventManager.getInstance();
+    }
+
+    public addListener(eventType: string, listener: (event: IEvent) => void): void {
+        this.eventManager.registerListener(eventType, listener);
+    }
+
+    public removeListener(eventType: string, listener: (event: IEvent) => void): void {
+        this.eventManager.unregisterListener(eventType, listener);
+    }
+
+    public trigger(event: IEvent): void {
+        this.eventManager.dispatchEvent(event);
+    }
+
+    public getListeners(eventType: string): ((event: IEvent) => void)[] | undefined {
+        return this.eventManager.getListeners(eventType);
+    }
+}
