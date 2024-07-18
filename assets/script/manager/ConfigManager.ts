@@ -17,9 +17,9 @@ export class ConfigManager extends Component {
 
     public async loadConfig(name?: string): Promise<void> {
         let path = this.getConfigPath(name);
-        if (name.endsWith('.zip')) {
+        if (path.endsWith('.zip')) {
             await this.loadZipConfig(path);
-        } else if (name.endsWith('.json') || path.endsWith('.kv')) {
+        } else if (path.endsWith('.json') || path.endsWith('.kv')) {
             await this.loadSingleConfig(path);
         } else {
             await this.loadDirectory(path);

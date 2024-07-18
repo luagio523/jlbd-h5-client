@@ -107,9 +107,6 @@ export class Footprint extends Component {
 }
 
 
-
-
-
 // @ccclass('GameController')
 // export class GameController extends Component {
 //     @property(FootprintManager)

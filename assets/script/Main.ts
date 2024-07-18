@@ -48,9 +48,8 @@ export class Main extends Root {
         });
     }
 
-    protected async preload():Promise<any>{
-        // app.config.loadConfig();
-        return null 
+    protected async preload():Promise<void>{
+        await app.config.loadConfig();
     }
 
     /** 初始化游戏UI */
