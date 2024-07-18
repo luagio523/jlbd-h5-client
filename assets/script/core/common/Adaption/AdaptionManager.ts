@@ -1,14 +1,25 @@
-import { _decorator, Component, Node, EventTarget, Rect, Size, view, screen, UITransform } from 'cc';
+import { ResolutionPolicy, sys } from 'cc';
+import { _decorator, Component, Node, EventTarget, Rect, Size, view, screen, UITransform, Vec3, log } from 'cc';
 
 const { ccclass } = _decorator;
 
-export enum UIAnchorPoint {
+export enum UIPosition {
     Center = 'Center',
     TopLeft = 'TopLeft',
     BottomLeft = 'BottomLeft',
     TopRight = 'TopRight',
     BottomRight = 'BottomRight'
 }
+
+// 2D 坐标系:
+// X 轴: 从左到右为正方向
+// Y 轴: 从下到上为正方向
+// 原点(0,0): 默认在屏幕左下角
+// 3D 坐标系:
+// X 轴: 从左到右为正方向
+// Y 轴: 从下到上为正方向
+// Z 轴: 从屏幕内向外为正方向
+// 原点(0,0,0): 默认在场景中心
 
 @ccclass('AdaptionManager')
 export class AdaptionManager extends EventTarget {
@@ -25,39 +36,37 @@ export class AdaptionManager extends EventTarget {
     private isFixedHeight: boolean = false;
     private designToScreenRatio: number = 1;
     private designSize: Size = new Size();
-    private rootNodes: Map<UIAnchorPoint, Node> = new Map();
+    private rootNodes: Map<Node, UIPosition> = new Map();
 
     private constructor() {
         super();
         this.updateDesignSize();
         this.updateSafeArea();
+        // view.on("canvas-resize", () => {  // 画布大小变化   OK
+        //     console.log("canvas-resize");
+        // }, this);
+        // screen.on("fullscreen-change", () => {
+        //     console.log("fullscreen-change");
+        // }, this);
+        screen.on("orientation-change", () => {
+            console.log("orientation-change");
+        }, this);
         
-        view.on('design-resolution-changed', this.onDesignResolutionChanged, this);
-        view.on('window-resize', this.onWindowResize, this);
-        view.on('orientation-change', this.onOrientationChange, this);
+        screen.on('window-resize', this.onWindowResize, this); //屏幕大小变化   OK
     }
 
-    private onDesignResolutionChanged = () => {
-        console.log('design-resolution-changed');
-        this.updateDesignSize();
-        this.updateSafeArea();
-        this.adaptRootNodes();
-        this.emit('adaption-updated', 'design-resolution');
-    }
-
+   
     private onWindowResize = () => {
         console.log('window-resize');
         this.updateSafeArea();
         this.adaptRootNodes();
+        // setTimeout(() => {
+        //     this.adaptRootNodes();
+        // }, 2000);
         this.emit('adaption-updated', 'window-resize');
     }
 
-    private onOrientationChange = () => {
-        console.log('orientation-change');
-        this.updateSafeArea();
-        this.adaptRootNodes();
-        this.emit('adaption-updated', 'orientation-change');
-    }
+  
 
     private updateDesignSize(): void {
         this.designSize = view.getDesignResolutionSize();
@@ -83,6 +92,8 @@ export class AdaptionManager extends EventTarget {
             visibleWidth,
             visibleHeight
         );
+
+        view.setDesignResolutionSize(this.designSize.width, this.designSize.height, this.isFixedHeight? ResolutionPolicy.FIXED_HEIGHT : ResolutionPolicy.FIXED_WIDTH);
 
         console.log(`designSize: ${this.designSize.width}, ${this.designSize.height}`);
         console.log(`screenSize: ${screenSize.width}, ${screenSize.height}`);
@@ -111,24 +122,18 @@ export class AdaptionManager extends EventTarget {
         return 1 / this.designToScreenRatio;
     }
 
-    public getActualDesignPosition(designX: number, designY: number): { x: number, y: number } {
-        return {
-            x: designX - this.safeArea.x,
-            y: designY - this.safeArea.y
-        };
+    public getActualDesignPosition(designX: number, designY: number): Vec3 {
+        return new Vec3(designX - this.safeArea.x, designY - this.safeArea.y, 0);
     }
 
-    public getActualScreenPosition(designX: number, designY: number): { x: number, y: number } {
+    public getActualScreenPosition(designX: number, designY: number): Vec3 {
         const actualPos = this.getActualDesignPosition(designX, designY);
-        return {
-            x: actualPos.x * this.designToScreenRatio,
-            y: actualPos.y * this.designToScreenRatio
-        };
+        return new Vec3(actualPos.x * this.designToScreenRatio, actualPos.y * this.designToScreenRatio, 0);
     }
 
     public setNodePosition(node: Node, designX: number, designY: number): void {
         const actualPosition = this.getActualDesignPosition(designX, designY);
-        node.setPosition(actualPosition.x, actualPosition.y);
+        node.setPosition(actualPosition);
     }
 
     public forceAdaption(): void {
@@ -139,61 +144,145 @@ export class AdaptionManager extends EventTarget {
     }
 
     private adaptRootNodes(): void {
-        this.rootNodes.forEach((rootNode, anchorPoint) => {
-            const uiTransform = rootNode.getComponent(UITransform);
-            if (uiTransform) {
-                uiTransform.setContentSize(this.safeArea.width, this.safeArea.height);
-                this.setNodePositionByAnchor(rootNode, anchorPoint);
-            }
+        this.rootNodes.forEach((anchorPoint, rootNode) => {
+            console.log(`adapt root node: ${anchorPoint}`, rootNode);
+            this.adaptRootNode(rootNode, anchorPoint);
         });
     }
 
-    private setNodePositionByAnchor(node: Node, anchorPoint: UIAnchorPoint): void {
-        let x = this.safeArea.x;
-        let y = this.safeArea.y;
+    public adaptRootNode(rootNode: Node, anchorPoint: UIPosition): void {
+        const uiTransform = rootNode.getComponent(UITransform);
+        if (uiTransform) {
+            uiTransform.setContentSize(this.safeArea.width, this.safeArea.height);
+            this.setNodePositionByAnchor(rootNode, anchorPoint);
+        }
+    }
+
+
+    // export enum UIPosition {
+    //     Center = 'Center',
+    //     TopLeft = 'TopLeft',
+    //     BottomLeft = 'BottomLeft',
+    //     TopRight = 'TopRight',
+    //     BottomRight = 'BottomRight'
+    // }
+    
+    // // 2D 坐标系:
+    // // X 轴: 从左到右为正方向
+    // // Y 轴: 从下到上为正方向
+    // // 原点(0,0): 默认在屏幕左下角
+    // // 3D 坐标系:
+    // // X 轴: 从左到右为正方向
+    // // Y 轴: 从下到上为正方向
+    // // Z 轴: 从屏幕内向外为正方向
+    // // 原点(0,0,0): 默认在场景中心
+
+    //中心原点(0,0,0)坐标系
+    private setNodePositionByAnchor(node: Node, anchorPoint: UIPosition): void {
+        let x = 0;
+        let y = 0;
 
         switch (anchorPoint) {
-            case UIAnchorPoint.Center:
-                x += this.safeArea.width / 2;
-                y += this.safeArea.height / 2;
+            case UIPosition.Center:
+                // Center is default (x, y)
                 break;
-            case UIAnchorPoint.TopLeft:
-                y += this.safeArea.height;
+            case UIPosition.TopLeft:
+                x -= this.safeArea.width/2;
+                y += this.safeArea.height/2;
                 break;
-            case UIAnchorPoint.TopRight:
-                x += this.safeArea.width;
-                y += this.safeArea.height;
+            case UIPosition.TopRight:
+                x += this.safeArea.width/2;
+                y += this.safeArea.height/2;
                 break;
-            case UIAnchorPoint.BottomRight:
-                x += this.safeArea.width;
+            case UIPosition.BottomRight:
+                x += this.safeArea.width/2;
+                y -= this.safeArea.height/2;
                 break;
-            // BottomLeft is default (x, y)
+            case UIPosition.BottomLeft:
+                x -= this.safeArea.width/2;
+                y -= this.safeArea.height/2;
+                break;
         }
 
-        node.setPosition(x, y);
+        node.setPosition(new Vec3(x, y, 0));
+
+        console.log(`${node.name} :set node position: ${anchorPoint}`, node.getPosition(),view.getResolutionPolicy());
     }
 
-    public addRootNode(node: Node,anchorPoint?: UIAnchorPoint): void {
-        anchorPoint = anchorPoint || UIAnchorPoint.Center;
-        if (!this.rootNodes.has(anchorPoint)) {
-            this.rootNodes.set(anchorPoint, node);
-            this.adaptRootNodes();
+    public addRootNode(node: Node, anchorPoint: UIPosition = UIPosition.Center): void {
+        if(!node||!node.isValid){
+            log(`addRootNode failed, node is invalid: ${node}`);
+            return;
+        }
+        if (!this.rootNodes.has(node)) {
+            this.rootNodes.set(node, anchorPoint);
+            this.adaptRootNode(node, anchorPoint);
         }
     }
 
-    public removeRootNode(anchorPoint: UIAnchorPoint): void {
-        this.rootNodes.delete(anchorPoint);
+    public removeRootNode(node: Node): void {
+        this.rootNodes.delete(node);
     }
 
-    public getRootNode(anchorPoint: UIAnchorPoint): Node | undefined {
-        return this.rootNodes.get(anchorPoint);
+    public getNodeAnchorPoint(node: Node): UIPosition | undefined {
+        return this.rootNodes.get(node);
+    }
+
+    public getAllRootNodes(): IterableIterator<Node> {
+        return this.rootNodes.keys();
     }
 
     public destroy(): void {
-        view.off('design-resolution-changed', this.onDesignResolutionChanged, this);
-        view.off('window-resize', this.onWindowResize, this);
-        view.off('orientation-change', this.onOrientationChange, this);
+        screen.off('window-resize', this.onWindowResize, this);
         this.rootNodes.clear();
         AdaptionManager.instance = null;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// private setNodePositionByAnchor2D(node: Node, anchorPoint: UIPosition): void {
+//     let x = this.safeArea.x;
+//     let y = this.safeArea.y;
+
+//     switch (anchorPoint) {
+//         case UIPosition.Center:
+//             x += this.safeArea.width / 2;
+//             y += this.safeArea.height / 2;
+//             break;
+//         case UIPosition.TopLeft:
+//             y += this.safeArea.height;
+//             break;
+//         case UIPosition.TopRight:
+//             x += this.safeArea.width;
+//             y += this.safeArea.height;
+//             break;
+//         case UIPosition.BottomRight:
+//             x += this.safeArea.width;
+//             break;
+//         // BottomLeft is default (x, y)
+//     }
+
+//     node.setPosition(new Vec3(x, y, 0));
+
+//     console.log(`${node.name} set node position: ${anchorPoint}`, node.getPosition());
+// }

@@ -1,14 +1,15 @@
 
-import { Component, DynamicAtlasManager, Game,  _decorator, director, game, macro, profiler, screen  } from 'cc';
+import { Component, DynamicAtlasManager, Game,  _decorator, director, game, macro, profiler, screen, view  } from 'cc';
 import { DEBUG, JSB } from 'cc/env';
 import { Root } from './core/Root';
 import app from './App';
 import { GameManager } from './core/game/GameManager';
-import { UIAnchorPoint } from './core/common/Adaption/AdaptionManager';
+import { UIPosition } from './core/common/Adaption/AdaptionManager';
 import { MapDisplay } from './rpg/map/MapDisplay';
 import MapManager from './rpg/manager/MapManager';
 import { EventManager } from './rpg/event/EventListenerManager';
 import { Event } from './rpg/event/Event';
+import { AudioManager } from './core/common/audio/AudioManager';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -29,7 +30,7 @@ export class Main extends Root {
 
     protected init() {
         this.initUI();
-        this.test();
+        // this.test();
         // 游戏显示事件
         game.on(Game.EVENT_SHOW, () => {
             app.time.resume();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
@@ -54,14 +55,12 @@ export class Main extends Root {
 
     /** 初始化游戏UI */
     protected initUI() {
-        
-        
         // // 创建音频模块
-        // app.audio = this.persistRootNode.addComponent(AudioManager);
+        app.audio = this.persistRootNode.addComponent(AudioManager);
         //创建游戏节点管理器
-        app.game = new GameManager(this.getGameNode);
+        app.game = new GameManager(this.getGameNode());
         // 适配管理器添加游戏根节点，并设置锚点左下角
-        app.adaption.addRootNode(app.game.getGameRoot(),UIAnchorPoint.BottomLeft) 
+        app.adaption.addRootNode(app.game.getGameRoot(),UIPosition.BottomLeft) 
     }
 
    
