@@ -1,0 +1,148 @@
+{
+  "role_a":{"start":1,"id":1001,"times":0,"scale":1.2,"interval":50,"animUrl":"anim/body/char","length":7, "defaultframeKey":"role"},
+  "role_s":{"start":1,"id":3001,"times":0,"scale":1.2,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"role"},
+  "role_r":{"start":1,"id":4001,"times":0,"scale":1.2,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"role"},
+  "role_d":{"start":1,"id":5001,"times":0,"scale":1.2,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"role"},
+  "role_j":{"start":1,"id":6001,"times":0,"scale":1.2,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"role"},
+
+  "Stone":{"start":0,"id":5013,"scale":0.2,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet2","length":4, "defaultframeKey":"zhousi"},
+  "Arrow":{"start":1,"id":10001,"scale":0.15,"times":0,"interval":100,"animUrl":"anim/skillEff/baseSkill","length":1, "defaultframeKey":"zhousi"},
+  "Bomb":{"start":1,"id":10001,"scale":0.2,"times":0,"interval":100,"animUrl":"anim/skillEff/baseSkill","length":1, "defaultframeKey":"zhousi"},
+  "BS_Sword1":{"start":1,"id":10001,"scale":0.2,"times":0,"interval":100,"animUrl":"anim/skillEff/baseSkill","length":1, "defaultframeKey":"zhousi"},
+  "BS_Sword2":{"start":1,"id":10001,"scale":0.2,"times":0,"interval":100,"animUrl":"anim/skillEff/baseSkill","length":1, "defaultframeKey":"zhousi"},
+
+  "Rock":{"start":1,"id":10001,"scale":0.2,"times":0,"interval":100,"animUrl":"anim/skillEff/baseSkill","length":1, "defaultframeKey":"zhousi"},
+  "Sword1":{"start":1,"id":10001,"scale":0.15,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet2","length":1, "defaultframeKey":"zhousi"},
+  "Sword2":{"start":1,"id":10001,"scale":0.17,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet2","length":1, "defaultframeKey":"zhousi"},
+  "Sword3":{"start":1,"id":10001,"scale":0.17,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet2","length":1, "defaultframeKey":"zhousi"},
+  "Sword4":{"start":1,"id":10001,"scale":0.17,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet2","length":1, "defaultframeKey":"zhousi"},
+  "Sword5":{"start":1,"id":10001,"scale":0.15,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet2","length":1, "defaultframeKey":"zhousi"},
+  "Bullet1":{"start":1,"id":10001,"scale":-0.9,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet","length":1, "defaultframeKey":"zhousi"},
+  "Bullet2":{"start":1,"id":10001,"scale":-1,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet","length":1, "defaultframeKey":"zhousi"},
+  "Bullet3":{"start":1,"id":10001,"scale":-1,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet","length":1, "defaultframeKey":"zhousi"},
+  "Bullet4":{"start":1,"id":10001,"scale":-1,"times":0,"interval":100,"animUrl":"anim/skillEff/bullet","length":1, "defaultframeKey":"zhousi"},
+  "huyue":{"start":1,"id":10001,"times":0,"interval":100,"animUrl":"anim/skillEff/huyue","length":16, "defaultframeKey":"zhousi"},
+  "10200":{"start":1,"id":10001,"scale":0.8,"times":0,"interval":50,"animUrl":"anim/skillEff/10200","length":17, "defaultframeKey":"zhousi"},
+  "longjuan":{"start":1,"id":10001,"scale":1.2,"anchorY":0,"times":0,"interval":100,"animUrl":"anim/skillEff/longjuan","length":12, "defaultframeKey":"zhousi"},
+  "blood1":{"start":0,"id":10001,"scale":0.4,"anchorY":0.5, "anchorX":0.3,"times":0,"interval":50,"animUrl":"anim/skillEff/blood1","length":4, "defaultframeKey":"zhousi"},
+  "yaolei":{"start":1,"id":10001,"scale":0.3,"times":0,"interval":60,"animUrl":"anim/skillEff/yaolei","length":4, "defaultframeKey":"zhousi"},
+  "daoguang":{"start":0,"id":10001,"scale":1,"times":0,"interval":60,"animUrl":"anim/skillEff/daoguang","length":1, "defaultframeKey":"zhousi"},
+  "hit_firrain":{"start":1,"id":10001,"scale":1,"anchorY":0.2, "anchorX":0.5,"times":0,"interval":60,"animUrl":"anim/skillEff/hit_firrain","length":13, "defaultframeKey":"zhousi"},
+  "penquan":{"start":1,"id":10001,"scale":0.8,"anchorY":0.2, "anchorX":0.6,"times":0,"interval":60,"animUrl":"anim/skillEff/penquan","length":13, "defaultframeKey":"zhousi"},
+  "110478":{"start":1,"id":10001,"scale":0.6,"anchorY":0.5, "anchorX":0.5,"times":0,"interval":60,"animUrl":"anim/skillEff/110478","length":12, "defaultframeKey":"zhousi"},
+  "yuanyuedaoguang":{"start":1,"id":10001,"scale":0.5,"anchorY":0.5, "anchorX":0.5,"times":0,"interval":60,"animUrl":"anim/skillEff/yuanyuedaoguang","length":5, "defaultframeKey":"zhousi"},
+  "wuyadaoguang":{"start":1,"id":10001,"scale":0.8,"anchorY":0.5, "anchorX":1,"times":0,"interval":60,"animUrl":"anim/skillEff/wuyadaoguang","length":19, "defaultframeKey":"zhousi"},
+  "nandaoxuanfengzhan":{"start":1,"id":10001,"scale":0.5,"anchorY":0.6, "anchorX":0.5,"times":0,"interval":50,"animUrl":"anim/skillEff/nandaoxuanfengzhan","length":8, "defaultframeKey":"zhousi"},
+  "3103":{"start":1,"id":10001,"scale":0.7,"anchorY":0.6, "anchorX":0.5,"times":0,"interval":80,"animUrl":"anim/skillEff/3103","length":11, "defaultframeKey":"zhousi"},
+  "penhuo":{"start":1,"id":10001,"scale":0.7,"anchorY":0.2, "anchorX":0.5,"times":0,"interval":100,"animUrl":"anim/skillEff/penhuo","length":8, "defaultframeKey":"zhousi"},
+  "weapon_greenarrow":{"start":1,"id":10001,"scale":0.5,"anchorY":0.5, "anchorX":0.5,"times":0,"interval":100,"animUrl":"anim/skillEff/weapon_greenarrow","length":12, "defaultframeKey":"zhousi"},
+  "weapon_firarrow":{"start":1,"id":10001,"scale":0.5,"anchorY":0.5, "anchorX":0.5,"times":0,"interval":100,"animUrl":"anim/skillEff/weapon_firarrow","length":12, "defaultframeKey":"zhousi"},
+
+
+  "Heavy_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Heavy_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Heavy_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":3, "defaultframeKey":"zhousi"},
+  "Heavy_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+
+  "Medieval_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Medieval_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Medieval_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Medieval_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+
+  "Mummy1_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Mummy1_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Mummy1_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Mummy1_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  
+  "Mummy2_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Mummy2_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Mummy2_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Mummy2_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  
+  "Mummy3_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Mummy3_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Mummy3_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Mummy3_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  
+  "Persian_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Persian_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Persian_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Persian_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  
+  "Pirate_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Pirate_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Pirate_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Pirate_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+
+  "Thief_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Thief_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Thief_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Thief_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  
+  "ReaperMan1_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "ReaperMan1_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "ReaperMan1_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "ReaperMan1_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  
+  "ReaperMan2_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "ReaperMan2_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "ReaperMan2_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "ReaperMan2_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  
+  "ReaperMan3_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "ReaperMan3_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "ReaperMan3_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "ReaperMan3_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  
+  "Rogue_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Rogue_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Rogue_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Rogue_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  
+  "Skeleton1_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Skeleton1_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Skeleton1_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Skeleton1_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  
+  "Skeleton2_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Skeleton2_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Skeleton2_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Skeleton2_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  
+  "Skeleton3_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Skeleton3_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Skeleton3_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Skeleton3_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  
+  "Orc1_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Orc1_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Orc1_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Orc1_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  
+  "Orc2_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":4, "defaultframeKey":"zhousi"},
+  "Orc2_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Orc2_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Orc2_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  
+  "Orc3_a":{"start":1,"id":1013,"times":0,"interval":100,"animUrl":"anim/body/char","length":5, "defaultframeKey":"zhousi"},
+  "Orc3_s":{"start":1,"id":3013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Orc3_r":{"start":1,"id":4013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+  "Orc3_d":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/body/char","length":6, "defaultframeKey":"zhousi"},
+
+
+  "item_0":{"start":1,"id":5013,"times":0,"interval":100,"animUrl":"anim/item/gold","length":7, "defaultframeKey":"zhousi"},
+
+  "LvUp":{"start":0,"id":5013,"times":0,"scale":0.5, "anchorY":0, "anchorX":0.5,"interval":100,"animUrl":"anim/skillEff/LvUp","length":15, "defaultframeKey":"zhousi"},
+  "BossBorn":{"start":0,"id":5013,"times":0,"scale":1, "anchorY":-0.5, "anchorX":0.5,"interval":150,"animUrl":"anim/skillEff/BossBorn","length":9, "defaultframeKey":"zhousi"},
+  "BossDie":{"start":0,"id":5013,"times":0,"scale":1.5, "anchorY":0, "anchorX":0.5,"interval":200,"animUrl":"anim/skillEff/BossDie","length":8, "defaultframeKey":"zhousi"},
+  "MonsterBorn":{"start":0,"id":5013,"times":0,"scale":0.3, "anchorY":-0.5, "anchorX":0.5,"interval":100,"animUrl":"anim/skillEff/MonsterBorn","length":8, "defaultframeKey":"zhousi"},
+  "RoleBorn":{"start":0,"id":5013,"times":0,"scale":0.3, "anchorY":-0.5, "anchorX":0.5,"interval":100,"animUrl":"anim/skillEff/RoleBorn","length":8, "defaultframeKey":"zhousi"},
+  "RoleDie":{"start":0,"id":5013,"times":0,"scale":0.5, "anchorY":-0.5, "anchorX":0.5,"interval":200,"animUrl":"anim/skillEff/RoleDie","length":8, "defaultframeKey":"zhousi"},
+
+  "Father":{"start":1,"id":1013,"times":0, "scale":1, "interval":100,"animUrl":"anim/body/father","length":6, "defaultframeKey":"zhousi"},
+
+  "zhenqi":{"start":1,"id":1013,"times":0, "scale":1, "interval":200,"animUrl":"anim/skillEff/zhenqi","length":4, "defaultframeKey":"zhousi"}
+
+
+  
+}

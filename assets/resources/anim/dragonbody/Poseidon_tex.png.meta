@@ -1,0 +1,47 @@
+{
+  "ver": "1.0.22",
+  "importer": "texture",
+  "imported": true,
+  "uuid": "e94ac0a4-48b5-41bd-880b-57b9bb953699",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {
+    "Poseidon_tex": {
+      "ver": "1.0.6",
+      "uuid": "d210dd80-2276-47dc-9161-249c9300aae0",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "520b3038-bb10-467b-910b-06ba04bee515",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -2,
+      "offsetY": 36.5,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 506,
+      "height": 437,
+      "rawWidth": 512,
+      "rawHeight": 512,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    }
+  },
+  "userData": {
+    "wrapModeS": "repeat",
+    "wrapModeT": "repeat",
+    "minfilter": "linear",
+    "magfilter": "linear",
+    "mipfilter": "none",
+    "anisotropy": 0
+  }
+}

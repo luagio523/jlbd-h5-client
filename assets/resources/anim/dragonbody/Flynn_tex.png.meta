@@ -1,0 +1,47 @@
+{
+  "ver": "1.0.22",
+  "importer": "texture",
+  "imported": true,
+  "uuid": "3d8742d2-4590-464a-9a6a-59b429daa71c",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {
+    "Flynn_tex": {
+      "ver": "1.0.6",
+      "uuid": "c536cede-8d01-48f0-83b4-4f03deaa6fce",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "0c328805-fc1f-49e8-9de7-3284c182c916",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -28,
+      "offsetY": 4,
+      "trimX": 1,
+      "trimY": 2,
+      "width": 454,
+      "height": 500,
+      "rawWidth": 512,
+      "rawHeight": 512,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    }
+  },
+  "userData": {
+    "wrapModeS": "repeat",
+    "wrapModeT": "repeat",
+    "minfilter": "linear",
+    "magfilter": "linear",
+    "mipfilter": "none",
+    "anisotropy": 0
+  }
+}

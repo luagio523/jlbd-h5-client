@@ -1,0 +1,47 @@
+{
+  "ver": "1.0.22",
+  "importer": "texture",
+  "imported": true,
+  "uuid": "d817f20d-d46d-4ef7-91d2-56459cfab6ed",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {
+    "MechaSnake_tex": {
+      "ver": "1.0.6",
+      "uuid": "e59582d1-fe5a-4da7-bd54-491ef18ca7f7",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "072146e4-f4be-4b19-ac87-b9edccdf9150",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -73.5,
+      "offsetY": 17.5,
+      "trimX": 2,
+      "trimY": 2,
+      "width": 873,
+      "height": 473,
+      "rawWidth": 1024,
+      "rawHeight": 512,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    }
+  },
+  "userData": {
+    "wrapModeS": "repeat",
+    "wrapModeT": "repeat",
+    "minfilter": "linear",
+    "magfilter": "linear",
+    "mipfilter": "none",
+    "anisotropy": 0
+  }
+}

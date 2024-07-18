@@ -68,6 +68,9 @@ export class MapVisualizer extends Node {
 	}
 
 	private getVisibleTiles(viewPosition: Vec2): Set<string> {
+		// console.log("getVisibleTiles", viewPosition);
+
+
 		const visibleTiles = new Set<string>();
 		const { x, y } = viewPosition;
 		const screenSize =   this.getScreenSize();
@@ -88,24 +91,24 @@ export class MapVisualizer extends Node {
 
 	private updateVisibleTiles(visibleTiles: Set<string>): void {
 		visibleTiles.forEach((tileKey) => {
-		if (!this.tileImages.has(tileKey)) {
-			const [i, j] = tileKey.split(',').map(Number);
-			const tileImage = new TileImage();
-			tileImage.setAnchor(0, 0);
-			tileImage.source = ResPathUtil.getTileImagePath(this.mapName, i, this.maxImageY - j - 1);
-			tileImage.setPosition(i * this.imgSize, j * this.imgSize);
-			this.addChild(tileImage);
-			this.tileImages.set(tileKey, tileImage);
-		}
+			if (!this.tileImages.has(tileKey)) {
+				const [i, j] = tileKey.split(',').map(Number);
+				const tileImage = new TileImage();
+				tileImage.setAnchor(0, 0);
+				tileImage.source = ResPathUtil.getTileImagePath(this.mapName, i, this.maxImageY - j - 1);
+				tileImage.setPosition(i * this.imgSize, j * this.imgSize);
+				this.addChild(tileImage);
+				this.tileImages.set(tileKey, tileImage);
+			}
 		});
 	}
 
 	private removeInvisibleTiles(visibleTiles: Set<string>): void {
 		this.tileImages.forEach((tileImage, key) => {
-		if (!visibleTiles.has(key)) {
-			tileImage.removeFromParent();
-			this.tileImages.delete(key);
-		}
+			if (!visibleTiles.has(key)) {
+				tileImage.removeFromParent();
+				this.tileImages.delete(key);
+			}
 		});
 	}
 

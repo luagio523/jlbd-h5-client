@@ -1,19 +1,27 @@
+export type EasingFunction = (t: number) => number;
 
 export default class MovieClip {
     protected curAnimeTime: number = 0;
     protected finishNum: number = 0;
     protected statusPause: boolean = false;
     protected statusStop: boolean = true;
-    protected frameIndex: number = 0; // 帧序号
+    protected frameIndex: number = 0;
 
     protected frameTb: any[] = [];
-    protected frameCount: number = 0; // 总帧数
-    protected updateGap: number = 0.33; // 跟新间隔默认值
+    protected frameCount: number = 0;
+    protected updateGap: number = 0.33;
     protected animeTimes: number = 1;
-    protected isLoop: boolean = false; // 是否循环
-    protected callback: Function | null = null;
-    protected activeInMgr: boolean = false; // 在动画管理器是否活动状态
-    protected frameUpdateRender: Function | null = null; // 帧渲染函数　会传递当前帧数据
+    protected isLoop: boolean = false;
+    protected activeInMgr: boolean = false;
+    protected frameUpdateRender: Function | null = null;
+
+    // Event callbacks
+    protected onStartCallback: Function | null = null;
+    protected onUpdateCallback: Function | null = null;
+    protected onCompleteCallback: Function | null = null;
+
+    // Easing function
+    protected easingFunction: EasingFunction = (t) => t; // Linear easing by default
 
     public constructor() {
         this.init();
@@ -39,29 +47,20 @@ export default class MovieClip {
         this.frameCount = frameTb.length;
     }
 
-	/**
-	 * 秒
-	 * @param updateGap 
-	 */
     public setUpdateGap(updateGap: number) {
-        this.updateGap = updateGap ;
+        this.updateGap = updateGap;
     }
 
-	 /**
-     * 调整动画播放的速度
-     * @param {number} scale - 播放速度的缩放比例。值大于1将加快动画速度，值小于1将减慢动画速度。
-     */
-	 public scaleTime(scale: number) {
+    public scaleTime(scale: number) {
         if (scale <= 0) {
             console.warn('scale must be greater than 0.');
             return;
         }
-        // 用传入的缩放比例调整更新间隔
         this.updateGap /= scale;
     }
 
     public get interval(): number {
-        return this.updateGap ;
+        return this.updateGap;
     }
 
     public setAnimeTimes(animeTimes: number) {
@@ -70,8 +69,20 @@ export default class MovieClip {
         this.isLoop = animeTimes === 0;
     }
 
-    public setCallback(callback: Function) {
-        this.callback = callback;
+    public setEasingFunction(easingFunction: EasingFunction) {
+        this.easingFunction = easingFunction;
+    }
+
+    public onStart(callback: Function) {
+        this.onStartCallback = callback;
+    }
+
+    public onUpdate(callback: Function) {
+        this.onUpdateCallback = callback;
+    }
+
+    public onComplete(callback: Function) {
+        this.onCompleteCallback = callback;
     }
 
     public update(dt: number) {
@@ -89,8 +100,8 @@ export default class MovieClip {
                     this.finishNum++;
                     if (this.finishNum >= this.animeTimes) {
                         this.stopAnime();
-                        if (this.callback) {
-                            this.callback();
+                        if (this.onCompleteCallback) {
+                            this.onCompleteCallback();
                         }
                         return;
                     }
@@ -99,13 +110,18 @@ export default class MovieClip {
             this.curAnimeTime -= this.updateGap;
             this.rendererCurrentFrame();
         }
+
+        if (this.onUpdateCallback) {
+            this.onUpdateCallback(this.frameIndex, this.frameCount);
+        }
     }
 
     public rendererCurrentFrame() {
         if (this.frameUpdateRender && this.frameTb) {
             const currentFrame = this.frameTb[this.frameIndex];
             if (currentFrame) {
-                this.frameUpdateRender(currentFrame);
+                const progress = this.easingFunction(this.frameIndex / (this.frameCount - 1));
+                this.frameUpdateRender(currentFrame, progress);
             }
         }
     }
@@ -131,11 +147,13 @@ export default class MovieClip {
 
     public playAnime() {
         this.statusStop = false;
+        if (this.onStartCallback) {
+            this.onStartCallback();
+        }
     }
 
     public remove() {
         this.stopAnime();
-        
     }
 
     public stopAnime() {
@@ -151,7 +169,6 @@ export default class MovieClip {
         this.frameIndex = 0;
         this.curAnimeTime = 0;
         this.finishNum = 0;
-        // Optionally reset to the first frame to start from the beginning
         this.rendererCurrentFrame();
     }
 
@@ -166,6 +183,8 @@ export default class MovieClip {
     public destroy() {
         this.frameTb = [];
         this.frameUpdateRender = null;
-        this.callback = null;
+        this.onStartCallback = null;
+        this.onUpdateCallback = null;
+        this.onCompleteCallback = null;
     }
 }

@@ -28,6 +28,8 @@ export class MapDisplay extends Node {
 		this.mapNode.addComponent(TiledMap)
         this.addChild(this.mapVisualizer = new MapVisualizer());
         this.trackLookAt = new TrackLookAt(0.2); // 每0.2秒检测下跟踪player
+
+		// this.mapVisualizer.active = true;
     }
 
 	public getTiledMap():TiledMap{
@@ -71,7 +73,7 @@ export class MapDisplay extends Node {
 		this.calculateOffset();
 		this.adjustMapView();
 		this.updateMapImage(this.gameMap.getFileName());
-		this.centerViewOnMap();
+		// this.centerViewOnMap(); // 看向地图中心
 	}
 
 	private calculateOffset(): void {
@@ -93,7 +95,7 @@ export class MapDisplay extends Node {
 
 
 	private updateMapImage(mapName: string): void {
-		this.mapVisualizer.setLastUpdate(this.position.x, this.position.y);
+		// this.mapVisualizer.setLastUpdate(this.position.x, this.position.y);
 		this.mapVisualizer.render(this.gameMap.maxWidth, this.gameMap.maxHeight, GameMap.IMG_SIZE, mapName);
 		this.updateHDMap();
 	}

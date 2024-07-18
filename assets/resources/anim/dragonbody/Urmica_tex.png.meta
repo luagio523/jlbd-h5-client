@@ -1,0 +1,47 @@
+{
+  "ver": "1.0.22",
+  "importer": "texture",
+  "imported": true,
+  "uuid": "30ae07d9-bb42-417c-ab1c-ac9986092e24",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {
+    "Urmica_tex": {
+      "ver": "1.0.6",
+      "uuid": "aafb29fb-f66e-40f2-8934-f720a3605c50",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "aec9304b-eca3-4246-99f6-a8d5b7e66f27",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -46.5,
+      "offsetY": 478,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 929,
+      "height": 1090,
+      "rawWidth": 1024,
+      "rawHeight": 2048,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    }
+  },
+  "userData": {
+    "wrapModeS": "repeat",
+    "wrapModeT": "repeat",
+    "minfilter": "linear",
+    "magfilter": "linear",
+    "mipfilter": "none",
+    "anisotropy": 0
+  }
+}

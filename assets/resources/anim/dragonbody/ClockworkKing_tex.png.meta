@@ -1,0 +1,47 @@
+{
+  "ver": "1.0.22",
+  "importer": "texture",
+  "imported": true,
+  "uuid": "20d97945-a4bf-4241-b3dc-c810adc1c92a",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {
+    "ClockworkKing_tex": {
+      "ver": "1.0.6",
+      "uuid": "74af1712-5e0f-4f20-828f-c51fa4e6dd1d",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "abd8392b-f81a-4041-b0e7-d25e0a051d1c",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -128.5,
+      "offsetY": 37,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 765,
+      "height": 948,
+      "rawWidth": 1024,
+      "rawHeight": 1024,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    }
+  },
+  "userData": {
+    "wrapModeS": "repeat",
+    "wrapModeT": "repeat",
+    "minfilter": "linear",
+    "magfilter": "linear",
+    "mipfilter": "none",
+    "anisotropy": 0
+  }
+}

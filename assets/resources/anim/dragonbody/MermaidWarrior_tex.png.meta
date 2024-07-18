@@ -1,0 +1,47 @@
+{
+  "ver": "1.0.22",
+  "importer": "texture",
+  "imported": true,
+  "uuid": "6ae6c8ff-1b0b-4cbd-ab83-dd449035b19e",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {
+    "MermaidWarrior_tex": {
+      "ver": "1.0.6",
+      "uuid": "0759caf2-5aa7-4900-b6cd-05645a582e0f",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "f93f46e4-03bc-464f-a136-9741cdcf8a5d",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -1.5,
+      "offsetY": 70,
+      "trimX": 2,
+      "trimY": 2,
+      "width": 505,
+      "height": 368,
+      "rawWidth": 512,
+      "rawHeight": 512,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    }
+  },
+  "userData": {
+    "wrapModeS": "repeat",
+    "wrapModeT": "repeat",
+    "minfilter": "linear",
+    "magfilter": "linear",
+    "mipfilter": "none",
+    "anisotropy": 0
+  }
+}

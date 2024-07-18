@@ -6,7 +6,6 @@
  */
 
 import { oops } from "./core/Oops"
-import PoolMgr from "./core/common/pool/PoolMgr"
 import { HeapTimerMgr, ITimerMgr } from "./core/common/timer/TimerMgr"
 import  { ConfigManager } from "./manager/ConfigManager"
 import { AdaptionManager } from "./core/common/Adaption/AdaptionManager"
@@ -19,8 +18,8 @@ import { HttpRequest } from "./libs/network/HttpRequest"
 import { NetManager } from "./libs/network/NetManager"
 import { LanguageManager } from "./core/common/i18n/LanguageManager"
 import { LocationManager } from "./core/common/location/LocationMgr"
+import { PoolManager } from "./core/common/pool/PoolManager"
 
-// const i18n = require("LanguageData");
 
 export default class app extends oops{
 
@@ -35,7 +34,7 @@ export default class app extends oops{
     /** 配置 */
     static config:ConfigManager = ConfigManager.getInstance()
     /** 对象池管理 */
-    static pool:PoolMgr = PoolMgr.getInstance()
+    static pool:PoolManager = PoolManager.getInstance()
     /** 定时器 */
     static timer:ITimerMgr = new HeapTimerMgr()
     /** 本地参数 */

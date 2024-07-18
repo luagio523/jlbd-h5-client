@@ -1,0 +1,47 @@
+{
+  "ver": "1.0.22",
+  "importer": "texture",
+  "imported": true,
+  "uuid": "0f06e711-b8ca-4162-92e5-89e79b7c3453",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {
+    "Zeograth_tex": {
+      "ver": "1.0.6",
+      "uuid": "d77432e6-8175-421c-bccd-dc40e98d998e",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "688d0e94-6687-4213-9828-d0807c2721f9",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -6,
+      "offsetY": 2,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 1010,
+      "height": 506,
+      "rawWidth": 1024,
+      "rawHeight": 512,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    }
+  },
+  "userData": {
+    "wrapModeS": "repeat",
+    "wrapModeT": "repeat",
+    "minfilter": "linear",
+    "magfilter": "linear",
+    "mipfilter": "none",
+    "anisotropy": 0
+  }
+}

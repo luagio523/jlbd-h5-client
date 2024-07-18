@@ -30,7 +30,7 @@ export class Main extends Root {
 
     protected init() {
         this.initUI();
-        // this.test();
+        this.test();
         // 游戏显示事件
         game.on(Game.EVENT_SHOW, () => {
             app.time.resume();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
@@ -67,7 +67,6 @@ export class Main extends Root {
    
     protected test() {
 
-        console.log("screen",screen.resolution);
         
         let display = new MapDisplay();
         app.game.getGameRoot().addChild(display);

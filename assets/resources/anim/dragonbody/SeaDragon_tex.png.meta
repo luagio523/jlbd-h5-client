@@ -1,0 +1,47 @@
+{
+  "ver": "1.0.22",
+  "importer": "texture",
+  "imported": true,
+  "uuid": "7994ae1a-b699-48c8-bfc7-f2eff59d18b0",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {
+    "SeaDragon_tex": {
+      "ver": "1.0.6",
+      "uuid": "da2b9e0a-f8f4-461d-bc95-be9b56bd43c3",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "99b692dc-2bf1-4c36-913c-dc0a820cbb12",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": -6,
+      "offsetY": 195.5,
+      "trimX": 1,
+      "trimY": 2,
+      "width": 1010,
+      "height": 629,
+      "rawWidth": 1024,
+      "rawHeight": 1024,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {},
+      "imported": false,
+      "files": [],
+      "userData": {},
+      "displayName": "",
+      "id": "",
+      "name": ""
+    }
+  },
+  "userData": {
+    "wrapModeS": "repeat",
+    "wrapModeT": "repeat",
+    "minfilter": "linear",
+    "magfilter": "linear",
+    "mipfilter": "none",
+    "anisotropy": 0
+  }
+}
