@@ -10,17 +10,11 @@ export enum UIPosition {
     TopRight = 'TopRight',
     BottomRight = 'BottomRight'
 }
-
-// 2D 坐标系:
-// X 轴: 从左到右为正方向
-// Y 轴: 从下到上为正方向
-// 原点(0,0): 默认在屏幕左下角
-// 3D 坐标系:
-// X 轴: 从左到右为正方向
-// Y 轴: 从下到上为正方向
-// Z 轴: 从屏幕内向外为正方向
-// 原点(0,0,0): 默认在场景中心
-
+/**
+ * 不产生黑边的适配方案：
+ * 适配管理器，通过计算设计分辨率宽高比与屏幕分辨率的宽高比，确定固定高度或者固定宽度策略
+ * 来计算出适配裁切后后的屏幕安全区域尺寸，并设置节点的位置。 
+ */
 @ccclass('AdaptionManager')
 export class AdaptionManager extends EventTarget {
     private static instance: AdaptionManager;
@@ -60,9 +54,6 @@ export class AdaptionManager extends EventTarget {
         console.log('window-resize');
         this.updateSafeArea();
         this.adaptRootNodes();
-        // setTimeout(() => {
-        //     this.adaptRootNodes();
-        // }, 2000);
         this.emit('adaption-updated', 'window-resize');
     }
 
@@ -78,6 +69,9 @@ export class AdaptionManager extends EventTarget {
         const screenRatio = screenSize.width / screenSize.height;
     
         this.isFixedHeight = designRatio > screenRatio;
+         //设置策略
+        view.setResolutionPolicy(this.isFixedHeight? ResolutionPolicy.FIXED_HEIGHT : ResolutionPolicy.FIXED_WIDTH);
+
         const scale = this.isFixedHeight 
             ? screenSize.height / this.designSize.height 
             : screenSize.width / this.designSize.width;
@@ -92,8 +86,6 @@ export class AdaptionManager extends EventTarget {
             visibleWidth,
             visibleHeight
         );
-
-        view.setDesignResolutionSize(this.designSize.width, this.designSize.height, this.isFixedHeight? ResolutionPolicy.FIXED_HEIGHT : ResolutionPolicy.FIXED_WIDTH);
 
         console.log(`designSize: ${this.designSize.width}, ${this.designSize.height}`);
         console.log(`screenSize: ${screenSize.width}, ${screenSize.height}`);
@@ -145,7 +137,6 @@ export class AdaptionManager extends EventTarget {
 
     private adaptRootNodes(): void {
         this.rootNodes.forEach((anchorPoint, rootNode) => {
-            console.log(`adapt root node: ${anchorPoint}`, rootNode);
             this.adaptRootNode(rootNode, anchorPoint);
         });
     }
@@ -205,8 +196,7 @@ export class AdaptionManager extends EventTarget {
         }
 
         node.setPosition(new Vec3(x, y, 0));
-
-        console.log(`${node.name} :set node position: ${anchorPoint}`, node.getPosition(),view.getResolutionPolicy());
+        // console.log(`${node.name} :set node position: ${anchorPoint}`, node.getPosition(),view.getResolutionPolicy());
     }
 
     public addRootNode(node: Node, anchorPoint: UIPosition = UIPosition.Center): void {
