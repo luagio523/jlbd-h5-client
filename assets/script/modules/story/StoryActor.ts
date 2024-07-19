@@ -1,12 +1,12 @@
 import { _decorator, log } from "cc"
 import { BaseActor } from "../../mvc/BaseActor"
 import { Notification } from "../../mvc/Notification"
-import { IActionHandler } from "../../mvc/init"
 import app from "../../App"
 import StoryProxy from "./StoryProxy"
 
 import StoryMediator from "./StoryMediator"
 import StoryGuideMediator from "./StoryGuideMediator"
+import { IActionHandler } from "../../core/mvc/init"
 const { ccclass } = _decorator
 @ccclass
 export class StoryActor extends BaseActor {
@@ -18,7 +18,7 @@ export class StoryActor extends BaseActor {
 
   public executeLogin(...args: any) {}
 
-  //nishidajfjdal
+
   public executePlotStep(...args: any) {
     log("somethings")
   }

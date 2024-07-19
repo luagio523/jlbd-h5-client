@@ -14,11 +14,12 @@ import SDKManager from "./core/common/sdk/SDKManager"
 import { StorageManager } from "./core/common/storage/StorageManager"
 import { RandomManager } from "./core/common/random/RandomManager"
 import {  MessageSubscriber } from "./core/common/event/MessageManager"
-import { HttpRequest } from "./libs/network/HttpRequest"
-import { NetManager } from "./libs/network/NetManager"
+
 import { LanguageManager } from "./core/common/i18n/LanguageManager"
 import { LocationManager } from "./core/common/location/LocationMgr"
 import { PoolManager } from "./core/common/pool/PoolManager"
+import { HttpRequest } from "./core/network/HttpRequest"
+import { NetManager } from "./core/network/NetManager"
 
 
 export default class app extends oops{

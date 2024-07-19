@@ -1,7 +1,7 @@
   
 import { _decorator } from "cc"; 
 import BaseMediator from "../../mvc/BaseMediator"; 
-import { IActionHandler } from "../../mvc/init"; 
+import { IActionHandler } from "../../core/mvc/init";
 const { ccclass, property } = _decorator; 
 /** 
  * StoryGuideMediator 
@@ -13,13 +13,10 @@ export default class StoryGuideMediator extends BaseMediator {
     public listInterests(): [string, IActionHandler][] { 
         return [] 
     } 
-     
  
     public onRegister(){ 
         super.onRegister()  
     } 
- 
-     
  
     /** 
      * 初始化ui 

@@ -1,7 +1,7 @@
  
 import { _decorator } from "cc";
 import BaseMediator from "../../mvc/BaseMediator";
-import { IActionHandler } from "../../mvc/init";
+import { IActionHandler } from "../../core/mvc/init";
 const { ccclass } = _decorator;
 /**
  * <%=Template%>Mediator

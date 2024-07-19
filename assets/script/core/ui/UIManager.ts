@@ -64,9 +64,10 @@ export class UIManager  {
         console.log(message)
     }
 
-    public async open(uiId: string, uiLayer: UILayer, ...params: any[]): Promise<string> {
+    public async open(uiId: string,  ...params: any[]): Promise<string> {
         const config = this.UI_CONFIG[uiId];
         assert(!!config, `config is not exist,plz check uiId:${uiId}`);
+        const uiLayer = config.uiLayer
         let uiInstance = this.uiInstances.get(uiId);
         if (!uiInstance) {
             try {

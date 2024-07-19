@@ -11,6 +11,10 @@ import { EventManager } from './rpg/event/EventListenerManager';
 import { Event } from './rpg/event/Event';
 import { AudioManager } from './core/common/audio/AudioManager';
 import { KVManager } from './rpg/manager/KVManager';
+import { Notification } from './mvc/Notification';
+import { modules } from './mvc/modules';
+import { UIManager } from './core/ui/UIManager';
+import { Facade } from './core/mvc/init';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -54,14 +58,14 @@ export class Main extends Root {
             await app.config.loadDirectory("config/");
 
 
-            let ability = await KVManager.getInstance().getAbility("test_lua");
-            console.log(ability,ability.BaseClass);
-            let hero  = await KVManager.getInstance().getHero("npc_dota_hero_huskar_lua");
-            console.log(hero);
-            let item  = await KVManager.getInstance().getItem("item_recipe_arcane_boots2");
-            console.log(item);
-            let unit  = await KVManager.getInstance().getUnit("npc_dota_creature_gnoll_assassin");
-            console.log(unit);
+            // let ability = await KVManager.getInstance().getAbility("test_lua");
+            // console.log(ability,ability.BaseClass);
+            // let hero  = await KVManager.getInstance().getHero("npc_dota_hero_huskar_lua");
+            // console.log(hero);
+            // let item  = await KVManager.getInstance().getItem("item_recipe_arcane_boots2");
+            // console.log(item);
+            // let unit  = await KVManager.getInstance().getUnit("npc_dota_creature_gnoll_assassin");
+            // console.log(unit);
             
 
         } catch (error) {
@@ -76,30 +80,39 @@ export class Main extends Root {
         app.audio = this.persistRootNode.addComponent(AudioManager);
         //创建游戏节点管理器
         app.game = new GameManager(this.getGameNode());
+
+        app.gui = new UIManager(Facade.getInstance())
+        
         // 适配管理器添加游戏根节点，并设置锚点左下角
         app.adaption.addRootNode(app.game.getGameRoot(),UIPosition.BottomLeft) 
     }
 
-   
+    public btnTestClick() {
+        app.facade.send(Notification.CreateRole_View_show, { name: "test" });
+    }
    
     protected test() {
 
         console.log(app.config.get("animation"));
+        // app.facade.registerModules(modules)
 
+        app.gui.open("createRoleUI")
+        
 
        
-        let display = new MapDisplay();
-        app.game.getGameRoot().addChild(display);
+       
+        // let display = new MapDisplay();
+        // app.game.getGameRoot().addChild(display);
 
-        MapManager.getInstance().initMapDisplay(display);
+        // MapManager.getInstance().initMapDisplay(display);
 
-        MapManager.getInstance().enterMap("map004");
+        // MapManager.getInstance().enterMap("map004");
 
-        EventManager.getInstance().registerListener(Event.EnterMap, function (event) {
-            console.log("enter map", event);     
+        // EventManager.getInstance().registerListener(Event.EnterMap, function (event) {
+        //     console.log("enter map", event);     
             
-            display.changeMap();
-        });
+        //     display.changeMap();
+        // });
     }
 
 

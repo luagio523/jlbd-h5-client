@@ -1,7 +1,7 @@
 import { _decorator } from "cc";
 import { BaseActor } from "../../mvc/BaseActor";
 import { Notification } from "../../mvc/Notification";
-import { IActionHandler } from "../../mvc/init";
+import { IActionHandler } from "../../core/mvc/init";
 import app from "../../App";
 import <%=Template%>Proxy from "./<%=Template%>Proxy";
 <%for(var i = 0; i < importlist.length; i++) {%>

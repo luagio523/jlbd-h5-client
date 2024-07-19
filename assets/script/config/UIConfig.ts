@@ -9,4 +9,10 @@ export const UI_CONFIG: { [uiId: string]: IUIConfig } = {
         mediatorClass: "LoginMediator",
         resourcePath: "res/Login",
     },
+    "createRoleUI": {
+        uiId: "createRoleUI",
+        uiLayer: UILayer.BACKGROUND,
+        mediatorClass: "CreateRoleMediator", 
+        resourcePath: "UI/CreateRole",                   
+    }
 };

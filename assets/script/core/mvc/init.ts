@@ -180,7 +180,7 @@ export class Facade{
         actor.onRegister()
         let interests = actor.listInterests()
         interests.forEach(([eventName, action]) => {
-            assert(!eventName, "event is empty on addListener "+eventName)
+            assert(!!eventName, "event is empty on addListener "+eventName)
             assert(isFunction(action), "action is not function on addListener"+ eventName)
             let observer = new Observer(moduleName,action)
             observer.setContext(actor)
@@ -217,52 +217,7 @@ export class Facade{
     }
 
 
-    // public loadModule(module:string){
-    //     log("load module ",module)
-    //     if (this._loadedModules[module]){
-    //         log(module+" has loaded before,plz check")
-    //         return
-    //     }
-    //     let controller = this.loadController(module,null)
     
-    //     assert(!!controller,js.formatStr("%sController instance should not be null",module))
-    //     this._loadedModules[module] = controller
-    //     controller.onRegister()
-
-    //     if (!this._skippedModules[module] || !this._skippedModules[module]["m"]){
-    //         let model_ = this.loadModel(module)
-    //         if(model_){
-    //             ns.models[module.toLocaleLowerCase()] = model_
-    //         }
-    //     }
-
-    //     if (!this._skippedModules[module] || !this._skippedModules[module]["s"]){
-    //         let service_ = this.loadService(module)
-    //         if(service_){
-    //             ns.services[module.toLocaleLowerCase()] = service_
-    //         }
-    //     }
-    // }
-
-    // public disposeModule(module:string){
-    //     log("dispose module ",module)
-    //     if (!this._loadedModules[module]){
-    //         return
-    //     }
-
-    //     let controller = this._loadedModules[module]
-    //     controller.onRemove()
-    //     delete this._loadedModules[module]
-
-    //     delete ns.models[module.toLocaleLowerCase()]
-    //     delete ns.services[module.toLocaleLowerCase()]
-    // }
-
-    // public dispose(){
-    //     for (const module in this._loadedModules) {
-    //         this.disposeModule(module)
-    //     }
-    // }
 }
 
 /**
@@ -298,7 +253,7 @@ export class Actor extends Notifier{
     }
 
     public addListener(eventName:string,action:IActionHandler){
-        assert(!eventName, "event is empty on addListener "+eventName)
+        assert(!!eventName, "event is empty on addListener "+eventName)
         assert(isFunction(action), "action is not function on addListener"+ eventName)
 
         let observer = new Observer(eventName,action)

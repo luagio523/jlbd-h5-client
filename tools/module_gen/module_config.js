@@ -8,6 +8,14 @@
 
 _module_configs ={}
 
+
+_module_configs["Login"] = {
+        events : [
+                   "CreateRole_View_show",
+                 ],
+        views :  ["CreateRole",],
+}
+
 // // //登陆
 // _module_configs["Login"] = {
 //     events : [

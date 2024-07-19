@@ -1,10 +1,11 @@
 import { Node } from "cc";
+import { GComponent, GObject, GRoot, Window } from "fairygui-cc";
 
 
 export interface ILayerManager {
     initLayers(root: any): void; // 初始化各个层的容器
     addToLayer(uiInstance: any, layer: UILayer): void; // 将UI组件添加到指定层
-    removeFromLayer(uiInstance: fgui.GObject|Node, layer: UILayer): void
+    removeFromLayer(uiInstance: GObject|Node, layer: UILayer): void
     hideUILayer(layer: UILayer): void
     showUILayer(layer: UILayer): void
 }
@@ -19,11 +20,11 @@ export enum UILayer {
 }
 
 export class FairyGUILayerManager implements ILayerManager {
-    private _root: fgui.GRoot;
-    private _layers: Map<UILayer, fgui.GComponent>;
-    private _dialogs: fgui.Window[] = [];
+    private _root: GRoot;
+    private _layers: Map<UILayer, GComponent>;
+    private _dialogs: Window[] = [];
 
-    public initLayers(root: fgui.GRoot): void {
+    public initLayers(root: GRoot): void {
         this._root = root;
         // 初始化各层的节点
         this.initLayerNode(UILayer.BACKGROUND, 'BackgroundLayer');
@@ -34,7 +35,7 @@ export class FairyGUILayerManager implements ILayerManager {
     }
 
     private initLayerNode(layer: UILayer, name: string): void {
-        let node = new fgui.GComponent();
+        let node = new GComponent();
         node.name = name
         this._layers.set(layer, node);
         this._root.addChild(node);
@@ -42,7 +43,7 @@ export class FairyGUILayerManager implements ILayerManager {
 
     }
 
-    public addToLayer(uiInstance: fgui.GObject, layer: UILayer): void {
+    public addToLayer(uiInstance: GObject, layer: UILayer): void {
 
         switch (layer) {
             case UILayer.BACKGROUND:
@@ -51,10 +52,10 @@ export class FairyGUILayerManager implements ILayerManager {
                 this._layers[layer].addChild(uiInstance)
                 break;
             case UILayer.DIALOG:
-                let dialog = new fgui.Window();
+                let dialog = new Window();
                 dialog.contentPane = uiInstance.asCom;
                 this._dialogs.push(dialog);
-                fgui.GRoot.inst.showWindow(dialog);
+                GRoot.inst.showWindow(dialog);
                 this.adjustTopLayer()
                 break;
             case UILayer.TOP:
@@ -62,13 +63,13 @@ export class FairyGUILayerManager implements ILayerManager {
                 this.adjustTopLayer()
                 break;
             default:
-                fgui.GRoot.inst.addChild(uiInstance);
+                GRoot.inst.addChild(uiInstance);
                 break;
         }
     }
 
 
-    public removeFromLayer(uiInstance: fgui.GObject, layer: UILayer): void {
+    public removeFromLayer(uiInstance: GObject, layer: UILayer): void {
         switch (layer) {
             case UILayer.DIALOG:
                 this._dialogs.forEach((dialog) =>
@@ -120,7 +121,7 @@ export class FairyGUILayerManager implements ILayerManager {
     }
 
     private adjustTopLayer(): void {
-        fgui.GRoot.inst.setChildIndex(this._layers[UILayer.TOP], fgui.GRoot.inst.numChildren - 1);
+        GRoot.inst.setChildIndex(this._layers[UILayer.TOP], GRoot.inst.numChildren - 1);
     }
 }
 
