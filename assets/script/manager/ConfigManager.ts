@@ -3,7 +3,6 @@ import { _decorator, Asset, assetManager, BufferAsset, Component, JsonAsset, res
 const { ccclass, property } = _decorator;
 
 
-
 @ccclass('ConfigManager')
 export class ConfigManager extends Component {
     private static instance: ConfigManager = null;
@@ -25,7 +24,7 @@ export class ConfigManager extends Component {
         let path = this.getConfigPath(name);
         if (path.endsWith('.zip')) {
             await this.loadZipConfig(path);
-        } else if (path.endsWith('.json') || path.endsWith('.kv')) {
+        } else if (path.endsWith('.json') ) {
             await this.loadSingleConfig(path);
         } else {
             await this.loadDirectory(path);
@@ -71,7 +70,7 @@ export class ConfigManager extends Component {
                     const promises = [];
 
                     zip.forEach((relativePath, file) => {
-                        if (!file.dir && (relativePath.endsWith('.json') || relativePath.endsWith('.kv'))) {
+                        if (!file.dir && relativePath.endsWith('.json') ) {
                             promises.push(
                                 file.async('text').then(content => {
                                     const data = this.parseConfig(content, relativePath);
@@ -103,8 +102,8 @@ export class ConfigManager extends Component {
                     if (asset instanceof JsonAsset) {
                         this.configs.set(assetName, asset.json);
                     }else{
-                        if (asset.nativeUrl.endsWith('.kv')) {
-                            console.log('load kv', asset.nativeAsset);
+                        if (asset instanceof TextAsset){
+                            // kv file
                         }
                     }
 
@@ -119,24 +118,11 @@ export class ConfigManager extends Component {
     private parseConfig(content: string, path: string): any {
         if (path.endsWith('.json')) {
             return JSON.parse(content);
-        } else if (path.endsWith('.kv')) {
-            return this.parseKV(content);
-        } else {
+        }  else {
             throw new Error(`Unsupported file format: ${path}`);
         }
     }
 
-    private parseKV(content: string): any {
-        const lines = content.split('\n');
-        const result = {};
-        for (const line of lines) {
-            const [key, value] = line.split('=');
-            if (key && value) {
-                result[key.trim()] = value.trim();
-            }
-        }
-        return result;
-    }
 
     public getConfig(path: string): any {
         return this.configs.get(path);
