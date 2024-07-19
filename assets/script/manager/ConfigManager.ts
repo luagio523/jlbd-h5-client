@@ -1,12 +1,18 @@
-import { _decorator, BufferAsset, Component, resources, TextAsset } from 'cc';
+import { _decorator, Asset, assetManager, BufferAsset, Component, JsonAsset, resources, TextAsset,  } from 'cc';
 
 const { ccclass, property } = _decorator;
+
+
 
 @ccclass('ConfigManager')
 export class ConfigManager extends Component {
     private static instance: ConfigManager = null;
     private configs: Map<string, any> = new Map();
-    private static readonly CONFIG_PATH = 'configs/';
+    private static readonly CONFIG_PATH = 'config/';
+
+    private constructor() {
+        super();
+    }
 
     public static getInstance(): ConfigManager {
         if (!ConfigManager.instance) {
@@ -26,7 +32,10 @@ export class ConfigManager extends Component {
         }
     }
 
-    public getConfigPath(name: string): string {
+    public getConfigPath(name?: string): string {
+        if (name === undefined || name === null || name === '') {
+            return ConfigManager.CONFIG_PATH;
+        }
         return `${ConfigManager.CONFIG_PATH}${name}`;
     }
 
@@ -84,24 +93,28 @@ export class ConfigManager extends Component {
 
     private async loadDirectory(path: string): Promise<void> {
         return new Promise((resolve, reject) => {
-            resources.loadDir(path, TextAsset, (err, assets) => {
+            resources.loadDir(path, Asset, (err, assets) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-
                 assets.forEach(asset => {
-                    const assetPath = `${path}/${asset.name}`;
-                    if (assetPath.endsWith('.json') || assetPath.endsWith('.kv')) {
-                        const data = this.parseConfig(asset.text, assetPath);
-                        this.configs.set(assetPath, data);
+                    const assetName = asset.name;
+                    if (asset instanceof JsonAsset) {
+                        this.configs.set(assetName, asset.json);
+                    }else{
+                        if (asset.nativeUrl.endsWith('.kv')) {
+                            console.log('load kv', asset.nativeAsset);
+                        }
                     }
+
                 });
 
                 resolve();
             });
         });
     }
+    
 
     private parseConfig(content: string, path: string): any {
         if (path.endsWith('.json')) {

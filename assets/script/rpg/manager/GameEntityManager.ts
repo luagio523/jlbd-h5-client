@@ -7,7 +7,7 @@ import { ECSEntity } from "../ecs/ECSEntity";
 import GameEntity from "../entity/Entity";
 import { EntityType } from "../enum/Type";
 import EntityFactory from "../factory/EntityFactory";
-import KVFileManager from "./KVFileManager";
+import { KVManager } from "./KVManager";
 
 
 
@@ -33,7 +33,7 @@ export class GameEntityManager {
 
     addEntity(name: string): void {
         const heroEntity = this.entityFactory.createEntity(EntityType.Hero);
-        const kvData = KVFileManager.getInstance().getKVData(name);
+        const kvData = KVManager.getInstance().getKVData(name);
         const heroData = new HeroData()
         heroData.deserialize(kvData); 
     }

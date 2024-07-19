@@ -10,6 +10,7 @@ import MapManager from './rpg/manager/MapManager';
 import { EventManager } from './rpg/event/EventListenerManager';
 import { Event } from './rpg/event/Event';
 import { AudioManager } from './core/common/audio/AudioManager';
+import { KVManager } from './rpg/manager/KVManager';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -49,7 +50,24 @@ export class Main extends Root {
     }
 
     protected async preload():Promise<void>{
-        await app.config.loadConfig();
+        try {
+            await app.config.loadConfig();
+
+
+            let ability = await KVManager.getInstance().getAbility("test_lua");
+            console.log(ability,ability.BaseClass);
+            let hero  = await KVManager.getInstance().getHero("npc_dota_hero_huskar_lua");
+            console.log(hero);
+            let item  = await KVManager.getInstance().getItem("item_recipe_arcane_boots2");
+            console.log(item);
+            let unit  = await KVManager.getInstance().getUnit("npc_dota_creature_gnoll_assassin");
+            console.log(unit);
+            
+
+        } catch (error) {
+            console.error(error);
+        }
+       
     }
 
     /** 初始化游戏UI */
@@ -66,7 +84,10 @@ export class Main extends Root {
    
     protected test() {
 
-        
+        console.log(app.config.get("animation"));
+
+
+       
         let display = new MapDisplay();
         app.game.getGameRoot().addChild(display);
 
