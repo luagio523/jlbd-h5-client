@@ -33,103 +33,118 @@ interface IFacade {
 
 
 
-
-// UI管理器实现
-export class UIManager  {
-    /** 界面摄像机 */
-    camera!: Camera;
+export class UIManager {
+    /** UI camera */
+    public camera!: Camera;
 
     private uiInstances: Map<string, any>;
-    private layerManager: ILayerManager
-    private facade:IFacade 
-    private UI_CONFIG:{ [uiId: string]: IUIConfig }
-    private resManager:IResManager<GComponent>
-    constructor(facade:IFacade) {
+    private layerManager!: ILayerManager;
+    private facade: IFacade;
+    private UI_CONFIG!: { [uiId: string]: IUIConfig };
+    private resManager!: IResManager<GComponent>;
+    private instanceCounter: number = 0;
+
+    constructor(facade: IFacade) {
         this.uiInstances = new Map<string, any>();
-        this.facade = facade
-        this.layerManager = FairyGUIManager.getInstance()
-        this.resManager = new FairyGuiResManager()
+        this.facade = facade;
     }
 
-    public initialize(configs:{ [uiId: string]: IUIConfig }):UIManager{
-        this.UI_CONFIG = configs 
-        return this 
+    public initialize(
+        configs: { [uiId: string]: IUIConfig },
+        layerManager: ILayerManager,
+        resManager: IResManager<GComponent>
+    ): UIManager {
+        this.UI_CONFIG = configs;
+        this.layerManager = layerManager;
+        this.resManager = resManager;
+        return this;
     }
 
-    protected loadUI(config: IUIConfig): Promise<any> {
-        return this.resManager.load(config)
+    protected async loadUI(config: IUIConfig): Promise<any> {
+        assert(!!this.resManager, "Resource manager is not initialized");
+        try {
+            return await this.resManager.load(config);
+        } catch (error) {
+            log(`Failed to load UI: ${config.uiId}`, error);
+            throw error;
+        }
     }
 
-    public toast(message:string):void{
-        console.log(message)
+    public toast(message: string): void {
+        console.log(`Toast: ${message}`);
+        // Implement actual toast functionality here
     }
 
-    public async open(uiId: string,  ...params: any[]): Promise<string> {
+    public async open(uiId: string, ...params: any[]): Promise<string> {
         const config = this.UI_CONFIG[uiId];
-        assert(!!config, `config is not exist,plz check uiId:${uiId}`);
-        const uiLayer = config.uiLayer
-        let uiInstance = this.uiInstances.get(uiId);
+        assert(!!config, `Config not found for uiId: ${uiId}`);
+
+        const instanceId = this.genInstanceId(config);
+        let uiInstance = this.uiInstances.get(instanceId);
+
         if (!uiInstance) {
             try {
-                const instanceId = this.genInstanceId(config);
-                const loadedUIInstance = await this.loadUI(config);
-                this.uiInstances.set(instanceId, loadedUIInstance);
-                this.addUIToLayer(loadedUIInstance, uiLayer);
-                let mediator = MediatorFactory.create(config.mediatorClass, instanceId, loadedUIInstance);
+                uiInstance = await this.loadUI(config);
+                this.uiInstances.set(instanceId, uiInstance);
+                this.addUIToLayer(uiInstance, config.uiLayer);
+
+                const mediator = MediatorFactory.create(config.mediatorClass, instanceId, uiInstance);
                 this.facade.registerMediator(mediator);
-                mediator.initialize(instanceId);
-                mediator.open(...params);
-                return instanceId;
+                await mediator.initialize(instanceId);
+                await mediator.open(...params);
             } catch (error) {
-                // 处理加载或创建UI实例时出现的错误
+                log(`Failed to open UI: ${uiId}`, error);
                 throw error;
             }
         } else {
-            return uiId;
+            log(`UI instance already exists: ${instanceId}`);
         }
-    }
 
-    
+        return instanceId;
+    }
 
     public close(instanceId: string): void {
-        const uiId = this.getUiIdFromInstanceId(instanceId)
+        const uiId = this.getUiIdFromInstanceId(instanceId);
         const uiInstance = this.uiInstances.get(instanceId);
         const mediator = this.facade.retrieveMediator(instanceId);
-        const config = this.UI_CONFIG[uiId]
-        if (!config || !uiInstance || !mediator) {
-            log(`close fail,plz check instanceId:${instanceId},uiId:${uiId}`)
-            return
-        }
-        this.uiInstances.delete(instanceId)//从UI实例中移除
-        mediator.dispose();
-        this.facade.removeMediator(instanceId); //mediator移除
-        this.layerManager.removeFromLayer(uiInstance, config.uiLayer) //层显示移除
-        this.resManager.release(uiId,uiInstance) //资源管理释放
-    }
+        const config = this.UI_CONFIG[uiId];
 
+        if (!config || !uiInstance || !mediator) {
+            log(`Close failed. Please check instanceId: ${instanceId}, uiId: ${uiId}`);
+            return;
+        }
+
+        this.uiInstances.delete(instanceId);
+        mediator.dispose();
+        this.facade.removeMediator(instanceId);
+        this.layerManager.removeFromLayer(uiInstance, config.uiLayer);
+        this.resManager.release(uiId, uiInstance);
+    }
 
     public get(instanceId: string): any | undefined {
         return this.uiInstances.get(instanceId);
     }
 
-
-    private addUIToLayer(uiInstance: any, uiLayer: UILayer): void {
-        this.layerManager.addToLayer(uiInstance, uiLayer)
+    public isOpen(uiId: string): boolean {
+        return Array.from(this.uiInstances.keys()).some(instanceId => this.getUiIdFromInstanceId(instanceId) === uiId);
     }
 
-    private instanceCounter: number = 0;
-    private genInstanceId(config:IUIConfig): string {
-        const repeat = config.uiRepeat??false //是否允许重复
+    public closeAll(): void {
+        this.uiInstances.forEach((_, instanceId) => this.close(instanceId));
+    }
+
+    private addUIToLayer(uiInstance: any, uiLayer: UILayer): void {
+        assert(!!this.layerManager, "Layer manager is not initialized");
+        this.layerManager.addToLayer(uiInstance, uiLayer);
+    }
+
+    private genInstanceId(config: IUIConfig): string {
+        const repeat = config.uiRepeat ?? false;
         this.instanceCounter += 1;
-        if (repeat){
-            return `${config.uiId}_${this.instanceCounter}`;
-        }
-        return config.uiId
+        return repeat ? `${config.uiId}_${this.instanceCounter}` : config.uiId;
     }
 
     private getUiIdFromInstanceId(instanceId: string): string {
-        const parts = instanceId.split('_');
-        return parts[0];
+        return instanceId.split('_')[0];
     }
-
 }

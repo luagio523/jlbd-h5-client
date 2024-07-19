@@ -14,7 +14,6 @@ export class FairyGUIManager implements ILayerManager {
         return FairyGUIManager.instance;
     }
 
-
     private _root: GRoot;
     private _layers: Map<UILayer, GComponent>;
     private _dialogs: Window[] = [];
@@ -27,6 +26,46 @@ export class FairyGUIManager implements ILayerManager {
         //   this.initLayerNode(UILayer.POPUP, 'PopupLayer');
         //   this.initLayerNode(UILayer.DIALOG, 'DialogLayer');
         this.initLayerNode(UILayer.TOP, 'TopLayer');
+    }
+
+    private initFaiyGUI(){
+        //UIConfig.defaultFont = 'Droid Sans Fallback';
+        //UIConfig.windowModalWaiting = ""
+        //UIConfig.globalModalWaiting= ""
+        //UIConfig.buttonSound= ""
+        //UIConfig.buttonSoundVolumeScale= 0.5
+        //UIConfig.horizontalScrollBar= ""
+        //UIConfig.verticalScrollBar= ""
+        //UIConfig.tooltipsWin = "ui://包名/组件名";
+        // UIObjectFactory.SetLoaderExtension(typeof(MyGLoader));
+        //UIPackage.loadPackage(ResPath.UI+"BlueSkin",()=>{}); //for test
+        //UIPackage.loadPackage(ResPath.UI+"Common",()=>{}); //for test
+       
+    //    GRoot.create();
+    //    addLoadHandler();
+    //     //GRoot.inst.volumeScale = 0;
+    //    GRoot.inst.modalLayer.touchable = true;
+    //    UIConfig.modalLayerColor = new cc.Color(0,0,0,170);
+    //    UIConfig.bringWindowToFrontOnClick = false;
+    //    UIConfig.buttonSound = "ui://Battle/buttonSound";
+
+        // //UIObjectFactory.setLoaderExtension(Loader);
+        
+        //UIConfig.bringWindowToFrontOnClick = false;
+        //UIConfig.modalLayerColor = new cc.Color(0,0,0,170);
+        // //GRoot.create(); //会将 director.getScene() 做为 root父节点
+        //GRoot.inst.modalLayer.touchable = true
+        //GRoot.inst.volumeScale = 0;
+        // //InputProcessor
+
+        // if(GameGlobal.OPEN_TRADITIONAL) {
+        //    UIPackage.branch = "fanti";
+        // }
+        // else if(GameGlobal.CHANNEL_ID == CHANNEL_ID.SBGDY) {
+        //    UIPackage.branch = "gdy";
+        // }
+        //UIConfig.defaultFont = "方正兰亭圆简体";
+        // FguiRegister();
     }
 
     private initLayerNode(layer: UILayer, name: string): void {
@@ -132,6 +171,17 @@ export class FairyGUIManager implements ILayerManager {
 
 
 export class FairyGuiResManager implements IResManager<GComponent> {
+
+    private static instance: FairyGuiResManager;
+
+    public static getInstance(): FairyGuiResManager {
+        if (!FairyGuiResManager.instance) {
+            FairyGuiResManager.instance = new FairyGuiResManager();
+        }
+        return FairyGuiResManager.instance;
+    }
+
+
     private resMap:{ [uiId: string]: FairyGuiUIRes }
 
     public constructor(){

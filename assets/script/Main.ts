@@ -15,6 +15,9 @@ import { Notification } from './mvc/Notification';
 import { modules } from './mvc/modules';
 import { UIManager } from './core/ui/UIManager';
 import { Facade } from './core/mvc/init';
+import { FairyGUIManager, FairyGuiResManager } from './core/ui/FairyGUIManager';
+import { GRoot } from 'fairygui-cc';
+import { UI_CONFIG } from './config/UIConfig';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -82,7 +85,13 @@ export class Main extends Root {
         app.game = new GameManager(this.getGameNode());
 
         app.gui = new UIManager(Facade.getInstance())
+
+        const fairyguiManager = FairyGUIManager.getInstance();
+        fairyguiManager.initLayers(GRoot.create());
         
+        const fairyguiResManager = FairyGuiResManager.getInstance();
+        app.gui.initialize(UI_CONFIG,fairyguiManager, fairyguiResManager);
+
         // 适配管理器添加游戏根节点，并设置锚点左下角
         app.adaption.addRootNode(app.game.getGameRoot(),UIPosition.BottomLeft) 
     }
