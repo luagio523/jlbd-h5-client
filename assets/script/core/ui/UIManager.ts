@@ -1,8 +1,9 @@
 import { Camera, assert, js, log } from "cc";
 import {  IUIConfig } from "./UIConfig";
-import { FairyGUILayerManager, ILayerManager, UILayer } from "./LayerManager";
-import {FairyGuiResMgr,IResManager  } from "./ResManager";
+import { ILayerManager, UILayer } from "./UILayer";
+import {IResManager  } from "./UIRes";
 import { GComponent } from "fairygui-cc";
+import { FairyGUIManager, FairyGuiResManager } from "./FairyGUIManager";
 
 
 // 
@@ -46,10 +47,9 @@ export class UIManager  {
     constructor(facade:IFacade) {
         this.uiInstances = new Map<string, any>();
         this.facade = facade
-        this.layerManager = new FairyGUILayerManager()
-        this.resManager = new FairyGuiResMgr()
+        this.layerManager = FairyGUIManager.getInstance()
+        this.resManager = new FairyGuiResManager()
     }
-
 
     public initialize(configs:{ [uiId: string]: IUIConfig }):UIManager{
         this.UI_CONFIG = configs 

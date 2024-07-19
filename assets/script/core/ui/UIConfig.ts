@@ -1,4 +1,4 @@
-import { UILayer } from "./LayerManager";
+import { UILayer } from "./UILayer";
 
 export interface IUIConfig {
     uiId: string; //uiId 配置标识

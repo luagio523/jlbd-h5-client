@@ -1,25 +1,20 @@
-import { Node } from "cc";
-import { GComponent, GObject, GRoot, Window } from "fairygui-cc";
+import { GComponent, GObject, GRoot, UIPackage, Window } from "fairygui-cc";
+import { ILayerManager, UILayer } from "./UILayer";
+import { IUIConfig } from "./UIConfig";
+import { IResManager, UIResBase } from "./UIRes";
+import scheduler from "../../utils/scheduler";
+import { sys } from "cc";
+export class FairyGUIManager implements ILayerManager {
+    private static instance: FairyGUIManager;
+
+    public static getInstance(): FairyGUIManager {
+        if (!FairyGUIManager.instance) {
+            FairyGUIManager.instance = new FairyGUIManager();
+        }
+        return FairyGUIManager.instance;
+    }
 
 
-export interface ILayerManager {
-    initLayers(root: any): void; // 初始化各个层的容器
-    addToLayer(uiInstance: any, layer: UILayer): void; // 将UI组件添加到指定层
-    removeFromLayer(uiInstance: GObject|Node, layer: UILayer): void
-    hideUILayer(layer: UILayer): void
-    showUILayer(layer: UILayer): void
-}
-
-
-// UI层枚举，根据UI资源类型分层
-export enum UILayer {
-    BACKGROUND, // 背景层
-    MAIN,       // 主层
-    DIALOG,    //模式窗口层
-    TOP         // 顶层
-}
-
-export class FairyGUILayerManager implements ILayerManager {
     private _root: GRoot;
     private _layers: Map<UILayer, GComponent>;
     private _dialogs: Window[] = [];
@@ -39,8 +34,6 @@ export class FairyGUILayerManager implements ILayerManager {
         node.name = name
         this._layers.set(layer, node);
         this._root.addChild(node);
-
-
     }
 
     public addToLayer(uiInstance: GObject, layer: UILayer): void {
@@ -126,60 +119,102 @@ export class FairyGUILayerManager implements ILayerManager {
 }
 
 
-export class CocosCreatorLayerManager implements ILayerManager {
-    private _root: Node;
-    private _layers: Map<UILayer, Node>;
 
-    public initLayers(root: Node): void {
-        this._root = root;
-        this._layers = new Map<UILayer, Node>();
 
-        // 初始化各层的节点
-        this.initLayerNode(UILayer.BACKGROUND, 'BackgroundLayer');
-        this.initLayerNode(UILayer.MAIN, 'MainLayer');
-        this.initLayerNode(UILayer.DIALOG, 'DialogLayer');
-        this.initLayerNode(UILayer.TOP, 'TopLayer');
+
+
+
+
+
+
+
+
+
+
+export class FairyGuiResManager implements IResManager<GComponent> {
+    private resMap:{ [uiId: string]: FairyGuiUIRes }
+
+    public constructor(){
+        this.resMap = {}
+        scheduler.scheduleGlobal(this.cleanup.bind(this), 10)// 例如每30秒清理一次
     }
 
-    private initLayerNode(layer: UILayer, name: string): void {
-        let node = new Node(name);
-        this._layers.set(layer, node);
-        this._root.addChild(node);
-    }
-
-    public addToLayer(uiInstance: Node, layer: UILayer): void {
-        let layerNode = this._layers.get(layer);
-        if (layerNode) {
-            layerNode.addChild(uiInstance);
-        } else {
-            console.error("Layer not initialized for Cocos Creator.");
+    // 清理函数，会根据设置的时间阈值来释放实例和资源
+    private cleanup() {
+        const now = sys.now();
+        for (let uiId in this.resMap) {
+            let res = this.resMap[uiId]
+            if(res.clean(now)){
+                delete this.resMap[uiId]
+            }
         }
     }
 
-    public removeFromLayer(uiInstance: Node, layer: UILayer): void {
-        let layerNode = this._layers.get(layer);
-        if (layerNode) {
-            layerNode.removeChild(uiInstance);
-        } else {
-            console.error(`Layer - ${UILayer[layer]} not initialized.`);
+    async load(config: IUIConfig): Promise<GComponent> {
+        try {
+            // 检查缓存中是否存在资源
+            let res = this.resMap[config.uiId];
+            if (res) {
+                const component = res.get();
+                if (component) {
+                    return component;
+                }
+            }
+
+            // 如果缓存中不存在资源，则加载并生成一个新的UIRes
+            if (!res) {
+                res = new FairyGuiUIRes(config);
+                this.resMap[config.uiId] = res;
+            }
+
+            const uiPackage = await this.loadPackage(config.resourcePath);
+            const component = UIPackage.createObject(uiPackage.name, config.uiComponentName);
+            
+            if (component instanceof GComponent) {
+                return component;
+            } else {
+                throw new Error("UI component created is not a GComponent");
+            }
+
+        } catch (error) {
+            throw error;
         }
     }
 
-    public hideUILayer(layer: UILayer): void {
-        let layerNode = this._layers.get(layer);
-        if (layerNode) {
-            layerNode.active = false;
-        } else {
-            console.error(`Layer - ${UILayer[layer]} not initialized.`);
-        }
+
+    private loadPackage(resourcePath: string): Promise<UIPackage> {
+        return new Promise((resolve, reject) => {
+            UIPackage.loadPackage(resourcePath, (error, uiPackage) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(uiPackage);
+                }
+            });
+        });
+    } 
+    
+   
+    getUIRes(uiId:string ):FairyGuiUIRes{
+        return  this.resMap[uiId]
     }
 
-    public showUILayer(layer: UILayer): void {
-        let layerNode = this._layers.get(layer);
-        if (layerNode) {
-            layerNode.active = true;
-        } else {
-            console.error(`Layer - ${UILayer[layer]} not initialized.`);
-        }
+    release(uiId:string,uiInstance:GComponent):void{
+        this.getUIRes(uiId)?.put(uiInstance)
+    }
+}
+
+
+
+class FairyGuiUIRes extends UIResBase<GComponent> {
+    protected cleanUI() {
+        this.instanceList.forEach((instance: GComponent) => {
+            instance.dispose();
+        });
+        this.instanceList = [];
+    }
+
+    protected cleanAssets(resourcePath: string) {
+        UIPackage.removePackage(resourcePath);
     }
 }

@@ -1,4 +1,4 @@
-import { UILayer } from "../core/ui/LayerManager";
+import { UILayer } from "../core/ui/UILayer";
 import { IUIConfig } from "../core/ui/UIConfig";
 
 // 配置对象更新成包含loader方法
