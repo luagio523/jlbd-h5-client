@@ -51,7 +51,7 @@ export class Main extends Root {
 
     protected async preload():Promise<void>{
         try {
-            await app.config.loadConfig();
+            await app.config.loadDirectory("config/");
 
 
             let ability = await KVManager.getInstance().getAbility("test_lua");

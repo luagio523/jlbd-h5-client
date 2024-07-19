@@ -1,5 +1,5 @@
 import { _decorator, Component } from 'cc';
-import { KVNode, KVReader } from '../base/KVReader';
+import { KVNode, KVReader } from '../../core/common/reader/KVReader';
 
 const { ccclass, property } = _decorator;
 
