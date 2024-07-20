@@ -29,16 +29,30 @@ export class Main extends Root {
     start() {
         if (DEBUG) profiler.showStats();
     }
+
+    protected async preload():Promise<void>{
+        try {
+            await app.config.loadDirectory("config/");
+
+            // let ability = await KVManager.getInstance().getAbility("test_lua");
+            // console.log(ability,ability.BaseClass);
+            // let hero  = await KVManager.getInstance().getHero("npc_dota_hero_huskar_lua");
+            // console.log(hero);
+            // let item  = await KVManager.getInstance().getItem("item_recipe_arcane_boots2");
+            // console.log(item);
+            // let unit  = await KVManager.getInstance().getUnit("npc_dota_creature_gnoll_assassin");
+            // console.log(unit);
+        } catch (error) {
+            console.error(error);
+        }
+       
+    }
+
     protected run() {
         if (JSB) {
             app.gui.toast("热更新后新程序的提示");
         }
-        this.init();
-    }
 
-    protected init() {
-        this.initUI();
-        this.test();
         // 游戏显示事件
         game.on(Game.EVENT_SHOW, () => {
             app.time.resume();     // 平台不需要在退出时精准计算时间，直接暂时游戏时间
@@ -54,27 +68,14 @@ export class Main extends Root {
             director.pause();
             game.pause();
         });
+
+        this.init();
     }
 
-    protected async preload():Promise<void>{
-        try {
-            await app.config.loadDirectory("config/");
-
-
-            // let ability = await KVManager.getInstance().getAbility("test_lua");
-            // console.log(ability,ability.BaseClass);
-            // let hero  = await KVManager.getInstance().getHero("npc_dota_hero_huskar_lua");
-            // console.log(hero);
-            // let item  = await KVManager.getInstance().getItem("item_recipe_arcane_boots2");
-            // console.log(item);
-            // let unit  = await KVManager.getInstance().getUnit("npc_dota_creature_gnoll_assassin");
-            // console.log(unit);
-            
-
-        } catch (error) {
-            console.error(error);
-        }
-       
+    protected init() {
+        app.facade.registerModules(modules)
+        this.initUI();
+        this.test();
     }
 
     /** 初始化游戏UI */
@@ -109,7 +110,7 @@ export class Main extends Root {
     protected async test() {
 
         console.log(app.config.get("animation"));
-        app.facade.registerModules(modules)
+        
         
        
         // let display = new MapDisplay();
