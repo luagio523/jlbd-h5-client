@@ -4,5 +4,5 @@ const { ccclass } = _decorator
 
 @ccclass
 export default class UserProxy extends BaseProxy {
-  public static NAME = "User"
+	public static NAME = "User"
 }

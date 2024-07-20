@@ -4,5 +4,5 @@ const { ccclass } = _decorator
 
 @ccclass
 export default class AccountProxy extends BaseProxy {
-  public static NAME = "Account"
+	public static NAME = "Account"
 }

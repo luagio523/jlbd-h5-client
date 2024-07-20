@@ -5,9 +5,9 @@ const prettier = require('prettier');
 
 const _module_configs = {
   "Account": {
-    events: ["Login_View_Show","Logout_View_Hide"],
-    views: ["Login"],
-    models: ["Account","User"],
+    events: ["Login_View_Show","Logout_View_Show","Role_View_Show","User_View_Show","User_View_Hide","User_View_Show_Role_List","User_View_Show_Role_Detail","User_View_Show_Role_Create","User_View_Show_Role_Edit","User_View_Show_Role_Delete","User_View_Show_Role_Save","User_View_Show_Role_Cancel","User_View_Show_Role_Delete_Confirm","User_View_Show_Role_Delete_Cancel","User_View_Show_Role_Delete_Confirm_OK","User_View_Show_Role_Delete_Confirm_Cancel","User_View_Show_Role_Delete_Confirm_OK_OK","User_View_Show_Role_Delete_Confirm_OK_Cancel","User_View_Show_Role_Delete_Confirm_Cancel_OK","User_View_Show_Role_Delete_Confirm_Cancel_Cancel","User_View_Show_Role"],
+    views: ["Login","Role"],
+    models: ["Account","User","Role"],
   }
 };
 
@@ -41,6 +41,7 @@ async function writeFileIfNotExists(filePath, content) {
       const formattedContent = await prettier.format(cleanContent, {
         semi: false,
         parser: "typescript",
+		useTabs: true
       });
       
       fs.writeFileSync(filePath, formattedContent);
@@ -61,6 +62,7 @@ async function updateFile(filePath, content) {
     const formattedContent = await prettier.format(cleanContent, {
       semi: false,
       parser: "typescript",
+	  useTabs: true
     });
     
     fs.writeFileSync(filePath, formattedContent);
@@ -88,15 +90,59 @@ async function updateActorFile(filePath, newConfig) {
   const existingViews = (content.match(/get (\w+)Mediator/g) || []).map(m => m.replace('get ', '').replace('Mediator', ''));
   const existingEvents = (content.match(/execute(\w+)/g) || []).map(m => m.replace('execute', ''));
 
+
   // 找出需要添加的新内容
-  const newModels = newConfig.models.filter(m => !existingModels.includes(m));
-  const newViews = newConfig.views.filter(v => !existingViews.includes(v));
+  const newModels = newConfig.models.filter(m => !existingModels.includes(m.toLowerCase()));
+  const newViews = newConfig.views.filter(v => !existingViews.includes(v.toLowerCase()));
   const newEvents = newConfig.events.filter(e => !existingEvents.includes(e));
+
+	if(newModels.length>0){	
+		console.log(`New models: ${newModels}`);
+	}
+	if(newViews.length>0){
+		console.log(`New views: ${newViews}`);
+		}
+	if(newEvents.length>0){
+		console.log(`New events: ${newEvents}`);
+	}
+	// 更新 listInterests 方法
+	  // 更新 listInterests 方法
+	  if (newEvents.length > 0) {
+		const listInterestsRegex = /public\s+listInterests\(\)[\s\S]*?\{[\s\S]*?return\s*\[([\s\S]*?)\]\s*;?\s*\}/;
+		const match = content.match(listInterestsRegex);
+		if (match) {
+			let existingInterests = match[1].trim().split('\n')
+				.map(line => line.trim())
+				.filter(line => line !== '' && line !== ',' && !line.startsWith('//'))
+				.map(line => line.replace(/,$/, ''));  // Remove trailing commas
+			
+			const newInterests = newEvents.map(event => `[Notification.${event}, this.execute${event}]`);
+			const allInterests = existingInterests.concat(newInterests);
+			
+			const updatedInterests = allInterests.join(',\n\t\t\t');
+	
+			console.log(`Existing interests: ${JSON.stringify(existingInterests)}`);
+			console.log(`New interests: ${JSON.stringify(newInterests)}`);
+			console.log(`All interests: ${JSON.stringify(allInterests)}`);
+			console.log(`Updated interests: ${updatedInterests}`);
+	
+			content = content.replace(listInterestsRegex, `public listInterests(): [string, IActionHandler][] {
+			return [
+				${updatedInterests}
+			];
+		}`);
+		}
+	}
+	
+
+  
 
   // 生成新的内容
   let newNoticesContent = '';
   let newModelsContent = '';
   let newViewsContent = '';
+
+    
 
   if (newEvents.length > 0) {
     newEvents.forEach(event => {
@@ -144,6 +190,7 @@ async function updateActorFile(filePath, newConfig) {
     const formattedContent = await prettier.format(content, {
       semi: false,
       parser: "typescript",
+	  useTabs: true
     });
     
     fs.writeFileSync(filePath, formattedContent);
