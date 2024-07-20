@@ -9,30 +9,30 @@ const { ccclass } = _decorator;
 export default class <%= name %>Mediator extends BaseMediator {
     public listInterests(): [string, IActionHandler][] {
         return [
-            // Add interested events and corresponding handlers here
-            // For example: ["Login", this.handleLogin.bind(this)] 
+            // 在这里添加感兴趣的事件和对应的处理函数 
+            // 例如：["Login", this.handleLogin.bind(this)] 
         ];
     }
      
     protected onInitialize(): void {
-        // Initialization logic
-        // For example: set initial UI element states, add event listeners, etc.
+        // 初始化逻辑 
+        // 例如：设置UI元素的初始状态，添加事件监听器等 
     }
 
     protected onOpen(params: any): void {
         console.log("<%= name %>Mediator opened", params);
-        // Logic for opening the UI
+        // 打开UI的逻辑 
     }
 
     protected onClose(): void {
         console.log("<%= name %>Mediator closed");
-        // Logic for closing the UI
-        // For example: clear temporary data, etc.
+        // 关闭UI的逻辑 
+        // 例如：移除事件监听器,清理临时缓存
     }
 
     protected onDestroy(): void {
         console.log("<%= name %>Mediator destroyed");
-        // Clean up resources
-        // For example: release occupied memory, etc.
+        // 清理资源 
+        // 例如：释放占用的内存等 
     }
 }
