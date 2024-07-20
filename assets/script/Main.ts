@@ -130,5 +130,7 @@ export class Main extends Root {
     update(dt: number) {
         // app.game.update(dt);
         // app.ecs.execute(dt);
+
+        app.timer.update(dt);
     }
 }

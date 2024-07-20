@@ -20,6 +20,7 @@ import { LocationManager } from "./core/common/location/LocationMgr"
 import { PoolManager } from "./core/common/pool/PoolManager"
 import { HttpRequest } from "./core/network/HttpRequest"
 import { NetManager } from "./core/network/NetManager"
+import { CacheManager } from "./core/cache/CacheManager"
 
 
 export default class app extends oops{
@@ -48,6 +49,8 @@ export default class app extends oops{
     static http:HttpRequest = new HttpRequest() 
     /** net  */
     static net:NetManager = NetManager.getInstance()
+    /** cache用于缓存用户数据 */
+    static cache:CacheManager = CacheManager.getInstance()
      /** mvc facade */
     static facade:Facade = Facade.getInstance()
 }

@@ -22,7 +22,7 @@ export enum CacheType {
 export abstract class Cache implements ICache {
     protected type: CacheType;
     protected data: any;
-    private autoSaveInterval: number = null;
+    private flushTimer: number = null;
 
     constructor(type: CacheType = CacheType.CLIENT) {
         this.type = type;
@@ -34,6 +34,11 @@ export abstract class Cache implements ICache {
      * @param data 要恢复的数据
      */
     protected abstract recover(data: any): void;
+
+    /**
+     * 获取数据
+     */
+    protected abstract getData(): any;
 
     /**
      * 获取缓存键
@@ -78,19 +83,19 @@ export abstract class Cache implements ICache {
      * @param interval 保存间隔（毫秒）
      */
     public start(interval: number=600000): void {
-        if (this.autoSaveInterval) {
+        if (this.flushTimer) {
             this.stop();
         }
-        this.autoSaveInterval = scheduler.scheduleGlobal(this.save.bind(this),interval)
+        this.flushTimer = scheduler.scheduleGlobal(this.save.bind(this),interval)
     }
 
     /**
      * 停止自动保存
      */
     public stop(): void {
-        if (this.autoSaveInterval) {
-            scheduler.unscheduleGlobal(this.autoSaveInterval);
-            this.autoSaveInterval = null;
+        if (this.flushTimer) {
+            scheduler.unscheduleGlobal(this.flushTimer);
+            this.flushTimer = null;
         }
     }
 
