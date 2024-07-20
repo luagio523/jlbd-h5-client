@@ -5,6 +5,8 @@ import {IResManager  } from "./UIRes";
 import { GComponent } from "fairygui-cc";
 import { FairyGUIManager, FairyGuiResManager } from "./FairyGUIManager";
 import { Facade } from "../mvc/init";
+import { ToastManager } from "./ToastManager";
+import { AlertManager, AlertOptions } from "./AlertManager";
 
 
 // 
@@ -56,6 +58,9 @@ export class UIManager {
         this.UI_CONFIG = configs;
         this.layerManager = new FairyGUIManager();
         this.resManager = new FairyGuiResManager();
+        
+        ToastManager.getInstance().initialize( this.layerManager);
+        AlertManager.getInstance().initialize(this.layerManager);
         return this;
     }
 
@@ -69,9 +74,13 @@ export class UIManager {
         }
     }
 
-    public toast(message: string): void {
-        console.log(`Toast: ${message}`);
-        // Implement actual toast functionality here
+    
+    public showAlert(options: AlertOptions): void {
+        AlertManager.getInstance().showDialog(options);
+    }
+
+    public showToast(message: string, duration: number = 2000): void {
+        ToastManager.getInstance().showToast(message, duration);
     }
 
     public async open(uiId: string, params?: any): Promise<string> {

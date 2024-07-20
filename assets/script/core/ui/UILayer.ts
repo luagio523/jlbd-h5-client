@@ -17,6 +17,7 @@ export enum UILayer {
     BACKGROUND, // 背景层
     MAIN,       // 主层
     DIALOG,    //模式窗口层
+    TOAST,      // 提示层
     TOP         // 顶层
 }
 
