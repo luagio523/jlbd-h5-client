@@ -21,7 +21,7 @@ _module_configs["Account"] = {
 				"Login_View_Show",
 				],
 	views :  ["Login",],
-	models: ["Login","User"],
+	models: ["Account"],
 }
 
 // // //登陆
