@@ -1,14 +1,20 @@
+
+#配置加载  90%
+
 #缩略图偏移
-#配置加载
+
 #Plist动画
 #龙骨动画
 #模型prefab
 
 
-#fairygui UI
-#UI MVC
-#UI VM
+#fairygui UI  50%
+#UI MVC      40%
+#UI VM        
 
+
+#http
+#net
 
 #地图摄象机 
 #地图遮罩
@@ -16,5 +22,10 @@
 #地图光照
 #地图动态
 
+#寻路
+#RVO
+#绕行
+
+#AI
 
 #技能编辑器
