@@ -112,7 +112,7 @@ async function handlerActor(module,events,views){
     ctlpdt.viewlist = []
     views.forEach(element => {
         let rmethod =`protected  get {0}Mediator():{1}Mediator{ 
-        return app.facade.retrieveMediator({1}Mediator.NAME) as {1}Mediator
+        return app.facade.retrieveMediator(UIView.{1}) as {1}Mediator
     } `
 
         rmethod = strfmt(rmethod,firstLower(element),element)

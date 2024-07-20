@@ -1,5 +1,5 @@
 
-import { Component, DynamicAtlasManager, Game,  _decorator, director, game, macro, profiler, screen, view  } from 'cc';
+import { Component, DynamicAtlasManager, Game,  UITransform,  _decorator, director, game, macro, profiler, screen, view  } from 'cc';
 import { DEBUG, JSB } from 'cc/env';
 import { Root } from './core/Root';
 import app from './App';
@@ -16,7 +16,7 @@ import { modules } from './mvc/modules';
 import { UIManager } from './core/ui/UIManager';
 import { Facade } from './core/mvc/init';
 import { FairyGUIManager, FairyGuiResManager } from './core/ui/FairyGUIManager';
-import { GRoot, UIPackage } from 'fairygui-cc';
+import { GComponent, GRoot, UIPackage } from 'fairygui-cc';
 import { UIView, UI_CONFIG } from './config/UIConfig';
 const { ccclass, property } = _decorator;
 
@@ -86,11 +86,9 @@ export class Main extends Root {
 
         app.gui = new UIManager(Facade.getInstance())
 
-        const fairyguiManager = FairyGUIManager.getInstance();
-        fairyguiManager.initialize(this.getGUINode());
+        FairyGUIManager.getInstance().initialize(this.getGUINode());
 
-        const fairyguiResManager = FairyGuiResManager.getInstance();
-        app.gui.initialize(UI_CONFIG,fairyguiManager, fairyguiResManager);
+        app.gui.initialize(UI_CONFIG,FairyGUIManager.getInstance(), FairyGuiResManager.getInstance());
 
 
         // UIPackage.loadPackage("UI/Bag", (error, uiPackage) => {
@@ -108,23 +106,60 @@ export class Main extends Root {
 
         // });
 
-
+        // app.adaption.addRootNode(FairyGUIManager.getInstance().getRootNode(),UIPosition.TopLeft) 
         // 适配管理器添加游戏根节点，并设置锚点左下角
-        app.adaption.addRootNode(app.game.getGameRoot(),UIPosition.BottomLeft) 
+        // app.adaption.addRootNode(app.game.getGameRoot(),UIPosition.BottomLeft) 
+
+        console.log("UI初始化完成",FairyGUIManager.getInstance().getRootNode().position);
+
+        let position = FairyGUIManager.getInstance().getRootNode().position;
+
+        let node = FairyGUIManager.getInstance().getRootNode();
+        // let uiTransform = node.getComponent(UITransform);
+        // uiTransform.height = 300 
+        // uiTransform.width = 400 
+
+        // uiTransform.setContentSize(400,300)
+
+        // GRoot.inst.setSize(700,300)
+
+        console.log(GRoot.inst.width,GRoot.inst.height,"=x=x=xx==");
+
+
+        // FairyGUIManager.getInstance().getRootNode().setPosition(position.x,position.y);
     }
 
     public btnTestClick() {
-        app.facade.send(Notification.CreateRole_View_show, { name: "test" });
+
+        let node = FairyGUIManager.getInstance().getRootNode();
+        let uiTransform = node.getComponent(UITransform);
+        console.log(uiTransform.height,uiTransform.width);
+        console.log(node.position);
+
+
+        console.log(GRoot.inst.width,GRoot.inst.height,"=x=x=xx=2=",GRoot.inst.node.position);
+
+        // app.facade.send(Notification.CreateRole_View_show, { name: "test" });
     }
    
-    protected test() {
+    protected async test() {
 
         console.log(app.config.get("animation"));
         // app.facade.registerModules(modules)
         
-        app.gui.open(UIView.CREATE_ROLE)
-        
+        let instanceID = await app.gui.open(UIView.CREATE_ROLE)
+        let instance = app.gui.get(instanceID)
+        console.log(instance);
 
+        (instance as GComponent).makeFullScreen()
+
+        // instance.setSize(500,300)
+        // let node = instance.node;
+        // let uiTransform = node.getComponent(UITransform);
+        // console.log(uiTransform.height,uiTransform.width);
+        // uiTransform.setContentSize(500,300)
+
+        // app.adaption.addRootNode(instance.node,UIPosition.Center) 
        
        
         // let display = new MapDisplay();

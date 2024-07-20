@@ -60,14 +60,21 @@ export class FairyGUIManager implements ILayerManager {
     private _root: GRoot;
     private _layers: Map<UILayer, GComponent>;
 
+
+    public getRootNode(): Node {
+        return this._root.node;
+    }
+
     private constructor() {
         this._layers = new Map<UILayer, GComponent>();
     }
 
     public initialize(root: Node): void {
         console.log("FairyGUIManager initialize", root);
+        //  GRoot 本身已经做了适配，适配逻辑跟AdaptionManager一样，这里不需要再次适配
+        //  对于全屏的添加面板 直接 makeFullScreen() 即可。如 添加到 UILayer.BACKGROUND 上的
+        this._root = GRoot.create(); 
 
-        this._root = GRoot.create();
 
         this.initLayerNode(UILayer.BACKGROUND, 'BackgroundLayer');
         this.initLayerNode(UILayer.MAIN, 'MainLayer');
@@ -101,6 +108,7 @@ export class FairyGUIManager implements ILayerManager {
         switch (layer) {
             case UILayer.BACKGROUND:
             case UILayer.MAIN:
+                uiInstance.makeFullScreen(); // 全屏即可自动适配
                 layerNode.addChild(uiInstance);
                 break;
             case UILayer.TOP:

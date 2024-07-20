@@ -195,9 +195,13 @@ export class AdaptionManager extends EventTarget {
                 break;
         }
 
+
         node.setPosition(new Vec3(x, y, 0));
-        // console.log(`${node.name} :set node position: ${anchorPoint}`, node.getPosition(),view.getResolutionPolicy());
+        console.log(`${node.name} :set node position: ${anchorPoint}`, node.getPosition(),view.getResolutionPolicy());
     }
+
+
+   
 
     public addRootNode(node: Node, anchorPoint: UIPosition = UIPosition.Center): void {
         if(!node||!node.isValid){

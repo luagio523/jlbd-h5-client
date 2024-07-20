@@ -99,8 +99,8 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 640,
-      "y": 306.9452736318408,
+      "x": 667,
+      "y": 319.89452736318407,
       "z": 0
     },
     "_lrot": {
@@ -185,7 +185,7 @@
     "_priority": 1073741824,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 306.9452736318408,
+    "_orthoHeight": 374.99999999999994,
     "_near": 1,
     "_far": 2000,
     "_color": {
@@ -276,7 +276,7 @@
     "_priority": 65534,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 306.9452736318408,
+    "_orthoHeight": 374.99999999999994,
     "_near": 1,
     "_far": 2000,
     "_color": {
@@ -288,7 +288,7 @@
     },
     "_depth": 1,
     "_stencil": 0,
-    "_clearFlags": 7,
+    "_clearFlags": 6,
     "_rect": {
       "__type__": "cc.Rect",
       "x": 0,
@@ -947,8 +947,8 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 302.544,
-      "y": 148.572,
+      "x": 0.245,
+      "y": 55.714,
       "z": 0
     },
     "_lrot": {
@@ -1257,8 +1257,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
-      "height": 720
+      "width": 1334,
+      "height": 750
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1332,8 +1332,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
-      "height": 613.8905472636816
+      "width": 1334,
+      "height": 639.7890547263681
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1424,8 +1424,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
-      "height": 613.8905472636816
+      "width": 1334,
+      "height": 639.7890547263681
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1506,8 +1506,8 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 640,
-      "y": 306.9452736318408,
+      "x": 667,
+      "y": 319.89452736318407,
       "z": 0
     },
     "_lrot": {
@@ -1545,8 +1545,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
-      "height": 613.8905472636816
+      "width": 1334,
+      "height": 639.7890547263681
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",

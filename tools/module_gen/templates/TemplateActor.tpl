@@ -3,6 +3,7 @@ import { BaseActor } from "../../mvc/BaseActor";
 import { Notification } from "../../mvc/Notification";
 import { IActionHandler } from "../../core/mvc/init";
 import app from "../../App";
+import { UIView } from "../../config/UIConfig";
 import <%=Template%>Proxy from "./<%=Template%>Proxy";
 <%for(var i = 0; i < importlist.length; i++) {%>
 import <%:=importlist[i].name%> from "./<%:=importlist[i].name%>";<%}%>
