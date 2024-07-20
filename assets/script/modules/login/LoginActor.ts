@@ -6,6 +6,7 @@ import app from "../../App"
 import LoginProxy from "./LoginProxy"
 
 import CreateRoleMediator from "./CreateRoleMediator"
+import { UIView } from "../../config/UIConfig"
 const { ccclass } = _decorator
 @ccclass
 export class LoginActor extends BaseActor {
@@ -17,7 +18,7 @@ export class LoginActor extends BaseActor {
   /*---------------------------------[notices]------------------------------------*/
   public executeCreateroleViewShow(...args: any) {
     app.log.logView(args, "LoginActor.executeCreateroleViewShow")
-    // app.gui.open("createRoleUI")
+    app.gui.open(UIView.CreateRole,{name:"hhh"})
   }
 
   public loginProxy(): LoginProxy {

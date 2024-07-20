@@ -4,6 +4,8 @@ import { IUIConfig } from "./UIConfig";
 import { IResManager, UIResBase } from "./UIRes";
 import scheduler from "../../utils/scheduler";
 import { Node, sys } from "cc";
+import { UIManager } from "./UIManager";
+import { AdaptionManager } from "../common/Adaption/AdaptionManager";
 
 // private initFaiyGUI(){
     //UIConfig.defaultFont = 'Droid Sans Fallback';
@@ -79,6 +81,8 @@ export class FairyGUIManager implements ILayerManager {
         this.initLayerNode(UILayer.BACKGROUND, 'BackgroundLayer');
         this.initLayerNode(UILayer.MAIN, 'MainLayer');
         this.initLayerNode(UILayer.TOP, 'TopLayer');
+
+        
     }
 
     private initLayerNode(layer: UILayer, name: string): void {
@@ -88,6 +92,7 @@ export class FairyGUIManager implements ILayerManager {
         }
 
         const node = new GComponent();
+        node.makeFullScreen();
         node.name = name;
         this._layers.set(layer, node);
         this._root.addChild(node);

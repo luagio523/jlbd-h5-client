@@ -8,8 +8,6 @@ import { Finder } from "../core/ui/Finder";
 
 export default abstract class BaseMediator extends Mediator {
     protected viewComponent: GComponent|Node;
-    protected param: any;
-    public readonly instanceId: string;
 
     
 
@@ -18,9 +16,8 @@ export default abstract class BaseMediator extends Mediator {
         await this.onInitialize();
     }
 
-    public async open(param: any): Promise<void> {
-        this.param = param;
-        await this.onOpen();
+    public async open(params: any): Promise<void> {
+        await this.onOpen(params);
     }
 
     public async close(): Promise<void> {
@@ -29,7 +26,7 @@ export default abstract class BaseMediator extends Mediator {
     
 
     protected abstract onInitialize(): Promise<void> | void;
-    protected abstract onOpen(): Promise<void> | void;
+    protected abstract onOpen(params: any): Promise<void> | void;
     protected abstract onClose(): Promise<void> | void;
     protected abstract onDestroy(): void;
 

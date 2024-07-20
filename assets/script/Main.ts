@@ -90,6 +90,10 @@ export class Main extends Root {
 
         app.gui.initialize(UI_CONFIG,FairyGUIManager.getInstance(), FairyGuiResManager.getInstance());
 
+        app.adaption.on("adaption-updated", () => { // 屏幕适配更新事件
+            app.gui.adaptUI();
+        })
+
 
         // UIPackage.loadPackage("UI/Bag", (error, uiPackage) => {
         //     console.log(error,uiPackage);
@@ -129,6 +133,15 @@ export class Main extends Root {
         // FairyGUIManager.getInstance().getRootNode().setPosition(position.x,position.y);
     }
 
+    public btnTestClick2() {
+        console.log("btnTestClick2");
+        let instance = app.gui.get(UIView.CreateRole);
+        console.log(instance.position,instance.width,instance.height);
+
+
+        instance.makeFullScreen();
+    }
+
     public btnTestClick() {
 
         let node = FairyGUIManager.getInstance().getRootNode();
@@ -139,19 +152,19 @@ export class Main extends Root {
 
         console.log(GRoot.inst.width,GRoot.inst.height,"=x=x=xx=2=",GRoot.inst.node.position);
 
-        // app.facade.send(Notification.CreateRole_View_show, { name: "test" });
+        app.facade.send(Notification.CreateRole_View_show, { name: "test" });
     }
    
     protected async test() {
 
         console.log(app.config.get("animation"));
-        // app.facade.registerModules(modules)
+        app.facade.registerModules(modules)
         
-        let instanceID = await app.gui.open(UIView.CREATE_ROLE)
-        let instance = app.gui.get(instanceID)
-        console.log(instance);
+        // let instanceID = await app.gui.open(UIView.CreateRole)
+        // let instance = app.gui.get(instanceID)
+        // console.log(instance);
 
-        (instance as GComponent).makeFullScreen()
+        // (instance as GComponent).makeFullScreen()
 
         // instance.setSize(500,300)
         // let node = instance.node;

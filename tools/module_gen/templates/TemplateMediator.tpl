@@ -22,8 +22,8 @@ export default class <%=Template%>Mediator extends BaseMediator {
         // 例如：设置UI元素的初始状态，添加事件监听器等
     }
 
-    protected  onOpen(): void {
-        console.log("<%=Template%>Mediator opened");
+    protected  onOpen(params: any): void {
+        console.log("<%=Template%>Mediator opened",params);
         // 打开UI的逻辑
     }
 

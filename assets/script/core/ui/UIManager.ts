@@ -90,7 +90,6 @@ export class UIManager {
 
                 const mediator = MediatorFactory.create(config.mediatorClass, instanceId);
                 this.facade.registerMediator(mediator);
-                
 
                 mediator.initialize(uiInstance).then(() => {
                     mediator.open(params);
@@ -150,5 +149,19 @@ export class UIManager {
 
     private getUiIdFromInstanceId(instanceId: string): string {
         return instanceId.split('_')[0];
+    }
+
+
+    public adaptUI(): void {
+        this.uiInstances.forEach((uiInstance, instanceId) => {
+            const uiId = this.getUiIdFromInstanceId(instanceId);
+            const config = this.UI_CONFIG[uiId];
+
+            if (config && (config.uiLayer === UILayer.BACKGROUND || config.uiLayer === UILayer.MAIN)) {
+                if (uiInstance instanceof GComponent) {
+                    uiInstance.makeFullScreen();
+                }
+            }
+        });
     }
 }

@@ -54,7 +54,7 @@ export class AdaptionManager extends EventTarget {
         console.log('window-resize');
         this.updateSafeArea();
         this.adaptRootNodes();
-        this.emit('adaption-updated', 'window-resize');
+        this.emit('adaption-updated', this.getSafeArea());
     }
 
   
