@@ -79,58 +79,19 @@ export class Main extends Root {
 
     /** 初始化游戏UI */
     protected initUI() {
-        // // 创建音频模块
+        //创建音频模块
         app.audio = this.persistRootNode.addComponent(AudioManager);
         //创建游戏节点管理器
         app.game = new GameManager(this.getGameNode());
-
+        //创建ui管理
         app.gui = new UIManager(Facade.getInstance())
+        app.gui.initialize(UI_CONFIG);//初始化UI配置
 
-        FairyGUIManager.getInstance().initialize(this.getGUINode());
-
-        app.gui.initialize(UI_CONFIG,FairyGUIManager.getInstance(), FairyGuiResManager.getInstance());
-
+        app.adaption.addRootNode(this.getGameNode(),UIPosition.BottomLeft) //游戏节点适配左下角
         app.adaption.on("adaption-updated", () => { // 屏幕适配更新事件
             app.gui.adaptUI();
         })
 
-
-        // UIPackage.loadPackage("UI/Bag", (error, uiPackage) => {
-        //     console.log(error,uiPackage);
-                
-        //     const component = UIPackage.createObject(uiPackage.name, "Main");
-
-        // });
-
-
-        // UIPackage.loadPackage("UI/CreateRole", (error, uiPackage) => {
-        //     console.log(error,uiPackage);
-                
-        //     const component = UIPackage.createObject(uiPackage.name, "CreateRoleWin");
-
-        // });
-
-        // app.adaption.addRootNode(FairyGUIManager.getInstance().getRootNode(),UIPosition.TopLeft) 
-        // 适配管理器添加游戏根节点，并设置锚点左下角
-        // app.adaption.addRootNode(app.game.getGameRoot(),UIPosition.BottomLeft) 
-
-        console.log("UI初始化完成",FairyGUIManager.getInstance().getRootNode().position);
-
-        let position = FairyGUIManager.getInstance().getRootNode().position;
-
-        let node = FairyGUIManager.getInstance().getRootNode();
-        // let uiTransform = node.getComponent(UITransform);
-        // uiTransform.height = 300 
-        // uiTransform.width = 400 
-
-        // uiTransform.setContentSize(400,300)
-
-        // GRoot.inst.setSize(700,300)
-
-        console.log(GRoot.inst.width,GRoot.inst.height,"=x=x=xx==");
-
-
-        // FairyGUIManager.getInstance().getRootNode().setPosition(position.x,position.y);
     }
 
     public btnTestClick2() {
@@ -144,14 +105,6 @@ export class Main extends Root {
 
     public btnTestClick() {
 
-        let node = FairyGUIManager.getInstance().getRootNode();
-        let uiTransform = node.getComponent(UITransform);
-        console.log(uiTransform.height,uiTransform.width);
-        console.log(node.position);
-
-
-        console.log(GRoot.inst.width,GRoot.inst.height,"=x=x=xx=2=",GRoot.inst.node.position);
-
         app.facade.send(Notification.CreateRole_View_show, { name: "test" });
     }
    
@@ -160,20 +113,6 @@ export class Main extends Root {
         console.log(app.config.get("animation"));
         app.facade.registerModules(modules)
         
-        // let instanceID = await app.gui.open(UIView.CreateRole)
-        // let instance = app.gui.get(instanceID)
-        // console.log(instance);
-
-        // (instance as GComponent).makeFullScreen()
-
-        // instance.setSize(500,300)
-        // let node = instance.node;
-        // let uiTransform = node.getComponent(UITransform);
-        // console.log(uiTransform.height,uiTransform.width);
-        // uiTransform.setContentSize(500,300)
-
-        // app.adaption.addRootNode(instance.node,UIPosition.Center) 
-       
        
         // let display = new MapDisplay();
         // app.game.getGameRoot().addChild(display);

@@ -4,6 +4,7 @@ import { ILayerManager, UILayer } from "./UILayer";
 import {IResManager  } from "./UIRes";
 import { GComponent } from "fairygui-cc";
 import { FairyGUIManager, FairyGuiResManager } from "./FairyGUIManager";
+import { Facade } from "../mvc/init";
 
 
 // 
@@ -51,12 +52,10 @@ export class UIManager {
 
     public initialize(
         configs: { [uiId: string]: IUIConfig },
-        layerManager: ILayerManager,
-        resManager: IResManager<GComponent>
     ): UIManager {
         this.UI_CONFIG = configs;
-        this.layerManager = layerManager;
-        this.resManager = resManager;
+        this.layerManager = new FairyGUIManager();
+        this.resManager = new FairyGuiResManager();
         return this;
     }
 
