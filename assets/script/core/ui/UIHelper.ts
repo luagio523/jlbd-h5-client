@@ -3,21 +3,13 @@ import { Constructor, Node } from "cc";
 
 
 export class FGUIHelper {
-     /**
-     * 类型谓词函数，用于检查对象是否为指定类型
-     */
-     private static isInstanceOf<T extends GObject>(obj: GObject, classType: Constructor<T>): obj is T {
-        return obj instanceof classType;
-    }
-
     /**
      * 根据路径查找子节点
      * @param root 根节点
      * @param path 子节点路径，以 '/' 分隔
-     * @param classType 期望的子节点类型
      * @returns 找到的子节点或 null
      */
-    static findChild<T extends GObject>(root: GComponent, path: string, classType?: Constructor<T>): T | null {
+    static findChild(root: GComponent, path: string): GObject | null {
         if (!root || !path) {
             return null;
         }
@@ -26,46 +18,41 @@ export class FGUIHelper {
         let currentNode: GObject | null = root;
 
         for (const part of pathParts) {
-            if (!currentNode || !(currentNode instanceof GComponent)) {
+            if (!currentNode) {
                 return null;
             }
-            currentNode = currentNode.getChild(part);
+            if (currentNode instanceof GComponent) {
+                currentNode = currentNode.getChild(part);
+            } else {
+                return null;
+            }
         }
 
-        if (!currentNode) {
-            return null;
-        }
-
-        if (classType) {
-            return this.isInstanceOf(currentNode, classType) ? currentNode : null;
-        }
-
-        return currentNode as unknown as T;
+        return currentNode;
     }
 
     /**
      * 递归查找子节点
      * @param root 根节点
      * @param name 子节点名称
-     * @param classType 期望的子节点类型
      * @returns 找到的子节点或 null
      */
-    static seekChild<T extends GObject>(root: GComponent, name: string, classType?: Constructor<T>): T | null {
+    static seekChild(root: GComponent, name: string): GObject | null {
         if (!root || !name) {
             return null;
         }
 
         if (root.name === name) {
-            return classType ? (this.isInstanceOf(root, classType) ? root : null) : root as unknown as T;
+            return root;
         }
 
         for (let i = 0; i < root.numChildren; i++) {
             const child = root.getChildAt(i);
             if (child.name === name) {
-                return classType ? (this.isInstanceOf(child, classType) ? child : null) : child as unknown as T;
+                return child;
             }
             if (child instanceof GComponent) {
-                const result = this.seekChild(child, name, classType);
+                const result = this.seekChild(child, name);
                 if (result) {
                     return result;
                 }
@@ -79,11 +66,10 @@ export class FGUIHelper {
      * 根据名称查找子节点
      * @param root 根节点
      * @param name 子节点名称
-     * @param classType 期望的子节点类型
      * @returns 找到的子节点或 null
      */
-    static getUIChild<T extends GObject>(root: GComponent, name: string, classType?: Constructor<T>): T | null {
-        return this.seekChild(root, name, classType);
+    static getUIChild(root: GComponent, name: string): GObject | null {
+        return this.seekChild(root, name);
     }
 
     /**

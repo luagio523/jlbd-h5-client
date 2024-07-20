@@ -1,4 +1,4 @@
-import { EventTarget } from "cc";
+import { EventTarget, warn } from "cc";
 
 export interface LanguageConfig {
     nameParts: string[][];  // 每个数组代表一个部分的可能值
@@ -14,23 +14,34 @@ export interface NameConfig {
 export class NameGenerator  {
     private config: NameConfig | null = null;
     private nameCache: Map<string, Set<string>> = new Map();
-    
+    private maxCombinations: Map<string, number> = new Map();
 
     public initialize(config: NameConfig): void {
         this.config = config;
         this.clearCache();
+        this.calculateAllMaxCombinations();
     }
 
     public unloadConfig(): void {
         this.config = null;
         this.clearCache();
+        this.maxCombinations.clear();
     }
+    
 
     public generateName(language: string, isGameName: boolean = false): string {
         this.ensureConfigLoaded();
         this.ensureLanguageSupported(language);
 
         const langConfig = this.config![language];
+        const maxCombinations = this.maxCombinations.get(language)!;
+        const currentCombinations = this.nameCache.get(language)?.size || 0;
+
+        if (currentCombinations >= maxCombinations) {
+            warn(`All possible name combinations (${maxCombinations}) for ${language} have been exhausted.`);
+            this.clearCache();
+        }
+
         let name: string;
         do {
             name = this.generateBaseName(langConfig);
@@ -47,6 +58,19 @@ export class NameGenerator  {
         }
 
         return name;
+    }
+
+
+    private calculateMaxCombinations(config: LanguageConfig): number {
+        let combinations = 1;
+        for (const part of config.nameParts) {
+            combinations *= part.length;
+        }
+        if (config.numberRange) {
+            const [min, max] = config.numberRange;
+            combinations *= (max - min + 1);
+        }
+        return combinations;
     }
 
     private generateBaseName(config: LanguageConfig): string {
@@ -89,6 +113,23 @@ export class NameGenerator  {
         }
         this.nameCache.get(language)!.add(name);
     }
+
+
+    private calculateAllMaxCombinations(): void {
+        this.maxCombinations.clear();
+        for (const [language, langConfig] of Object.entries(this.config!)) {
+            const maxCombos = this.calculateMaxCombinations(langConfig);
+            this.maxCombinations.set(language, maxCombos);
+        }
+    }
+   
+
+    public getMaxCombinations(language: string): number | undefined {
+        return this.maxCombinations.get(language);
+    }
+
+   
+
 
     public release(): void {
         this.unloadConfig();

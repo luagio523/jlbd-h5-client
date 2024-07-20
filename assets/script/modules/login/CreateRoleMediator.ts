@@ -40,7 +40,7 @@ export default class CreateRoleMediator extends BaseMediator {
             }
         })
       
-        this.inputName = <GTextInput>this.findChild("input_name");
+        this.inputName = <GTextInput>this.findChild("input_name") ;
 
     } 
 
@@ -50,6 +50,8 @@ export default class CreateRoleMediator extends BaseMediator {
 
     private onBtnRollClick() {
         console.log("roll click");
+        let name = this.nameGenerator.generateName("chinese",true);
+        this.inputName.text = name;
     }
 
  
