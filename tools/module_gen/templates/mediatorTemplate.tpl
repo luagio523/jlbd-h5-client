@@ -1,11 +1,11 @@
 import { _decorator } from "cc";
 import BaseMediator from "../../mvc/BaseMediator";
 import { IActionHandler } from "../../core/mvc/init";
-const { ccclass } = _decorator;
+import { mvc } from "../../core/mvc/__private";
 /** 
  * <%= name %>Mediator 
  */ 
-@ccclass("<%= name %>Mediator")
+@mvc.component("<%= name %>Mediator")
 export default class <%= name %>Mediator extends BaseMediator {
     public listInterests(): [string, IActionHandler][] {
         return [

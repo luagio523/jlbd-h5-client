@@ -4,13 +4,11 @@ import { Notification } from "../../mvc/Notification";
 import { IActionHandler } from "../../core/mvc/init";
 import app from "../../App";
 import { UIView } from "../../config/UIConfig";
-
+import { mvc } from "../../core/mvc/__private";
 <% for (var i = 0; i < models.length; i++) { %>import <%= models[i] %>Proxy from "./<%= models[i] %>Proxy";<% } %>
-
 <% for (var i = 0; i < views.length; i++) { %>import <%= views[i] %>Mediator from "./<%= views[i] %>Mediator";<% } %>
 
-const { ccclass } = _decorator;
-@ccclass
+@mvc.component("<%= name %>Actor")
 export class <%= name %>Actor extends BaseActor {
     public listInterests(): [string, IActionHandler][] {
         return [

@@ -8,9 +8,9 @@ import { UIView } from "../../config/UIConfig"
 import RoleProxy from "./RoleProxy"
 
 import CreateRoleMediator from "./CreateRoleMediator"
+import { mvc } from "../../core/mvc/__private"
 
-const { ccclass } = _decorator
-@ccclass
+@mvc.component("RoleActor")
 export class RoleActor extends BaseActor {
 	public listInterests(): [string, IActionHandler][] {
 		return [[Notification.CreateRole_View_show, this.executeCreateRoleViewShow]]
@@ -22,8 +22,9 @@ export class RoleActor extends BaseActor {
 
 	/*---------------------------------[notices]------------------------------------*/
 
-	public executeCreateRoleViewShow(args?: any) {
-		// 执行逻辑
+	public executeCreateRoleViewShow(args: any) {
+		app.log.logView(args, "LoginActor.executeCreateroleViewShow")
+		app.gui.open(UIView.CreateRole,{name:"hhh"})
 	}
 
 	/*---------------------------------[models]------------------------------------*/

@@ -1,8 +1,6 @@
 import { Component, assert, js, log } from "cc";
+import { mvc } from "./__private";
 
-function isArray(obj) {
-    return Object.prototype.toString.call(obj) === '[object Array]';
-}
 
 function isFunction(value: any): value is Function {
     return typeof value === 'function';
@@ -92,13 +90,11 @@ export class Facade{
     }
 
 
-    registerMediator(mediator: Mediator): void {
-		var name: string = mediator.getMediatorName();
-
-		if (this._mediatorMap[name])
+    public registerMediator(mediatorName: string): Mediator {
+		if (this._mediatorMap[mediatorName])
 			return;
-		this._mediatorMap[name] = mediator;
-
+        const mediator = this.loadMediator(mediatorName);
+        this._mediatorMap[mediatorName] = mediator;
         let interests = mediator.listInterests()
         interests.forEach(([eventName, action]) => {
             assert(!eventName, "event is empty on addListener "+eventName)
@@ -108,6 +104,7 @@ export class Facade{
             this.registerObserver(eventName, observer)
         });
 		mediator.onRegister();
+        return mediator;
 	}
 
 
@@ -189,33 +186,35 @@ export class Facade{
     }
   
 
-    public loadActor(module:string, controller?:string){
-        let controller_ = controller || module
-        let className = js.formatStr("%sActor",controller_)
-        let classDef:any = js.getClassByName(className)
-        if(!classDef){
-            return
+    public loadActor(module: string, controller?: string) {
+        const controller_ = controller || module;
+        const className = `${controller_}Actor`;
+        const ClassDef = mvc.getClass<new () => any>(className);
+        if (!ClassDef) {
+            return undefined;
         }
-        return  new classDef()
+        return new ClassDef();
     }
 
-    public loadProxy(module:string,proxy?:string){
-        let proxy_ = proxy || module
-        let className = js.formatStr("%sProxy",proxy_)
-        let classDef:any = js.getClassByName(className)
-        assert(!classDef,js.formatStr("cant found class:[%s]",className))
-        return  new classDef()
+    public loadProxy( proxy: string) {
+        const proxy_ = proxy;
+        const className = `${proxy_}Proxy`;
+        const ClassDef = mvc.getClass<new () => any>(className);
+        if (!ClassDef) {
+            throw new Error(`Can't find class: [${className}]`);
+        }
+        return new ClassDef();
     }
 
-
-    public loadMediator(module:string,view?:string){
-        let view_ = view || module
-        let className = js.formatStr("%sView",view_)
-        let classDef:any = js.getClassByName(className)
-        assert(!classDef,js.formatStr("cant found class:[%s]",className))
-        return  new classDef()
+    public loadMediator(view: string) {
+        const view_ = view;
+        const className = `${view_}Mediator`;
+        const ClassDef = mvc.getClass<new () => any>(className);
+        if (!ClassDef) {
+            throw new Error(`Can't find class: [${className}]`);
+        }
+        return new ClassDef();
     }
-
 
     
 }
@@ -225,7 +224,7 @@ export class Facade{
  * 继承cc.Component 纯粹为了 cc.js.getClass 
  * 另外视图也恰好需要
  */
-export class Notifier extends Component{
+export class Notifier {
     public send(name:string, body?:any){
         Facade.getInstance().send(name,body)
     }   
@@ -317,6 +316,14 @@ export class Mediator extends Notifier{
  * 数据代理基类
  */
 export class Proxy extends Notifier{
+
+    /**
+     * 组件的类名
+     */
+    get name(): string {
+        return this.constructor.name;
+    }
+
     public onRegister():void{
         
     }

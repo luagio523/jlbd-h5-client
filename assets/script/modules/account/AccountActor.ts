@@ -8,9 +8,9 @@ import { UIView } from "../../config/UIConfig"
 import AccountProxy from "./AccountProxy"
 
 import LoginMediator from "./LoginMediator"
+import { mvc } from "../../core/mvc/__private"
 
-const { ccclass } = _decorator
-@ccclass
+@mvc.component("AccountActor")
 export class AccountActor extends BaseActor {
 	public listInterests(): [string, IActionHandler][] {
 		return [[Notification.Login_View_Show, this.executeLoginViewShow]]

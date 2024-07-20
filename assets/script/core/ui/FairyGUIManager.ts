@@ -191,7 +191,6 @@ export class FairyGuiResManager implements IResManager<GComponent> {
         return FairyGuiResManager.instance;
     }
 
-
     private resMap:{ [uiId: string]: FairyGuiUIRes }
 
     public constructor(){

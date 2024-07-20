@@ -5,11 +5,11 @@ import { IActionHandler } from "../../core/mvc/init";
 import { NameGenerator } from "../../core/common/name/NameGenerator";
 import app from "../../App";
 import { GTextInput } from "fairygui-cc";
-const { ccclass } = _decorator; 
+import { mvc } from "../../core/mvc/__private";
 /** 
  * CreateRoleMediator 
  */ 
-@ccclass("CreateRoleMediator") 
+@mvc.component("CreateRoleMediator") 
 export default class CreateRoleMediator extends BaseMediator { 
     private nameGenerator: NameGenerator = new NameGenerator();
 
@@ -21,9 +21,6 @@ export default class CreateRoleMediator extends BaseMediator {
             // 例如：["Login", this.handleLogin.bind(this)] 
         ]; 
     } 
-
-
-    
      
     protected  onInitialize(): void { 
         // 初始化逻辑 
