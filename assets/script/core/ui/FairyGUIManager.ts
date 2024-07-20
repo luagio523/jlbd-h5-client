@@ -3,7 +3,50 @@ import { ILayerManager, UILayer } from "./UILayer";
 import { IUIConfig } from "./UIConfig";
 import { IResManager, UIResBase } from "./UIRes";
 import scheduler from "../../utils/scheduler";
-import { sys } from "cc";
+import { Node, sys } from "cc";
+
+// private initFaiyGUI(){
+    //UIConfig.defaultFont = 'Droid Sans Fallback';
+    //UIConfig.windowModalWaiting = ""
+    //UIConfig.globalModalWaiting= ""
+    //UIConfig.buttonSound= ""
+    //UIConfig.buttonSoundVolumeScale= 0.5
+    //UIConfig.horizontalScrollBar= ""
+    //UIConfig.verticalScrollBar= ""
+    //UIConfig.tooltipsWin = "ui://包名/组件名";
+    // UIObjectFactory.SetLoaderExtension(typeof(MyGLoader));
+    //UIPackage.loadPackage(ResPath.UI+"BlueSkin",()=>{}); //for test
+    //UIPackage.loadPackage(ResPath.UI+"Common",()=>{}); //for test
+   
+//    GRoot.create();
+//    addLoadHandler();
+//     //GRoot.inst.volumeScale = 0;
+//    GRoot.inst.modalLayer.touchable = true;
+//    UIConfig.modalLayerColor = new cc.Color(0,0,0,170);
+//    UIConfig.bringWindowToFrontOnClick = false;
+//    UIConfig.buttonSound = "ui://Battle/buttonSound";
+
+    // //UIObjectFactory.setLoaderExtension(Loader);
+    
+    //UIConfig.bringWindowToFrontOnClick = false;
+    //UIConfig.modalLayerColor = new cc.Color(0,0,0,170);
+    // //GRoot.create(); //会将 director.getScene() 做为 root父节点
+    //GRoot.inst.modalLayer.touchable = true
+    //GRoot.inst.volumeScale = 0;
+    // //InputProcessor
+
+    // if(GameGlobal.OPEN_TRADITIONAL) {
+    //    UIPackage.branch = "fanti";
+    // }
+    // else if(GameGlobal.CHANNEL_ID == CHANNEL_ID.SBGDY) {
+    //    UIPackage.branch = "gdy";
+    // }
+    //UIConfig.defaultFont = "方正兰亭圆简体";
+    // FguiRegister();
+// }
+
+
+
 export class FairyGUIManager implements ILayerManager {
     private static instance: FairyGUIManager;
 
@@ -16,146 +59,113 @@ export class FairyGUIManager implements ILayerManager {
 
     private _root: GRoot;
     private _layers: Map<UILayer, GComponent>;
-    private _dialogs: Window[] = [];
 
-    public initLayers(root: GRoot): void {
-        this._root = root;
-        // 初始化各层的节点
+    private constructor() {
+        this._layers = new Map<UILayer, GComponent>();
+    }
+
+    public initialize(root: Node): void {
+        console.log("FairyGUIManager initialize", root);
+
+        this._root = GRoot.create();
+
         this.initLayerNode(UILayer.BACKGROUND, 'BackgroundLayer');
         this.initLayerNode(UILayer.MAIN, 'MainLayer');
-        //   this.initLayerNode(UILayer.POPUP, 'PopupLayer');
-        //   this.initLayerNode(UILayer.DIALOG, 'DialogLayer');
         this.initLayerNode(UILayer.TOP, 'TopLayer');
     }
 
-    private initFaiyGUI(){
-        //UIConfig.defaultFont = 'Droid Sans Fallback';
-        //UIConfig.windowModalWaiting = ""
-        //UIConfig.globalModalWaiting= ""
-        //UIConfig.buttonSound= ""
-        //UIConfig.buttonSoundVolumeScale= 0.5
-        //UIConfig.horizontalScrollBar= ""
-        //UIConfig.verticalScrollBar= ""
-        //UIConfig.tooltipsWin = "ui://包名/组件名";
-        // UIObjectFactory.SetLoaderExtension(typeof(MyGLoader));
-        //UIPackage.loadPackage(ResPath.UI+"BlueSkin",()=>{}); //for test
-        //UIPackage.loadPackage(ResPath.UI+"Common",()=>{}); //for test
-       
-    //    GRoot.create();
-    //    addLoadHandler();
-    //     //GRoot.inst.volumeScale = 0;
-    //    GRoot.inst.modalLayer.touchable = true;
-    //    UIConfig.modalLayerColor = new cc.Color(0,0,0,170);
-    //    UIConfig.bringWindowToFrontOnClick = false;
-    //    UIConfig.buttonSound = "ui://Battle/buttonSound";
-
-        // //UIObjectFactory.setLoaderExtension(Loader);
-        
-        //UIConfig.bringWindowToFrontOnClick = false;
-        //UIConfig.modalLayerColor = new cc.Color(0,0,0,170);
-        // //GRoot.create(); //会将 director.getScene() 做为 root父节点
-        //GRoot.inst.modalLayer.touchable = true
-        //GRoot.inst.volumeScale = 0;
-        // //InputProcessor
-
-        // if(GameGlobal.OPEN_TRADITIONAL) {
-        //    UIPackage.branch = "fanti";
-        // }
-        // else if(GameGlobal.CHANNEL_ID == CHANNEL_ID.SBGDY) {
-        //    UIPackage.branch = "gdy";
-        // }
-        //UIConfig.defaultFont = "方正兰亭圆简体";
-        // FguiRegister();
-    }
-
     private initLayerNode(layer: UILayer, name: string): void {
-        let node = new GComponent();
-        node.name = name
+        if (this._layers.has(layer)) {
+            console.warn(`Layer ${UILayer[layer]} already initialized.`);
+            return;
+        }
+
+        const node = new GComponent();
+        node.name = name;
         this._layers.set(layer, node);
         this._root.addChild(node);
     }
 
     public addToLayer(uiInstance: GObject, layer: UILayer): void {
+        if (!uiInstance) {
+            console.error("Invalid UI instance provided.");
+            return;
+        }
+
+        const layerNode = this._layers.get(layer);
+        if (!layerNode) {
+            console.error(`Layer ${UILayer[layer]} not initialized.`);
+            return;
+        }
 
         switch (layer) {
             case UILayer.BACKGROUND:
-                this._layers[layer].addChild(uiInstance)
             case UILayer.MAIN:
-                this._layers[layer].addChild(uiInstance)
-                break;
-            case UILayer.DIALOG:
-                let dialog = new Window();
-                dialog.contentPane = uiInstance.asCom;
-                this._dialogs.push(dialog);
-                GRoot.inst.showWindow(dialog);
-                this.adjustTopLayer()
+                layerNode.addChild(uiInstance);
                 break;
             case UILayer.TOP:
-                this._layers[UILayer.TOP].addChild(uiInstance);
-                this.adjustTopLayer()
+                layerNode.addChild(uiInstance);
+                this.adjustTopLayer();
                 break;
             default:
-                GRoot.inst.addChild(uiInstance);
+                console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI. Use appropriate FairyGUI methods.`);
                 break;
         }
     }
-
 
     public removeFromLayer(uiInstance: GObject, layer: UILayer): void {
-        switch (layer) {
-            case UILayer.DIALOG:
-                this._dialogs.forEach((dialog) =>
-                    dialog.hide()
-                );
-                break;
-            default:
-                let layerNode = this._layers.get(layer);
-                if (layerNode) {
-                    layerNode.removeChild(uiInstance);
-                } else {
-                    console.error(`Layer - ${UILayer[layer]} not initialized.`);
-                }
+        if (!uiInstance) {
+            console.error("Invalid UI instance provided.");
+            return;
+        }
+
+        const layerNode = this._layers.get(layer);
+        if (layerNode) {
+            layerNode.removeChild(uiInstance);
+        } else {
+            console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI or not initialized.`);
         }
     }
 
-
-
     public hideUILayer(layer: UILayer): void {
-        switch (layer) {
-            case UILayer.DIALOG:
-                this._dialogs.forEach((dialog) =>
-                    dialog.visible = false);
-                break;
-            default:
-                let layerNode = this._layers.get(layer);
-                if (layerNode) {
-                    layerNode.visible = false;
-                } else {
-                    console.error(`Layer - ${UILayer[layer]} not initialized.`);
-                }
-        }
+        this.setLayerVisibility(layer, false);
     }
 
     public showUILayer(layer: UILayer): void {
-        switch (layer) {
-            case UILayer.DIALOG:
-                this._dialogs.forEach((dialog) =>
-                    dialog.visible = true);
-                break;
-            default:
-                let layerNode = this._layers.get(layer);
-                if (layerNode) {
-                    layerNode.visible = true;
-                } else {
-                    console.error(`Layer - ${UILayer[layer]} not initialized.`);
-                }
+        this.setLayerVisibility(layer, true);
+    }
+
+    private setLayerVisibility(layer: UILayer, visible: boolean): void {
+        const layerNode = this._layers.get(layer);
+        if (layerNode) {
+            layerNode.visible = visible;
+        } else {
+            console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI or not initialized.`);
         }
     }
 
     private adjustTopLayer(): void {
-        GRoot.inst.setChildIndex(this._layers[UILayer.TOP], GRoot.inst.numChildren - 1);
+        const topLayer = this._layers.get(UILayer.TOP);
+        if (topLayer) {
+            this._root.setChildIndex(topLayer, this._root.numChildren - 1);
+        }
+    }
+
+    public getLayerNode(layer: UILayer): GComponent | null {
+        return this._layers.get(layer) || null;
+    }
+
+    public clearLayer(layer: UILayer): void {
+        const layerNode = this._layers.get(layer);
+        if (layerNode) {
+            layerNode.removeChildren();
+        } else {
+            console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI or not initialized.`);
+        }
     }
 }
+
+
 
 
 
@@ -186,7 +196,7 @@ export class FairyGuiResManager implements IResManager<GComponent> {
 
     public constructor(){
         this.resMap = {}
-        scheduler.scheduleGlobal(this.cleanup.bind(this), 10)// 例如每30秒清理一次
+        // scheduler.scheduleGlobal(this.cleanup.bind(this), 10)// 例如每30秒清理一次
     }
 
     // 清理函数，会根据设置的时间阈值来释放实例和资源
@@ -218,14 +228,15 @@ export class FairyGuiResManager implements IResManager<GComponent> {
             }
 
             const uiPackage = await this.loadPackage(config.resourcePath);
+
+            // console.log("FairyGuiResManager load",config.resourcePath,uiPackage,uiPackage.name,config.uiComponentName)
             const component = UIPackage.createObject(uiPackage.name, config.uiComponentName);
-            
             if (component instanceof GComponent) {
                 return component;
             } else {
-                throw new Error("UI component created is not a GComponent");
+                // throw new Error("UI component created is not a GComponent");
             }
-
+            return null;
         } catch (error) {
             throw error;
         }

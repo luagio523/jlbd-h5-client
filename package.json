@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
+    "fairygui-cc": "^1.2.2",
     "prettier": "^3.2.5"
   }
 }

@@ -2,10 +2,28 @@
 # yarn lockfile v1
 
 
+"@types/node@^14.0.1":
+  "integrity" "sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ=="
+  "resolved" "https://registry.npmmirror.com/@types/node/-/node-14.18.63.tgz"
+  "version" "14.18.63"
+
 "crypto-js@^4.2.0":
   "integrity" "sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q=="
   "resolved" "https://registry.npmmirror.com/crypto-js/-/crypto-js-4.2.0.tgz"
   "version" "4.2.0"
+
+"fairygui-cc@^1.2.2":
+  "integrity" "sha512-hDxK6xtr8AcTerhJUUe7Hg6i8DiFhvcF/+lOKONRFTlRaPxXtvydzllwchse5ZHqc20oTtNU6aEQ2HG4YZM4Yg=="
+  "resolved" "https://registry.npmmirror.com/fairygui-cc/-/fairygui-cc-1.2.2.tgz"
+  "version" "1.2.2"
+  dependencies:
+    "@types/node" "^14.0.1"
+    "lodash" "^4.17.15"
+
+"lodash@^4.17.15":
+  "integrity" "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
+  "resolved" "https://registry.npmmirror.com/lodash/-/lodash-4.17.21.tgz"
+  "version" "4.17.21"
 
 "prettier@^3.2.5":
   "integrity" "sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A=="

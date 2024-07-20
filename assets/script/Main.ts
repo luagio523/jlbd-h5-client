@@ -16,8 +16,8 @@ import { modules } from './mvc/modules';
 import { UIManager } from './core/ui/UIManager';
 import { Facade } from './core/mvc/init';
 import { FairyGUIManager, FairyGuiResManager } from './core/ui/FairyGUIManager';
-import { GRoot } from 'fairygui-cc';
-import { UI_CONFIG } from './config/UIConfig';
+import { GRoot, UIPackage } from 'fairygui-cc';
+import { UIView, UI_CONFIG } from './config/UIConfig';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -87,10 +87,27 @@ export class Main extends Root {
         app.gui = new UIManager(Facade.getInstance())
 
         const fairyguiManager = FairyGUIManager.getInstance();
-        fairyguiManager.initLayers(GRoot.create());
-        
+        fairyguiManager.initialize(this.getGUINode());
+
         const fairyguiResManager = FairyGuiResManager.getInstance();
         app.gui.initialize(UI_CONFIG,fairyguiManager, fairyguiResManager);
+
+
+        // UIPackage.loadPackage("UI/Bag", (error, uiPackage) => {
+        //     console.log(error,uiPackage);
+                
+        //     const component = UIPackage.createObject(uiPackage.name, "Main");
+
+        // });
+
+
+        // UIPackage.loadPackage("UI/CreateRole", (error, uiPackage) => {
+        //     console.log(error,uiPackage);
+                
+        //     const component = UIPackage.createObject(uiPackage.name, "CreateRoleWin");
+
+        // });
+
 
         // 适配管理器添加游戏根节点，并设置锚点左下角
         app.adaption.addRootNode(app.game.getGameRoot(),UIPosition.BottomLeft) 
@@ -104,8 +121,8 @@ export class Main extends Root {
 
         console.log(app.config.get("animation"));
         // app.facade.registerModules(modules)
-
-        app.gui.open("createRoleUI")
+        
+        app.gui.open(UIView.CREATE_ROLE)
         
 
        

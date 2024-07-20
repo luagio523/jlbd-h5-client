@@ -1,4 +1,4 @@
-import { Camera, assert, js, log } from "cc";
+import { Camera, Node, assert, js, log } from "cc";
 import {  IUIConfig } from "./UIConfig";
 import { ILayerManager, UILayer } from "./UILayer";
 import {IResManager  } from "./UIRes";
@@ -8,19 +8,19 @@ import { FairyGUIManager, FairyGuiResManager } from "./FairyGUIManager";
 
 // 
 export interface IViewMediator {
-   initialize(instanceId :string): void;
-   open(...params: any[]): void; 
-   dispose(): void; 
+   initialize(instance:GComponent|Node): Promise<void>;
+   open(params: any): Promise<void>; 
+   close(): Promise<void>; 
  }
 
 
 export class MediatorFactory {
-    public static create(mediatorClassName: string,mediatorName:string, uiInstance: any): IViewMediator {
-        const MediatorClass = js.getClassByName(mediatorClassName) as new (mediatorName:string,uiInstance: any) => IViewMediator;
+    public static create(mediatorClassName: string,mediatorName:string): IViewMediator {
+        const MediatorClass = js.getClassByName(mediatorClassName) as new (mediatorName:string) => IViewMediator;
         if (!MediatorClass) {
             throw new Error(`Mediator class not found: ${mediatorClassName}`);
         }
-        return new MediatorClass(mediatorName,uiInstance);
+        return new MediatorClass(mediatorName);
     }
 }
 
@@ -75,7 +75,7 @@ export class UIManager {
         // Implement actual toast functionality here
     }
 
-    public async open(uiId: string, ...params: any[]): Promise<string> {
+    public async open(uiId: string, params?: any): Promise<string> {
         const config = this.UI_CONFIG[uiId];
         assert(!!config, `Config not found for uiId: ${uiId}`);
 
@@ -88,10 +88,14 @@ export class UIManager {
                 this.uiInstances.set(instanceId, uiInstance);
                 this.addUIToLayer(uiInstance, config.uiLayer);
 
-                const mediator = MediatorFactory.create(config.mediatorClass, instanceId, uiInstance);
+                const mediator = MediatorFactory.create(config.mediatorClass, instanceId);
                 this.facade.registerMediator(mediator);
-                await mediator.initialize(instanceId);
-                await mediator.open(...params);
+                
+
+                mediator.initialize(uiInstance).then(() => {
+                    mediator.open(params);
+                });
+
             } catch (error) {
                 log(`Failed to open UI: ${uiId}`, error);
                 throw error;

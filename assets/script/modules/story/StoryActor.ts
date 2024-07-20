@@ -18,7 +18,6 @@ export class StoryActor extends BaseActor {
 
   public executeLogin(...args: any) {}
 
-
   public executePlotStep(...args: any) {
     log("somethings")
   }
@@ -28,6 +27,4 @@ export class StoryActor extends BaseActor {
   }
 
   /*---------------------------------[views]------------------------------------*/
-  
-  
 }

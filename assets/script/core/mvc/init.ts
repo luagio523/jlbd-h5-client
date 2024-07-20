@@ -297,6 +297,7 @@ export class Mediator extends Notifier{
     public onRegister():void{
 
     }
+    
     public onRemove():void{
         
     }

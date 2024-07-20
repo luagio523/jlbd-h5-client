@@ -33,9 +33,7 @@ export class LoginActor extends BaseActor{
  
  
      /*---------------------------------[views]------------------------------------*/ 
-    protected  get createRoleMediator():CreateRoleMediator{ 
-        return app.facade.retrieveMediator(CreateRoleMediator.NAME) as CreateRoleMediator
-    }  
+     
      
 } 
  
