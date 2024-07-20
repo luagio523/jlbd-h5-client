@@ -75,11 +75,11 @@ export class UIManager {
     }
 
     
-    public showAlert(options: AlertOptions): void {
+    public alert(options: AlertOptions): void {
         AlertManager.getInstance().showDialog(options);
     }
 
-    public showToast(message: string, duration: number = 2000): void {
+    public toast(message: string, duration: number = 2000): void {
         ToastManager.getInstance().showToast(message, duration);
     }
 

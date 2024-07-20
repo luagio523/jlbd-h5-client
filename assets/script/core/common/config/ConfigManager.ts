@@ -1,4 +1,4 @@
-import { _decorator, Asset, assetManager, BufferAsset, Component, JsonAsset, log, resources, TextAsset,  } from 'cc';
+import { _decorator, Asset, assetManager, BufferAsset, Component, JsonAsset, log, path, resources, TextAsset,  } from 'cc';
 
 const { ccclass, property } = _decorator;
 
@@ -7,6 +7,8 @@ const { ccclass, property } = _decorator;
 export class ConfigManager extends Component {
     private static instance: ConfigManager = null;
     private configs: Map<string, any> = new Map();
+
+    public static readonly PATH_CONFIG_DIRECTORY = 'config/';
 
     private constructor() {
         super();
@@ -19,9 +21,7 @@ export class ConfigManager extends Component {
         return ConfigManager.instance;
     }
 
-    public get(configName: string): any {
-        return this.configs.get(configName) || null;
-    }
+    
 
     /**
      * 加载单独配置文件 loadSingle("config/config.json")
@@ -29,7 +29,7 @@ export class ConfigManager extends Component {
      * @returns 
      */
     public async loadSingle(path: string): Promise<void> {
-        path = this.removeExtension(path);
+        path = this.getConfigPath(path);
         return new Promise((resolve, reject) => {
             resources.load(path, Asset, (err, asset) => {
                 if (err) {
@@ -42,7 +42,18 @@ export class ConfigManager extends Component {
         });
     }
 
-    
+    /**
+     * 获取资源路径
+     * @param path 
+     * @returns 
+     */
+    private getConfigPath(path: string): string {
+        path = this.removeExtension(path);
+        if (path.startsWith(ConfigManager.PATH_CONFIG_DIRECTORY)) {
+            return path;
+        }
+        return `${ConfigManager.PATH_CONFIG_DIRECTORY}${path}`;
+    }
 
     /**
      * 加载配置文件目录 loadDirectory("config/")
@@ -50,7 +61,7 @@ export class ConfigManager extends Component {
      * @returns 
      */
     public async loadDirectory(path: string): Promise<void> {
-        path = this.removeExtension(path);
+        path = this.getConfigPath(path);
         return new Promise((resolve, reject) => {
             resources.loadDir(path, Asset, (err, assets) => {
                 if (err) {
@@ -71,7 +82,7 @@ export class ConfigManager extends Component {
      * @returns 
      */
     public async loadZip(path: string): Promise<void> {
-        path = this.removeExtension(path);
+        path = this.getConfigPath(path);
         return new Promise((resolve, reject) => {
             resources.load(path, BufferAsset, async (err, asset) => {
                 console.log(path,err,asset);
@@ -124,12 +135,37 @@ export class ConfigManager extends Component {
         }
     }
 
-    public getConfig(path: string): any {
-        return this.configs.get(path);
+    public get(configName: string): any {
+        return this.configs.get(configName) || null;
     }
 
+    
     public getAllConfigs(): Map<string, any> {
-        return new Map(this.configs);
+        const jsonConfigs = new Map<string, any>();
+        this.configs.forEach((value, key) => {
+            jsonConfigs.set(key, value.json);
+        });
+        return jsonConfigs;
+    }
+
+    public releaseSingle(configName: string): boolean {
+        const item = this.configs.get(configName);
+        if (item) {
+            const path = this.getConfigPath(configName);
+            if (resources.get(path)){
+                resources.release(path);
+            }
+            this.configs.delete(configName);
+            return true;
+        }
+        return false;
+    }
+
+    public releaseAll(): void {
+        this.configs.forEach((_, configName) => {
+            this.releaseSingle(configName);
+        });
+        this.configs.clear();
     }
 
     public clear(): void {

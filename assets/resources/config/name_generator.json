@@ -1,0 +1,28 @@
+{
+    "chinese": {
+        "nameParts": [
+            ["李", "王", "张"],
+            ["小", "大", "老"],
+            ["明", "华", "强"]
+        ],
+        "titles": ["大师", "勇士", "智者"]
+    },
+    "english": {
+        "nameParts": [
+            ["Brave", "Swift", "Wise"],
+            ["Heart", "Blade", "Storm"]
+        ],
+        "separators": [" ", "-"],
+        "titles": ["Master", "Warrior", "Sage"],
+        "numberRange": [1, 99]
+    },
+    "fantasy": {
+        "nameParts": [
+            ["Aer", "Dae", "Fyr"],
+            ["wyn", "mor", "leth"],
+            ["ian", "iel", "or"]
+        ],
+        "separators": ["'", "-"],
+        "numberRange": [100, 999]
+    }
+}

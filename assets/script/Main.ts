@@ -91,7 +91,6 @@ export class Main extends Root {
         app.adaption.on("adaption-updated", () => { // 屏幕适配更新事件
             app.gui.adaptUI();
         })
-
     }
 
     public btnTestClick2() {
@@ -104,7 +103,6 @@ export class Main extends Root {
     }
 
     public btnTestClick() {
-
         app.facade.send(Notification.CreateRole_View_show, { name: "test" });
     }
    
