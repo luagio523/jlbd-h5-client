@@ -3,6 +3,6 @@ import BaseProxy from "../../mvc/BaseProxy";
 const { ccclass } = _decorator; 
  
 @ccclass 
-export default class LoginProxy extends BaseProxy { 
-    public static NAME = "Login" 
+export default class AccountProxy extends BaseProxy { 
+    public static NAME = "Account" 
 }

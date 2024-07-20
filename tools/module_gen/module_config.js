@@ -9,11 +9,19 @@
 _module_configs ={}
 
 
-_module_configs["Login"] = {
-        events : [
-                   "CreateRole_View_show",
-                 ],
-        views :  ["CreateRole",],
+_module_configs["Role"] = {
+	events : [
+				"CreateRole_View_show",
+			],
+	views :  ["CreateRole",],
+}
+
+_module_configs["Account"] = {
+	events : [
+				"Login_View_Show",
+				],
+	views :  ["Login",],
+	models: ["Login","User"],
 }
 
 // // //登陆

@@ -4,7 +4,8 @@ import { Notification } from "../../mvc/Notification";
 import { IActionHandler } from "../../core/mvc/init";
 import app from "../../App";
 import { UIView } from "../../config/UIConfig";
-import <%=Template%>Proxy from "./<%=Template%>Proxy";
+<%for(var i = 0; i < importProxylist.length; i++) {%>
+import <%:=importProxylist[i].name%> from "./<%:=importProxylist[i].name%>";<%}%>
 <%for(var i = 0; i < importlist.length; i++) {%>
 import <%:=importlist[i].name%> from "./<%:=importlist[i].name%>";<%}%>
 const { ccclass } = _decorator;
@@ -25,9 +26,11 @@ export class <%=Template%>Actor extends BaseActor{
     <%}%>
     
 
-    public <%=Template2%>Proxy():<%=Template%>Proxy{
-        return app.facade.retrieveProxy(<%=Template%>Proxy.NAME) as <%=Template%>Proxy
-    }
+    
+
+     /*---------------------------------[models]------------------------------------*/<%for(var i = 0; i < proxylist.length; i++) {%>
+    <%:=proxylist[i].method%>
+    <%}%>
 
 
      /*---------------------------------[views]------------------------------------*/<%for(var i = 0; i < viewlist.length; i++) {%>

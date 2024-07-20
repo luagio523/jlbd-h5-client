@@ -64,9 +64,31 @@ function handlerItem(module,item,tpldt,overide){
 }
 
 
+
+
+
+
 //处理model
-function handlerProxy(module){
-    handlerItem(module,"Proxy",{Template: module}) 
+function handlerProxy(module,proxy,overide){
+    let tpldt = {Template: module}
+    let item = "Proxy"
+    var tpl = fs.readFileSync('templates/Template'+item+".tpl",'utf-8');
+    let ret = handlerTemplate(tpl,tpldt)
+    let modulePath = MODULE_ROOT_PATH+module.toLocaleLowerCase()+"/"
+    let isExist = fs.existsSync(modulePath)
+    if(!isExist){
+        fs.mkdirSync(modulePath)
+    }
+    let moduleFile = modulePath + proxy+item+".ts"
+
+    if(!overide && fs.existsSync(moduleFile)){
+        console.log(moduleFile+" is exist,will not write")
+        return false
+    }
+
+    fs.writeFileSync(moduleFile,ret)
+    console.log("write "+moduleFile)
+    return true
 }
 
 //处理service
@@ -74,16 +96,28 @@ function handlerService(module){
     handlerItem(module,"Service",{Template: module}) 
 }
 
+// function toPascalCase(str) {
+//     return str
+//       .toLowerCase()
+//       .split('_')
+//       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+//       .join('');
+// }
+
 function toPascalCase(str) {
-    return str
-      .toLowerCase()
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join('');
+    // 首先分割字符串，但保留大写字母
+    const words = str.split(/[_-]|\B(?=[A-Z])/);
+    
+    // 然后处理每个单词
+    return words.map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join('');
 }
 
+
+
 //处理controller
-async function handlerActor(module,events,views){
+async function handlerActor(module,events,views,models){
     let modulePath = MODULE_ROOT_PATH+module.toLocaleLowerCase()+"/"
     let moduleFile = modulePath + module+"Actor"+".ts"
     let isExist = fs.existsSync(moduleFile)
@@ -124,6 +158,26 @@ async function handlerActor(module,events,views){
             // ctlpdt.importlist.push({name:element+"Proxy"})
         }
     });
+
+    if (models && models.length > 0) {
+        ctlpdt.proxylist = []
+        ctlpdt.importProxylist = []
+        models.forEach(element => {
+            let rmethod =`protected  get {0}Proxy():{1}Proxy{ 
+        return app.facade.retrieveProxy({1}Proxy.NAME) as {1}Proxy
+    }`
+    
+            rmethod = strfmt(rmethod,firstLower(element),element)
+    
+            let method = "get " +firstLower(element)+"Proxy():"+element+"Proxy"
+            if(!isExist || fileData.indexOf(method) ==  -1){　//当文件不存在　或者　文件内容不包含
+                ctlpdt.proxylist.push({method:rmethod})
+                ctlpdt.importProxylist.push({name:element+"Proxy"})
+            }
+        });
+    }
+
+    
     
     
 
@@ -314,13 +368,24 @@ function genRun(_module_configs){
     let modules = []
     for (const module in _module_configs) {
         let config = _module_configs[module]
-        handlerProxy(module)
+        
+
+        if(config.models && config.models.length > 0){  
+            config.models.forEach(model => {
+                handlerProxy(module,model)
+            });
+        }else{
+            handlerProxy(module,module)
+            config.models = [module]
+        }
+        
+
     
         if(config.services){
             handlerService(module)
         }
     
-        handlerActor(module,config.events,config.views)
+        handlerActor(module,config.events,config.views,config.models)
         handlerMediator(config.views,module)
         // handlerNotification(module,config.events)
 

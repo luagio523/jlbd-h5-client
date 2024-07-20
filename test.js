@@ -1,21 +1,15 @@
-var s = {width: 2048, height: 1536};
-var rw = s.width;
-var rh = s.height;
-var finalW = rw;
-var finalH = rh;
-
-var dr = {width: 1280, height: 720};
-
-if ((rw / rh) > (dr.width / dr.height)) {
-    // 如果更长，则用定高
-     finalW = finalH * rw / rh;
-     console.log("顶宽",finalW, finalH,rw,rh);
+function toPascalCase(str) {
+    // 首先分割字符串，但保留大写字母
+    const words = str.split(/[_-]|\B(?=[A-Z])/);
+    
+    // 然后处理每个单词
+    return words.map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join('');
 }
-else {
-    // 如果更短，则用定宽
-    finalW = dr.width;
-    finalH = finalW * rh / rw;
-    console.log("更短");
-}
-console.log(finalW, finalH);
 
+// 测试
+console.log(toPascalCase('CreateRole_View')); // 输出: CreateRoleView
+console.log(toPascalCase('create_role_view')); // 输出: CreateRoleView
+console.log(toPascalCase('create-role-view')); // 输出: CreateRoleView
+console.log(toPascalCase('createRoleView')); // 输出: CreateRoleView

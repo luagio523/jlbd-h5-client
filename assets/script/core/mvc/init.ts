@@ -79,7 +79,7 @@ export class Facade{
         let proxy = this._proxyMap[proxyName]
         if(!proxy){
             proxy = this.loadProxy(proxyName)
-            this._proxyMap[proxyName]
+            this._proxyMap[proxyName] = proxy
             proxy.onRegister();
         }
         return proxy
