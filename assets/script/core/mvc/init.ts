@@ -198,7 +198,7 @@ export class Facade{
 
     public loadProxy( proxy: string) {
         const proxy_ = proxy;
-        const className = `${proxy_}Proxy`;
+        const className = `${proxy_}`;
         const ClassDef = mvc.getClass<new () => any>(className);
         if (!ClassDef) {
             throw new Error(`Can't find class: [${className}]`);
@@ -208,7 +208,7 @@ export class Facade{
 
     public loadMediator(view: string) {
         const view_ = view;
-        const className = `${view_}Mediator`;
+        const className = `${view_}`;
         const ClassDef = mvc.getClass<new () => any>(className);
         if (!ClassDef) {
             throw new Error(`Can't find class: [${className}]`);
