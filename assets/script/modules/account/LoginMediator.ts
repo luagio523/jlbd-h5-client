@@ -1,43 +1,38 @@
-  
-import { _decorator } from "cc"; 
-import BaseMediator from "../../mvc/BaseMediator"; 
-import { IActionHandler } from "../../core/mvc/init"; 
-const { ccclass } = _decorator; 
-/** 
- * LoginMediator 
- */ 
-@ccclass("LoginMediator") 
-export default class LoginMediator extends BaseMediator { 
-    
- 
-    public listInterests(): [string, IActionHandler][] { 
-        return [ 
-            // 在这里添加感兴趣的事件和对应的处理函数 
-            // 例如：["Login", this.handleLogin.bind(this)] 
-        ]; 
-    } 
-     
-    protected  onInitialize(): void { 
-        // 初始化逻辑 
-        // 例如：设置UI元素的初始状态，添加事件监听器等 
-    } 
- 
-    protected  onOpen(params: any): void { 
-        console.log("LoginMediator opened",params); 
-        // 打开UI的逻辑 
-    } 
- 
-    protected  onClose(): void { 
-        console.log("LoginMediator closed"); 
-        // 关闭UI的逻辑 
-        // 例如：清理临时数据等 
-    } 
- 
-    protected onDestroy(): void { 
-        console.log("LoginMediator destroyed"); 
-        // 清理资源 
-        // 例如：释放占用的内存等 
-    } 
-     
-} 
- 
+import { _decorator } from "cc"
+import BaseMediator from "../../mvc/BaseMediator"
+import { IActionHandler } from "../../core/mvc/init"
+const { ccclass } = _decorator
+/**
+ * LoginMediator
+ */
+@ccclass("LoginMediator")
+export default class LoginMediator extends BaseMediator {
+	public listInterests(): [string, IActionHandler][] {
+		return [
+			// Add interested events and corresponding handlers here
+			// For example: ["Login", this.handleLogin.bind(this)]
+		]
+	}
+
+	protected onInitialize(): void {
+		// Initialization logic
+		// For example: set initial UI element states, add event listeners, etc.
+	}
+
+	protected onOpen(params: any): void {
+		console.log("LoginMediator opened", params)
+		// Logic for opening the UI
+	}
+
+	protected onClose(): void {
+		console.log("LoginMediator closed")
+		// Logic for closing the UI
+		// For example: clear temporary data, etc.
+	}
+
+	protected onDestroy(): void {
+		console.log("LoginMediator destroyed")
+		// Clean up resources
+		// For example: release occupied memory, etc.
+	}
+}

@@ -14,7 +14,7 @@ const { ccclass } = _decorator;
 export class <%= name %>Actor extends BaseActor {
     public listInterests(): [string, IActionHandler][] {
         return [
-            <% for (var i = 0; i < events.length; i++) { %>[Notification.<%= events[i] %>, this.execute<%= events[i] %>],
+            <% for (var i = 0; i < events.length; i++) { %>[Notification.<%= events[i] %>, this.execute<%= toPascalCase(events[i]) %>],
             <% } %>
         ];
     }
@@ -25,7 +25,7 @@ export class <%= name %>Actor extends BaseActor {
 
     /*---------------------------------[notices]------------------------------------*/
     <% for (var i = 0; i < events.length; i++) { %>
-    public execute<%= events[i] %>(...args: any) {
+    public execute<%= toPascalCase(events[i]) %>(args?: any) {
         // 执行逻辑
     }
     <% } %>

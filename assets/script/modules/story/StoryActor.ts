@@ -11,34 +11,38 @@ import StoryGuideMediator from "./StoryGuideMediator"
 const { ccclass } = _decorator
 @ccclass
 export class StoryActor extends BaseActor {
-  public listInterests(): [string, IActionHandler][] {
-    return [
-      [Notification.PLOT_STEP, this.executePlotStep],
-      [Notification.LOGIN, this.executeLogin],
-    ]
-  }
+	public listInterests(): [string, IActionHandler][] {
+		return [
+			[Notification.PLOT_STEP, this.executePlotStep],
+			[Notification.LOGIN, this.executeLogin],
+		]
+	}
 
-  public onRegister() {}
+	public onRegister() {}
 
-  public executePLOTSTEP(...args: any) {}
+	public executePLOTSTEP(...args: any) {}
 
-  public executeLOGIN(...args: any) {}
+	public executeLOGIN(...args: any) {}
 
-  /*---------------------------------[notices]------------------------------------*/
-  public executePlotStep(...args: any) {}
+	/*---------------------------------[notices]------------------------------------*/
+	public executePlotStep(...args: any) {}
 
-  public executeLogin(...args: any) {}
+	public executeLogin(...args: any) {}
 
-  public storyProxy(): StoryProxy {
-    return app.facade.retrieveProxy(StoryProxy.NAME) as StoryProxy
-  }
+	public storyProxy(): StoryProxy {
+		return app.facade.retrieveProxy(StoryProxy.NAME) as StoryProxy
+	}
 
-  /*---------------------------------[views]------------------------------------*/
-  protected get storyMediator(): StoryMediator {
-    return app.facade.retrieveMediator(UIView.Story) as StoryMediator
-  }
+	/*---------------------------------[views]------------------------------------*/
+	protected get storyguideMediator(): StoryGuideMediator {
+		return app.facade.retrieveMediator(UIView.StoryGuide) as StoryGuideMediator
+	}
 
-  protected get storyGuideMediator(): StoryGuideMediator {
-    return app.facade.retrieveMediator(UIView.StoryGuide) as StoryGuideMediator
-  }
+	protected get storyMediator(): StoryMediator {
+		return app.facade.retrieveMediator(UIView.Story) as StoryMediator
+	}
+
+	protected get storyGuideMediator(): StoryGuideMediator {
+		return app.facade.retrieveMediator(UIView.StoryGuide) as StoryGuideMediator
+	}
 }
