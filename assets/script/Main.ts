@@ -137,6 +137,7 @@ export class Main extends Root {
 
       
         const secureManager = SecureManager.getInstance();
+        secureManager.initialize("yongyuandexin");
 
         // 使用所有安全特性
         const fullSecureData = secureManager.process('Sensitive information', 

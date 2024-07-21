@@ -10,12 +10,11 @@ import { AlertManager, AlertOptions } from "./AlertManager";
 
 // 
 export interface IViewMediator {
-   initialize(instance:GComponent|Node): Promise<void>;
-   open(params: any): Promise<void>; 
-   close(): Promise<void>; 
+   initialize(instance:GComponent|Node):void ;
+   onOpen(params: any):void ; 
+   onClose():void ; 
+   onDestroy():void ; 
  }
-
-
 
 
 interface IFacade {
@@ -24,12 +23,10 @@ interface IFacade {
     removeMediator(instanceId:string):void 
 }
 
-
-
 export class UIManager {
     /** UI camera */
     public camera!: Camera;
-
+    private mediatorMap: Map<string, any>; //uiId -> mediator 同时只有一个实例
     private uiInstances: Map<string, any>; // uiId -> uiInstance 同时只有一个实例
     private layerManager!: ILayerManager;
     private facade: IFacade;
@@ -40,6 +37,7 @@ export class UIManager {
 
     constructor(facade: IFacade) {
         this.uiInstances = new Map<string, any>();
+        this.mediatorMap = new Map<string, any>();
         this.facade = facade;
     }
 
@@ -79,45 +77,68 @@ export class UIManager {
         const config = this.UI_CONFIG[uiId];
         assert(!!config, `Config not found for uiId: ${uiId}`);
 
+        let mediator = this.mediatorMap.get(uiId);
         let uiInstance = this.uiInstances.get(uiId);
 
-        if (!uiInstance) {
-            try {
-                uiInstance = await this.loadUI(config);
-                this.uiInstances.set(uiId, uiInstance);
-                this.addUIToLayer(uiInstance, config.uiLayer);
-                const mediator = this.facade.registerMediator(config.mediatorClass);
-                mediator.initialize(uiInstance).then(() => {
-                    mediator.open(params);
-                });
-
-            } catch (error) {
-                log(`Failed to open UI: ${uiId}`, error);
-                throw error;
-            }
-        } else {
+        if(mediator && uiInstance){
             log(`UI instance already exists: ${uiId}`);
+            this.addUIToLayer(uiInstance, config.uiLayer);
+            mediator.onOpen(params);
+            return ;
         }
 
+        try {
+            uiInstance = await this.loadUI(config);
+            this.uiInstances.set(uiId, uiInstance);
+
+            mediator = this.facade.registerMediator(config.mediatorClass) as IViewMediator;
+            this.mediatorMap.set(uiId, mediator);
+
+            this.addUIToLayer(uiInstance, config.uiLayer);
+            mediator.initialize(uiInstance);
+            mediator.onOpen(params);
+        } catch (error) {
+            log(`Failed to open UI: ${uiId}`, error);
+            throw error;
+        }
         return ;
     }
 
-    public close(uiId: string): void {
-        const uiInstance = this.uiInstances.get(uiId);
+   
+
+    public close(uiId: string,destroy:boolean = true): void {
         const config = this.UI_CONFIG[uiId];
-        const mediator = this.facade.retrieveMediator(config.mediatorClass);
+        let mediator = this.mediatorMap.get(uiId);
+        let uiInstance = this.uiInstances.get(uiId);
 
         if (!config || !uiInstance || !mediator) {
             log(`Close failed. Please check  uiId: ${uiId}`);
             return;
         }
-
-        this.uiInstances.delete(uiId);
-        mediator.dispose();
-        this.facade.removeMediator(config.mediatorClass);
         this.layerManager.removeFromLayer(uiInstance, config.uiLayer);
-        this.resManager.release(uiId, uiInstance);
+        mediator.onClose();
+        if(destroy){
+            this.destroy(uiId); 
+        }
     }
+
+    private destroy(uiId: string): void {
+        const config = this.UI_CONFIG[uiId];
+
+        let mediator = this.mediatorMap.get(uiId);
+        let uiInstance = this.uiInstances.get(uiId);
+
+        if (!config || !uiInstance || !mediator) {
+            log(`Destroy failed. Please check  uiId: ${uiId}`);
+            return;
+        }
+        this.facade.removeMediator(config.mediatorClass);
+        this.mediatorMap.delete(uiId);
+        mediator.onDestroy();
+        
+        this.uiInstances.delete(uiId);
+        this.resManager.release(uiId, uiInstance);
+    }   
 
     public get(uiId: string): any | undefined {
         return this.uiInstances.get(uiId);

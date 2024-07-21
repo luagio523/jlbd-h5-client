@@ -12,19 +12,11 @@ export default abstract class BaseMediator extends Mediator {
         this.viewComponent = instance;
         await this.onInitialize();
     }
-
-    public async open(params: any): Promise<void> {
-        await this.onOpen(params);
-    }
-
-    public async close(): Promise<void> {
-        await this.onClose();
-    }
     
 
-    protected abstract onInitialize(): Promise<void> | void;
-    protected abstract onOpen(params: any): Promise<void> | void;
-    protected abstract onClose(): Promise<void> | void;
+    protected abstract onInitialize():  void;
+    protected abstract onOpen(params: any): void;
+    protected abstract onClose(): void;
     protected abstract onDestroy(): void;
 
     

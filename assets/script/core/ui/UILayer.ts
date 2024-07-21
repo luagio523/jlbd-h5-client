@@ -4,11 +4,11 @@ import { GObject } from "fairygui-cc";
 
 
 export interface ILayerManager {
-    // initLayers(root: any): void; // 初始化各个层的容器
     addToLayer(uiInstance: any, layer: UILayer): void; // 将UI组件添加到指定层
     removeFromLayer(uiInstance: GObject|Node, layer: UILayer): void
     hideUILayer(layer: UILayer): void
     showUILayer(layer: UILayer): void
+    isUIInLayer(uiInstance: GObject|Node, layer: UILayer): boolean
 }
 
 
