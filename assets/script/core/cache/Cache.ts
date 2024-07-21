@@ -20,13 +20,11 @@ export enum CacheType {
  * 抽象缓存类
  */
 export abstract class Cache implements ICache {
-    protected type: CacheType;
-    protected data: any;
+    protected type: CacheType = CacheType.CLIENT;
     private flushTimer: number = null;
 
     constructor(type: CacheType = CacheType.CLIENT) {
         this.type = type;
-        this.data = null;
     }
 
     /**
@@ -118,7 +116,7 @@ export abstract class Cache implements ICache {
      * 保存到客户端
      */
     protected saveToClient(flush: boolean): void {
-        StorageManager.getInstance().setItem(this.getKey(), this.data);
+        StorageManager.getInstance().setItem(this.getKey(), this.getData());
     }
 
     /**

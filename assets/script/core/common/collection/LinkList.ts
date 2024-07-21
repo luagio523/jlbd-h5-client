@@ -268,31 +268,35 @@ export class TLinkList<T>
 
 
 export class DLinkListNode<T> {
-    prev: DLinkListNode<T> = null;
-    next: DLinkListNode<T> = null;
+    prev: DLinkListNode<T> | null = null;
+    next: DLinkListNode<T> | null = null;
     data: T;
+
     constructor(data: T) {
         this.data = data;
     }
 }
 
 export class DoublyLinkedList<T> {
-    protected _head: DLinkListNode<T> = null;
-    protected _tail: DLinkListNode<T> = null;
-    protected size: number = 0;
+    private _head: DLinkListNode<T> | null = null;
+    private _tail: DLinkListNode<T> | null = null;
+    private _size: number = 0;
 
-
-    public get head() {
-        return this._head
+    public get head(): DLinkListNode<T> | null {
+        return this._head;
     }
 
-    public get tail() {
-        return this._head
+    public get tail(): DLinkListNode<T> | null {
+        return this._tail;
+    }
+
+    public get size(): number {
+        return this._size;
     }
 
     // 向链表头部添加元素
-    unshift(data: T): void {
-        const newNode: DLinkListNode<T> = new DLinkListNode<T>(data);
+    public unshift(data: T): void {
+        const newNode = new DLinkListNode<T>(data);
         if (!this._head) {
             this._head = this._tail = newNode;
         } else {
@@ -300,26 +304,26 @@ export class DoublyLinkedList<T> {
             this._head.prev = newNode;
             this._head = newNode;
         }
-        this.size++;
+        this._size++;
     }
 
     // 从链表头部删除元素
-    shift(): T {
+    public shift(): T | null {
         if (!this._head) return null;
-        const data: T = this._head.data;
+        const data = this._head.data;
         this._head = this._head.next;
         if (this._head) {
             this._head.prev = null;
         } else {
             this._tail = null;
         }
-        this.size--;
+        this._size--;
         return data;
     }
 
     // 向链表尾部添加元素
-    push(data: T): DLinkListNode<T> {
-        const newNode: DLinkListNode<T> = new DLinkListNode<T>(data);
+    public push(data: T): DLinkListNode<T> {
+        const newNode = new DLinkListNode<T>(data);
         if (!this._tail) {
             this._head = this._tail = newNode;
         } else {
@@ -327,123 +331,135 @@ export class DoublyLinkedList<T> {
             this._tail.next = newNode;
             this._tail = newNode;
         }
-        this.size++;
-        return newNode
+        this._size++;
+        return newNode;
     }
 
     // 从链表尾部删除元素
-    pop(): T {
+    public pop(): T | null {
         if (!this._tail) return null;
-        const data: T = this._tail.data;
+        const data = this._tail.data;
         this._tail = this._tail.prev;
         if (this._tail) {
             this._tail.next = null;
         } else {
             this._head = null;
         }
-        this.size--;
+        this._size--;
         return data;
     }
 
-    
     // 插入到指定位置
-    insert(data: T, index: number): void {
-        if (index < 0 || index > this.size) {
+    public insert(data: T, index: number): void {
+        if (index < 0 || index > this._size) {
             throw new Error("Index out of bounds");
         }
         if (index === 0) {
             this.unshift(data);
-        } else if (index === this.size) {
+        } else if (index === this._size) {
             this.push(data);
         } else {
-            const newNode: DLinkListNode<T> = new DLinkListNode<T>(data);
+            const newNode = new DLinkListNode<T>(data);
             let current = this._head;
-            let i;
-            for (i = 0; i < index - 1; i++) {
-                current = current.next;
+            for (let i = 0; i < index - 1; i++) {
+                current = current!.next;
             }
-            newNode.next = current.next;
+            newNode.next = current!.next;
             newNode.prev = current;
-            current.next.prev = newNode;
-            current.next = newNode;
-            this.size++;
+            current!.next!.prev = newNode;
+            current!.next = newNode;
+            this._size++;
         }
     }
 
     // 删除指定位置的元素
-    remove(index: number): T {
-        if (index < 0 || index >= this.size) {
+    public remove(index: number): T | null {
+        if (index < 0 || index >= this._size) {
             throw new Error("Index out of bounds");
         }
-        let data: T;
         if (index === 0) {
-            data = this.shift();
-        } else if (index === this.size - 1) {
-            data = this.pop();
+            return this.shift();
+        } else if (index === this._size - 1) {
+            return this.pop();
         } else {
-            let current: DLinkListNode<T> = this._head;
-            let i;
-            for (i = 0; i < index; i++) {
-                current = current.next;
+            let current = this._head;
+            for (let i = 0; i < index; i++) {
+                current = current!.next;
             }
-            data = current.data;
-            current.prev.next = current.next;
-            current.next.prev = current.prev;
-            this.size--;
+            const data = current!.data;
+            current!.prev!.next = current!.next;
+            current!.next!.prev = current!.prev;
+            this._size--;
+            return data;
         }
-        return data;
     }
 
-
     // 删除特定节点值
-    removeValue(data: T): boolean {
-        let current: DLinkListNode<T> = this._head;
-        while (current != null) {
+    public removeValue(data: T): boolean {
+        let current = this._head;
+        while (current !== null) {
             if (current.data === data) {
-                // 如果删除头部节点
-                if (current == this._head) {
+                if (current === this._head) {
                     this.shift();
-                }
-                // 如果删除尾部节点
-                else if (current == this._tail) {
+                } else if (current === this._tail) {
                     this.pop();
-                } 
-                // 删除中间的节点
-                else {
-                    current.prev.next = current.next;
-                    current.next.prev = current.prev;
-                    this.size--;
+                } else {
+                    current.prev!.next = current.next;
+                    current.next!.prev = current.prev;
+                    this._size--;
                 }
                 return true;
             }
             current = current.next;
         }
-        return false; // 如果没有找到值返回false
+        return false;
     }
 
     // 删除特定节点
-    deleteNode(node: DLinkListNode<T>): T {
-        // 如果删除头部节点
+    public deleteNode(node: DLinkListNode<T>): T | null {
         if (node === this._head) {
             return this.shift();
-        }
-        // 如果删除尾部节点
-        else if (node === this._tail) {
+        } else if (node === this._tail) {
             return this.pop();
-        } 
-        // 删除中间的节点
-        else {
-            const data: T = node.data;
-            node.prev.next = node.next;
-            node.next.prev = node.prev;
-            this.size--;
+        } else {
+            const data = node.data;
+            node.prev!.next = node.next;
+            node.next!.prev = node.prev;
+            this._size--;
             return data;
         }
-      }
-   
-    
+    }
+
     // 获取链表大小
-    get length(): number {
-        return this.size;
+    public get length(): number {
+        return this._size;
+    }
+
+    // 清空链表
+    public clear(): void {
+        this._head = this._tail = null;
+        this._size = 0;
+    }
+
+    // 转换为数组
+    public toArray(): T[] {
+        const result: T[] = [];
+        let current = this._head;
+        while (current !== null) {
+            result.push(current.data);
+            current = current.next;
+        }
+        return result;
+    }
+
+    // 遍历链表
+    public forEach(callback: (value: T, index: number) => void): void {
+        let current = this._head;
+        let index = 0;
+        while (current !== null) {
+            callback(current.data, index);
+            current = current.next;
+            index++;
+        }
     }
 }

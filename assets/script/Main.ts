@@ -18,6 +18,7 @@ import { Facade } from './core/mvc/init';
 import { FairyGUIManager, FairyGuiResManager } from './core/ui/FairyGUIManager';
 import { GComponent, GRoot, UIPackage } from 'fairygui-cc';
 import { UIView, UI_CONFIG } from './config/UIConfig';
+import scheduler from './utils/scheduler';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -96,20 +97,37 @@ export class Main extends Root {
 
     public btnTestClick2() {
         console.log("btnTestClick2");
-        let instance = app.gui.get(UIView.CreateRole);
-        console.log(instance.position,instance.width,instance.height);
+        // let instance = app.gui.get(UIView.CreateRole);
+        // console.log(instance.position,instance.width,instance.height);
 
 
-        instance.makeFullScreen();
+        // instance.makeFullScreen();
+
+
+        let timer = scheduler.scheduleGlobal(() => {
+            console.log("scheduleGlobal23");            
+        }, 2);
+
+        console.log("scheduleGlobal",timer);
+
     }
 
     public btnTestClick() {
         app.facade.send(Notification.CREATEROLE_VIEW_SHOW, { name: "test" });
+
+
+
     }
    
     protected async test() {
 
         console.log(app.config.get("animation"));
+
+      
+        scheduler.scheduleGlobal(() => {
+            console.log("scheduleGlobal2");            
+        }, 2);
+
         
         
        

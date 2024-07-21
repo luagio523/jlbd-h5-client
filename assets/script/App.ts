@@ -6,7 +6,7 @@
  */
 
 import { oops } from "./core/Oops"
-import { HeapTimerMgr, ITimerMgr } from "./core/common/timer/TimerMgr"
+import {  ITimerMgr, LinkListTimerMgr,HeapTimerMgr } from "./core/common/timer/TimerMgr"
 import  { ConfigManager } from "./core/common/config/ConfigManager"
 import { AdaptionManager } from "./core/common/Adaption/AdaptionManager"
 import { Facade } from "./core/mvc/init"
@@ -38,7 +38,7 @@ export default class app extends oops{
     /** 对象池管理 */
     static pool:PoolManager = PoolManager.getInstance()
     /** 定时器 */
-    static timer:ITimerMgr = new HeapTimerMgr()
+    static timer:ITimerMgr = new LinkListTimerMgr()
     /** 本地参数 */
     static location:LocationManager = LocationManager.getInstance()
     /** SDK  */

@@ -51,7 +51,6 @@ export class UIManager {
         this.resManager = new FairyGuiResManager();
         this.toastManager = ToastManager.getInstance();
         this.alertManager = AlertManager.getInstance();
-        
         this.toastManager.initialize( this.layerManager);
         this.alertManager.initialize(this.layerManager);
         return this;

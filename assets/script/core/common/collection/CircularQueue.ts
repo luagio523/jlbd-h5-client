@@ -2,89 +2,102 @@
 
 
 export class CircularQueue<T> {
-    private queue: Array<T>;
+    private queue: Array<T | undefined>;
     private head: number;
     private tail: number;
-    private size: number;
+    private _size: number;
     private capacity: number;
 
-    constructor(capacity:number = 120) {
-        this.queue = new Array<T>(capacity);
-        this.head = -1;
-        this.tail = -1;
-        this.size = 0;
+    constructor(capacity: number = 120) {
+        if (capacity <= 0) {
+            throw new Error("Capacity must be a positive number");
+        }
+        this.queue = new Array<T | undefined>(capacity);
+        this.head = 0;
+        this.tail = 0;
+        this._size = 0;
         this.capacity = capacity;
     }
 
-    public getSize():number{
-        return this.size
+    public getSize(): number {
+        return this._size;
     }
     
     public enqueue(value: T): boolean {
         if (this.isFull()) {
-            this.resize(this.capacity * 2); // Resize on full
+            this.resize(this.capacity * 2);
         }
-        this.tail = (this.tail + 1) % this.capacity;
         this.queue[this.tail] = value;
-        if (this.head === -1) {
-            this.head = this.tail;
-        }
-        this.size++;
+        this.tail = (this.tail + 1) % this.capacity;
+        this._size++;
         return true;
     }
     
-    public dequeue(): T | null {
+    public dequeue(): T | undefined {
         if (this.isEmpty()) {
-            console.log("Queue is empty.");
-            return null;
+            return undefined;
         }
-        let result = this.queue[this.head];
+        const result = this.queue[this.head];
+        this.queue[this.head] = undefined; // Clear the reference
         this.head = (this.head + 1) % this.capacity;
-        this.size--;
-        if (this.isEmpty()) {
-            this.head = -1;
-            this.tail = -1;
+        this._size--;
+        return result;
+    }
+
+    public front(): T | undefined {
+        return this.isEmpty() ? undefined : this.queue[this.head];
+    }
+
+    public rear(): T | undefined {
+        return this.isEmpty() ? undefined : this.queue[(this.tail - 1 + this.capacity) % this.capacity];
+    }
+
+    public isEmpty(): boolean {
+        return this._size === 0;
+    }
+
+    public isFull(): boolean {
+        return this._size === this.capacity;
+    }
+
+    private resize(newCapacity: number): void {
+        if (newCapacity < this._size) {
+            throw new Error("New capacity is too small");
+        }
+        const newQueue = new Array<T | undefined>(newCapacity);
+        for (let i = 0; i < this._size; i++) {
+            newQueue[i] = this.queue[(this.head + i) % this.capacity];
+        }
+        this.queue = newQueue;
+        this.capacity = newCapacity;
+        this.head = 0;
+        this.tail = this._size;
+    }
+
+    public clear(): void {
+        this.queue = new Array<T | undefined>(this.capacity);
+        this.head = 0;
+        this.tail = 0;
+        this._size = 0;
+    }
+
+    public toArray(): T[] {
+        const result: T[] = [];
+        for (let i = 0; i < this._size; i++) {
+            const item = this.queue[(this.head + i) % this.capacity];
+            if (item !== undefined) {
+                result.push(item);
+            }
         }
         return result;
     }
 
-    public front(): T | null {
-        if (this.isEmpty()) {
-            return null;
+    public forEach(callback: (value: T, index: number) => void): void {
+        for (let i = 0; i < this._size; i++) {
+            const item = this.queue[(this.head + i) % this.capacity];
+            if (item !== undefined) {
+                callback(item, i);
+            }
         }
-        return this.queue[this.head];
     }
-
-    public rear(): T | null {
-        if (this.isEmpty()) {
-            return null;
-        }
-        return this.queue[this.tail];
-    }
-
-    public isEmpty(): boolean {
-        return this.size === 0;
-    }
-
-    public isFull(): boolean {
-        return this.size === this.capacity;
-    }
-
-    public resize(newCapacity: number): void {
-        let temp = new Array<T>(newCapacity);
-        for (let i = 0; i < this.size; i++) {
-            temp[i] = this.queue[(this.head + i) % this.capacity];
-        }
-        this.queue = temp;
-        this.capacity = newCapacity;
-        this.head = 0;
-        this.tail = this.size === newCapacity ? 0 : this.size - 1; 
-    }
-
-    public clear(): void {
-        this.queue = new Array<T>(this.capacity);
-        this.head = -1;
-        this.tail = -1;
-        this.size = 0;
-     }
 }

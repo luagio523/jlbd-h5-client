@@ -27,6 +27,7 @@ export default class RoleProxy extends BaseProxy {
 	}
 
 	public getRole(): any {
+		console.log("getRole",this.role.name)
 		return this.role	
 	}
 }

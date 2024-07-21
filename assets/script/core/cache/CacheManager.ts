@@ -35,6 +35,10 @@ export class CacheManager  {
      * @param interval 自动保存间隔（毫秒）
      */
     public registerCache(key: string, cache: ICache, interval?: number): void {
+        if (this.caches.has(key)) {
+            console.warn(`缓存 ${key} 已存在`);
+            return;
+        }
         this.caches.set(key, { cache, interval });
         cache.start(interval);//注册即开始
     }

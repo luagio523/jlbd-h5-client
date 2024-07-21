@@ -16,6 +16,6 @@ export default class RoleCache extends Cache{
         return this.proxy.getRole()
     }
     public getKey(): string {
-        throw this.proxy.name;
+        return this.proxy.name;
     }
 }

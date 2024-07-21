@@ -39,9 +39,9 @@ export class RoleActor extends BaseActor {
 		// 执行逻辑
 		console.log("RoleActor executeCreateRole",name)
 		const role = this.roleProxy.createRole(name)
-		// let cache = new RoleCache(this.roleProxy)
+		let cache = new RoleCache(this.roleProxy)
 		// app.cache.registerCache(cache.getKey(), cache,RoleCache.cacheInterval)
-
+		cache.save(true)
 	}
 
 	/*---------------------------------[models]------------------------------------*/
