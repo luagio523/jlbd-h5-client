@@ -19,6 +19,7 @@ export abstract class UIResBase<T> {
 
     constructor(config: IUIConfig) {
         this.config = config;
+        this.uiId = config.uiId;
         this.maxIdleTime = config.uiIdleTime ?? UIResBase.DefaultUIIdleTime;
         this.instanceList = [];
     }

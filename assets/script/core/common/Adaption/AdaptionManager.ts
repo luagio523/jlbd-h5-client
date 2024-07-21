@@ -137,15 +137,15 @@ export class AdaptionManager extends EventTarget {
 
     private adaptRootNodes(): void {
         this.rootNodes.forEach((anchorPoint, rootNode) => {
-            this.adaptRootNode(rootNode, anchorPoint);
+            this.adaptNode(rootNode, anchorPoint,this.safeArea);
         });
     }
 
-    public adaptRootNode(rootNode: Node, anchorPoint: UIPosition): void {
-        const uiTransform = rootNode.getComponent(UITransform);
+    public adaptNode(node: Node, anchorPoint: UIPosition,safeArea:Rect ): void {
+        const uiTransform = node.getComponent(UITransform);
         if (uiTransform) {
-            uiTransform.setContentSize(this.safeArea.width, this.safeArea.height);
-            this.setNodePositionByAnchor(rootNode, anchorPoint);
+            uiTransform.setContentSize(safeArea.width, safeArea.height);
+            this.setNodePositionByAnchor(node, anchorPoint,safeArea);
         }
     }
 
@@ -169,7 +169,7 @@ export class AdaptionManager extends EventTarget {
     // // 原点(0,0,0): 默认在场景中心
 
     //中心原点(0,0,0)坐标系
-    private setNodePositionByAnchor(node: Node, anchorPoint: UIPosition): void {
+    private setNodePositionByAnchor(node: Node, anchorPoint: UIPosition,safeArea:Rect ): void {
         let x = 0;
         let y = 0;
 
@@ -178,24 +178,22 @@ export class AdaptionManager extends EventTarget {
                 // Center is default (x, y)
                 break;
             case UIPosition.TopLeft:
-                x -= this.safeArea.width/2;
-                y += this.safeArea.height/2;
+                x -= safeArea.width/2;
+                y += safeArea.height/2;
                 break;
             case UIPosition.TopRight:
-                x += this.safeArea.width/2;
-                y += this.safeArea.height/2;
+                x += safeArea.width/2;
+                y += safeArea.height/2;
                 break;
             case UIPosition.BottomRight:
-                x += this.safeArea.width/2;
-                y -= this.safeArea.height/2;
+                x += safeArea.width/2;
+                y -= safeArea.height/2;
                 break;
             case UIPosition.BottomLeft:
-                x -= this.safeArea.width/2;
-                y -= this.safeArea.height/2;
+                x -= safeArea.width/2;
+                y -= safeArea.height/2;
                 break;
         }
-
-
         node.setPosition(new Vec3(x, y, 0));
         console.log(`${node.name} :set node position: ${anchorPoint}`, node.getPosition(),view.getResolutionPolicy());
     }
@@ -210,7 +208,7 @@ export class AdaptionManager extends EventTarget {
         }
         if (!this.rootNodes.has(node)) {
             this.rootNodes.set(node, anchorPoint);
-            this.adaptRootNode(node, anchorPoint);
+            this.adaptNode(node, anchorPoint,this.safeArea);
         }
     }
 

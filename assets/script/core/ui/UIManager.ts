@@ -1,4 +1,4 @@
-import { Camera, Node, assert, js, log } from "cc";
+import { Camera, Node, Rect, assert, js, log } from "cc";
 import {  IUIConfig } from "./UIConfig";
 import { ILayerManager, UILayer } from "./UILayer";
 import {IResManager  } from "./UIRes";
@@ -6,7 +6,7 @@ import { GComponent } from "fairygui-cc";
 import { FairyGUIManager, FairyGuiResManager } from "./FairyGUIManager";
 import { ToastManager } from "./ToastManager";
 import { AlertManager, AlertOptions } from "./AlertManager";
-
+import { AdaptionManager,UIPosition } from "../common/Adaption/AdaptionManager"
 
 // 
 export interface IViewMediator {
@@ -34,11 +34,15 @@ export class UIManager {
     private resManager!: IResManager<GComponent>;
     private toastManager!: ToastManager;
     private alertManager!: AlertManager;
+    private adaptionManager!: AdaptionManager;
 
     constructor(facade: IFacade) {
         this.uiInstances = new Map<string, any>();
         this.mediatorMap = new Map<string, any>();
         this.facade = facade;
+        this.adaptionManager.on("adaption-updated", (safeArea) => { // 屏幕适配更新事件
+            this.adaptForUI(safeArea);
+        })
     }
 
     public initialize(
@@ -54,10 +58,7 @@ export class UIManager {
         return this;
     }
 
-    protected async createUI(config: IUIConfig): Promise<any> {
-        assert(!!this.resManager, "Resource manager is not initialized");
-        return  this.resManager.create(config);
-    }
+  
     
     public alert(options: AlertOptions): void {
         this.alertManager!.showDialog(options);
@@ -75,7 +76,10 @@ export class UIManager {
         let uiInstance = this.uiInstances.get(uiId);
 
         if(mediator && uiInstance){
-            log(`UI instance already exists: ${uiId}`);
+            if(this.layerManager.isUIInLayer(uiInstance, config.uiLayer)){
+                log(`UI instance is already in layer: ${uiId}`);
+                return ;
+            }
             this.addUIToLayer(uiInstance, config.uiLayer);
             mediator.onOpen(params);
             return ;
@@ -139,7 +143,15 @@ export class UIManager {
     }
 
     public isOpen(uiId: string): boolean {
-        return this.uiInstances.has(uiId);
+        const config = this.UI_CONFIG[uiId];
+        if (!config) {
+            return false;
+        }
+        const uiInstance = this.uiInstances.get(uiId);
+        if (!uiInstance) {
+            return false;
+        }
+        return this.layerManager.isUIInLayer(uiInstance, config.uiLayer);
     }
 
     public closeAll(): void {
@@ -151,13 +163,24 @@ export class UIManager {
         this.layerManager.addToLayer(uiInstance, uiLayer);
     }
 
+    private async createUI(config: IUIConfig): Promise<any> {
+        assert(!!this.resManager, "Resource manager is not initialized");
+        return  this.resManager.create(config);
+    }
 
-    public adaptUI(): void {
+
+    /**
+     * 适配UI
+     * @param safeArea 
+     */
+    private adaptForUI(safeArea:Rect): void {
         this.uiInstances.forEach((uiInstance, uiId) => {
             const config = this.UI_CONFIG[uiId];
             if (config && (config.uiLayer === UILayer.BACKGROUND || config.uiLayer === UILayer.MAIN)) {
                 if (uiInstance instanceof GComponent) {
                     uiInstance.makeFullScreen();
+                } else if (uiInstance instanceof Node) {
+                    this.adaptionManager.adaptNode(uiInstance, UIPosition.Center,safeArea);
                 }
             }
         });

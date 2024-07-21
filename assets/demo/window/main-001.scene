@@ -100,7 +100,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 667,
-      "y": 319.89452736318407,
+      "y": 319.5488047808765,
       "z": 0
     },
     "_lrot": {
@@ -185,7 +185,7 @@
     "_priority": 1073741824,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 319.89452736318407,
+    "_orthoHeight": 319.5488047808765,
     "_near": 1,
     "_far": 2000,
     "_color": {
@@ -276,7 +276,7 @@
     "_priority": 65534,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 319.89452736318407,
+    "_orthoHeight": 319.5488047808765,
     "_near": 1,
     "_far": 2000,
     "_color": {
@@ -609,7 +609,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Button",
+    "_name": "btn_test2",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -1157,9 +1157,9 @@
     "_dstBlendFactor": 4,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
-      "b": 255,
+      "r": 230,
+      "g": 15,
+      "b": 118,
       "a": 255
     },
     "_spriteFrame": {
@@ -1347,7 +1347,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 1334,
-      "height": 639.7890547263681
+      "height": 639.097609561753
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1439,7 +1439,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 1334,
-      "height": 639.7890547263681
+      "height": 639.097609561753
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1521,7 +1521,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 667,
-      "y": 319.89452736318407,
+      "y": 319.5488047808765,
       "z": 0
     },
     "_lrot": {
@@ -1560,7 +1560,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 1334,
-      "height": 639.7890547263681
+      "height": 639.097609561753
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",

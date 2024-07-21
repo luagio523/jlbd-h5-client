@@ -99,13 +99,11 @@ export class Main extends Root {
         app.gui.initialize(UI_CONFIG);//初始化UI配置
 
         app.adaption.addRootNode(this.getGameNode(),UIPosition.BottomLeft) //游戏节点适配左下角
-        app.adaption.on("adaption-updated", () => { // 屏幕适配更新事件
-            app.gui.adaptUI();
-        })
+        
     }
 
     public btnTestClick2() {
-        console.log("btnTestClick2");
+        // console.log("btnTestClick2");
         // let instance = app.gui.get(UIView.CreateRole);
         // console.log(instance.position,instance.width,instance.height);
 
@@ -113,11 +111,13 @@ export class Main extends Root {
         // instance.makeFullScreen();
 
 
-        let timer = scheduler.scheduleGlobal(() => {
-            console.log("scheduleGlobal23");            
-        }, 2);
+        // let timer = scheduler.scheduleGlobal(() => {
+        //     console.log("scheduleGlobal23");            
+        // }, 2);
 
-        console.log("scheduleGlobal",timer);
+        // console.log("scheduleGlobal",timer);
+
+        app.gui.close(UIView.CreateRole);
 
     }
 
