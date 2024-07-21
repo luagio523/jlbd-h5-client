@@ -23,7 +23,7 @@ export class <%= name %>Actor extends BaseActor {
 
     /*---------------------------------[notices]------------------------------------*/
     <% for (var i = 0; i < events.length; i++) { %>
-    public execute<%= toPascalCase(events[i]) %>(args?: any) {
+    public execute<%= toPascalCase(events[i]) %>(...args: any) {
         // 执行逻辑
     }
     <% } %>

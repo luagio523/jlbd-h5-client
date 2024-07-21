@@ -34,9 +34,9 @@ export class RoleActor extends BaseActor {
 		app.gui.open(UIView.CreateRole,{name:"hhh"})
 	}
 
-	public executeCreateRole(name:string,tip:string) {
+	public executeCreateRole(name:string) {
 		// 执行逻辑
-		console.log("RoleActor executeCreateRole",name,tip)
+		console.log("RoleActor executeCreateRole",name)
 	}
 
 	/*---------------------------------[models]------------------------------------*/
