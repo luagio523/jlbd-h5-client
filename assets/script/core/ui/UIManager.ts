@@ -54,16 +54,10 @@ export class UIManager {
         return this;
     }
 
-    protected async loadUI(config: IUIConfig): Promise<any> {
+    protected async createUI(config: IUIConfig): Promise<any> {
         assert(!!this.resManager, "Resource manager is not initialized");
-        try {
-            return await this.resManager.load(config);
-        } catch (error) {
-            log(`Failed to load UI: ${config.uiId}`, error);
-            throw error;
-        }
+        return  this.resManager.create(config);
     }
-
     
     public alert(options: AlertOptions): void {
         this.alertManager!.showDialog(options);
@@ -88,7 +82,7 @@ export class UIManager {
         }
 
         try {
-            uiInstance = await this.loadUI(config);
+            uiInstance = await this.createUI(config);
             this.uiInstances.set(uiId, uiInstance);
 
             mediator = this.facade.registerMediator(config.mediatorClass) as IViewMediator;

@@ -97,7 +97,7 @@ export class CreatorResMgr  implements IResManager<Node> {
         }
     }
 
-    async load(config: IUIConfig): Promise<Node> {
+    async create(config: IUIConfig): Promise<Node> {
         if (!config.uiId || !config.resourcePath || !config.uiComponentName) {
             throw new Error("Invalid UI config provided.");
         }
@@ -124,12 +124,7 @@ export class CreatorResMgr  implements IResManager<Node> {
 
 
 class CreatorUIRes extends UIResBase<Node> {
-    protected cleanUI() {
-        this.instanceList.forEach((instance: Node) => {
-            instance.destroy();
-        });
-        this.instanceList = [];
-    }
+   
 
     protected release(config: IUIConfig) {
         this.instanceList.forEach((instance: Node) => {

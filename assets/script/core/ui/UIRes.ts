@@ -1,10 +1,8 @@
-import {  Node, Prefab, assetManager, instantiate, resources } from "cc";
-import {  IUIConfig,  } from "./UIConfig";
-import { sys } from "cc";
-import scheduler from "../../utils/scheduler";
+import {  IUIConfig } from "./UIConfig";
+import { log, sys } from "cc";
 
 export interface IResManager<T> {
-    load(config: IUIConfig): Promise<T>;
+    create(config: IUIConfig): Promise<T>;
     release(uiId: string, uiInstance: T): void;
 }
 
@@ -52,8 +50,9 @@ export abstract class UIResBase<T> {
         if (now - this.idleAt > this.maxIdleTime) {
             if (this.ref <= 0) {
                 this.release(this.config);
+                log(`UIResBase: UI instance idle time out, release ui instance: ${this.uiId}`);
+                return true;
             }
-            return true;
         }
         return false;
     }

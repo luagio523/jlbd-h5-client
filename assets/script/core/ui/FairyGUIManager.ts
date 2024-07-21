@@ -4,8 +4,6 @@ import { IUIConfig } from "./UIConfig";
 import { IResManager, UIResBase } from "./UIRes";
 import scheduler from "../../utils/scheduler";
 import { Node, sys } from "cc";
-import { UIManager } from "./UIManager";
-import { AdaptionManager } from "../common/Adaption/AdaptionManager";
 
 // private initFaiyGUI(){
     //UIConfig.defaultFont = 'Droid Sans Fallback';
@@ -182,20 +180,6 @@ export class FairyGUIManager implements ILayerManager {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export class FairyGuiResManager implements IResManager<GComponent> {
 
     private static instance: FairyGuiResManager;
@@ -223,7 +207,7 @@ export class FairyGuiResManager implements IResManager<GComponent> {
         }
     }
 
-    async load(config: IUIConfig): Promise<GComponent> {
+    async create(config: IUIConfig): Promise<GComponent> {
         if (!config.uiId || !config.resourcePath || !config.uiComponentName) {
             throw new Error("Invalid UI config provided.");
         }
