@@ -35,6 +35,8 @@ export class UIManager {
     private facade: IFacade;
     private UI_CONFIG!: { [uiId: string]: IUIConfig };
     private resManager!: IResManager<GComponent>;
+    private toastManager!: ToastManager;
+    private alertManager!: AlertManager;
 
     constructor(facade: IFacade) {
         this.uiInstances = new Map<string, any>();
@@ -47,9 +49,11 @@ export class UIManager {
         this.UI_CONFIG = configs;
         this.layerManager = new FairyGUIManager();
         this.resManager = new FairyGuiResManager();
+        this.toastManager = ToastManager.getInstance();
+        this.alertManager = AlertManager.getInstance();
         
-        ToastManager.getInstance().initialize( this.layerManager);
-        AlertManager.getInstance().initialize(this.layerManager);
+        this.toastManager.initialize( this.layerManager);
+        this.alertManager.initialize(this.layerManager);
         return this;
     }
 
@@ -65,11 +69,11 @@ export class UIManager {
 
     
     public alert(options: AlertOptions): void {
-        AlertManager.getInstance().showDialog(options);
+        this.alertManager!.showDialog(options);
     }
 
     public toast(message: string, duration: number = 2000): void {
-        ToastManager.getInstance().showToast(message, duration);
+        this.toastManager!.showToast(message, duration);
     }
 
     public async open(uiId: string, params?: any): Promise<void> {
