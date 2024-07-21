@@ -28,13 +28,15 @@ export class UIManager {
     public camera!: Camera;
     private mediatorMap: Map<string, any>; //uiId -> mediator 同时只有一个实例
     private uiInstances: Map<string, any>; // uiId -> uiInstance 同时只有一个实例
-    private layerManager!: ILayerManager;
-    private facade: IFacade;
-    private UI_CONFIG!: { [uiId: string]: IUIConfig };
-    private resManager!: IResManager<GComponent>;
-    private toastManager!: ToastManager;
-    private alertManager!: AlertManager;
-    private adaptionManager!: AdaptionManager;
+    
+    private UI_CONFIG!: { [uiId: string]: IUIConfig };// UI配置
+
+    private facade: IFacade; // facade模式
+    private layerManager!: ILayerManager; // 层管理器
+    private resManager!: IResManager<GComponent>; // 资源管理器
+    private toastManager!: ToastManager; // toast管理器
+    private alertManager!: AlertManager; // 弹窗管理器
+    private adaptionManager!: AdaptionManager;// 屏幕适配管理器
 
     constructor(facade: IFacade) {
         this.uiInstances = new Map<string, any>();
