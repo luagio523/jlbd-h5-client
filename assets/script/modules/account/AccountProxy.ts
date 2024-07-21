@@ -4,5 +4,5 @@ import { mvc } from "../../core/mvc/__private"
 
 @mvc.component("AccountProxy")
 export default class AccountProxy extends BaseProxy {
-	public static NAME = "Account"
+	public static NAME = "AccountProxy"
 }

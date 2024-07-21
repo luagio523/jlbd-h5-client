@@ -1,60 +1,45 @@
-
-/**
- * ViewModel类
- * 用于创建可观察的数据模型,支持对象和数组的观察
- */
 class ViewModel<T> {
     private _data: T;
-    private _listeners: Set<Function> = new Set();
+    private _listeners: Set<(data: T) => void> = new Set();
 
-    /**
-     * 添加监听器
-     * @param listener 监听函数
-     */
-    addListener(listener: Function): void {
+    addListener(listener: (data: T) => void): void {
         this._listeners.add(listener);
     }
 
-    /**
-     * 移除监听器
-     * @param rlistener 要移除的监听函数
-     */
-    removeListener(rlistener: Function): void {
+    removeListener(rlistener: (data: T) => void): void {
         this._listeners.delete(rlistener);
     }
 
-    /**
-     * 观察数据
-     * @param data 要观察的数据
-     * @returns 观察后的数据
-     */
-    observe(data: T): T {
+    observe(data: T, isNested: boolean = false): T {
+        if (!isNested) {
+            this._data = data;
+        }
+
         if (Array.isArray(data)) {
             return this.observeArray(data as unknown as any[]) as unknown as T;
         } else if (data !== null && typeof data === 'object') {
             return this.observeObject(data);
         }
-        this._data = data;
+
         return data;
     }
 
-    /**
-     * 观察对象
-     * @param obj 要观察的对象
-     * @returns 观察后的对象
-     */
     private observeObject(obj: T): T {
-        const onChange = () => this._listeners.forEach(listener => listener());
+        const onChange = () => this._listeners.forEach(listener => { 
+            console.log('changed', this._data, obj);
+            listener(this._data);
+        });
+
         const defineObservedProperty = (object: any, key: string, value: any) => {
             let observedValue = value;
             if (typeof value === 'object' && value !== null) {
-                observedValue = this.observe(value);
+                observedValue = this.observe(value, true);
             }
             Object.defineProperty(object, key, {
                 get: () => observedValue,
                 set: (newValue) => {
                     if (newValue !== observedValue) {
-                        observedValue = this.observe(newValue);
+                        observedValue = this.observe(newValue, true);
                         onChange();
                     }
                 },
@@ -65,6 +50,7 @@ class ViewModel<T> {
 
         (obj as any).addProperty = function(key: string, value: any) {
             defineObservedProperty(this, key, value);
+            onChange(); // 添加新属性时也触发变更
         };
 
         for (let key in obj) {
@@ -75,13 +61,8 @@ class ViewModel<T> {
         return obj;
     }
 
-    /**
-     * 观察数组
-     * @param arr 要观察的数组
-     * @returns 观察后的数组
-     */
     private observeArray(arr: any[]): any[] {
-        const onChange = () => this._listeners.forEach(listener => listener());
+        const onChange = () => this._listeners.forEach(listener => listener(this._data));
         const arrayProto = Object.create(Array.prototype);
 
         ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse', 'fill'].forEach((method) => {
@@ -101,20 +82,18 @@ class ViewModel<T> {
 
         arr.forEach((item, index) => {
             if (item !== null && typeof item === 'object') {
-                arr[index] = this.observe(item);
+                arr[index] = this.observe(item, true);
             }
         });
 
         return arr;
     }
 
-    /**
-     * 获取数据
-     */
     public get data(): T {
         return this._data;
     }
 }
+
 
 /**
  * ViewModelMgr类
@@ -154,9 +133,10 @@ export class ViewModelMgr<T> {
      * @param bindHandler 监听函数
      * @param isTrigger 是否立即触发
      */
-    public bind(bindName: string, bindHandler: Function, isTrigger: boolean = false): void {
+    public bind(bindName: string, bindHandler: (data: T) => void, isTrigger: boolean = false): void {
         let vm = this.dataMap.get(bindName);
         if (!vm) {
+            console.warn(`No ViewModel found for ${bindName}`);
             vm = this.addViewModel(bindName);
         }
         if (typeof bindHandler !== 'function') {
@@ -173,7 +153,7 @@ export class ViewModelMgr<T> {
      * @param bindName 绑定名
      * @param bindHandler 要解绑的监听函数
      */
-    public unbind(bindName: string, bindHandler: Function): void {
+    public unbind(bindName: string, bindHandler: (data: T) => void): void {
         const vm = this.dataMap.get(bindName);
         if (vm) {
             vm.removeListener(bindHandler);
@@ -190,6 +170,7 @@ export class ViewModelMgr<T> {
         return vm ? vm.data : undefined;
     }
 }
+
 
 
 

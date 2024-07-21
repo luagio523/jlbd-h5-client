@@ -9,6 +9,7 @@ import RoleProxy from "./RoleProxy"
 
 import CreateRoleMediator from "./CreateRoleMediator"
 import { mvc } from "../../core/mvc/__private"
+import RoleCache from "./RoleCache"
 // -- 遵守开发约定
 // -- 1. 模块之间必须通过事件来做交互，主要是界面的处理
 // -- 2. 只有模块中的 Actor 层才能调用 view 层的接口，其他层如 model、service、handler 等都不能
@@ -37,6 +38,10 @@ export class RoleActor extends BaseActor {
 	public executeCreateRole(name:string) {
 		// 执行逻辑
 		console.log("RoleActor executeCreateRole",name)
+		const role = this.roleProxy.createRole(name)
+		// let cache = new RoleCache(this.roleProxy)
+		// app.cache.registerCache(cache.getKey(), cache,RoleCache.cacheInterval)
+
 	}
 
 	/*---------------------------------[models]------------------------------------*/

@@ -34,7 +34,7 @@ export class CacheManager  {
      * @param cache 缓存实例
      * @param interval 自动保存间隔（毫秒）
      */
-    public registerCache(key: string, cache: ICache, interval: number): void {
+    public registerCache(key: string, cache: ICache, interval?: number): void {
         this.caches.set(key, { cache, interval });
         cache.start(interval);//注册即开始
     }

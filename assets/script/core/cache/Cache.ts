@@ -43,7 +43,7 @@ export abstract class Cache implements ICache {
     /**
      * 获取缓存键
      */
-    protected abstract getKey(): string;
+    public abstract getKey(): string;
 
     /**
      * 保存数据

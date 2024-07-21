@@ -44,7 +44,7 @@ export default class CreateRoleMediator extends BaseMediator {
 
     private onBtnCreateClick() {
         console.log("create role click");
-        this.send(Notification.CREATE_ROLE,this.inputName.text,"hello");
+        this.sendNotification(Notification.CREATE_ROLE,this.inputName.text,"hello");
     }
 
     private onBtnRollClick() {

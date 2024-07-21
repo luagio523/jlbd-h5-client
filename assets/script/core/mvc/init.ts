@@ -204,7 +204,7 @@ export class Facade {
 }
 
 export class Notifier {
-    send(name: string, ...args: any): void {
+    sendNotification(name: string, ...args: any): void {
         Facade.getInstance().send(name, ...args);
     }
 }
