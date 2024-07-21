@@ -40,8 +40,8 @@ export class RoleActor extends BaseActor {
 		console.log("RoleActor executeCreateRole",name)
 		const role = this.roleProxy.createRole(name)
 		let cache = new RoleCache(this.roleProxy)
-		// app.cache.registerCache(cache.getKey(), cache,RoleCache.cacheInterval)
-		cache.save(true)
+		app.cache.registerCache(cache.getKey(), cache,RoleCache.cacheInterval)
+		this.sendNotification(Notification.ENTER_WORLD, role)
 	}
 
 	/*---------------------------------[models]------------------------------------*/

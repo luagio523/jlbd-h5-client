@@ -64,8 +64,8 @@ export class CacheManager  {
      * 保存所有缓存
      * @param flush 是否立即刷新到存储
      */
-    public saveAll(flush: boolean): void {
-        this.caches.forEach(config => config.cache.save(flush));
+    public saveAll(): void {
+        this.caches.forEach(config => config.cache.save());
     }
 
     /**

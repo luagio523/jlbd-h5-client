@@ -21,6 +21,7 @@ import { PoolManager } from "./core/common/pool/PoolManager"
 import { HttpRequest } from "./core/network/HttpRequest"
 import { NetManager } from "./core/network/NetManager"
 import { CacheManager } from "./core/cache/CacheManager"
+import { SecureManager } from "./core/common/secure/SecureManager"
 
 
 export default class app extends oops{
@@ -31,6 +32,8 @@ export default class app extends oops{
     static random:RandomManager = RandomManager.getInstance();
     /** 本地存储 */
     static storage: StorageManager = StorageManager.getInstance();
+    /** 网络请求 */
+    static secure:SecureManager = SecureManager.getInstance();
     /** 屏幕适配 */
     static adaption:AdaptionManager = AdaptionManager.getInstance()
     /** 配置 */

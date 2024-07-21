@@ -1,4 +1,5 @@
 import scheduler from "../../utils/scheduler";
+import { SecureManager, SecureOptions } from "../common/secure/SecureManager";
 import { StorageManager } from "../common/storage/StorageManager";
 
 /**
@@ -6,7 +7,7 @@ import { StorageManager } from "../common/storage/StorageManager";
  */
 export interface ICache {
     load(): void; // 加载数据
-    save(flush: boolean): void; // 保存数据
+    save(): void; // 保存数据
     start(interval: number): void; // 开始自动保存
     stop(): void; // 停止自动保存
 }
@@ -45,15 +46,15 @@ export abstract class Cache implements ICache {
 
     /**
      * 保存数据
-     * @param flush 是否立即刷新到存储
+     * @param 
      */
-    public save(flush: boolean): void {
+    public save(): void {
         switch (this.type) {
             case CacheType.CLIENT:
-                this.saveToClient(flush);
+                this.saveToClient();
                 break;
             case CacheType.SERVER:
-                this.saveToServer(flush);
+                this.saveToServer();
                 break;
         }
     }
@@ -101,7 +102,10 @@ export abstract class Cache implements ICache {
      * 从客户端加载数据
      */
     protected loadFromClient(): any {
-        return StorageManager.getInstance().getItem(this.getKey());
+
+        return StorageManager.getInstance().getItem(this.getKey(),(decrypted: string) => {
+            return SecureManager.getInstance().unprocess(decrypted, SecureOptions.UseAES | SecureOptions.UseHash | SecureOptions.UseTimestamp | SecureOptions.UseBase64)
+        });
     }
 
     /**
@@ -115,14 +119,16 @@ export abstract class Cache implements ICache {
     /**
      * 保存到客户端
      */
-    protected saveToClient(flush: boolean): void {
-        StorageManager.getInstance().setItem(this.getKey(), this.getData());
+    protected saveToClient(): void {
+        StorageManager.getInstance().setItem(this.getKey(), this.getData(), (encrypted: string) => {
+            return SecureManager.getInstance().process(encrypted, SecureOptions.UseAES | SecureOptions.UseHash | SecureOptions.UseTimestamp | SecureOptions.UseBase64)
+        });
     }
 
     /**
      * 保存到服务器
      */
-    protected saveToServer(flush: boolean): void {
+    protected saveToServer(): void {
         // TODO: 实现保存到服务器的逻辑
     }
 }
