@@ -56,6 +56,8 @@ export default class app extends oops{
     static cache:CacheManager = CacheManager.getInstance()
      /** mvc facade */
     static facade:Facade = Facade.getInstance()
+
+   
 }
 
 

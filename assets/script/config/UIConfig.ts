@@ -5,6 +5,7 @@ import { IUIConfig } from "../core/ui/UIConfig";
 export enum UIView {
     Login = "Login",
     CreateRole = "CreateRole",
+    HeadUpDisplay = "HeadUpDisplay",
     Story = "Story",
     StoryGuide = "StoryGuide",
 }
@@ -15,7 +16,7 @@ export const UI_CONFIG: { [key in UIView]: IUIConfig } = {
         uiId: UIView.Login,
         uiLayer: UILayer.BACKGROUND,
         mediatorClass: "LoginMediator",
-        resourcePath: "res/Login",
+        resourcePath: "UI/Login",
     },
     [UIView.CreateRole]: {
         uiId: UIView.CreateRole,
@@ -23,6 +24,13 @@ export const UI_CONFIG: { [key in UIView]: IUIConfig } = {
         mediatorClass: "CreateRoleMediator",
         resourcePath: "UI/CreateRole",
         uiComponentName: "CreateRoleWin",
+    },
+    [UIView.HeadUpDisplay]: {
+        uiId: UIView.HeadUpDisplay,
+        uiLayer: UILayer.BACKGROUND,
+        mediatorClass: "CreateRoleMediator",
+        resourcePath: "UI/Battle",
+        uiComponentName: "BattlePanel",
     },
     [UIView.Story]: {
         uiId: UIView.Story,

@@ -35,7 +35,7 @@ export class MapVisualizer extends Node {
 		this.lastUpdatePosition.y = y;
 	}
 
-	public render(width: number, height: number, imgSize: number, mapName: string): void {
+	public initialize(width: number, height: number, imgSize: number, mapName: string): void {
 		app.log.logView({mapName,width, height,imgSize}, ``);
 
 		this.clear();

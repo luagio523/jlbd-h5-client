@@ -1,7 +1,7 @@
 import { Color, Graphics, Node, Rect, Vec2 } from "cc";
 
 
-export enum LayerType {
+export enum SLayerType {
     Map,
     Drop,
     Entity,
@@ -10,7 +10,7 @@ export enum LayerType {
 export class SceneManager {
     private static instance: SceneManager;
     private rootNode: Node;
-    private layers: Map<LayerType, Node> = new Map();
+    private layers: Map<SLayerType, Node> = new Map();
     private graphics: Graphics;
 
     private constructor() {}
@@ -22,33 +22,36 @@ export class SceneManager {
         return SceneManager.instance;
     }
 
-    public initLayers(root: Node): void {
+    public initialize(root: Node): void {
+        if (this.rootNode) {
+            return;
+        }
         this.rootNode = root;
-        this.createLayer(LayerType.Map);
-        this.createLayer(LayerType.Drop);
-        this.createLayer(LayerType.Entity);
+        this.createLayer(SLayerType.Map);
+        this.createLayer(SLayerType.Drop);
+        this.createLayer(SLayerType.Entity);
     }
 
-    private createLayer(type: LayerType): void {
+    private createLayer(type: SLayerType): void {
         const layer = new Node();
-        layer.name = LayerType[type];
+        layer.name = SLayerType[type];
         this.rootNode.addChild(layer);
         this.layers.set(type, layer);
     }
  
-    public addToLayer(type: LayerType, node: Node): void {
+    public addToLayer(type: SLayerType, node: Node): void {
         const layer = this.layers.get(type);
         if (layer) {
             layer.addChild(node);
         } else {
-            console.warn(`Layer ${LayerType[type]} not found`);
+            console.warn(`Layer ${SLayerType[type]} not found`);
         }
     }
 
     private getDrawGraphics(): Graphics {
         if (!this.graphics) {
             const node = new Node();
-            this.addToLayer(LayerType.Drop, node);
+            this.addToLayer(SLayerType.Drop, node);
             node.setSiblingIndex(1);
             this.graphics = node.addComponent(Graphics);
         }

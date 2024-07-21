@@ -36,12 +36,15 @@ export class RoleActor extends BaseActor {
 	}
 
 	public executeCreateRole(name:string) {
-		// 执行逻辑
 		console.log("RoleActor executeCreateRole",name)
-		const role = this.roleProxy.createRole(name)
+
+		const role = this.roleProxy.createRole(name) //创建角色
 		let cache = new RoleCache(this.roleProxy)
-		app.cache.registerCache(cache.getKey(), cache,RoleCache.cacheInterval)
-		this.sendNotification(Notification.ENTER_WORLD, role)
+		app.cache.registerCache(cache.getKey(), cache,RoleCache.cacheInterval) //注册缓存
+
+		this.sendNotification(Notification.ENTER_WORLD, role) //进入游戏世界
+
+		app.gui.close(UIView.CreateRole)//关闭创建角色界面
 	}
 
 	/*---------------------------------[models]------------------------------------*/

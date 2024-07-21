@@ -2,7 +2,7 @@ import { GButton, GComponent, GObject } from "fairygui-cc"
 import {  Button, Node } from "cc";
 
 export interface IUIAdapter<T = any> {
-    setView(view: T): void;
+    injectUI(ui: T): void;
     findChild<U extends T>(path: string): U | null;
     getUIChild<U extends T>(name: string): U | null;
     safeClick(target: string | T, callback: Function, thisArg?: any): void;
@@ -11,10 +11,10 @@ export interface IUIAdapter<T = any> {
 
 // FairyGUI 实现
 export class FairyUIAdapter implements IUIAdapter {
-    private view: GComponent;
+    private ui: GComponent;
 
-    setView(view: GComponent): void {
-        this.view = view;
+    injectUI(ui: GComponent): void {
+        this.ui = ui;
     }
 
     /**
@@ -23,7 +23,7 @@ export class FairyUIAdapter implements IUIAdapter {
      * @returns 找到的子节点或 null
      */
     public findChild<T extends GObject>(path: string): T | null {
-        const root = this.view;
+        const root = this.ui;
         if (!root || !path) {
             return null;
         }
@@ -51,7 +51,7 @@ export class FairyUIAdapter implements IUIAdapter {
      * @returns 找到的子节点或 null
      */
     public getUIChild<T extends GObject>(name: string): T | null {
-        return this.seekChild(this.view, name) as T;
+        return this.seekChild(this.ui, name) as T;
     }
 
     /**
@@ -114,10 +114,10 @@ export class FairyUIAdapter implements IUIAdapter {
 
 
 export class CreatorUIAdapter implements IUIAdapter {
-    private view: Node;
+    private ui: Node;
 
-    setView(view: Node): void {
-        this.view = view;
+    injectUI(ui: Node): void {
+        this.ui = ui;
     }
 
     /**
@@ -126,10 +126,10 @@ export class CreatorUIAdapter implements IUIAdapter {
      * @returns 找到的子节点或 null
      */
     public findChild<T extends Node>(path: string): T | null {
-        if (!this.view || !path) {
+        if (!this.ui || !path) {
             return null;
         }
-        const node = this.view.getChildByPath(path);
+        const node = this.ui.getChildByPath(path);
         return node as T;
     }
 
@@ -139,7 +139,7 @@ export class CreatorUIAdapter implements IUIAdapter {
      * @returns 找到的子节点或 null
      */
     public getUIChild<T extends Node>(name: string): T | null {
-        return this.view.getChildByName(name) as T;
+        return this.ui.getChildByName(name) as T;
     }
 
     /**

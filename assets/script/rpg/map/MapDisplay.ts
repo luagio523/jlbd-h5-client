@@ -22,13 +22,12 @@ export class MapDisplay extends Node {
 	    /**
      * 初始化地图层
      */
-    public init(gameMap: GameMap) {
+    public initialize(gameMap: GameMap) {
 		this.gameMap = gameMap;
         this.addChild(this.mapNode = new Node());
 		this.mapNode.addComponent(TiledMap)
         this.addChild(this.mapVisualizer = new MapVisualizer());
         this.trackLookAt = new TrackLookAt(0.2); // 每0.2秒检测下跟踪player
-
 		// this.mapVisualizer.active = true;
     }
 
@@ -59,21 +58,24 @@ export class MapDisplay extends Node {
 		// this.trackLookAt.lookAt(target, (callback) => this.syncViewWithTarget(target, 0.2, callback));
 	}
 
-	public changeMap(): void {
+	public changeMap(position?: Vec2): void {
 		log("Change map for");
-		this.off(Node.EventType.TRANSFORM_CHANGED);
 	
 		this.mapVisualizer.active = true;
 		this.mapNode.active = false;
 
+		this.off(Node.EventType.TRANSFORM_CHANGED);
 		this.on(Node.EventType.TRANSFORM_CHANGED, () => {
 			this.updateHDMap();
 		});
 		
-		this.calculateOffset();
-		this.adjustMapView();
-		this.updateMapImage(this.gameMap.getFileName());
-		// this.centerViewOnMap(); // 看向地图中心
+		this.adjustMapView(); // 调整地图偏差位置
+		this.updateMapVisualizer(this.gameMap.getFileName());
+		if (position) {
+			this.takeLookAt(position);//用户视野定位到指定位置
+		} else {
+			this.centerViewOnMap(); // 看向地图中心
+		}
 	}
 
 	private calculateOffset(): void {
@@ -84,6 +86,7 @@ export class MapDisplay extends Node {
 	}
 
 	private adjustMapView(): void {
+		this.calculateOffset();
 		if (this.mapVisualizer != null) {
 			this.mapVisualizer.setPosition(this.mapVisualizer.position.x, -this.offset.y);
 		}
@@ -94,9 +97,8 @@ export class MapDisplay extends Node {
 	}
 
 
-	private updateMapImage(mapName: string): void {
-		// this.mapVisualizer.setLastUpdate(this.position.x, this.position.y);
-		this.mapVisualizer.render(this.gameMap.maxWidth, this.gameMap.maxHeight, GameMap.IMG_SIZE, mapName);
+	private updateMapVisualizer(mapName: string): void {
+		this.mapVisualizer.initialize(this.gameMap.maxWidth, this.gameMap.maxHeight, GameMap.IMG_SIZE, mapName);
 		this.updateHDMap();
 	}
 

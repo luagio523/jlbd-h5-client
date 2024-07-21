@@ -2,7 +2,6 @@ import { BaseAbility } from "../ability/BaseAbility";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { ActType } from "../enum/Act";
 import { DamageFlag, DamageType } from "../enum/Damage";
-import { AttackType } from "../enum/Type";
 
 export interface IEvent {
     type: string;
@@ -40,7 +39,7 @@ export function ecsclass(name: string) {
 
 
 export class ApplyDamageEvent implements IEvent{
-    public readonly type = Event.ApplyDamage
+    public readonly type = RPGEvent.ApplyDamage
     constructor(
         public readonly attacker: ECSEntity,
         public readonly victim: ECSEntity,
@@ -53,7 +52,7 @@ export class ApplyDamageEvent implements IEvent{
 
 
 export class AttackEvent implements IEvent{
-    public readonly type = Event.ApplyDamage
+    public readonly type = RPGEvent.ApplyDamage
     constructor(
         public readonly attacker: ECSEntity,
         public readonly victim: ECSEntity,
@@ -63,7 +62,7 @@ export class AttackEvent implements IEvent{
 
 // 假设的 DelayedEvent 类，用于延迟执行事件
 export class DelayedEvent implements IEvent {
-    public readonly type = Event.Delayed
+    public readonly type = RPGEvent.Delayed
     constructor(
         public readonly  callback: () => void,
         public readonly  delay: number
@@ -71,7 +70,7 @@ export class DelayedEvent implements IEvent {
 }
 
 export class AnimationEvent implements IEvent {
-    public readonly type = Event.Animation
+    public readonly type = RPGEvent.Animation
     constructor(
         public readonly  attacker: ECSEntity,
         public readonly  act: ActType,
@@ -80,7 +79,7 @@ export class AnimationEvent implements IEvent {
 
 
 export class ProjectileEvent implements IEvent {
-    public readonly type = Event.Projectile
+    public readonly type = RPGEvent.Projectile
     constructor(
         public readonly  attacker: ECSEntity,
         public readonly  target: ECSEntity,
@@ -90,7 +89,7 @@ export class ProjectileEvent implements IEvent {
 
 
 export class CastAbilityEvent implements IEvent {
-    public readonly type = Event.AbilityStart
+    public readonly type = RPGEvent.AbilityStart
     constructor(
         public readonly  caster: ECSEntity,
         public readonly  ability: BaseAbility,
@@ -100,7 +99,7 @@ export class CastAbilityEvent implements IEvent {
 
 
 export class AbilityPhaseStartEvent implements IEvent {
-    public readonly type = Event.AbilityPhaseStart
+    public readonly type = RPGEvent.AbilityPhaseStart
     constructor(
         public readonly  caster: ECSEntity,
         public readonly  ability: BaseAbility,
@@ -108,7 +107,7 @@ export class AbilityPhaseStartEvent implements IEvent {
 }
 
 export class AbilityPhaseInterruptedEvent implements IEvent {
-    public readonly type = Event.AbilityPhaseInterrupted
+    public readonly type = RPGEvent.AbilityPhaseInterrupted
     constructor(
         public readonly  caster: ECSEntity,
         public readonly  ability: BaseAbility,
@@ -118,7 +117,7 @@ export class AbilityPhaseInterruptedEvent implements IEvent {
 
 
 export class AbilityStartEvent implements IEvent {
-    public readonly type = Event.AbilityStart
+    public readonly type = RPGEvent.AbilityStart
     constructor(
         public readonly  caster: ECSEntity,
         public readonly  ability: BaseAbility,
@@ -126,7 +125,7 @@ export class AbilityStartEvent implements IEvent {
 }
 
 export class AbilityEndEvent implements IEvent {
-    public readonly type = Event.AbilityEnd
+    public readonly type = RPGEvent.AbilityEnd
     constructor(
         public readonly  caster: ECSEntity,
         public readonly  ability: BaseAbility,
@@ -138,7 +137,7 @@ export class AbilityEndEvent implements IEvent {
 
 
 export class EnterMapEvent implements IEvent {
-    public readonly type = Event.EnterMap
+    public readonly type = RPGEvent.EnterMap
     constructor(
     ) {}
 }
@@ -146,7 +145,7 @@ export class EnterMapEvent implements IEvent {
 
 
 
-export  enum  Event {
+export  enum  RPGEvent {
     ApplyAttack = "ApplyAttack",
     ApplyDamage = "ApplyDamage",
     Delayed = "Delayed",

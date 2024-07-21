@@ -33,6 +33,15 @@ _module_configs["World"] = {
 	models: ["World"],
 }
 
+_module_configs["Game"] = {
+	events : [
+				"Enter_World","HeadUpDisplay_View_Show"
+				],
+	views :  ["HeadUpDisplay"],
+	models: [],
+}
+
+
 
 // // //登陆
 // _module_configs["Login"] = {

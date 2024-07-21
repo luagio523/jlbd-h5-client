@@ -1,4 +1,5 @@
 import { _decorator, Node, game, director, Vec3, Component } from 'cc';
+import { SceneManager } from '../../rpg/manager/SceneManager';
 const { ccclass } = _decorator;
 /** 游戏世界管理 */
 @ccclass('GameManager')
@@ -59,6 +60,9 @@ export class GameManager extends Component {
     /** 重启游戏 */
     public restartGame(): void {
         // director.loadScene(director.getScene().name);
+
+       
+
     }
 
     /** 添加节点到游戏根节点 */

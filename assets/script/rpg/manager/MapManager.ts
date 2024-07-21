@@ -1,16 +1,23 @@
-import { ImageAsset, Node, SpriteFrame, Texture2D, TiledMap, TiledMapAsset, assetManager, log, resources } from "cc";
+import { Node, TiledMap, TiledMapAsset, resources } from "cc";
 import { GameMap } from "../map/GameMap";
 import { MapDisplay } from "../map/MapDisplay";
 import { EnterMapEvent } from "../event/Event";
 import app from "../../App";
 import { EventDispatcher } from "../event/EventListenerManager";
+import { ColliderManager } from "./ColliderManager";
 
 export default class MapManager {
     private static instance: MapManager;
-    private gameMap: GameMap
-    private mapDisplay:MapDisplay
-    private eventDispatcher: EventDispatcher
+    private gameMap: GameMap;
+    private mapDisplay: MapDisplay;
+    private tiledMap: TiledMap;
+    private eventDispatcher: EventDispatcher;
 
+    private constructor() {
+        this.eventDispatcher = new EventDispatcher();
+        this.gameMap = new GameMap();
+        ColliderManager.getInstance().initialize(this.gameMap);
+    }
 
     public static getInstance(): MapManager {
         if (!MapManager.instance) {
@@ -19,87 +26,51 @@ export default class MapManager {
         return MapManager.instance;
     }
 
+    public getGameMap(): GameMap {
+        return this.gameMap;
+    }
 
-    public initMapDisplay(mapDisplay:MapDisplay):Node{
-        if(!this.gameMap){
-            this.eventDispatcher = new EventDispatcher();
-            this.gameMap = new GameMap();
-        }
+    public initMapDisplay(mapDisplay: MapDisplay): Node {
         this.mapDisplay = mapDisplay;
-        this.mapDisplay.init(this.gameMap)
+        this.mapDisplay.initialize(this.gameMap);
+        this.tiledMap = this.mapDisplay.getTiledMap();
         return this.mapDisplay;
     }
-    
-   
 
     public async enterMap(mapID: string): Promise<void> {
-        if(!this.mapDisplay){
-            console.error("should init map display first");
-            return;
+        app.log.logView({ mapID }, 'enterMap');
+        
+        if (!this.mapDisplay) {
+            throw new Error("Map display must be initialized first.");
         }
-        console.log(`enterMap map ${mapID}`); // TODO: load map
-        this.gameMap.changeMap(mapID);
 
-        const mapPath = this.gameMap.getMapPath();
         try {
+            this.gameMap.changeMap(mapID);
+            const mapPath = this.gameMap.getMapPath();
             const tiledMapAsset = await this.loadTiledMapAsset(mapPath);
-            let tiledMap: TiledMap = this.mapDisplay.getTiledMap();
-            tiledMap.tmxAsset = tiledMapAsset;
-            this.gameMap.initWithTiledMap(tiledMap);
+            
+            this.tiledMap.tmxAsset = tiledMapAsset;
+            this.gameMap.initWithTiledMap(this.tiledMap);
             this.eventDispatcher.trigger(new EnterMapEvent());
-
-            app.log.logView({mapID: mapID},'');
+            this.mapDisplay.changeMap();
         } catch (err) {
-            console.error("Error loading map:", err);
+            console.error("Error entering map:", err);
+            throw err; // 重新抛出错误，允许调用者处理
         }
     }
-
-    protected onComplete(): void {
-        // this.dispatchEvent(Event.MAP_DATA_INIT);
-    }
-
 
     private loadTiledMapAsset(mapPath: string): Promise<TiledMapAsset> {
-        app.log.logView({mapPath},'');
-
-
-
-
-
+        app.log.logView({ mapPath }, 'loadTiledMapAsset');
         
         return new Promise((resolve, reject) => {
             resources.load(mapPath, TiledMapAsset, (err, tiledMapAsset) => {
                 if (err) {
+                    console.error("Error loading TiledMapAsset:", err);
                     reject(err);
                 } else {
                     resolve(tiledMapAsset);
                 }
             });
-
-            app.log.logView({mapPath:mapPath},'loadTiledMapAsset');
-           
-
-
-
-            // assetManager.loadBundle(`map/map004/small`, ImageAsset,  (err, bundle)=> {
-            //     if (err != null) {
-            //         console.log(err);
-            //         return;
-            //     }
-            //     bundle.load(`map/map004/small`, SpriteFrame, (err, spFrame) => {
-            //         if (err != null) {
-            //             console.log(err);
-            //             return;
-            //         }
-            //         console.log(spFrame,"================================");
-            //     });
-            // });
-          
-
         });
     }
-
-   
-   
-
 }
