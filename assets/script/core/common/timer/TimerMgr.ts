@@ -236,8 +236,6 @@ export class HeapTimerMgr implements ITimerMgr {
 
     private processTimers(dt: number): void {
         while (this.shouldProcessNextTimer()) {
-
-            console.log("process next timer",dt);
             const taskTimer = this.heap.pop();
             if (!taskTimer) break;
 
@@ -247,11 +245,11 @@ export class HeapTimerMgr implements ITimerMgr {
                 continue;
             }
 
-
-            this.executeTimer(taskTimer, dt);
+            const elapsedSinceLastExecution = this.runTime - taskTimer.executeTime;
+            this.executeTimer(taskTimer, elapsedSinceLastExecution);
 
             if (this.shouldReinsertTimer(taskTimer)) {
-                this.reinsertTimer(taskTimer);
+                this.reinsertTimer(taskTimer, elapsedSinceLastExecution);
             } else {
                 this.recycleTimer(taskTimer);
             }
@@ -263,15 +261,9 @@ export class HeapTimerMgr implements ITimerMgr {
         return nextTimer !== undefined && this.runTime >= nextTimer.executeTime;
     }
 
-    private executeTimer(taskTimer: TaskTimer, dt: number): void {
-
-        console.log("execute timer", dt);
-
-        if (taskTimer.isUpdater || taskTimer.update(dt)) {
-
-           
-
-            taskTimer.cb?.(dt);
+    private executeTimer(taskTimer: TaskTimer, elapsedTime: number): void {
+        if (taskTimer.isUpdater || taskTimer.update(elapsedTime)) {
+            taskTimer.cb?.(elapsedTime);
         }
     }
 
@@ -279,11 +271,14 @@ export class HeapTimerMgr implements ITimerMgr {
         return !taskTimer.isUpdater && (taskTimer.repeat === 0 || taskTimer.times < taskTimer.repeat);
     }
 
-    private reinsertTimer(taskTimer: TaskTimer): void {
-        taskTimer.executeTime = this.runTime + taskTimer.interval;
+    private reinsertTimer(taskTimer: TaskTimer, elapsedTime: number): void {
+        // 计算下一次执行时间，考虑可能的多次间隔
+        const intervalsPassed = Math.floor(elapsedTime / taskTimer.interval);
+        taskTimer.executeTime += (intervalsPassed + 1) * taskTimer.interval;
         this.heap.insert(taskTimer);
     }
 
+    
     private recycleTimer(taskTimer: TaskTimer): void {
         this.timerIdMap.delete(taskTimer.key);
         if (this.pool.getSize() < this.maxPoolSize) {

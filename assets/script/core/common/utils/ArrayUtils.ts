@@ -6,6 +6,9 @@ import { MathUtil } from "./MathUtil";
 
  export class ArrayUtils {
 
+    
+   
+
     /**
 	 * 去除数组中 相同的元素
 	 */
@@ -48,13 +51,6 @@ import { MathUtil } from "./MathUtil";
     }
 
 
-    public static removeItem(list:Array<any>,item:any){
-        let index = list.indexOf(item)
-        if(index > -1){
-            list.slice(index,1)
-        }
-       
-    }
 
 
      /**
@@ -127,14 +123,10 @@ import { MathUtil } from "./MathUtil";
     }
 
     /** 删除数组中指定项 */
-    static removeItem(array: any[], item: any) {
-        var temp = array.concat();
-        for (let i = 0; i < temp.length; i++) {
-            const value = temp[i];
-            if (item == value) {
-                array.splice(i, 1);
-                break;
-            }
+    public static removeItem(list: Array<any>, item: any) {
+        let index = list.indexOf(item);
+        if (index > -1) {
+            list.splice(index, 1);
         }
     }
 

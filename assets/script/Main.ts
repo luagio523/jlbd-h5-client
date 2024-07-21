@@ -19,11 +19,20 @@ import { FairyGUIManager, FairyGuiResManager } from './core/ui/FairyGUIManager';
 import { GComponent, GRoot, UIPackage } from 'fairygui-cc';
 import { UIView, UI_CONFIG } from './config/UIConfig';
 import scheduler from './utils/scheduler';
+import { StorageManager } from './core/common/storage/StorageManager';
+import { SecureManager, SecureOptions } from './core/common/secure/SecureManager';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
 DynamicAtlasManager.instance.enabled = true;
 DynamicAtlasManager.instance.maxFrameSize = 512;
+
+interface User {
+    id: number;
+    name: string;
+    email: string;
+}
+
 
 @ccclass('Main')
 export class Main extends Root {
@@ -118,15 +127,36 @@ export class Main extends Root {
 
 
     }
+
+    
+    
    
     protected async test() {
 
         console.log(app.config.get("animation"));
 
       
-        scheduler.scheduleGlobal(() => {
-            console.log("scheduleGlobal2");            
-        }, 2);
+        const secureManager = SecureManager.getInstance();
+
+        // 使用所有安全特性
+        const fullSecureData = secureManager.process('Sensitive information', 
+            SecureOptions.UseAES | SecureOptions.UseHash | SecureOptions.UseTimestamp | SecureOptions.UseBase64);
+        console.log('Full secure:', fullSecureData);
+        
+        // 只使用 AES 加密和 Base64 编码
+        const simpleSecureData = secureManager.process('Sensitive information', 
+            SecureOptions.UseAES | SecureOptions.UseBase64);
+        console.log('Simple secure:', simpleSecureData);
+        
+        // 解密完全安全的数据
+        const decryptedFull = secureManager.unprocess(fullSecureData, 
+            SecureOptions.UseAES | SecureOptions.UseHash | SecureOptions.UseTimestamp | SecureOptions.UseBase64);
+        console.log('Decrypted full:', decryptedFull);
+        
+        // 解密简单安全的数据
+        const decryptedSimple = secureManager.unprocess(simpleSecureData, 
+            SecureOptions.UseAES | SecureOptions.UseBase64);
+        console.log('Decrypted simple:', decryptedSimple);
 
         
         
