@@ -8,14 +8,20 @@ const prettier = require('prettier');
 let MODULE_ROOT_PATH = "../../assets/script/modules/" //模块路径
 let GAME_MVC_ROOT_PATH = "../../assets/script/mvc/" //GameNotification路径
 
+
 function toPascalCase(str) {
-  // 首先分割字符串,但保留大写字母
+  // 首先将整个字符串转换为小写
+  str = str.toLowerCase();
+  // 首先分割字符串，但保留大写字母
   const words = str.split(/[_-]|\B(?=[A-Z])/);
+  
   // 然后处理每个单词
-  return words.map(word =>
-    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  return words.map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
   ).join('');
 }
+
+
 
 function readTemplate(templateName) {
   const templatePath = path.join(__dirname, 'templates', `${templateName}.tpl`);
@@ -118,7 +124,7 @@ async function updateActorFile(filePath, newConfig) {
         .filter(line => line !== '' && line !== ',' && !line.startsWith('//'))
         .map(line => line.replace(/,$/, '')); // Remove trailing commas
       
-      const newInterests = newEvents.map(event => `[Notification.${event}, this.execute${toPascalCase(event)}]`);
+      const newInterests = newEvents.map(event => `[Notification.${event.toUpperCase()}, this.execute${toPascalCase(event)}]`);
       const allInterests = existingInterests.concat(newInterests);
       const updatedInterests = allInterests.join(',\n\t\t\t');
       
@@ -226,7 +232,8 @@ async function generateTemplates(config, modulePath, mvcPath) {
   const modulesPath = path.join(mvcPath, 'modules.ts');
   await updateFile(modulesPath, modulesRendered);
 
-  const notificationRendered = template(notificationTemplate)({ events: allEvents });
+  const events =allEvents.map(event => event.toUpperCase()); // 转换为大写
+  const notificationRendered = template(notificationTemplate)({ events: events });
   const notificationPath = path.join(mvcPath, 'Notification.ts');
   await updateFile(notificationPath, notificationRendered);
 }

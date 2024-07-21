@@ -104,7 +104,7 @@ export class Main extends Root {
     }
 
     public btnTestClick() {
-        app.facade.send(Notification.CreateRole_View_show, { name: "test" });
+        app.facade.send(Notification.CREATEROLE_VIEW_SHOW, { name: "test" });
     }
    
     protected async test() {

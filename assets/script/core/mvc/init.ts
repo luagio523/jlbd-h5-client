@@ -1,4 +1,4 @@
-import { Component, js, log } from "cc";
+import { Component, debug, js, log } from "cc";
 import { mvc } from "./__private";
 
 
@@ -27,7 +27,7 @@ class Observer {
         this.context = context;
     }
 
-    notifyObserver(...args: any[]): void {
+    notifyObserver(...args: any): void {
         if (isFunction(this.action)) {
             this.action.apply(this.context, args);
         }
@@ -131,6 +131,8 @@ export class Facade {
     notifyObservers(eventName: string, ...args: any[]): void {
         validateEventName(eventName);
         const observers = this._observerMap[eventName];
+        // console.log(js.formatStr("Notifying observers for eventName: [%s]", eventName),this._observerMap);
+
         if (observers) {
             observers.forEach((observer) => observer.notifyObserver(...args));
         } else {
@@ -138,7 +140,8 @@ export class Facade {
         }
     }
 
-    send(eventName: string, ...args: any[]): void {
+    send(eventName: string, ...args: any): void {
+        debug(`Facade.send: ${eventName}`, args);
         this.notifyObservers(eventName, ...args);
     }
 
@@ -201,13 +204,13 @@ export class Facade {
 }
 
 export class Notifier {
-    send(name: string, body?: any): void {
-        Facade.getInstance().send(name, body);
+    send(name: string, ...args: any): void {
+        Facade.getInstance().send(name, ...args);
     }
 }
 
 export interface IActionHandler {
-    (...args: any[]): void;
+    (...args: any): void;
 }
 
 export class Actor extends Notifier {

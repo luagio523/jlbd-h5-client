@@ -11,7 +11,7 @@ _module_configs ={}
 
 _module_configs["Role"] = {
 	events : [
-				"CreateRole_View_show",
+				"CreateRole_View_Show","Create_Role"
 			],
 	views :  ["CreateRole",],
 }

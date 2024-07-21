@@ -15,6 +15,8 @@ export class StoryActor extends BaseActor {
 		return [
 			[Notification.PLOT_STEP, this.executePLOTSTEP],
 			[Notification.LOGIN, this.executeLOGIN],
+			[Notification.PLOT_STEP, this.executePlotStep],
+			[Notification.LOGIN, this.executeLogin],
 		]
 	}
 
@@ -23,6 +25,13 @@ export class StoryActor extends BaseActor {
 	}
 
 	/*---------------------------------[notices]------------------------------------*/
+	public executePlotStep(...args: any) {
+		// 执行逻辑
+	}
+
+	public executeLogin(...args: any) {
+		// 执行逻辑
+	}
 
 	public executePLOTSTEP(args?: any) {
 		// 执行逻辑

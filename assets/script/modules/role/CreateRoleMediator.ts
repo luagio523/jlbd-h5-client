@@ -6,6 +6,7 @@ import { NameGenerator } from "../../core/common/name/NameGenerator";
 import app from "../../App";
 import { GTextInput } from "fairygui-cc";
 import { mvc } from "../../core/mvc/__private";
+import { Notification } from "../../mvc/Notification";
 /** 
  * CreateRoleMediator 
  */ 
@@ -43,6 +44,7 @@ export default class CreateRoleMediator extends BaseMediator {
 
     private onBtnCreateClick() {
         console.log("create role click");
+        this.send(Notification.CREATE_ROLE,this.inputName.text,"hello");
     }
 
     private onBtnRollClick() {

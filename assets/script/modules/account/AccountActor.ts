@@ -13,7 +13,7 @@ import { mvc } from "../../core/mvc/__private"
 @mvc.component("AccountActor")
 export class AccountActor extends BaseActor {
 	public listInterests(): [string, IActionHandler][] {
-		return [[Notification.Login_View_Show, this.executeLoginViewShow]]
+		return [[Notification.LOGIN_VIEW_SHOW, this.executeLoginViewShow]]
 	}
 
 	public onRegister() {
