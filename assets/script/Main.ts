@@ -8,7 +8,6 @@ import { UIPosition } from './core/common/Adaption/AdaptionManager';
 import { MapDisplay } from './rpg/map/MapDisplay';
 import MapManager from './rpg/manager/MapManager';
 import { EventManager } from './rpg/event/EventListenerManager';
-import { Event } from './rpg/event/Event';
 import { AudioManager } from './core/common/audio/AudioManager';
 import { KVManager } from './rpg/manager/KVManager';
 import { Notification } from './mvc/Notification';
