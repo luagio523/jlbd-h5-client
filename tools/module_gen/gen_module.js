@@ -21,6 +21,10 @@ function toPascalCase(str) {
   ).join('');
 }
 
+function toUpperCase(str) {
+  // 首先将整个字符串转换为小写
+  return str.toUpperCase();
+}
 
 
 function readTemplate(templateName) {
@@ -87,7 +91,7 @@ async function updateFile(filePath, content) {
 async function updateActorFile(filePath, newConfig) {
   if (!fs.existsSync(filePath)) {
     // 如果文件不存在，直接创建新文件
-    const actorRendered = template(actorTemplate)({...newConfig, toPascalCase});
+    const actorRendered = template(actorTemplate)({...newConfig, toPascalCase,toUpperCase});
     await writeFileIfNotExists(filePath, actorRendered);
     return;
   }

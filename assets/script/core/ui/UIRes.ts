@@ -15,7 +15,7 @@ export abstract class UIResBase<T> {
     protected idleAt: number;
     protected ref:number = 0;
 
-    public static DefaultUIIdleTime = 1 * 60 * 1000  // 默认 UI 释放时间 1 分钟
+    public static DefaultUIIdleTime = 1 * 30 * 1000  // 默认 UI 释放时间 1 分钟
 
     constructor(config: IUIConfig) {
         this.config = config;
@@ -29,14 +29,27 @@ export abstract class UIResBase<T> {
             const instance = await this.createInstance(this.config);
             this.put(instance);
         }
-        this.ref ++;    
+        this.incrementRef(); 
+        console.log(`UIResBase: get ui instance: ${this.uiId}, ref: ${this.ref}`);
         return this.instanceList.pop()
     }
 
     public put(instance: T): void {
-        this.ref --;
+        this.decrementRef();
         this.instanceList.push(instance);
+        console.log(`UIResBase: put ui instance: ${this.uiId}, ref: ${this.ref}`);
+    }
 
+
+    private incrementRef(): void {
+        this.ref++;
+        // this.idleAt =  Number.MAX_SAFE_INTEGER;
+    }
+
+    private decrementRef(): void {
+        if (this.ref > 0) {
+            this.ref--;
+        }
         if(this.ref <= 0){//如果引用计数为0，则说明没有任何地方引用了，可以进行回收
             this.idleAt = sys.now() ;
         }
@@ -48,13 +61,15 @@ export abstract class UIResBase<T> {
     protected abstract createInstance(config: IUIConfig): Promise<T>;
 
     public checkIdle(now: number): boolean {
+        if(this.ref > 0){
+            return false;
+        }
         if (now - this.idleAt > this.maxIdleTime) {
-            if (this.ref <= 0) {
                 this.release(this.config);
                 log(`UIResBase: UI instance idle time out, release ui instance: ${this.uiId}`);
                 return true;
-            }
         }
         return false;
     }
+
 }

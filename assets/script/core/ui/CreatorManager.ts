@@ -114,11 +114,11 @@ export class CreatorResMgr  implements IResManager<Node> {
     }
    
     getUIRes(uiId:string ):CreatorUIRes{
-        return  this.resMap[uiId]
+        return  this.resMap.get(uiId)
     }
 
     release(uiId:string,uiInstance:Node):void{
-        this.getUIRes(uiId)?.put(uiInstance)
+        this.resMap.get(uiId)?.put(uiInstance)
     }
 }
 

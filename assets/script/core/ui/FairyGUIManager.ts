@@ -224,11 +224,11 @@ export class FairyGuiResManager implements IResManager<GComponent> {
     }
    
     getUIRes(uiId:string ):FairyGuiUIRes{
-        return  this.resMap[uiId]
+        return  this.resMap.get(uiId)
     }
 
     release(uiId:string,uiInstance:GComponent):void{
-        this.getUIRes(uiId)?.put(uiInstance)
+        this.resMap.get(uiId)?.put(uiInstance)
     }
 }
 

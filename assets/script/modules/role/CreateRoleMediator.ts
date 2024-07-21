@@ -26,10 +26,9 @@ export default class CreateRoleMediator extends BaseMediator {
     protected  onInitialize(): void { 
         // 初始化逻辑 
         // 例如：设置UI元素的初始状态，添加事件监听器等 
-
-        this.safeClick("btn_create", this.onBtnCreateClick, this);
-        this.safeClick("btn_roll", this.onBtnRollClick, this);
-
+        this.inputName = this.viewAdapter.findChild<GTextInput>("input_name") ;
+        this.viewAdapter.safeClick("btn_create", this.onBtnCreateClick, this);
+        this.viewAdapter.safeClick("btn_roll", this.onBtnRollClick, this);
 
         app.config.loadSingle("name_generator").then(()=>{
             let nameGeneratorConfig = app.config.get("name_generator");
@@ -37,8 +36,6 @@ export default class CreateRoleMediator extends BaseMediator {
                 this.nameGenerator.initialize(nameGeneratorConfig);
             }
         })
-      
-        this.inputName = <GTextInput>this.findChild("input_name") ;
 
     } 
 

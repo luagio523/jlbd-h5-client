@@ -12,7 +12,7 @@ import { mvc } from "../../core/mvc/__private";
 export class <%= name %>Actor extends BaseActor {
     public listInterests(): [string, IActionHandler][] {
         return [
-            <% for (var i = 0; i < events.length; i++) { %>[Notification.<%= events[i] %>, this.execute<%= toPascalCase(events[i]) %>],
+            <% for (var i = 0; i < events.length; i++) { %>[Notification.<%= toUpperCase(events[i]) %>, this.execute<%= toPascalCase(events[i]) %>],
             <% } %>
         ];
     }

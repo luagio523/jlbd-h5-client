@@ -7,9 +7,9 @@ function isFunction(value: unknown): value is Function {
     return typeof value === 'function';
 }
 
-function validateEventName(eventName: string): void {
+function validateEventName(eventName: string,tag:string=''): void {
     if (typeof eventName !== 'string' || eventName.trim() === '') {
-        throw new Error('Event name must be a non-empty string');
+        throw new Error(`Event name must be a non-empty string,tag:${tag}`);
     }
 }
 
@@ -94,7 +94,7 @@ export class Facade {
         this._mediatorMap[mediatorName] = mediator;
         const interests = mediator.listInterests();
         interests.forEach(([eventName, action]) => {
-            validateEventName(eventName);
+            validateEventName(eventName,mediatorName);
             if (!isFunction(action)) {
                 throw new Error(`Action is not a function for event: ${eventName}`);
             }
@@ -123,25 +123,22 @@ export class Facade {
     }
 
     registerObserver(eventName: string, observer: Observer): void {
-        validateEventName(eventName);
         this._observerMap[eventName] = this._observerMap[eventName] ?? [];
         this._observerMap[eventName].push(observer);
     }
 
     notifyObservers(eventName: string, ...args: any[]): void {
-        validateEventName(eventName);
         const observers = this._observerMap[eventName];
         // console.log(js.formatStr("Notifying observers for eventName: [%s]", eventName),this._observerMap);
-
         if (observers) {
             observers.forEach((observer) => observer.notifyObserver(...args));
         } else {
-            log(js.formatStr("Cannot find observers for eventName: [%s]", eventName));
+            log(`cannot find observers for event: ${eventName}`)
         }
     }
 
     send(eventName: string, ...args: any): void {
-        debug(`Facade.send: ${eventName}`, args);
+        log(`Facade.send: ${eventName}`, args);
         this.notifyObservers(eventName, ...args);
     }
 
@@ -164,7 +161,7 @@ export class Facade {
         actor.onRegister();
         const interests = actor.listInterests();
         interests.forEach(([eventName, action]) => {
-            validateEventName(eventName);
+            validateEventName(eventName,moduleName);
             if (!isFunction(action)) {
                 throw new Error(`Action is not a function for event: ${eventName}`);
             }
@@ -244,7 +241,6 @@ export class Event extends Component { }
 
 export class Mediator extends Notifier {
     protected mediatorName: string;
-    protected viewComponent: any;
 
     onRegister(): void { }
 

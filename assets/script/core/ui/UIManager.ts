@@ -42,9 +42,7 @@ export class UIManager {
         this.uiInstances = new Map<string, any>();
         this.mediatorMap = new Map<string, any>();
         this.facade = facade;
-        this.adaptionManager.on("adaption-updated", (safeArea) => { // 屏幕适配更新事件
-            this.adaptForUI(safeArea);
-        })
+        
     }
 
     public initialize(
@@ -57,6 +55,11 @@ export class UIManager {
         this.alertManager = AlertManager.getInstance();
         this.toastManager.initialize( this.layerManager);
         this.alertManager.initialize(this.layerManager);
+        this.adaptionManager = AdaptionManager.getInstance();
+        this.adaptionManager.on("adaption-updated", (safeArea) => { // 屏幕适配更新事件
+            this.adaptForUI(safeArea);
+        })
+
         return this;
     }
 

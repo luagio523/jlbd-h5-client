@@ -24,6 +24,16 @@ _module_configs["Account"] = {
 	models: ["Account"],
 }
 
+
+_module_configs["World"] = {
+	events : [
+				"Enter_World",
+				],
+	views :  [],
+	models: ["World"],
+}
+
+
 // // //登陆
 // _module_configs["Login"] = {
 //     events : [

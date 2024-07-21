@@ -122,7 +122,7 @@ export class ConfigManager extends Component {
         if (asset instanceof JsonAsset) {
             this.configs.set(asset.name, asset.json);
         } else {
-            log(`Unsupported asset type: ${asset.constructor.name}`);
+            // log(`Unsupported asset type: ${asset.constructor.name}`);
         }
     }
 
