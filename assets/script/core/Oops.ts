@@ -9,9 +9,9 @@ import { AudioManager } from "./common/audio/AudioManager";
 import { ResLoader } from "./common/loader/ResLoader";
 import { Logger } from "./common/log/Logger";
 import { GameManager } from "./game/GameManager";
-import { ViewModelMgr } from "./vm/vm";
 import { UIManager } from "./ui/UIManager";
 import { GameTime  } from "./common/timer/GameTime";
+import { VMManager } from "./vm/VMManager";
 
 
 /** 框架核心模块访问入口 */
@@ -32,7 +32,7 @@ export class oops {
     /** ----------可选模块---------- */
    
     /** 数据绑定管理 */
-    static vm = new ViewModelMgr;
+    static vm = new VMManager();
     /**
      * 游戏时间
      */
