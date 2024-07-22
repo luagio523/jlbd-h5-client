@@ -28,7 +28,7 @@ export const UI_CONFIG: { [key in UIView]: IUIConfig } = {
     [UIView.HeadUpDisplay]: {
         uiId: UIView.HeadUpDisplay,
         uiLayer: UILayer.BACKGROUND,
-        mediatorClass: "CreateRoleMediator",
+        mediatorClass: "HeadUpDisplayMediator",
         resourcePath: "UI/Battle",
         uiComponentName: "BattlePanel",
     },

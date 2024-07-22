@@ -2,11 +2,16 @@ import { _decorator } from "cc"
 import BaseMediator from "../../mvc/BaseMediator"
 import { IActionHandler } from "../../core/mvc/init"
 import { mvc } from "../../core/mvc/__private"
+import { GComponent } from "fairygui-cc"
+import { Joystick } from "./Joystick"
 /**
  * HeadUpDisplayMediator
  */
 @mvc.component("HeadUpDisplayMediator")
 export default class HeadUpDisplayMediator extends BaseMediator {
+	private joystick: Joystick = null
+
+
 	public listInterests(): [string, IActionHandler][] {
 		return [
 			// 在这里添加感兴趣的事件和对应的处理函数
@@ -15,8 +20,12 @@ export default class HeadUpDisplayMediator extends BaseMediator {
 	}
 
 	protected onInitialize(): void {
+		console.log("HeadUpDisplayMediator onInitialize")
 		// 初始化逻辑
 		// 例如：设置UI元素的初始状态，添加事件监听器等
+		const cptHand = this.viewAdapter.findChild<GComponent>("cpt_hand");
+		this.joystick = new Joystick();
+		this.joystick.injectUI(cptHand)
 	}
 
 	protected onOpen(params: any): void {
