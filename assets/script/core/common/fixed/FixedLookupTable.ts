@@ -27,8 +27,8 @@ export class FixedLookupTable {
     }
 
     public lookup(input: FixedPoint): FixedPoint {
-        if (input.lessThanOrEqual(this.minInput)) return this.table[0];
-        if (input.greaterThanOrEqual(this.maxInput)) return this.table[this.size - 1];
+        if (input.lte(this.minInput)) return this.table[0];
+        if (input.gte(this.maxInput)) return this.table[this.size - 1];
 
         const normalizedInput = input.sub(this.minInput).div(this.inputRange);
         const index = Math.min(Math.floor(normalizedInput.toNumber() * this.size), this.size - 1);
@@ -36,8 +36,8 @@ export class FixedLookupTable {
     }
 
     public lookupInterpolated(input: FixedPoint): FixedPoint {
-        if (input.lessThanOrEqual(this.minInput)) return this.table[0];
-        if (input.greaterThanOrEqual(this.maxInput)) return this.table[this.size - 1];
+        if (input.lte(this.minInput)) return this.table[0];
+        if (input.gte(this.maxInput)) return this.table[this.size - 1];
 
         const normalizedInput = input.sub(this.minInput).div(this.inputRange);
         const indexFloat = normalizedInput.toNumber() * (this.size - 1);
@@ -57,4 +57,8 @@ export class FixedLookupTable {
         // 插值
         return value1.mul(FixedPoint.ONE_FIXED.sub(fraction)).add(value2.mul(fraction));
     }
+
+
+
+    
 }

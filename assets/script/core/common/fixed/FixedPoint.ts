@@ -24,6 +24,17 @@ export class FixedPoint {
     toString(): string {
         return (this.rawValue / FixedPoint.ONE).toFixed(4);
     }
+    isZero(): boolean {
+        return this.rawValue === 0;
+    }
+
+    isOne(): boolean {
+        return this.rawValue === FixedPoint.ONE;
+    }
+
+    isNegative(): boolean {
+        return this.rawValue <0;
+    }
 
     clone(): FixedPoint {
         return new FixedPoint(this.rawValue);
@@ -33,19 +44,19 @@ export class FixedPoint {
         return this.rawValue === other.rawValue;
     }
 
-    lessThan(other: FixedPoint): boolean {
+    lt(other: FixedPoint): boolean {
         return this.rawValue < other.rawValue;
     }
 
-    greaterThan(other: FixedPoint): boolean {
+    gt(other: FixedPoint): boolean {
         return this.rawValue > other.rawValue;
     }
 
-    lessThanOrEqual(other: FixedPoint): boolean {
+    lte(other: FixedPoint): boolean {
         return this.rawValue <= other.rawValue;
     }
 
-    greaterThanOrEqual(other: FixedPoint): boolean {
+    gte(other: FixedPoint): boolean {
         return this.rawValue >= other.rawValue;
     }
 

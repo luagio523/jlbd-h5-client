@@ -10,6 +10,8 @@ export class FixedTrigLookupTables {
     private readonly tanTable: FixedLookupTable;
     private readonly asinTable: FixedLookupTable;
     private readonly atanTable: FixedLookupTable;
+    private readonly atan2Table: FixedLookupTable;
+    private readonly atan2QuadrantTable: FixedLookupTable;
 
     private constructor() {
         this.sinTable = new FixedLookupTable(
@@ -39,6 +41,23 @@ export class FixedTrigLookupTables {
             FixedPoint.fromNumber(10),
             (value) => FixedPoint.fromNumber(Math.atan(value.toNumber()))
         );
+
+
+        
+        this.atan2Table = new FixedLookupTable(
+            FixedTrigLookupTables.TABLE_SIZE,
+            FixedPoint.ZERO,
+            FixedPoint.fromNumber(1),
+            (value) => FixedPoint.fromNumber(Math.atan(value.toNumber()))
+        );
+
+        this.atan2QuadrantTable = new FixedLookupTable(
+            4,
+            FixedPoint.ZERO,
+            FixedPoint.fromNumber(3),
+            (value) => FixedPoint.fromNumber(value.toNumber() * Math.PI / 2)
+        );
+        
     }
 
     public static getInstance(): FixedTrigLookupTables {
@@ -93,37 +112,72 @@ export class FixedTrigLookupTables {
         return this.atanTable.lookupInterpolated(value);
     }
 
+    // public atan2(y: FixedPoint, x: FixedPoint): FixedPoint {
+    //     if (x.rawValue === 0) {
+    //         return y.rawValue > 0 ? FixedPoint.PI.div(FixedPoint.fromNumber(2))
+    //             : y.rawValue < 0 ? FixedPoint.PI.div(FixedPoint.fromNumber(-2))
+    //             : FixedPoint.ZERO;
+    //     }
+
+    //     const abs_y = y.abs();
+    //     let angle: FixedPoint;
+
+    //     if (x.rawValue >= 0) {
+    //         const r = x.sub(abs_y).div(x.add(abs_y));
+    //         // angle = FixedPoint.PI.div(FixedPoint.fromNumber(4)).sub(
+    //         //     r.mul(FixedPoint.fromNumber(0.98279372324732906))
+    //         // );
+    //         angle = this.atan(r);
+    //     } else {
+    //         const r = x.add(abs_y).div(abs_y.sub(x));
+    //         // angle = FixedPoint.PI.mul(FixedPoint.fromNumber(3/4)).sub(
+    //         //     r.mul(FixedPoint.fromNumber(0.98279372324732906))
+    //         // );
+    //         angle = this.atan(r);
+    //         angle = FixedTrigLookupTables.PI.sub(angle);
+    //     }
+
+    //     return y.rawValue < 0 ? angle.negate() : angle;
+    // }
+
+
     public atan2(y: FixedPoint, x: FixedPoint): FixedPoint {
-        if (x.rawValue === 0) {
-            return y.rawValue > 0 ? FixedPoint.PI.div(FixedPoint.fromNumber(2))
-                : y.rawValue < 0 ? FixedPoint.PI.div(FixedPoint.fromNumber(-2))
-                : FixedPoint.ZERO;
+        if(x.equals(FixedPoint.ZERO) && y.equals(FixedPoint.ZERO)) {
+            return FixedPoint.ZERO; // 未定义，但通常返回0
         }
-
-        const abs_y = y.abs();
-        let angle: FixedPoint;
-
-        if (x.rawValue >= 0) {
-            const r = x.sub(abs_y).div(x.add(abs_y));
-            // angle = FixedPoint.PI.div(FixedPoint.fromNumber(4)).sub(
-            //     r.mul(FixedPoint.fromNumber(0.98279372324732906))
-            // );
-            angle = this.atan(r);
+    
+        const absX = x.abs();
+        const absY = y.abs();
+    
+        let r: FixedPoint;
+        let quadrant: number;
+    
+        if (absX.gte(absY)) {
+            r = absY.div(absX);
+            quadrant = x.isNegative() ? 2 : 0;
         } else {
-            const r = x.add(abs_y).div(abs_y.sub(x));
-            // angle = FixedPoint.PI.mul(FixedPoint.fromNumber(3/4)).sub(
-            //     r.mul(FixedPoint.fromNumber(0.98279372324732906))
-            // );
-            angle = this.atan(r);
-            angle = FixedTrigLookupTables.PI.sub(angle);
+            r = absX.div(absY);
+            quadrant = 1;
         }
-
-        return y.rawValue < 0 ? angle.negate() : angle;
+    
+        if (y.isNegative()) {
+            quadrant = 3 - quadrant;
+        }
+    
+        let angle = this.atan2Table.lookupInterpolated(r);
+    
+        if (quadrant & 1) {
+            angle = FixedTrigLookupTables.PI.div(FixedPoint.fromNumber(2)).sub(angle);
+        }
+    
+        const quadrantAngle = this.atan2QuadrantTable.lookup(FixedPoint.fromNumber(quadrant));
+        angle = angle.add(quadrantAngle);
+    
+        if (angle.gt(FixedTrigLookupTables.PI)) {
+            angle = angle.sub(FixedPoint.TWO_PI);
+        }
+    
+        return angle;
     }
-
-
-
-    
-    
     
 }
