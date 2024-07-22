@@ -2,6 +2,7 @@ import { Vec2 } from "cc";
 import { Event, GButton, GComponent, GObject, GRoot, GTween, EaseType } from "fairygui-cc";
 import { FairyUIAdapter } from "../../core/ui/UIAdapter";
 import app from "../../App";
+import { TrigLookupTables } from "../../core/common/math/TrigLookupTables";
 
 export class Joystick extends FairyUIAdapter {
     public static readonly JOYSTICK_MOVE = "joystick_move";
@@ -122,4 +123,15 @@ export class Joystick extends FairyUIAdapter {
         if (angle < 0) angle += 360;
         return Math.round(angle * 254 / 360);
     }
+
+    // private getCompressedAngle(): number {
+    //     if (this.direction.x === 0 && this.direction.y === 0) {
+    //         return 255; // 特殊值表示中心位置
+    //     }
+    //     const trigTables = TrigLookupTables.getInstance();
+    //     const angle = trigTables.fastAtan2(this.direction.y, this.direction.x);
+    //     const normalizedAngle = angle < 0 ? angle + TrigLookupTables.TWO_PI : angle;
+    //     return Math.round(normalizedAngle * 254 / TrigLookupTables.TWO_PI);
+    // }
+    
 }
