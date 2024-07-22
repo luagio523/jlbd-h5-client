@@ -48,8 +48,13 @@ export class FixedLookupTable {
         const value1 = this.table[index1];
         const value2 = this.table[index2];
 
+        // 确保 value1 和 value2 都是有效的
+        if (!value1 || !value2) {
+            console.error('Invalid lookup table values', { index1, index2, tableSize: this.size });
+            return this.table[0]; // 返回一个默认值
+        }
+
         // 插值
         return value1.mul(FixedPoint.ONE_FIXED.sub(fraction)).add(value2.mul(fraction));
     }
 }
-

@@ -1,19 +1,19 @@
 export class FixedPoint {
-    private  static readonly FRACTION_BITS = 16;
-    private  static readonly ONE = 1 << FixedPoint.FRACTION_BITS;
-    private  static readonly HALF = FixedPoint.ONE >> 1;
-    private  static readonly MASK = FixedPoint.ONE - 1;
+    private static readonly FRACTION_BITS = 16;
+    private static readonly ONE = 1 << FixedPoint.FRACTION_BITS;
+    private static readonly HALF = FixedPoint.ONE >> 1;
+    private static readonly MASK = FixedPoint.ONE - 1;
 
-    public  static readonly ZERO = new FixedPoint(0);
-    public  static readonly ONE_FIXED = new FixedPoint(FixedPoint.ONE);
-    public  static readonly PI = new FixedPoint(Math.PI * FixedPoint.ONE);
-    public  static readonly TWO_PI = new FixedPoint(2 * Math.PI * FixedPoint.ONE);
+    public static readonly ZERO = new FixedPoint(0);
+    public static readonly ONE_FIXED = new FixedPoint(FixedPoint.ONE);
+    public static readonly PI = new FixedPoint(Math.PI * FixedPoint.ONE);
+    public static readonly TWO_PI = new FixedPoint(2 * Math.PI * FixedPoint.ONE);
 
     constructor(public rawValue: number) {
         this.rawValue = rawValue | 0;
     }
 
-    public static fromNumber(n: number): FixedPoint {
+    static fromNumber(n: number): FixedPoint {
         return new FixedPoint((n * FixedPoint.ONE) | 0);
     }
 
@@ -67,29 +67,87 @@ export class FixedPoint {
     }
 
     mul(other: FixedPoint): FixedPoint {
-        const result = Math.imul(this.rawValue, other.rawValue);
-        return new FixedPoint((result + FixedPoint.HALF) >> FixedPoint.FRACTION_BITS);
+        let positiveSign: boolean = true;
+        let aRawValue: number = this.rawValue;
+        let bRawValue: number = other.rawValue;
+        if (aRawValue < 0) {
+            aRawValue *= -1;
+            positiveSign = !positiveSign;
+        }
+        if (bRawValue < 0) {
+            bRawValue *= -1;
+            positiveSign = !positiveSign;
+        }
+        let aHi: number = aRawValue >> FixedPoint.FRACTION_BITS;
+        let aLo: number = aRawValue & 0x0000FFFF;
+        let bHi: number = bRawValue >> FixedPoint.FRACTION_BITS;
+        let bLo: number = bRawValue & 0x0000FFFF;
+        let sum: number = ((
+            ((Math.imul(aLo, bLo)) >>> FixedPoint.FRACTION_BITS) +
+            (Math.imul(aLo, bHi) | 0) +
+            (Math.imul(bLo, aHi) | 0) +
+            ((Math.imul(aHi, bHi)) << FixedPoint.FRACTION_BITS)
+        ) | 0);
+        if (!positiveSign) {
+            sum *= -1;
+        }
+        return new FixedPoint(sum);
     }
 
     div(other: FixedPoint): FixedPoint {
-        const result = (Math.abs(this.rawValue) << (FixedPoint.FRACTION_BITS + 1)) / Math.abs(other.rawValue);
-        const sign = ((this.rawValue ^ other.rawValue) >= 0) ? 1 : -1;
-        return new FixedPoint((result * sign) | 0);
+        let positiveSign: boolean = true;
+        let aRawValue: number = this.rawValue;
+        let bRawValue: number = other.rawValue;
+        if (aRawValue < 0) {
+            aRawValue *= -1;
+            positiveSign = !positiveSign;
+        }
+        if (bRawValue < 0) {
+            bRawValue *= -1;
+            positiveSign = !positiveSign;
+        }
+        let remainder: number = aRawValue >>> 0;
+        let divisor: number = bRawValue >>> 0;
+        let leftShift: number = FixedPoint.FRACTION_BITS;
+        let quotient: number = 0 >>> 0;
+        while (remainder > 0 && leftShift >= 0) {
+            let remainderShift: number = Math.clz32(remainder);
+            remainderShift = Math.min(remainderShift, leftShift);
+            remainder <<= remainderShift;
+            leftShift -= remainderShift;
+
+            let res: number = ((remainder >>> 0) / (divisor >>> 0)) >>> 0;
+            remainder = ((remainder >>> 0) % (divisor >>> 0)) >>> 0;
+            quotient += res << leftShift;
+
+            remainder <<= 1;
+            leftShift--;
+        }
+        quotient = quotient | 0;
+        if (!positiveSign) {
+            quotient *= -1;
+        }
+        return new FixedPoint(quotient | 0);
     }
 
     sqrt(): FixedPoint {
-        if (this.rawValue <= 0) {
-            return FixedPoint.ZERO;
+        let n: number = this.rawValue | 0;
+        let x: number = n | 0;
+        let c: number = 0 | 0;
+        let d: number = 1 << 30;
+        while ((d | 0) > (n | 0)) {
+            d >>= 2;
         }
-
-        let x = this.rawValue;
-        let y = (x + 1) >> 1;
-        while (y < x) {
-            x = y;
-            y = (x + (this.rawValue / x)) >> 1;
+        while ((d | 0) != 0) {
+            if ((x | 0) >= (((c | 0) + (d | 0)) | 0)) {
+                x = (x - (((c | 0) + (d | 0)) | 0)) | 0;
+                c = ((c >> 1) + (d | 0)) | 0;
+            } else {
+                c >>= 1;
+            }
+            d >>= 2;
         }
-
-        return new FixedPoint(x << (FixedPoint.FRACTION_BITS >> 1));
+        return new FixedPoint(c << (FixedPoint.FRACTION_BITS >> 1));
     }
 
     floor(): FixedPoint {
@@ -105,35 +163,35 @@ export class FixedPoint {
     }
 
     // Static methods for convenience
-    public static add(a: FixedPoint, b: FixedPoint): FixedPoint {
+    static add(a: FixedPoint, b: FixedPoint): FixedPoint {
         return a.add(b);
     }
 
-    public static sub(a: FixedPoint, b: FixedPoint): FixedPoint {
+    static sub(a: FixedPoint, b: FixedPoint): FixedPoint {
         return a.sub(b);
     }
 
-    public static mul(a: FixedPoint, b: FixedPoint): FixedPoint {
+    static mul(a: FixedPoint, b: FixedPoint): FixedPoint {
         return a.mul(b);
     }
 
-    public static div(a: FixedPoint, b: FixedPoint): FixedPoint {
+    static div(a: FixedPoint, b: FixedPoint): FixedPoint {
         return a.div(b);
     }
 
-    public static sqrt(a: FixedPoint): FixedPoint {
+    static sqrt(a: FixedPoint): FixedPoint {
         return a.sqrt();
     }
 
-    public static floor(a: FixedPoint): FixedPoint {
+    static floor(a: FixedPoint): FixedPoint {
         return a.floor();
     }
 
-    public static ceil(a: FixedPoint): FixedPoint {
+    static ceil(a: FixedPoint): FixedPoint {
         return a.ceil();
     }
 
-    public static round(a: FixedPoint): FixedPoint {
+    static round(a: FixedPoint): FixedPoint {
         return a.round();
     }
 }

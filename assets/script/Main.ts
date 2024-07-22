@@ -20,6 +20,7 @@ import { UIView, UI_CONFIG } from './config/UIConfig';
 import scheduler from './utils/scheduler';
 import { StorageManager } from './core/common/storage/StorageManager';
 import { SecureManager, SecureOptions } from './core/common/secure/SecureManager';
+import { testFixedPoint } from './core/common/fixed/fixed';
 const { ccclass, property } = _decorator;
 
 macro.CLEANUP_IMAGE_CACHE = false;
@@ -161,6 +162,7 @@ export class Main extends Root {
         console.log('Decrypted simple:', decryptedSimple);
 
         
+        testFixedPoint();
         
        
         // let display = new MapDisplay();
