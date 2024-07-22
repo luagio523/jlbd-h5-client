@@ -1340,7 +1340,7 @@
     "node": {
       "__id__": 31
     },
-    "_enabled": true,
+    "_enabled": false,
     "__prefab": {
       "__id__": 33
     },
@@ -1368,7 +1368,7 @@
     "node": {
       "__id__": 31
     },
-    "_enabled": true,
+    "_enabled": false,
     "__prefab": null,
     "_cameraComponent": {
       "__id__": 6
@@ -1384,7 +1384,7 @@
     "node": {
       "__id__": 31
     },
-    "_enabled": true,
+    "_enabled": false,
     "__prefab": null,
     "_alignFlags": 45,
     "_target": {

@@ -1,5 +1,5 @@
 import { Vec2 } from "cc";
-import { Event, GButton, GComponent, GObject, GRoot } from "fairygui-cc";
+import { Event, GButton, GComponent, GObject, GRoot, GTween, EaseType } from "fairygui-cc";
 import { FairyUIAdapter } from "../../core/ui/UIAdapter";
 import app from "../../App";
 
@@ -7,87 +7,110 @@ export class Joystick extends FairyUIAdapter {
     public static readonly JOYSTICK_MOVE = "joystick_move";
 
     private joystickBg: GObject;
-    private joystickHandle: GObject;
+    private joystickHandle: GButton;
     private radius: number;
     private validArea: GObject;
     private startPosition: Vec2 = new Vec2();
-    private touchId: number | null = null;
+    private touchId: number = -1;
     private direction: Vec2 = new Vec2();
     private lastSentAngle: number = -1;
+    private radiusSquared: number;
+    private tween: any = null;
 
     public injectUI(ui: GComponent): void {
         super.injectUI(ui)
 
-        console.log("Joystick injected", 1);
-
         this.validArea = this.getUIChild<GObject>("joystick_touch");
         this.joystickBg = this.getUIChild<GObject>("joystick_center");
         this.joystickHandle = this.getUIChild<GButton>("joystick");
-
-        this.radius = 100;
-
-        console.log("Joystick injected", this.validArea, this.joystickBg, this.joystickHandle);
+        this.joystickHandle.changeStateOnClick = false;
+        
+        this.radius = 90;
+        this.radiusSquared = this.radius * this.radius;
 
         this.validArea.on(Event.TOUCH_BEGIN, this.onTouchStart, this);
-        // this.validArea.on(Event.TOUCH_MOVE, this.onTouchMove, this);
+        this.validArea.on(Event.TOUCH_MOVE, this.onTouchMove, this);
         this.validArea.on(Event.TOUCH_END, this.onTouchEnd, this);
-        // this.validArea.on(Event.TOUCH_CANCEL, this.onTouchEnd, this);
-
-        GRoot.inst.on(Event.TOUCH_MOVE, this.onTouchMove, this);
-
     }
 
     private onTouchStart(event: Event) {
-        console.log(this.touchId,"Joystick start",event.touchId)
-        if (this.touchId === null) {
+        if (this.touchId === -1) {
+            // 取消当前的缓动
+            if (this.tween) {
+                this.tween.kill();
+                this.tween = null;
+            }
+
             this.touchId = event.touchId;
-            const touchPos = event.pos 
+            const touchPos = event.pos;
             this.startPosition.set(touchPos.x, touchPos.y);
             // 将背景中心点设置到点击位置
-            this.joystickBg.setPosition(touchPos.x, touchPos.y );
+            this.joystickBg.setPosition(touchPos.x, touchPos.y);
             this.joystickHandle.setPosition(touchPos.x, touchPos.y);
+            this.joystickHandle.selected = true;
+            event.captureTouch();
         }
     }
 
     private onTouchMove(event: Event) {
         if (this.touchId === event.touchId) {
             const touchPos = event.pos;
-            const offset = new Vec2(touchPos.x - this.startPosition.x, touchPos.y - this.startPosition.y);
-            const distance = Math.sqrt(offset.x * offset.x + offset.y * offset.y);
-
-            if (distance > this.radius) {
-                const angle = Math.atan2(offset.y, offset.x);
-                offset.x = Math.cos(angle) * this.radius;
-                offset.y = Math.sin(angle) * this.radius;
+            const offsetX = touchPos.x - this.startPosition.x;
+            const offsetY = touchPos.y - this.startPosition.y;
+            const distanceSquared = offsetX * offsetX + offsetY * offsetY;
+    
+            let finalX = offsetX;
+            let finalY = offsetY;
+    
+            if (distanceSquared > this.radiusSquared) {
+                const scale = this.radius / Math.sqrt(distanceSquared);
+                finalX *= scale;
+                finalY *= scale;
             }
+    
             // 更新手柄位置，确保在半径范围内
             this.joystickHandle.setPosition(
-                this.startPosition.x + offset.x ,
-                this.startPosition.y + offset.y 
+                this.startPosition.x + finalX,
+                this.startPosition.y + finalY
             );
-            this.direction.set(offset.x / this.radius, offset.y / this.radius);
+    
+            const invRadius = 1 / this.radius;
+            this.direction.set(finalX * invRadius, finalY * invRadius);
             this.sendEvent();
         }
     }
 
     private onTouchEnd(event: Event) {
-        console.log("Joystick onTouchEnd", event.pos);
         if (this.touchId === event.touchId) {
-            this.touchId = null;
-            // 重置背景和手柄位置
-            this.joystickBg.setPosition(this.startPosition.x , this.startPosition.y );
-            this.joystickHandle.setPosition(this.startPosition.x , this.startPosition.y );
+            this.touchId = -1;
+            // 使用缓动效果将手柄移回中心位置
+            this.tween = GTween.to2(
+                this.joystickHandle.x,
+                this.joystickHandle.y,
+                this.startPosition.x,
+                this.startPosition.y,
+                0.3
+            )
+            .setTarget(this.joystickHandle, this.joystickHandle.setPosition)
+            .setEase(EaseType.CircOut)
+            .onComplete(this.onTweenComplete, this);
+
             this.direction.set(0, 0);
             this.sendEvent();
         }
+    }
+
+    private onTweenComplete(): void {
+        // 缓动完成后的回调
+        this.joystickHandle.selected = false;
+        this.tween = null;
     }
 
     private sendEvent() {
         const angle = this.getCompressedAngle();
         if (angle !== this.lastSentAngle) {
             this.lastSentAngle = angle;
-            let direction = this.direction.clone()
-            app.message.emit(Joystick.JOYSTICK_MOVE, angle);
+            app.message.emit(Joystick.JOYSTICK_MOVE, { angle, direction: this.direction.clone() });
         }
     }
 
