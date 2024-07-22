@@ -4,10 +4,22 @@ export class FixedPoint {
     private static readonly HALF = FixedPoint.ONE >> 1;
     private static readonly MASK = FixedPoint.ONE - 1;
 
+    public static readonly NaN = new FixedPoint(Number.MAX_SAFE_INTEGER);
+
+
+    public isNaN(): boolean {
+        return this.rawValue === FixedPoint.NaN.rawValue;
+    }
+
     public static readonly ZERO = new FixedPoint(0);
     public static readonly ONE_FIXED = new FixedPoint(FixedPoint.ONE);
     public static readonly PI = new FixedPoint(Math.PI * FixedPoint.ONE);
     public static readonly TWO_PI = new FixedPoint(2 * Math.PI * FixedPoint.ONE);
+    public static readonly HALF_PI = FixedPoint.PI.div(FixedPoint.fromNumber(2));
+
+    public static EPSILON = FixedPoint.fromNumber(0.01);
+    public static THREE_HALF_PI = FixedPoint.HALF_PI.mul(FixedPoint.fromNumber(3));
+
 
     constructor(public rawValue: number) {
         this.rawValue = rawValue | 0;
@@ -26,6 +38,21 @@ export class FixedPoint {
     }
     isZero(): boolean {
         return this.rawValue === 0;
+    }
+
+    public mod(other: FixedPoint): FixedPoint {
+        if (other.isZero()) {
+            throw new Error("Division by zero in mod operation");
+        }
+
+        let result = this.rawValue % other.rawValue;
+
+        // 处理负数情况
+        if (result < 0) {
+            result += Math.abs(other.rawValue);
+        }
+
+        return new FixedPoint(result);
     }
 
     isOne(): boolean {
