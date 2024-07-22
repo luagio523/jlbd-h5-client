@@ -182,7 +182,7 @@
     "_enabled": true,
     "__prefab": null,
     "_projection": 0,
-    "_priority": 1073741824,
+    "_priority": 65530,
     "_fov": 45,
     "_fovAxis": 0,
     "_orthoHeight": 319.5488047808765,
