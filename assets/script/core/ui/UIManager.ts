@@ -140,7 +140,7 @@ export class UIManager {
         mediator.onDestroy();
         
         this.uiInstances.delete(uiId);
-        this.resManager.release(uiId, uiInstance);
+        this.resManager.releaseUI(uiId, uiInstance);
     }   
 
     public get(uiId: string): any | undefined {
@@ -170,7 +170,7 @@ export class UIManager {
 
     private async createUI(config: IUIConfig): Promise<any> {
         assert(!!this.resManager, "Resource manager is not initialized");
-        return  this.resManager.create(config);
+        return  this.resManager.createUI(config);
     }
 
 

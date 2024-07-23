@@ -1,5 +1,5 @@
 
-import { Component, DynamicAtlasManager, Game,  UITransform,  _decorator, director, game, macro, profiler, screen, view  } from 'cc';
+import { Asset, Component, DynamicAtlasManager, Game,  SpriteFrame,  Texture2D,  UITransform,  _decorator, assetManager, director, game, macro, profiler, resources, screen, view  } from 'cc';
 import { DEBUG, JSB } from 'cc/env';
 import { Root } from './core/Root';
 import app from './App';
@@ -121,14 +121,22 @@ export class Main extends Root {
 
         // console.log("scheduleGlobal",timer);
 
-        app.gui.close(UIView.CreateRole);
+        // app.gui.close(UIView.CreateRole);
+        // resources.release("UI/Battle_atlas0");
 
+        // assetManager.releaseAsset(this.asset);
+
+        UIPackage.removePackage("UI/CreateRole")
     }
+
+    private asset:Asset = null;
 
     public btnTestClick() {
         app.facade.send(Notification.CREATEROLE_VIEW_SHOW, { name: "test" });
-
-
+        // resources.load("UI/Battle_atlas0/spriteFrame", SpriteFrame, (err, asset) => {
+        //     this.asset = asset;
+        //     console.log(err, asset)
+        // });
 
     }
 

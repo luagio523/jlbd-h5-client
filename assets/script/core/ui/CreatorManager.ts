@@ -1,6 +1,6 @@
 import { Node, Prefab, assetManager, instantiate, resources, sys } from "cc";
 import { ILayerManager, UILayer } from "./UILayer";
-import { IResManager, UIResBase } from "./UIRes";
+import { AbstractResManager, IResManager, UIResBase } from "./UIRes";
 import { IUIConfig } from "./UIConfig";
 import scheduler from "../../utils/scheduler";
 
@@ -79,59 +79,33 @@ export class CreatorManager implements ILayerManager {
 /**
  * 
  */
-export class CreatorResMgr  implements IResManager<Node> {
+export class CreatorResManager extends AbstractResManager<Node> {
+    private static instance: CreatorResManager;
 
-    private resMap: Map<string, CreatorUIRes> = new Map<string, CreatorUIRes>();
-
-    public constructor(){
-        scheduler.scheduleGlobal(this.cleanup.bind(this), 10)// 例如每30秒清理一次
-    }
-
-    // 清理函数，会根据设置的时间阈值来释放实例和资源
-    private cleanup() {
-        const now = sys.now();
-        for (const [uiId, uiRes] of this.resMap.entries()) {
-            if (uiRes.checkIdle(now)) {
-                this.resMap.delete(uiId);
-            }
+    public static getInstance(): CreatorResManager {
+        if (!CreatorResManager.instance) {
+            CreatorResManager.instance = new CreatorResManager();
         }
+        return CreatorResManager.instance;
     }
-
-    async create(config: IUIConfig): Promise<Node> {
-        if (!config.uiId || !config.resourcePath || !config.uiComponentName) {
-            throw new Error("Invalid UI config provided.");
-        }
-        if (!this.resMap.has(config.uiId)) {
-            this.resMap.set(config.uiId, new CreatorUIRes(config));
-        }
-        let res = this.resMap.get(config.uiId);
-        if (res) {
-            const component = await res.get();
-            if (component) {
-                return component;
-            }
-        }
-    }
-   
-    getUIRes(uiId:string ):CreatorUIRes{
-        return  this.resMap.get(uiId)
-    }
-
-    release(uiId:string,uiInstance:Node):void{
-        this.resMap.get(uiId)?.put(uiInstance)
+    protected createUIRes(config: IUIConfig): UIResBase<Node> {
+        return new CreatorUIRes(config);
     }
 }
 
 
-class CreatorUIRes extends UIResBase<Node> {
-   
 
-    protected release(config: IUIConfig) {
+class CreatorUIRes extends UIResBase<Node> {
+
+    public releaseAssets(resourcePath: string) {
+        resources.release(resourcePath, Prefab)
+    }
+
+    public disposeUI() {
         this.instanceList.forEach((instance: Node) => {
             instance.destroy();
         });
         this.instanceList = [];
-        resources.release(config.resourcePath, Prefab)
     }
 
     protected async createInstance(config: IUIConfig): Promise<Node> {

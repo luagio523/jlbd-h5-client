@@ -23,7 +23,7 @@ export default class GEONavigationMediator extends BaseMediator {
 		this.viewAdapter.safeClick("closeButton", () => { 
 			console.log("claose button clicked")
 			app.gui.close(UIView.GEONavigation)
-			app.gui.close(UIView.HeadUpDisplay)
+			// app.gui.close(UIView.HeadUpDisplay)
 		})	// 点击关闭按钮触发关闭事件
 
 		// this.closeButton = this._frame.getChild("closeButton");

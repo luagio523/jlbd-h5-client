@@ -128,7 +128,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "UICamera",
+    "_name": "GCamera",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -182,7 +182,7 @@
     "_enabled": true,
     "__prefab": null,
     "_projection": 0,
-    "_priority": 65530,
+    "_priority": 65535,
     "_fov": 45,
     "_fovAxis": 0,
     "_orthoHeight": 319.5488047808765,
@@ -197,7 +197,7 @@
     },
     "_depth": 1,
     "_stencil": 0,
-    "_clearFlags": 7,
+    "_clearFlags": 6,
     "_rect": {
       "__type__": "cc.Rect",
       "x": 0,

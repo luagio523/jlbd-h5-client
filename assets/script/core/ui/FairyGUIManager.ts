@@ -1,9 +1,8 @@
 import { EaseType, GComponent, GObject, GRoot, GTween, RelationType, UIPackage, Window } from "fairygui-cc";
 import { ILayerManager, UILayer } from "./UILayer";
 import { IUIConfig } from "./UIConfig";
-import { IResManager, UIResBase } from "./UIRes";
-import scheduler from "../../utils/scheduler";
-import { Asset, Node, assetManager, resources, sys } from "cc";
+import { AbstractResManager, IResManager, UIResBase } from "./UIRes";
+import { Asset, Node, Texture2D, assetManager, resources, sys } from "cc";
 
 // private initFaiyGUI(){
     //UIConfig.defaultFont = 'Droid Sans Fallback';
@@ -45,6 +44,29 @@ import { Asset, Node, assetManager, resources, sys } from "cc";
     // FguiRegister();
 // }
 
+
+
+
+// 重写 dispose 方法
+const originalDispose = UIPackage.prototype.dispose;
+UIPackage.prototype.dispose = function() {
+    const cnt = this._items.length;
+    for (let i = 0; i < cnt; i++) {
+        const pi = this._items[i];
+        if (pi.file) {
+            let asset: Asset =  resources.get(pi.file)
+            if(asset){
+                // console.log(`资源引用计数:${asset.name},${asset.nativeUrl}:${asset.refCount}`,asset);
+                if(asset.refCount > 1){
+                    // console.log(`资源${asset.name}被多次引用，可能导致资源释放失败`);
+                }else{
+                    assetManager.releaseAsset(asset);
+                }
+            }
+        }
+    }
+    originalDispose.call(this);
+};
 
 
 export class FairyGUIManager implements ILayerManager {
@@ -212,8 +234,8 @@ export class FairyGUIManager implements ILayerManager {
 }
 
 
-export class FairyGuiResManager implements IResManager<GComponent> {
 
+export class FairyGuiResManager extends AbstractResManager<GComponent> {
     private static instance: FairyGuiResManager;
 
     public static getInstance(): FairyGuiResManager {
@@ -223,115 +245,28 @@ export class FairyGuiResManager implements IResManager<GComponent> {
         return FairyGuiResManager.instance;
     }
 
-    private resMap: Map<string, FairyGuiUIRes> = new Map<string, FairyGuiUIRes>();
-
-    public constructor(){
-        scheduler.scheduleGlobal(this.cleanup.bind(this), 10)// 例如每30秒清理一次
-    }
-
-    // 清理函数，会根据设置的时间阈值来释放实例和资源
-    private cleanup() {
-        const now = sys.now();
-        for (const [uiId, uiRes] of this.resMap.entries()) {
-            if (uiRes.checkIdle(now)) {
-                this.resMap.delete(uiId);
-            }
-        }
-          assetManager.assets.forEach((value: Asset, key: string) => {
-            console.log(`资源引用计数:${value.name},${value.nativeUrl}:${value.refCount}`);
-        })
-        console.log(`cleanup当前资源总数:${assetManager.assets.count}`);
-    }
-
-    async create(config: IUIConfig): Promise<GComponent> {
-        if (!config.uiId || !config.resourcePath || !config.uiComponentName) {
-            throw new Error("Invalid UI config provided.");
-        }
-        if (!this.resMap.has(config.uiId)) {
-            this.resMap.set(config.uiId, new FairyGuiUIRes(config));
-        }
-        let res = this.resMap.get(config.uiId);
-        if (res) {
-            const component = await res.get();
-            if (component) {
-                return component;
-            }
-        }
-    }
-   
-    getUIRes(uiId:string ):FairyGuiUIRes{
-        return  this.resMap.get(uiId)
-    }
-
-    release(uiId:string,uiInstance:GComponent):void{
-        this.resMap.get(uiId)?.put(uiInstance)
+    protected createUIRes(config: IUIConfig): UIResBase<GComponent> {
+        return new FairyGuiUIRes(config);
     }
 }
 
 
 
 class FairyGuiUIRes extends UIResBase<GComponent> {
-   
-    protected release(config: IUIConfig) {
+
+    public  releaseAssets(resourcePath: string): void {
+        if(UIPackage.getById(resourcePath)) {   
+            UIPackage.removePackage(resourcePath);
+        }
+        resources.release(resourcePath);
+    }
+
+    public disposeUI() {
         this.instanceList.forEach((instance: GComponent) => {
             instance.dispose();
         });
         this.instanceList = [];
-        if(UIPackage.getById(config.resourcePath)) {   
-            console.log("存在释放资源getById:"+config.resourcePath)
-            UIPackage.removePackage(config.resourcePath);
-        }
-        if(UIPackage.getByName(config.resourcePath)) {   
-            console.log("存在释放资源getByName:"+config.resourcePath)
-            UIPackage.removePackage(config.resourcePath);
-        }
-
-        if(resources.get(config.resourcePath)) {
-            console.log("存在释放资源2:"+config.resourcePath)
-        }
-        
-        if(resources.get(config.resourcePath)) {
-            console.log("存在释放资源3:"+config.resourcePath)
-        }
-        resources.release(config.resourcePath);
-
-        // let ref = resources.get(config.resourcePath).refCount;
-        // console.log("资源引用计数:"+ref)
-        if(resources.get(config.resourcePath)) {
-            console.log("存在释放资源4:"+config.resourcePath)
-            resources.release(config.resourcePath);
-        }
-
-        if(resources.get(config.resourcePath)) {
-            console.log("存在释放资源5:"+config.resourcePath)
-            assetManager.releaseAsset(resources.get(config.resourcePath));
-        }
-        
-
-        if(resources.get(config.resourcePath)) {
-            console.log("存在释放资源6:"+config.resourcePath)
-            resources.release(config.resourcePath);
-        }
-
-        if(resources.get(config.resourcePath)) {
-            console.log("存在释放资源7:"+config.resourcePath)
-        }
-
-        if(resources.get(config.resourcePath)) {
-            console.log("存在释放资源8:"+config.resourcePath)
-            resources.release(config.resourcePath);
-        }
-
-        this.dump()
     }
-
-    dump() {
-        // assetManager.assets.forEach((value: Asset, key: string) => {
-        //     console.log(assetManager.assets.get(key));
-        // })
-        console.log(`当前资源总数:${assetManager.assets.count}`);
-    }
-
 
     protected async createInstance(config: IUIConfig): Promise<GComponent> {
         const uiPackage = await this.load(config.resourcePath);
@@ -396,4 +331,7 @@ class CustomDiaolog extends Window {
     closeEventHandler(evt) { //禁用关闭按钮事件，UI的管理全部由UIManager来控制
     }
 }
+
+
+
 

@@ -30,7 +30,7 @@ export default class CreateRoleMediator extends BaseMediator {
         this.viewAdapter.safeClick("btn_create", this.onBtnCreateClick, this);
         this.viewAdapter.safeClick("btn_roll", this.onBtnRollClick, this);
 
-        app.config.loadSingle("name_generator").then(()=>{
+        app.config.loadJSON("name_generator").then(()=>{
             let nameGeneratorConfig = app.config.get("name_generator");
             if(nameGeneratorConfig){
                 this.nameGenerator.initialize(nameGeneratorConfig);
