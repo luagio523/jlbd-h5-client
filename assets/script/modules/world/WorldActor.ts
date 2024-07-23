@@ -31,7 +31,7 @@ export class WorldActor extends BaseActor {
 		let display = new MapDisplay();
 		SceneManager.getInstance().addToLayer(SLayerType.Map,display);
 
-        MapManager.getInstance().initMapDisplay(display);
+        MapManager.getInstance().initialize(display,app.game.getCameraNode());//初始化地图
 
         MapManager.getInstance().enterMap("map004");
 

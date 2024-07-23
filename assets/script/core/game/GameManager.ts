@@ -1,20 +1,35 @@
-import { _decorator, Node, game, director, Vec3, Component } from 'cc';
-import { SceneManager } from '../../rpg/manager/SceneManager';
-const { ccclass } = _decorator;
+
+import { _decorator, Component, Node, Vec3, director } from 'cc';
+const { ccclass, property } = _decorator;
+
 /** 游戏世界管理 */
 @ccclass('GameManager')
 export class GameManager extends Component {
+    // private static instance: GameManager | null = null;
+    //  // 获取单例实例
+    //  public static getInstance(): GameManager {
+    //     if (!GameManager.instance) {
+    //         GameManager.instance = new GameManager();
+    //     }
+    //     return GameManager.instance;
+    // }
+
     /** 游戏根节点 */
-    private gameRoot: Node;
+    private gameRoot!: Node;
+    private cameraNode!: Node;
     private timeScale: number = 1;
 
-    public constructor(gameRoot) {
+    // 私有构造函数，防止直接实例化
+    public constructor(gameRoot: Node, cameraNode: Node) {
         super();
-        this.setGameRoot(gameRoot);
+        this.initialize(gameRoot, cameraNode);
     }
-    
-    public setGameRoot(gameRoot: Node) {
+
+   
+
+    public initialize(gameRoot: Node, cameraNode: Node): void {
         this.gameRoot = gameRoot;
+        this.cameraNode = cameraNode;
     }
 
     /** 获取游戏根节点 */
@@ -40,11 +55,10 @@ export class GameManager extends Component {
         // 应用时间缩放
         const scaledDt = dt * this.timeScale;
         this.updateDt(scaledDt);
-       
     }
 
     private updateDt(dt: number) {
-       
+        // 实现更新逻辑
     }
 
     /** 暂停游戏 */
@@ -59,10 +73,7 @@ export class GameManager extends Component {
 
     /** 重启游戏 */
     public restartGame(): void {
-        // director.loadScene(director.getScene().name);
-
-       
-
+        // 实现重启逻辑
     }
 
     /** 添加节点到游戏根节点 */
@@ -103,5 +114,10 @@ export class GameManager extends Component {
     /** 获取游戏根节点的激活状态 */
     public isGameRootActive(): boolean {
         return this.gameRoot.active;
+    }
+
+    /** 获取相机节点 */
+    public getCameraNode(): Node {
+        return this.cameraNode;
     }
 }

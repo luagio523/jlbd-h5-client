@@ -25,7 +25,7 @@ export class oops {
     /** 二维界面管理 */
     static gui: UIManager;
      /** 三维游戏世界管理 */
-    static game: GameManager;
+    static game: GameManager ;
    
     /** 资源管理 */
     static res = new ResLoader();

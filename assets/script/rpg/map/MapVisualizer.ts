@@ -28,7 +28,7 @@ export class MapVisualizer extends Node {
 	}
 	
 
-	public renderHDMap(x: number, y: number): void {
+	public renderHDMap(x: number, y: number,force: boolean = false): void {
 		const visibleTiles = this.getVisibleTiles(x,y);
 		this.updateVisibleTiles(visibleTiles);
 		this.removeInvisibleTiles(visibleTiles);

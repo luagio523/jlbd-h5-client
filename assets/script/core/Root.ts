@@ -4,10 +4,13 @@ const {  property } = _decorator;
 
 export class Root extends Component {
     @property({ type: Node, tooltip: "游戏层" })
-    private gameNode: Node = null!;
+    protected gameNode: Node = null!;
+
+    @property({ type: Node, tooltip: "游戏层相机节点" })
+    protected gameCameraNode: Node = null!;
 
     @property({ type: Node, tooltip: "界面层" })
-    private guiNode: Node = null!;
+    protected guiNode: Node = null!;
 
     protected persistRootNode: Node = null!;
     private static isInitialized: boolean = false;
@@ -32,15 +35,7 @@ export class Root extends Component {
     protected run(): void {
         // 在这里添加游戏运行时的初始化逻辑
     }
-
-    public getGameNode(): Node {
-        return this.gameNode;
-    }
-
-    public getGUINode(): Node {
-        return this.guiNode;
-    }
-
+  
     update(dt: number) {
     }
 
