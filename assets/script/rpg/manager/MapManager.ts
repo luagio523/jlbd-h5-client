@@ -58,7 +58,7 @@ export default class MapManager {
         this.gameMap.updateVisibleArea(adaptionManager.getSafeArea());
         
 
-        this.mapDisplay = mapDisplay;
+        this.mapDisplay = mapDisplay;   //地图显示层
         this.mapDisplay.initialize(this.gameMap,this.cameraController);
         this.mapDisplay.updateVisibleArea(adaptionManager.getSafeArea());
         this.tiledMap = this.mapDisplay.getTiledMap();
