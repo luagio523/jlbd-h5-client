@@ -56,6 +56,10 @@ export default class TileImage extends GameImage {
             }
         }
     }
+
+    public static cleanupAllAssets(): void {
+        TileImage.lruCache.clear();
+    }
 }
 
 

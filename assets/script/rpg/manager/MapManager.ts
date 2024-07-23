@@ -1,10 +1,11 @@
-import { Node, TiledMap, TiledMapAsset, resources } from "cc";
+import { Node, Rect, TiledMap, TiledMapAsset, resources } from "cc";
 import { GameMap } from "../map/GameMap";
 import { MapDisplay } from "../map/MapDisplay";
 import { EnterMapEvent } from "../event/Event";
 import app from "../../App";
 import { EventDispatcher } from "../event/EventListenerManager";
 import { ColliderManager } from "./ColliderManager";
+import { AdaptionManager } from "../../core/common/Adaption/AdaptionManager";
 
 export default class MapManager {
     private static instance: MapManager;
@@ -15,8 +16,19 @@ export default class MapManager {
 
     private constructor() {
         this.eventDispatcher = new EventDispatcher();
-        this.gameMap = new GameMap();
-        ColliderManager.getInstance().initialize(this.gameMap);
+        
+       
+        
+    }
+
+    private adaptForMap(safeArea: Rect) {
+        let size = safeArea.size;
+        if(this.gameMap){
+            this.gameMap.updateVisibleArea(size);
+        }
+        if(this.mapDisplay){
+            this.mapDisplay.updateVisibleArea(size);
+        }
     }
 
     public static getInstance(): MapManager {
@@ -30,11 +42,23 @@ export default class MapManager {
         return this.gameMap;
     }
 
-    public initMapDisplay(mapDisplay: MapDisplay): Node {
+    public initialize(mapDisplay: MapDisplay): void {
+        if(this.mapDisplay){
+            return ;
+        }
+        ColliderManager.getInstance().initialize(this.gameMap);
+
+        let adaptionManager = AdaptionManager.getInstance();
+        adaptionManager.on("adaption-updated", (safeArea) => { // 屏幕适配更新事件
+            this.adaptForMap(safeArea);
+        })
+        this.gameMap = new GameMap();
+        this.gameMap.updateVisibleArea(adaptionManager.getSafeArea());
+
         this.mapDisplay = mapDisplay;
         this.mapDisplay.initialize(this.gameMap);
+        this.mapDisplay.updateVisibleArea(adaptionManager.getSafeArea());
         this.tiledMap = this.mapDisplay.getTiledMap();
-        return this.mapDisplay;
     }
 
     public async enterMap(mapID: string): Promise<void> {
@@ -50,9 +74,11 @@ export default class MapManager {
             const tiledMapAsset = await this.loadTiledMapAsset(mapPath);
             
             this.tiledMap.tmxAsset = tiledMapAsset;
-            this.gameMap.initWithTiledMap(this.tiledMap);
+            
+            this.gameMap.initWithTiledMap(mapID,this.tiledMap);
+            this.mapDisplay.setupMap();
+
             this.eventDispatcher.trigger(new EnterMapEvent());
-            this.mapDisplay.changeMap();
         } catch (err) {
             console.error("Error entering map:", err);
             throw err; // 重新抛出错误，允许调用者处理

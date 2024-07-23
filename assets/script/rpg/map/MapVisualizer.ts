@@ -7,70 +7,38 @@ import app from "../../App";
 
 
 export class MapVisualizer extends Node {
-	private thumbnail: Thumbnail;
-	private tileImages: Map<string, TileImage>;
+	private tileImages: Map<string, TileImage> = new Map<string, TileImage>();
 	private mapName: string;
 	private maxImageX: number;
 	private maxImageY: number;
 	private imgSize: number;
-	private lastUpdatePosition: Vec2 = new Vec2();
+	private visibleArea: Size = Size.ZERO;
 
 	constructor() {
 		super();
-		this.thumbnail = new Thumbnail();
-		this.addChild(this.thumbnail);
-		this.thumbnail.onLoad = this.onThumbnailComplete.bind(this);
-		this.tileImages = new Map();
 	}
 
-  //     // 在缩略图加载完成之后开始显示高清图
-    public onThumbnailComplete(url: string): void {
-
-        this.updateHDMap(this.lastUpdatePosition, true);
-        // 显示遮罩
-    }
-
-	public setLastUpdate(x: number, y: number): void {
-		this.lastUpdatePosition.x = x;
-		this.lastUpdatePosition.y = y;
-	}
-
-	public initialize(width: number, height: number, imgSize: number, mapName: string): void {
-		app.log.logView({mapName,width, height,imgSize}, ``);
+	public setupHDMap(mapName: string,width: number, height: number, imgSize: number ): void {
 		this.clear();
-		this.setupThumbnail(mapName,width, height);
-		this.setupTileImages(mapName,width, height, imgSize);
-	}
 
-	public updateHDMap(viewPosition: Vec2, force: boolean = false): void {
-		if (!force && this.lastUpdatePosition.equals(viewPosition)) return;
-
-		this.lastUpdatePosition.set(viewPosition);
-
-		const visibleTiles = this.getVisibleTiles(viewPosition);
-		this.updateVisibleTiles(visibleTiles);
-		this.removeInvisibleTiles(visibleTiles);
-	}
-
-	private setupThumbnail(mapName: string,width: number, height: number): void {
-		
-		this.thumbnail.setSize(width, height);
-		this.thumbnail.setPosition(width / 2, height / 2);
-		this.thumbnail.source = ResPathUtil.getMapThumbnailPath(mapName);
-	}
-
-	private setupTileImages(mapName:string,width: number, height: number, imgSize: number): void {
 		this.mapName = mapName;
 		this.imgSize = imgSize;
 		this.maxImageX = Math.ceil(width / imgSize);
 		this.maxImageY = Math.ceil(height / imgSize);
 	}
+	
 
-	private getVisibleTiles(viewPosition: Vec2): Set<string> {
+	public renderHDMap(x: number, y: number): void {
+		const visibleTiles = this.getVisibleTiles(x,y);
+		this.updateVisibleTiles(visibleTiles);
+		this.removeInvisibleTiles(visibleTiles);
+	}
+	
+
+	private getVisibleTiles(x:number, y:number): Set<string> {
 		// console.log("getVisibleTiles", viewPosition);
 		const visibleTiles = new Set<string>();
-		const { x, y } = viewPosition;
-		const screenSize =   this.getScreenSize();
+		const screenSize =   this.visibleArea;
 
 		const startX = Math.max(Math.floor(-x / this.imgSize), 0);
 		const startY = Math.max(Math.floor(-y / this.imgSize), 0);
@@ -82,7 +50,6 @@ export class MapVisualizer extends Node {
 				visibleTiles.add(`${i},${j}`);
 			}
 		}
-
 		return visibleTiles;
 	}
 
@@ -109,14 +76,13 @@ export class MapVisualizer extends Node {
 		});
 	}
 
-	private clear(): void {
-		this.thumbnail.clear()
+	public clear(): void {
 		this.tileImages.forEach(tileImage => tileImage.removeFromParent());
 		this.tileImages.clear();
 	}
 
-	private getScreenSize(): Size {
-		return app.adaption.getSafeSize();	
+	public setVisibleArea(size: Size): void {
+		this.visibleArea = size;	
 	}
   
 }
