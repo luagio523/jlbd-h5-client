@@ -39,6 +39,8 @@ export default class MapManager {
             return;
         }
 
+        this.setupCamera(cameraNode);//设置相机
+
         ColliderManager.getInstance().initialize(this.gameMap);
 
         let adaptionManager = AdaptionManager.getInstance();
@@ -48,13 +50,13 @@ export default class MapManager {
 
         this.gameMap = new GameMap();
         this.gameMap.updateVisibleArea(adaptionManager.getSafeArea());
+        
 
         this.mapDisplay = mapDisplay;
         this.mapDisplay.initialize(this.gameMap,this.cameraController);
         this.mapDisplay.updateVisibleArea(adaptionManager.getSafeArea());
         this.tiledMap = this.mapDisplay.getTiledMap();
-
-        this.setupCamera(cameraNode);
+        
     }
 
     private setupCamera(cameraNode: Node): void {

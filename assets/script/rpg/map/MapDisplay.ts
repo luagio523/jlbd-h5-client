@@ -1,18 +1,15 @@
-import { Node, Vec2, tween, log, _decorator, Vec3, TiledMap, TransformBit, Size } from "cc";
+import { Node, Vec2, tween, log, _decorator, Vec3, TiledMap, Size } from "cc";
 import { GameMap } from "./GameMap";
 import { MapVisualizer } from "./MapVisualizer";
-import { TrackLookAt } from "./TrackLookAt";
 import Thumbnail from "./Thumbnail";
 import { ResPathUtil } from "./ResPathUtil";
 import { CameraController } from "./CameraController";
 const { ccclass, property } = _decorator;
 
-
 export interface MapTweenOptions {
     time?: number;
     callback?: Function;
 }
-
 
 /**
  * 地图显示层
@@ -43,7 +40,7 @@ export class MapDisplay extends Node {
 
         this.addChild(this.mapNode);
         this.mapNode.addComponent(TiledMap);
-		this.mapNode.active = false;
+        this.mapNode.active = false;
 
         this.addChild(this.thumbnail);
         this.thumbnail.onLoad = this.onThumbnailComplete.bind(this);
@@ -51,6 +48,9 @@ export class MapDisplay extends Node {
         this.addChild(this.mapVisualizer);
 
         this.updateVisibleArea(gameMap.getVisibleArea());
+
+        // 监听相机移动事件
+        this.cameraController.onCameraMoved(this.onCameraMoved.bind(this));
     }
 
     private setupThumbnail(mapName: string, width: number, height: number): void {
@@ -58,8 +58,6 @@ export class MapDisplay extends Node {
         this.thumbnail.setPosition(width / 2, height / 2);
         this.thumbnail.source = ResPathUtil.getMapThumbnailPath(mapName);
     }
-
-    
 
     public getTiledMap(): TiledMap | null {
         return this.mapNode.getComponent(TiledMap);
@@ -70,11 +68,11 @@ export class MapDisplay extends Node {
      * @param position 世界坐标中的位置
      */
     public setCameraFocus(position: Vec2): void {
-		if (this.cameraController) {
-			this.cameraController.setTargetPosition(new Vec3(position.x, position.y, this.cameraController.node.worldPosition.z));
-		}
+        if (this.cameraController) {
+            console.log("set camera focus:", position);
+            this.cameraController.node.setWorldPosition(new Vec3(position.x, position.y, this.cameraController.node.worldPosition.z));
+        }
     }
-
 
     /**
      * 开启一张新图
@@ -94,7 +92,7 @@ export class MapDisplay extends Node {
      * 注视世界地图中心
      */
     private centerViewOnMap(): void {
-        console.log("center view on map")
+        console.log("center view on map", this.gameMap.maxWidth / 2, this.gameMap.maxHeight / 2);
         this.setCameraFocus(new Vec2(this.gameMap.maxWidth / 2, this.gameMap.maxHeight / 2));
     }
 
@@ -109,10 +107,16 @@ export class MapDisplay extends Node {
      * @param force 强制重新渲染
      */
     public renderHDMap(force: boolean = false): void {
+        console.log("render hd map");
         if (this.cameraController) {
             const cameraPosition = this.cameraController.node.worldPosition;
+            console.log("render camera position:", cameraPosition);
             this.mapVisualizer.renderHDMap(cameraPosition.x, cameraPosition.y, force);
         }
+    }
+
+    private onCameraMoved(position: Vec3): void {
+        this.renderHDMap(false);
     }
 
     private onThumbnailComplete(url: string): void {

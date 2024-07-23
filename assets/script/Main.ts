@@ -100,6 +100,8 @@ export class Main extends Root {
         app.gui = new UIManager(Facade.getInstance())
         app.gui.initialize(UI_CONFIG);//初始化UI配置
 
+        // app.adaption.addRootNode(this.gameNode,UIPosition.BottomLeft) //游戏节点适配左下角
+
         app.adaption.addRootNode(this.gameNode,UIPosition.BottomLeft) //游戏节点适配左下角
 
         app.secure.initialize("yongyuandexin"); //初始化安全模块

@@ -35,16 +35,38 @@ export class MapVisualizer extends Node {
 	}
 	
 
-	private getVisibleTiles(x:number, y:number): Set<string> {
-		// console.log("getVisibleTiles", viewPosition);
+	// private getVisibleTiles(x:number, y:number): Set<string> {
+	// 	// console.log("getVisibleTiles", viewPosition);
+	// 	const visibleTiles = new Set<string>();
+	// 	const screenSize =   this.visibleArea;
+
+	// 	const startX = Math.max(Math.floor(-x / this.imgSize), 0);
+	// 	const startY = Math.max(Math.floor(-y / this.imgSize), 0);
+	// 	const endX = Math.min(startX + Math.ceil(screenSize.width / this.imgSize), this.maxImageX);
+	// 	const endY = Math.min(startY + Math.ceil(screenSize.height / this.imgSize) , this.maxImageY);
+
+	// 	for (let i = startX; i < endX; i++) {
+	// 		for (let j = startY; j < endY; j++) {
+	// 			visibleTiles.add(`${i},${j}`);
+	// 		}
+	// 	}
+	// 	return visibleTiles;
+	// }
+
+	private getVisibleTiles(centerX: number, centerY: number): Set<string> {
 		const visibleTiles = new Set<string>();
-		const screenSize =   this.visibleArea;
-
-		const startX = Math.max(Math.floor(-x / this.imgSize), 0);
-		const startY = Math.max(Math.floor(-y / this.imgSize), 0);
-		const endX = Math.min(startX + Math.ceil(screenSize.width / this.imgSize) + 1, this.maxImageX);
-		const endY = Math.min(startY + Math.ceil(screenSize.height / this.imgSize) + 1, this.maxImageY);
-
+		const screenSize = this.visibleArea;
+	
+		// 计算视口的左上角坐标
+		const viewportLeft = centerX - screenSize.width / 2;
+		const viewportTop = centerY - screenSize.height / 2;
+	
+		// 计算起始和结束的图块索引
+		const startX = Math.max(Math.floor(viewportLeft / this.imgSize), 0);
+		const startY = Math.max(Math.floor(viewportTop / this.imgSize), 0);
+		const endX = Math.min(Math.ceil((viewportLeft + screenSize.width) / this.imgSize), this.maxImageX);
+		const endY = Math.min(Math.ceil((viewportTop + screenSize.height) / this.imgSize), this.maxImageY);
+	
 		for (let i = startX; i < endX; i++) {
 			for (let j = startY; j < endY; j++) {
 				visibleTiles.add(`${i},${j}`);
