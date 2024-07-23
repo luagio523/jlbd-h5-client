@@ -15,7 +15,6 @@ export interface MapTweenOptions {
 /**
  * 地图显示层
  * 显示地图缩略图、地图视野、地图视角跟踪
- * tilemap地图是左上角坐标系，通过gamemap 已经转为creator左下角坐标系
  * 行走时，人不动，让地图相反移动，所以地图节点的位置刚好和世界坐标相反
  */
 export class MapDisplay extends Node {
@@ -46,6 +45,7 @@ export class MapDisplay extends Node {
 
 		this.on(Node.EventType.TRANSFORM_CHANGED, this.onTransformChanged.bind(this));
     }
+	
 
 	private onTransformChanged(type:number): void {
 		if (type & TransformBit.POSITION) {
@@ -100,9 +100,10 @@ export class MapDisplay extends Node {
 			this.centerViewOnMap(); // 看向地图中心
 		}
 	}
-
 	
-
+	/**
+	 * 注视世界地图中心
+	 */
 	private centerViewOnMap(): void {
 		this.takeLookAt(new Vec2(this.gameMap.maxWidth / 2, this.gameMap.maxHeight / 2));
 	}
@@ -113,15 +114,19 @@ export class MapDisplay extends Node {
 		this.mapVisualizer.setupHDMap(mapName,width, height, GameMap.IMG_SIZE, );
 	}
 
+	/**
+	 * 渲染高清地图
+	 * @param force 
+	 */
 	private renderHDMap(force: boolean = false): void {
 		if (force || this.lastLookAt.equals(Vec2.NEG_ONE)) {
-			let position = this.position //当前地图位置和世界坐标刚好相反。取反。  加上本身偏移量()
+			let position = this.position //当前地图位置和世界坐标刚好相反。取反。  
 			this.mapVisualizer.renderHDMap(-position.x,-position.y);
 		}
 	}
 
 	private onThumbnailComplete(url: string): void {
-		log("Thumbnail loaded:", url);
+		log("thumbnail complete:", url);
 		this.renderHDMap(true);
     }
 
