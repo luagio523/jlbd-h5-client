@@ -169,6 +169,7 @@ export class GameMap {
         this.offset.y = remainderY > 0 ? GameMap.IMG_SIZE - remainderY : 0;
     }
 
+    
     /**
      * 世界坐标转地图节点坐标
      * @param {Vec2} worldPoint - 世界坐标
@@ -176,17 +177,24 @@ export class GameMap {
      * @returns {Vec2} 地图节点坐标
      */
     public worldToMapNodePosition(worldPoint: Vec2, out: Vec2 = new Vec2()): Vec2 {
+        // 世界坐标的反向就是地图节点坐标
+        out.x = -worldPoint.x;
+        out.y = -worldPoint.y;
+
+        // 获取边界区域和可视区域
         const boundaryArea = this.getBoundaryArea();
         const visibleArea = this.getVisibleArea();
 
-        out.x = boundaryArea.x - worldPoint.x;
-        out.y = boundaryArea.y - worldPoint.y;
-
-        out.x = Math.max(Math.min(out.x, 0), visibleArea.width - boundaryArea.width);
-        out.y = Math.max(Math.min(out.y, 0), visibleArea.height - boundaryArea.height);
+        // 限制地图节点坐标在有效范围内
+        const minX = visibleArea.width - boundaryArea.width;
+        const minY = visibleArea.height - boundaryArea.height;
+        
+        out.x = Math.max(Math.min(out.x, 0), minX);
+        out.y = Math.max(Math.min(out.y, 0), minY);
 
         return out;
     }
+
 
 
     /**

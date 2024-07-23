@@ -59,6 +59,8 @@ export class MapDisplay extends Node {
         this.thumbnail.source = ResPathUtil.getMapThumbnailPath(mapName);
     }
 
+    
+
     public getTiledMap(): TiledMap | null {
         return this.mapNode.getComponent(TiledMap);
     }
@@ -92,6 +94,7 @@ export class MapDisplay extends Node {
      * 注视世界地图中心
      */
     private centerViewOnMap(): void {
+        console.log("center view on map")
         this.setCameraFocus(new Vec2(this.gameMap.maxWidth / 2, this.gameMap.maxHeight / 2));
     }
 
