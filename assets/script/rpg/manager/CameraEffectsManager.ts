@@ -4,6 +4,9 @@ import { SceneTour } from '../map/SceneTour';
 import { FogOfWar } from '../map/FogOfWar';
 
 export class CameraEffectsManager {
+
+    private static instance: CameraEffectsManager;
+
     private cameraController: CameraController;
     private cameraNode: Node;
     private camera: Camera;
@@ -11,13 +14,20 @@ export class CameraEffectsManager {
     private shakeTween: Tween<Vec3> | null = null;
     private fogOfWar: FogOfWar | null = null;
 
-    constructor(cameraController: CameraController) {
+
+    public static getInstance(): CameraEffectsManager {
+        if (!CameraEffectsManager.instance) {
+            CameraEffectsManager.instance = new CameraEffectsManager();
+        }
+        return CameraEffectsManager.instance;
+    }
+
+
+    public initialize(cameraController: CameraController) {
         this.cameraController = cameraController;
         this.cameraNode = cameraController.node;
         this.camera = this.cameraNode.getComponent(Camera)!;
     }
-
-
     
 
     

@@ -7,6 +7,7 @@ import { EventDispatcher } from "../event/EventListenerManager";
 import { ColliderManager } from "./ColliderManager";
 import { AdaptionManager } from "../../core/common/Adaption/AdaptionManager";
 import { CameraController } from "../map/CameraController";
+import { CameraEffectsManager } from "./CameraEffectsManager";
 
 
 export default class MapManager {
@@ -19,9 +20,7 @@ export default class MapManager {
     private camera: Camera;
     private cameraController: CameraController;
 
-    private constructor() {
-        this.eventDispatcher = new EventDispatcher();
-    }
+
 
     public static getInstance(): MapManager {
         if (!MapManager.instance) {
@@ -29,6 +28,12 @@ export default class MapManager {
         }
         return MapManager.instance;
     }
+
+    private constructor() {
+        this.eventDispatcher = new EventDispatcher();
+    }
+
+    
 
     public getGameMap(): GameMap {
         return this.gameMap;
@@ -40,6 +45,7 @@ export default class MapManager {
         }
 
         this.setupCamera(cameraNode);//设置相机
+        CameraEffectsManager.getInstance().initialize(this.cameraController); //设置相机特效管理器
 
         ColliderManager.getInstance().initialize(this.gameMap);
 
