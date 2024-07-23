@@ -6,11 +6,6 @@ export class FixedPoint {
 
     public static readonly NaN = new FixedPoint(Number.MAX_SAFE_INTEGER);
 
-
-    public isNaN(): boolean {
-        return this.rawValue === FixedPoint.NaN.rawValue;
-    }
-
     public static readonly ZERO = new FixedPoint(0);
     public static readonly ONE_FIXED = new FixedPoint(FixedPoint.ONE);
     public static readonly PI = new FixedPoint(Math.PI * FixedPoint.ONE);
@@ -23,6 +18,10 @@ export class FixedPoint {
 
     constructor(public rawValue: number) {
         this.rawValue = rawValue | 0;
+    }
+
+    public isNaN(): boolean {
+        return this.rawValue === FixedPoint.NaN.rawValue;
     }
 
     static fromNumber(n: number): FixedPoint {
@@ -39,6 +38,8 @@ export class FixedPoint {
     isZero(): boolean {
         return this.rawValue === 0;
     }
+    
+
 
     public mod(other: FixedPoint): FixedPoint {
         if (other.isZero()) {
@@ -231,5 +232,24 @@ export class FixedPoint {
 
     static round(a: FixedPoint): FixedPoint {
         return a.round();
+    }
+
+     // 最小值和最大值
+     static min(a: FixedPoint, b: FixedPoint): FixedPoint {
+        return a.lt(b) ? a : b;
+    }
+
+    static max(a: FixedPoint, b: FixedPoint): FixedPoint {
+        return a.gt(b) ? a : b;
+    }
+
+     // 限制值在指定范围内
+    static clamp(value: FixedPoint, min: FixedPoint, max: FixedPoint): FixedPoint {
+        return FixedPoint.min(FixedPoint.max(value, min), max);
+    }
+
+    // 从字符串创建 FixedPoint
+    static fromString(s: string): FixedPoint {
+        return FixedPoint.fromNumber(parseFloat(s));
     }
 }

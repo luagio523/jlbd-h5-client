@@ -2,7 +2,11 @@ import { _decorator, Asset, assetManager, BufferAsset, Component, JsonAsset, log
 
 const { ccclass, property } = _decorator;
 
-
+/**
+ * 配置管理器
+ * 加载的配置文件会自动释放，不需要手动释放
+ * 加载的配置文件会自动缓存，可以重复调用get方法获取同一配置数据，不会重复加载
+ */
 @ccclass('ConfigManager')
 export class ConfigManager extends Component {
     private static instance: ConfigManager = null;
@@ -21,23 +25,21 @@ export class ConfigManager extends Component {
         return ConfigManager.instance;
     }
 
-    
-
     /**
-     * 加载单独配置文件 loadSingle("config/config.json")
+     * 加载单独配置文件 loadJSON("config/config.json")
      * @param path 
      * @returns 
      */
-    public async loadSingle(path: string): Promise<void> {
+    public async loadJSON(path: string,release:boolean = true): Promise<JsonAsset> {
         path = this.getConfigPath(path);
         return new Promise((resolve, reject) => {
-            resources.load(path, Asset, (err, asset) => {
+            resources.load(path, JsonAsset, (err, asset) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-                this.parseAsset(asset);
-                resolve();
+                this.dealWithAsset(asset,release);
+                resolve(asset);
             });
         });
     }
@@ -60,7 +62,7 @@ export class ConfigManager extends Component {
      * @param path 
      * @returns 
      */
-    public async loadDirectory(path: string): Promise<void> {
+    public async loadDirectory(path: string,release:boolean = true): Promise<void> {
         path = this.getConfigPath(path);
         return new Promise((resolve, reject) => {
             resources.loadDir(path, Asset, (err, assets) => {
@@ -69,9 +71,8 @@ export class ConfigManager extends Component {
                     return;
                 }
                 assets.forEach(asset => {
-                    this.parseAsset(asset);
+                    this.dealWithAsset(asset,release);
                 });
-
                 resolve();
             });
         });
@@ -99,7 +100,7 @@ export class ConfigManager extends Component {
             } finally {
                 // 释放资源
                 if (asset && releaseZip) {
-                    resources.release(path);
+                    assetManager.releaseAsset(asset);
                 }
             }
         });
@@ -136,11 +137,15 @@ export class ConfigManager extends Component {
         return lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
     }
 
-    private parseAsset(asset: Asset): void {
+    private dealWithAsset(asset: Asset,release:boolean = true): void {
         if (asset instanceof JsonAsset) {
             this.configs.set(asset.name, asset.json);
         } else {
             // log(`Unsupported asset type: ${asset.constructor.name}`);
+        }
+
+        if(release){ //直接释放,已经在config缓存
+            assetManager.releaseAsset(asset);
         }
     }
 
