@@ -1,88 +1,115 @@
-
 export interface IAssetExpire {
     onExpire(): void;
 }
 
-
-
 export class LRUCache<K, T extends IAssetExpire> {
-    private capacity: number;
+    private readonly capacity: number;
     private cache: Map<K, T>;
-    private accessOrder: Array<K>;
-  
+    private readonly accessOrder: Map<K, number>;
+    private accessCounter: number = 0;
+
     constructor(capacity: number) {
-		if (capacity <= 0) {
-			throw new Error("Cache capacity must be greater than 0");
-		}
-		this.capacity = capacity;
-		this.cache = new Map<K, T>();
-		this.accessOrder = new Array<K>();
-    }
-  
-    public get(key: K): T | undefined {
-		const value = this.cache.get(key);
-		if (value) {
-			// 移到访问顺序的尾部
-			this.updateAccessOrder(key);
-			return value;
-		}
-		return undefined;
+        if (!Number.isInteger(capacity) || capacity <= 0) {
+            throw new Error("Cache capacity must be a positive integer");
+        }
+        this.capacity = capacity;
+        this.cache = new Map<K, T>();
+        this.accessOrder = new Map<K, number>();
     }
 
-    public access(key:K){
-        // 移到访问顺序的尾部
+    public get(key: K): T | undefined {
+        const value = this.cache.get(key);
+        if (value !== undefined) {
+            this.updateAccessOrder(key);
+        }
+        return value;
+    }
+
+    public access(key: K): boolean {
+        if (this.cache.has(key)) {
+            this.updateAccessOrder(key);
+            return true;
+        }
+        return false;
+    }
+
+    public set(key: K, value: T): void {
+        if (value === undefined || value === null) {
+            throw new Error("Cannot set undefined or null as a value");
+        }
+        
+        if (this.cache.size >= this.capacity && !this.cache.has(key)) {
+            this.evictLeastRecentlyUsed();
+        }
+        this.cache.set(key, value);
         this.updateAccessOrder(key);
     }
-  
-    public set(key: K, value: T): void {
-		if (this.cache.has(key)) {
-			// 更新值并移动访问顺序
-			this.cache.set(key, value);
-			this.updateAccessOrder(key);
-		} else {
-			// 清理缓存的逻辑
-			this.evictIfNeeded();
-			this.cache.set(key, value);
-			this.accessOrder.push(key);
-		}
+
+    public delete(key: K): boolean {
+        const value = this.cache.get(key);
+        if (value !== undefined) {
+            value.onExpire();
+            this.cache.delete(key);
+            this.accessOrder.delete(key);
+            return true;
+        }
+        return false;
     }
 
-    public has(key:K):boolean{
-      	return this.cache.has(key)
+    public has(key: K): boolean {
+        return this.cache.has(key);
     }
-  
-    private evictIfNeeded() {
-        // 如果缓存已满，删除最早的条目
-        if (this.cache.size >= this.capacity) {
-          const keyToEvict = this.accessOrder.shift();
-          if (keyToEvict !== undefined) {
-            // entity变量应该在delete之前从cache中获取
-            let entity = this.cache.get(keyToEvict);
-            if (entity) {
-              entity.onExpire()
-            }
-            this.cache.delete(keyToEvict);
-          }
+
+    public clear(): void {
+        for (const value of this.cache.values()) {
+            value.onExpire();
+        }
+        this.cache.clear();
+        this.accessOrder.clear();
+        this.accessCounter = 0;
+    }
+
+    public size(): number {
+        return this.cache.size;
+    }
+
+    public *entries(): IterableIterator<[K, T]> {
+        for (const [key, value] of this.cache.entries()) {
+            yield [key, value];
         }
     }
-  
-    private updateAccessOrder(key: K) {
-		// 移除旧的访问记录并将其放置到最后一位
-		const index = this.accessOrder.indexOf(key);
-		if (index > -1) {
-			this.accessOrder.splice(index, 1);
-		}
-		this.accessOrder.push(key);
+
+    private updateAccessOrder(key: K): void {
+        if (this.accessCounter === Number.MAX_SAFE_INTEGER) {
+            this.rebuildAccessOrder();
+        } else {
+            this.accessOrder.set(key, ++this.accessCounter);
+        }
     }
-  
-    // 您可能还想提供清除缓存的方法
-    public clear() {
-		this.cache.clear();
-		this.accessOrder.length = 0;
+
+    private evictLeastRecentlyUsed(): void {
+        let leastRecentlyUsedKey: K | undefined;
+        let lowestCounter = Infinity;
+
+        for (const [key, counter] of this.accessOrder) {
+            if (counter < lowestCounter) {
+                lowestCounter = counter;
+                leastRecentlyUsedKey = key;
+            }
+        }
+
+        if (leastRecentlyUsedKey !== undefined) {
+            this.delete(leastRecentlyUsedKey);
+        }
     }
-  
-    // 可能需要实现其他助手方法，例如检查当前缓存大小
-    public size(): number {
-      	return this.cache.size;
+
+    private rebuildAccessOrder(): void {
+        const entries = Array.from(this.accessOrder.entries());
+        entries.sort((a, b) => a[1] - b[1]);
+        this.accessOrder.clear();
+        this.accessCounter = 0;
+        for (const [key] of entries) {
+            this.accessOrder.set(key, ++this.accessCounter);
+        }
     }
 }
