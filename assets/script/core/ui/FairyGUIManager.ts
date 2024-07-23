@@ -1,9 +1,9 @@
-import { GComponent, GObject, GRoot, UIPackage, Window } from "fairygui-cc";
+import { EaseType, GComponent, GObject, GRoot, GTween, RelationType, UIPackage, Window } from "fairygui-cc";
 import { ILayerManager, UILayer } from "./UILayer";
 import { IUIConfig } from "./UIConfig";
 import { IResManager, UIResBase } from "./UIRes";
 import scheduler from "../../utils/scheduler";
-import { Node, sys } from "cc";
+import { Asset, Node, assetManager, resources, sys } from "cc";
 
 // private initFaiyGUI(){
     //UIConfig.defaultFont = 'Droid Sans Fallback';
@@ -51,6 +51,7 @@ export class FairyGUIManager implements ILayerManager {
    
     private _root: GRoot;
     private _layers: Map<UILayer, GComponent>;
+    private _dialogs: Window[] = [];
 
     public getRootNode(): Node {
         return this._root.node;
@@ -89,21 +90,30 @@ export class FairyGUIManager implements ILayerManager {
             return;
         }
 
-        const layerNode = this._layers.get(layer);
-        if (!layerNode) {
-            console.error(`Layer ${UILayer[layer]} not initialized.`);
-            return;
-        }
 
         switch (layer) {
             case UILayer.BACKGROUND:
+                uiInstance.makeFullScreen(); // 全屏即可自动适配
+                this.getLayerNode(UILayer.BACKGROUND)?.addChild(uiInstance);
+                break;
             case UILayer.MAIN:
                 uiInstance.makeFullScreen(); // 全屏即可自动适配
-                layerNode.addChild(uiInstance);
+                this.getLayerNode(UILayer.MAIN)?.addChild(uiInstance);
                 break;
             case UILayer.TOP:
-                layerNode.addChild(uiInstance);
+                this.getLayerNode(UILayer.TOP)?.addChild(uiInstance);
                 this.adjustTopLayer();
+                break;
+            case UILayer.DIALOG:
+                let dialog = new CustomDiaolog(uiInstance.asCom);
+                // dialog.contentPane = uiInstance.asCom;
+                this._dialogs.push(dialog);
+                GRoot.inst.showWindow(dialog);
+                this.adjustTopLayer()
+                break;
+            case UILayer.TOP:
+                this._layers[UILayer.TOP].addChild(uiInstance);
+                this.adjustTopLayer()
                 break;
             default:
                 console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI. Use appropriate FairyGUI methods.`);
@@ -121,7 +131,13 @@ export class FairyGUIManager implements ILayerManager {
         if (layerNode) {
             layerNode.removeChild(uiInstance);
         } else {
-            console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI or not initialized.`);
+            if (layer === UILayer.DIALOG) {
+                this._dialogs.forEach((dialog) =>
+                    dialog.hide()
+                );
+            }else{
+                console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI or not initialized.`);
+            }
         }
     }
 
@@ -138,7 +154,13 @@ export class FairyGUIManager implements ILayerManager {
         if (layerNode) {
             layerNode.visible = visible;
         } else {
-            console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI or not initialized.`);
+            if (layer === UILayer.DIALOG) {
+                this._dialogs.forEach((dialog) =>
+                    dialog.visible = visible
+                );
+            } else {
+                console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI or not initialized.`);
+            }
         }
     }
 
@@ -164,6 +186,11 @@ export class FairyGUIManager implements ILayerManager {
             }
             return false;
         } else {
+            if (layer === UILayer.DIALOG) {
+                return this._dialogs.some((dialog) =>
+                    dialog.contentPane === uiInstance
+                );
+            }
             console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI or not initialized.`);
             return false;
         }
@@ -174,6 +201,11 @@ export class FairyGUIManager implements ILayerManager {
         if (layerNode) {
             layerNode.removeChildren();
         } else {
+            if (layer === UILayer.DIALOG) {
+                this._dialogs.forEach((dialog) =>
+                    dialog.hide()
+                );
+            }
             console.warn(`Layer ${UILayer[layer]} is managed by FairyGUI or not initialized.`);
         }
     }
@@ -205,6 +237,10 @@ export class FairyGuiResManager implements IResManager<GComponent> {
                 this.resMap.delete(uiId);
             }
         }
+          assetManager.assets.forEach((value: Asset, key: string) => {
+            console.log(`资源引用计数:${value.name},${value.nativeUrl}:${value.refCount}`);
+        })
+        console.log(`cleanup当前资源总数:${assetManager.assets.count}`);
     }
 
     async create(config: IUIConfig): Promise<GComponent> {
@@ -241,13 +277,69 @@ class FairyGuiUIRes extends UIResBase<GComponent> {
             instance.dispose();
         });
         this.instanceList = [];
-        UIPackage.removePackage(config.resourcePath);
+        if(UIPackage.getById(config.resourcePath)) {   
+            console.log("存在释放资源getById:"+config.resourcePath)
+            UIPackage.removePackage(config.resourcePath);
+        }
+        if(UIPackage.getByName(config.resourcePath)) {   
+            console.log("存在释放资源getByName:"+config.resourcePath)
+            UIPackage.removePackage(config.resourcePath);
+        }
+
+        if(resources.get(config.resourcePath)) {
+            console.log("存在释放资源2:"+config.resourcePath)
+        }
+        
+        if(resources.get(config.resourcePath)) {
+            console.log("存在释放资源3:"+config.resourcePath)
+        }
+        resources.release(config.resourcePath);
+
+        // let ref = resources.get(config.resourcePath).refCount;
+        // console.log("资源引用计数:"+ref)
+        if(resources.get(config.resourcePath)) {
+            console.log("存在释放资源4:"+config.resourcePath)
+            resources.release(config.resourcePath);
+        }
+
+        if(resources.get(config.resourcePath)) {
+            console.log("存在释放资源5:"+config.resourcePath)
+            assetManager.releaseAsset(resources.get(config.resourcePath));
+        }
+        
+
+        if(resources.get(config.resourcePath)) {
+            console.log("存在释放资源6:"+config.resourcePath)
+            resources.release(config.resourcePath);
+        }
+
+        if(resources.get(config.resourcePath)) {
+            console.log("存在释放资源7:"+config.resourcePath)
+        }
+
+        if(resources.get(config.resourcePath)) {
+            console.log("存在释放资源8:"+config.resourcePath)
+            resources.release(config.resourcePath);
+        }
+
+        this.dump()
+    }
+
+    dump() {
+        // assetManager.assets.forEach((value: Asset, key: string) => {
+        //     console.log(assetManager.assets.get(key));
+        // })
+        console.log(`当前资源总数:${assetManager.assets.count}`);
     }
 
 
     protected async createInstance(config: IUIConfig): Promise<GComponent> {
         const uiPackage = await this.load(config.resourcePath);
+
         const component = UIPackage.createObject(uiPackage.name, config.uiComponentName);
+
+        console.log(`load当前资源总数:${assetManager.assets.count}`);
+
         if (component instanceof GComponent) {
             return component;
         } else {
@@ -268,3 +360,40 @@ class FairyGuiUIRes extends UIResBase<GComponent> {
     } 
         
 }
+
+
+
+
+
+
+/*************************************************定义一些fairygui的扩展组件*******************************************************/
+class CustomDiaolog extends Window {
+    constructor(contentPane: GComponent) {
+        super();
+        this.contentPane = contentPane;
+        this.setPivot(0.5, 0.5); //设置中心锚点
+        this.center(true); //设置居中
+    }
+
+    protected doShowAnimation(): void {
+        this.setScale(0.1, 0.1);
+        GTween.to2(0.1, 0.1, 1, 1, 0.15)
+            .setTarget(this, this.setScale)
+            .setEase(EaseType.BackOut)
+            .onComplete(() => {
+                this.onShown();
+            }, this);
+    }
+    
+    protected doHideAnimation(): void {
+        GTween.to2(1, 1, 0.1, 0.1, 0.1)
+            .setTarget(this, this.setScale)
+            .setEase(EaseType.BackIn)
+            .onComplete(() => {
+                this.hideImmediately();
+            }, this);
+    }
+    closeEventHandler(evt) { //禁用关闭按钮事件，UI的管理全部由UIManager来控制
+    }
+}
+

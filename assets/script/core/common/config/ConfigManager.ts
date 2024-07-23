@@ -81,36 +81,54 @@ export class ConfigManager extends Component {
      * @param path 
      * @returns 
      */
-    public async loadZip(path: string): Promise<void> {
+    public async loadZip(path: string,releaseZip:boolean = true): Promise<void> {
         path = this.getConfigPath(path);
+        return new Promise<void>(async (resolve, reject) => {
+            let asset: BufferAsset | null = null;
+            try {
+                // 加载资源
+                asset = await this.loadBufferAsset(path);
+                log(`Loaded zip file: ${path}`);
+                // 处理 ZIP 内容
+                const zip = await JSZip.loadAsync(asset.buffer());
+                await this.processZipContents(zip);
+                resolve();
+            } catch (error) {
+                error("Error processing zip content:", error);
+                reject(error);
+            } finally {
+                // 释放资源
+                if (asset && releaseZip) {
+                    resources.release(path);
+                }
+            }
+        });
+    }
+
+    private loadBufferAsset(path: string): Promise<BufferAsset> {
         return new Promise((resolve, reject) => {
-            resources.load(path, BufferAsset, async (err, asset) => {
-                console.log(path,err,asset);
+            resources.load(path, BufferAsset, (err, asset) => {
                 if (err) {
                     reject(err);
-                    return;
-                }
-
-                try {
-                    const zip = await JSZip.loadAsync(asset.buffer());
-                    const promises = [];
-
-                    zip.forEach((relativePath, file) => {
-                        if (!file.dir  ) {
-                            promises.push(
-                                file.async('text').then(content => {
-                                    this.parseText(content, file.name);
-                                })
-                            );
-                        }
-                    });
-                    await Promise.all(promises);
-                    resolve();
-                } catch (e) {
-                    reject(e);
+                } else {
+                    resolve(asset);
                 }
             });
         });
+    }
+
+    private async processZipContents(zip: JSZip): Promise<void> {
+        const promises = [];
+        zip.forEach((_, file) => {
+            if (!file.dir) {
+                promises.push(
+                    file.async('text').then(content => {
+                        this.parseText(content, file.name);
+                    })
+                );
+            }
+        });
+        await Promise.all(promises);
     }
 
     private removeExtension(filename: string): string {

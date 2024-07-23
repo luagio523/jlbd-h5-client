@@ -35,9 +35,9 @@ _module_configs["World"] = {
 
 _module_configs["Game"] = {
 	events : [
-				"Enter_World","HeadUpDisplay_View_Show"
+				"Enter_World","HeadUpDisplay_View_Show","GEONavigation_View_Show",
 				],
-	views :  ["HeadUpDisplay"],
+	views :  ["HeadUpDisplay","GEONavigation"],
 	models: [],
 }
 

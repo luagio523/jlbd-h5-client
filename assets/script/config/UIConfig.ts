@@ -8,6 +8,7 @@ export enum UIView {
     HeadUpDisplay = "HeadUpDisplay",
     Story = "Story",
     StoryGuide = "StoryGuide",
+    GEONavigation = "GEONavigation",
 }
 
 // 使用新的枚举名重构 UI_CONFIG
@@ -32,6 +33,16 @@ export const UI_CONFIG: { [key in UIView]: IUIConfig } = {
         resourcePath: "UI/Battle",
         uiComponentName: "BattlePanel",
     },
+
+    [UIView.GEONavigation]: {
+        uiId: UIView.GEONavigation,
+        uiLayer: UILayer.DIALOG,
+        mediatorClass: "GEONavigationMediator",
+        resourcePath: "UI/Battle",
+        uiComponentName: "MapBigWin",
+    },
+     
+
     [UIView.Story]: {
         uiId: UIView.Story,
         uiLayer: UILayer.BACKGROUND,

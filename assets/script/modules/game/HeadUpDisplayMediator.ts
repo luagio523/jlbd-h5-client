@@ -4,6 +4,7 @@ import { IActionHandler } from "../../core/mvc/init"
 import { mvc } from "../../core/mvc/__private"
 import { GComponent } from "fairygui-cc"
 import { Joystick } from "./Joystick"
+import { Notification } from "../../mvc/Notification"
 /**
  * HeadUpDisplayMediator
  */
@@ -23,9 +24,17 @@ export default class HeadUpDisplayMediator extends BaseMediator {
 		console.log("HeadUpDisplayMediator onInitialize")
 		// 初始化逻辑
 		// 例如：设置UI元素的初始状态，添加事件监听器等
+		//初始化摇杆
 		const cptHand = this.viewAdapter.findChild<GComponent>("cpt_hand");
 		this.joystick = new Joystick();
 		this.joystick.injectUI(cptHand)
+
+		this.viewAdapter.safeClick("btn_map",this.onBtnMapClick, this);
+
+	}
+
+	private onBtnMapClick(): void {		
+		this.sendNotification(Notification.GEONAVIGATION_VIEW_SHOW);
 	}
 
 	protected onOpen(params: any): void {

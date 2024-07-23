@@ -15,7 +15,7 @@ export abstract class UIResBase<T> {
     protected idleAt: number;
     protected ref:number = 0;
 
-    public static DefaultUIIdleTime = 1 * 30 * 1000  // 默认 UI 释放时间 1 分钟
+    public static DefaultUIIdleTime = 1 * 20 * 1000  // 默认 UI 释放时间 1 分钟
 
     constructor(config: IUIConfig) {
         this.config = config;

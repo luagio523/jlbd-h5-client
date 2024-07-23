@@ -7,13 +7,14 @@ import { UIView } from "../../config/UIConfig"
 import { mvc } from "../../core/mvc/__private"
 
 import HeadUpDisplayMediator from "./HeadUpDisplayMediator"
-
+import GEONavigationMediator from "./GEONavigationMediator"
 @mvc.component("GameActor")
 export class GameActor extends BaseActor {
 	public listInterests(): [string, IActionHandler][] {
 		return [
 			[Notification.ENTER_WORLD, this.executeEnterWorld],
 			[Notification.HEADUPDISPLAY_VIEW_SHOW, this.executeHeadupdisplayViewShow],
+			[Notification.GEONAVIGATION_VIEW_SHOW, this.executeGeonavigationViewShow],
 		]
 	}
 
@@ -22,15 +23,18 @@ export class GameActor extends BaseActor {
 	}
 
 	/*---------------------------------[notices]------------------------------------*/
+	public executeGeonavigationViewShow() {
+		// 执行逻辑
+		app.gui.open(UIView.GEONavigation)
+	}
 
 	public executeEnterWorld(role: any) {
-
-		this.sendNotification(Notification.HEADUPDISPLAY_VIEW_SHOW,role)
+		this.sendNotification(Notification.HEADUPDISPLAY_VIEW_SHOW, role)
 		// 执行逻辑
 		console.log("GameActor:executeEnterWorld")
 	}
 
-	public executeHeadupdisplayViewShow(role:any) {
+	public executeHeadupdisplayViewShow(role: any) {
 		// 执行逻辑
 		app.gui.open(UIView.HeadUpDisplay, role)
 	}
@@ -38,6 +42,11 @@ export class GameActor extends BaseActor {
 	/*---------------------------------[models]------------------------------------*/
 
 	/*---------------------------------[views]------------------------------------*/
+	protected get geonavigationMediator(): GEONavigationMediator {
+		return app.facade.retrieveMediator(
+			UIView.GEONavigation,
+		) as GEONavigationMediator
+	}
 
 	protected get headupdisplayMediator(): HeadUpDisplayMediator {
 		return app.facade.retrieveMediator(
