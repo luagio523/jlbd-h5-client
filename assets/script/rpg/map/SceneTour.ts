@@ -1,5 +1,6 @@
 import { Vec3, tween, Tween } from 'cc';
 import { CameraController } from './CameraController';
+
 /**
  * 基于地图相机控制
  * 提供一个场景巡视
@@ -54,15 +55,3 @@ export class SceneTour {
         }
     }
 }
-
-
-
-// const sceneTour = new SceneTour(cameraController);
-// const waypoints = [
-//     new Vec3(100, 100, 0),
-//     new Vec3(500, 300, 0),
-//     new Vec3(800, 200, 0),
-//     // ... 更多路点
-// ];
-// sceneTour.setWaypoints(waypoints);
-// sceneTour.startTour(10, () => console.log("Tour completed"));

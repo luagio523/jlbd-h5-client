@@ -1,4 +1,5 @@
-import { Component, Node, Vec3, _decorator, Camera, EventTarget, Size, Rect, misc, Tween, tween } from 'cc';
+import { Component, Node, Vec3, _decorator, Camera, EventTarget, Size, Rect, misc } from 'cc';
+
 const { ccclass, property } = _decorator;
 
 @ccclass('CameraController')
@@ -18,7 +19,7 @@ export class CameraController extends Component {
     private camera: Camera | null = null;
     private velocity: Vec3 = new Vec3();
     private lastTargetPosition: Vec3 = new Vec3();
-    private eventTarget = new EventTarget();
+    public eventTarget: EventTarget = new EventTarget();
     private mapSize: Size = new Size(0, 0);
     private viewportSize: Size = new Size(0, 0);
     private boundaryArea: Rect | null = null;
@@ -28,10 +29,12 @@ export class CameraController extends Component {
     private tempVec3: Vec3 = new Vec3();
     private frameCount: number = 0;
 
+    private targets: Node[] = []; // 可以跟踪多个目标
+
     start() {
         this.camera = this.getComponent(Camera);
         if (!this.camera) {
-            console.error("Camera component not found on this node.");
+            console.error("未在此节点上找到 Camera 组件。");
             return;
         }
 
@@ -43,6 +46,8 @@ export class CameraController extends Component {
         this.halfDeadZoneHeight = this.deadZoneHeight * 0.5;
         this.lastCameraPosition.set(this.node.worldPosition);
     }
+
+    /**************************区域限制******************************** */
 
     public setMapSize(width: number, height: number): void {
         this.mapSize.width = width;
@@ -56,6 +61,10 @@ export class CameraController extends Component {
         this.updateBoundaryFromSizes();
     }
 
+    /**
+     * 直接提供设置好的边界
+     * @param boundaryArea 
+     */
     public setBoundaryArea(boundaryArea: Rect): void {
         this.boundaryArea = boundaryArea;
     }
@@ -76,38 +85,57 @@ export class CameraController extends Component {
     public setTargetPosition(position: Vec3): void {
         if (this.target) {
             this.target.setWorldPosition(position);
+        } else if (this.targets.length > 0) {
+            // 移动所有目标相同的偏移量
+            const offset = position.subtract(this.getTargetPosition());
+            this.targets.forEach(target => {
+                target.setWorldPosition(target.worldPosition.add(offset));
+            });
         }
     }
 
+    public setTargets(targets: Node[]): void {
+        this.targets = targets;
+    }
+
+    private getTargetPosition(): Vec3 {
+        if (this.targets.length === 0) {
+            return this.target ? this.target.worldPosition : this.node.worldPosition;
+        }
+        const avgPos = new Vec3();
+        this.targets.forEach(target => avgPos.add(target.worldPosition));
+        return avgPos.divide3f(this.targets.length, this.targets.length, this.targets.length);
+    }
+
+    public clearTargets(): void {
+        this.targets = [];
+    }
+
     lateUpdate(dt: number) {
-        if (!this.target || !this.camera || !this.boundaryArea) return;
+        if (!this.camera || !this.boundaryArea) return;
 
         this.frameCount++;
         if (this.frameCount % 2 !== 0) return; // 每两帧更新一次
 
-        const targetPosition = this.target.worldPosition;
+        const targetPosition = this.getTargetPosition();
         const cameraPosition = this.node.worldPosition;
 
         // 计算目标移动的距离
-        const deltaX = targetPosition.x - this.lastTargetPosition.x;
-        const deltaY = targetPosition.y - this.lastTargetPosition.y;
-
-        // 更新上一帧的目标位置
+        const delta = targetPosition.subtract(this.lastTargetPosition);
         this.lastTargetPosition.set(targetPosition);
 
         // 检查是否超出死区
-        if (Math.abs(deltaX) > this.halfDeadZoneWidth || Math.abs(deltaY) > this.halfDeadZoneHeight) {
+        if (Math.abs(delta.x) > this.halfDeadZoneWidth || Math.abs(delta.y) > this.halfDeadZoneHeight) {
             // 计算新的目标相机位置
-            let targetX = cameraPosition.x + deltaX;
-            let targetY = cameraPosition.y + deltaY;
+            let targetPos = cameraPosition.add(delta);
 
             // 限制相机位置在边界区域内
-            targetX = misc.clampf(targetX, this.boundaryArea.xMin, this.boundaryArea.xMax);
-            targetY = misc.clampf(targetY, this.boundaryArea.yMin, this.boundaryArea.yMax);
+            targetPos.x = misc.clampf(targetPos.x, this.boundaryArea.xMin, this.boundaryArea.xMax);
+            targetPos.y = misc.clampf(targetPos.y, this.boundaryArea.yMin, this.boundaryArea.yMax);
 
             // 使用 SmoothDamp 进行平滑移动
-            const newX = this.smoothDamp(cameraPosition.x, targetX, this.velocity.x, this.smoothTime, dt);
-            const newY = this.smoothDamp(cameraPosition.y, targetY, this.velocity.y, this.smoothTime, dt);
+            const newX = this.smoothDamp(cameraPosition.x, targetPos.x, this.velocity.x, this.smoothTime, dt);
+            const newY = this.smoothDamp(cameraPosition.y, targetPos.y, this.velocity.y, this.smoothTime, dt);
 
             // 更新相机位置
             this.tempVec3.set(newX, newY, cameraPosition.z);
@@ -118,11 +146,6 @@ export class CameraController extends Component {
                 this.eventTarget.emit('camera-moved', this.tempVec3);
                 this.lastCameraPosition.set(this.tempVec3);
             }
-        }
-
-        // 在更新相机位置后应用震动偏移
-        if (!this.shakeOffset.equals(Vec3.ZERO)) {
-            this.node.position = this.node.position.add(this.shakeOffset);
         }
     }
 
@@ -152,35 +175,5 @@ export class CameraController extends Component {
 
     public offCameraMoved(callback: (position: Vec3) => void): void {
         this.eventTarget.off('camera-moved', callback);
-    }
-
-
-    //*********************************************基于相机的一些效果******************************************************** */
-
-    private shakeOffset: Vec3 = new Vec3();
-    private shakeTween: Tween<Vec3> | null = null;
-
-    public shake(duration: number, intensity: number): void {
-        if (this.shakeTween) {
-            this.shakeTween.stop();
-        }
-
-        this.shakeOffset.set(Vec3.ZERO);
-        this.shakeTween = tween(this.shakeOffset)
-            .to(duration, new Vec3(intensity, intensity, 0), {
-                onUpdate: (target: Vec3) => {
-                    const randomOffset = new Vec3(
-                        (Math.random() - 0.5) * 2 * target.x,
-                        (Math.random() - 0.5) * 2 * target.y,
-                        0
-                    );
-                    this.node.position = this.node.position.add(randomOffset);
-                }
-            })
-            .call(() => {
-                this.shakeOffset.set(Vec3.ZERO);
-                this.shakeTween = null;
-            })
-            .start();
     }
 }
