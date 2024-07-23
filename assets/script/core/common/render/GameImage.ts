@@ -1,72 +1,82 @@
-import { Node, Sprite, UITransform, resources, SpriteFrame, Texture2D, assetManager } from 'cc';
 
-/**
- * 游戏图片
- */
+import { _decorator, Node, Sprite, SpriteFrame, UITransform, Texture2D, resources, assetManager } from 'cc';
+const { ccclass, property } = _decorator;
+
+@ccclass('GameImage')
 export default class GameImage extends Node {
-    
-    protected renderSprite: Sprite; // 渲染精灵
-    protected url: string = ""; // 图片 URL
-    public onLoad?: (url: string) => void; // 加载完成回调
+    @property(Sprite)
+    protected renderSprite: Sprite = null!;
 
-    public constructor() {
+    @property
+    private _url: string = "";
+
+    @property({type: Function})
+    public onLoad: ((url: string) => void) | null = null;
+
+    constructor() {
         super();
-        this.renderSprite = this.addComponent(Sprite);
+        if (!this.renderSprite) {
+            this.renderSprite = this.addComponent(Sprite);
+        }
     }
 
-    public setAnchor(x: number, y: number) {
-        let transform = this.getComponent(UITransform);
-        transform.anchorX = x;
-        transform.anchorY = y;
+    public setAnchor(x: number, y: number): void {
+        const transform = this.getComponent(UITransform);
+        transform.setAnchorPoint(x, y);
     }
 
-    public isLoad(url: string): boolean {
-        return this.url === url && !!this.renderSprite.spriteFrame;
+    public isLoaded(url: string): boolean {
+        return this._url === url && !!this.renderSprite.spriteFrame;
+    }
+
+    public get source(): string {
+        return this._url;
     }
 
     public set source(url: string) {
-        if (this.isLoad(url)) return;
-        this.clear(); // 清除原有的
-        this.url = url;
+        if (this.isLoaded(url)) return;
+        this.clear();
+        this._url = url;
+        this.loadSpriteFrame(url);
+    }
+
+    private loadSpriteFrame(url: string): void {
         resources.load(url, SpriteFrame, (err, frame) => {
             if (err) {
-                console.error(err);
+                console.error(`Failed to load sprite frame: ${url}`, err);
                 return;
             }
+            if (this._url !== url) return; // URL可能在加载过程中已经改变
             this.renderSprite.spriteFrame = frame;
-            if (this.onLoad) {
-                this.onLoad(url);
-            }
+            this.onLoad?.call(this, url);
         });
     }
 
-    public setTexture(texture: Texture2D) {
+    public setTexture(texture: Texture2D): void {
         if (this.renderSprite.spriteFrame) {
+            this.renderSprite.spriteFrame.texture = texture;
+        } else {
+            this.renderSprite.spriteFrame = new SpriteFrame();
             this.renderSprite.spriteFrame.texture = texture;
         }
     }
 
-    public clear() {
+    public clear(): void {
         if (this.renderSprite.spriteFrame) {
             assetManager.releaseAsset(this.renderSprite.spriteFrame);
             this.renderSprite.spriteFrame = null;
         }
-        if (this.url) {
-            this.url = "";
-        }
+        this._url = "";
     }
     
     public clone(): GameImage {
-        let image = new GameImage();
-        image.source = this.url;
+        const image = new GameImage();
+        image.source = this._url;
         return image;
     }
 
-    
-
-    // 释放资源
-    public dispose() {
+    public dispose(): void {
         this.clear();
-        this.onLoad = undefined;
+        this.onLoad = null;
     }
 }

@@ -7,21 +7,21 @@ import app from "../../App";
 
 
 export class MapVisualizer extends Node {
-  private thumbnail: Thumbnail;
-  private tileImages: Map<string, TileImage>;
-  private mapName: string;
-  private maxImageX: number;
-  private maxImageY: number;
-  private imgSize: number;
-  private lastUpdatePosition: Vec2 = new Vec2();
+	private thumbnail: Thumbnail;
+	private tileImages: Map<string, TileImage>;
+	private mapName: string;
+	private maxImageX: number;
+	private maxImageY: number;
+	private imgSize: number;
+	private lastUpdatePosition: Vec2 = new Vec2();
 
-  constructor() {
-    super();
-    this.thumbnail = new Thumbnail();
-    this.addChild(this.thumbnail);
-    this.thumbnail.onLoad = this.onThumbnailComplete.bind(this);
-    this.tileImages = new Map();
-  }
+	constructor() {
+		super();
+		this.thumbnail = new Thumbnail();
+		this.addChild(this.thumbnail);
+		this.thumbnail.onLoad = this.onThumbnailComplete.bind(this);
+		this.tileImages = new Map();
+	}
 
   //     // 在缩略图加载完成之后开始显示高清图
     public onThumbnailComplete(url: string): void {
@@ -37,7 +37,6 @@ export class MapVisualizer extends Node {
 
 	public initialize(width: number, height: number, imgSize: number, mapName: string): void {
 		app.log.logView({mapName,width, height,imgSize}, ``);
-
 		this.clear();
 		this.setupThumbnail(mapName,width, height);
 		this.setupTileImages(mapName,width, height, imgSize);
@@ -69,8 +68,6 @@ export class MapVisualizer extends Node {
 
 	private getVisibleTiles(viewPosition: Vec2): Set<string> {
 		// console.log("getVisibleTiles", viewPosition);
-
-
 		const visibleTiles = new Set<string>();
 		const { x, y } = viewPosition;
 		const screenSize =   this.getScreenSize();
@@ -113,6 +110,7 @@ export class MapVisualizer extends Node {
 	}
 
 	private clear(): void {
+		this.thumbnail.clear()
 		this.tileImages.forEach(tileImage => tileImage.removeFromParent());
 		this.tileImages.clear();
 	}

@@ -28,16 +28,16 @@ export class WorldActor extends BaseActor {
 
 		SceneManager.getInstance().initialize(app.game.getGameRoot());//初始化场景
 
-		// let display = new MapDisplay();
-		// SceneManager.getInstance().addToLayer(SLayerType.Map,display);
+		let display = new MapDisplay();
+		SceneManager.getInstance().addToLayer(SLayerType.Map,display);
 
-        // MapManager.getInstance().initMapDisplay(display);
+        MapManager.getInstance().initMapDisplay(display);
 
-        // MapManager.getInstance().enterMap("map004");
+        MapManager.getInstance().enterMap("map004");
 
-        // EventManager.getInstance().registerListener(RPGEvent.EnterMap, function (event) {
-        //     console.log("enter map", event);     
-        // });
+        EventManager.getInstance().registerListener(RPGEvent.EnterMap, function (event) {
+            console.log("enter map", event);     
+        });
 	}
 
 	/*---------------------------------[models]------------------------------------*/
