@@ -17,9 +17,7 @@ abstract class ActPlayer {
     }
 
     // 共用方法
-    play( )  {
-        this.player.play();
-    }
+    play( )  {this.player.play();}
 
     stop() { this.player.stop(); }
   
@@ -46,9 +44,8 @@ class Act1Player extends ActPlayer {
 
     async changeAct(modelName: string,action: ActType): Promise<ActPlayer> {
         let mc = this.getMCKey(modelName,  action);
-        let jsonPath = `anim/body/${mc}.json`;
-        let imgPath = `anim/body/${mc}.png`;
-        await this.player.loadAnimation(jsonPath, imgPath);
+        let atlasPath = `anim/body/char`;
+        await this.player.loadAnimation(atlasPath);
         this.player.setupAnimation(mc);
         this.setLooping(true); // 默认循环
         return this;
@@ -200,12 +197,8 @@ class Act4Player extends ActPlayer {
 
 // 使用示例
 (async () => {
-    const player = new Act1Player();
+    const player = ActPlayerFactory.createPlayer(ActResourceType.ACT1);
     await player.changeAct("character",  ActType.ACT_IDLE);
-
-    // 播放循环动作（如待机）
-    player.play();
-
     // 播放非循环动作（如攻击），并在完成后执行回调
     player.play();
 
@@ -219,26 +212,37 @@ class Act4Player extends ActPlayer {
 })();
 
 
+export  enum  ActResourceType {
+    ACT1 = 'plist',
+    ACT2 = 'egret sheet',
+    ACT3 = 'dragon',
+    ACT4 = 'spine'
+}
+
 // 工厂类
-class ActPlayerFactory {
-    static createPlayer(type: 'Act1' | 'Act2'): ActPlayer {
+export class ActPlayerFactory {
+    static createPlayer(type: ActResourceType): ActPlayer {
         switch (type) {
-            case 'Act1':
+            case ActResourceType.ACT1:
                 return new Act1Player();
-            case 'Act2':
+            case ActResourceType.ACT2:
                 return new Act2Player();
+            case ActResourceType.ACT3:
+                return new Act3Player();
+            case ActResourceType.ACT4:
+                return new Act4Player();
             default:
                 throw new Error('Unsupported player type');
         }
     }
 }
 
-// 使用示例
-async function useActPlayer() {
-    const player = ActPlayerFactory.createPlayer('Act1');
-    await player.changeAct('character001', 1, 0, ActType.ACT_IDLE);
-    player.play();
-}
+// // 使用示例
+// async function useActPlayer() {
+//     const player = ActPlayerFactory.createPlayer('Act1');
+//     await player.changeAct('character001', 1, 0, ActType.ACT_IDLE);
+//     player.play();
+// }
 
 
 
