@@ -1,32 +1,59 @@
 
 
-import { Component, dragonBones ,_decorator, sp} from "cc";
+import { Component,_decorator, sp, resources} from "cc";
 const { ccclass, property } = _decorator;
+
+
 @ccclass('SpinePlayer')
-export class SpinePlayer extends Component implements IAnimationPlayer {
+export class SpinePlayer extends Component {
     @property(sp.Skeleton)
     private skeleton: sp.Skeleton | null = null;
 
     private animationName: string = '';
     private onCompleteCallback: Function | null = null;
 
-    async loadAnimation(jsonPath: string, atlasPath: string, texturePath: string): Promise<void> {
-        // 加载 Spine 资源
-        // 这里需要根据 Cocos Creator 的资源加载系统进行适当的实现
+    constructor() {
+        super();
     }
 
-    setupAnimation(animationName: string) {
-        this.animationName = animationName;
-    }
-
-    play() {
-        if (this.skeleton && this.animationName) {
-            this.skeleton.setAnimation(0, this.animationName, true);
-            this.skeleton.setCompleteListener(() => {
-                if (this.onCompleteCallback) {
-                    this.onCompleteCallback();
+    async loadAnimation(spineDataPath: string, animationName: string = "default"): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            resources.load(spineDataPath, sp.SkeletonData, (err, spineData) => {
+                if (err) {
+                    console.error('Failed to load Spine data:', err);
+                    reject(err);
+                    return;
                 }
+
+                if (this.skeleton) {
+                    this.skeleton.skeletonData = spineData;
+                    this.skeleton.setAnimation(0, animationName, true);
+                    this.skeleton.setCompleteListener(this.onAnimationComplete.bind(this));
+                }
+
+                resolve();
             });
+        });
+    }
+
+    setupAnimation(animationName?: string): void {
+        if (animationName) {
+            this.animationName = animationName;
+        }
+        if (this.skeleton) {
+            this.playAnimation(this.animationName || 'idle');
+        }
+    }
+
+    playAnimation(animName: string, loop: boolean = true) {
+        if (this.skeleton) {
+            this.skeleton.setAnimation(0, animName, loop);
+        }
+    }
+
+    play(loop: boolean = true) {
+        if (this.skeleton && this.animationName) {
+            this.skeleton.setAnimation(0, this.animationName, loop);
         }
     }
 
@@ -36,31 +63,15 @@ export class SpinePlayer extends Component implements IAnimationPlayer {
         }
     }
 
-    pause() {
-        if (this.skeleton) {
-            this.skeleton.paused = true;
-        }
-    }
-
-    resume() {
-        if (this.skeleton) {
-            this.skeleton.paused = false;
-        }
-    }
-
     setUpdateGap(gap: number) {
-        // Spine 没有直接对应的方法，可以考虑使用 timeScale
         if (this.skeleton) {
             this.skeleton.timeScale = 1 / gap;
         }
     }
 
     setAnimeTimes(times: number) {
-        // Spine 没有直接设置播放次数的方法，可以在 complete 回调中处理
-    }
-
-    setEasingFunction(easingFunction: (t: number) => number) {
-        // Spine 没有直接设置缓动函数的方法
+        // Spine 的播放次数可以通过 loop 参数控制，通常不需要手动设置播放次数
+        this.play(times > 1);
     }
 
     setOnCompleteCallback(callback: Function) {
@@ -69,5 +80,17 @@ export class SpinePlayer extends Component implements IAnimationPlayer {
 
     update(dt: number) {
         // Spine 自动更新，不需要手动调用
+    }
+
+    private onAnimationComplete() {
+        if (this.onCompleteCallback) {
+            this.onCompleteCallback();
+        }
+    }
+
+    onDestroy() {
+        if (this.skeleton) {
+            this.skeleton.setCompleteListener(null);
+        }
     }
 }
