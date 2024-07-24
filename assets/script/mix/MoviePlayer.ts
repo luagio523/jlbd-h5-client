@@ -1,6 +1,6 @@
 import { _decorator, Component, Sprite, SpriteFrame, SpriteAtlas, resources,  Vec2, UITransform } from 'cc';
-import MovieClip from './MovieClip';
-import app from '../../App';
+import MovieClip from '../core/common/render/MovieClip';
+
 
 const { ccclass, property } = _decorator;
 
