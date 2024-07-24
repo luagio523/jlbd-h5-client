@@ -5,7 +5,7 @@ const { ccclass, property } = _decorator;
 
 
 @ccclass('SpinePlayer')
-export class SpinePlayer extends Component {
+export class SpinePlayer extends Component implements IAnimationPlayer {
     @property(sp.Skeleton)
     private skeleton: sp.Skeleton | null = null;
 
