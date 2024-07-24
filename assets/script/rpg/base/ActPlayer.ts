@@ -1,3 +1,6 @@
+import { SpriteAtlasLoader, SpriteSheetLoader } from "../../core/common/animation/MCLoader";
+import { MCPlayer } from "../../core/common/animation/MCPlayer";
+import { ActType } from "../enum/Act";
 
 // 抽象基类
 abstract class ActPlayer {
@@ -16,11 +19,9 @@ abstract class ActPlayer {
     }
 
     stop() { this.player.stop(); }
-    pause() { this.player.pause(); }
-    resume() { this.player.resume(); }
+  
     setUpdateGap(gap: number) { this.player.setUpdateGap(gap); }
     setAnimeTimes(times: number) { this.player.setAnimeTimes(times); }
-    setEasingFunction(easingFunction: (t: number) => number) { this.player.setEasingFunction(easingFunction); }
 
     setLooping(looping: boolean) {
         this.isLooping = looping;
@@ -55,7 +56,7 @@ class Act1Player extends ActPlayer {
         let jsonPath = `anim/body/${mc}.json`;
         let imgPath = `anim/body/${mc}.png`;
         await this.player.loadAnimation(jsonPath, imgPath);
-        this.player.setupMovieClip(mc);
+        this.player.setupAnimation(mc);
 
         // 设置默认的循环行为
         this.setLooping(this.shouldLoop(action));
@@ -99,7 +100,7 @@ class Act2Player extends ActPlayer {
         let jsonPath = `anim/sheetbody/${mc}.json`;
         let imgPath = `anim/sheetbody/${mc}.png`;
         await this.player.loadAnimation(jsonPath, imgPath);
-        this.player.setupMovieClip(mc);
+        this.player.setupAnimation(mc);
 
         // 设置默认的循环行为
         this.setLooping(this.shouldLoop(action));
