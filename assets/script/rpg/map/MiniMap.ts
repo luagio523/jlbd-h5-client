@@ -1,6 +1,6 @@
 import { Graphics, Node, log } from "cc"
 import GameImage from "./TileImage"
-import { ResPathUtil } from "./ResPathUtil"
+import { ResPathUtil } from "../util/ResPathUtil"
 
 
 export default class MiniMap extends Node {

@@ -1,6 +1,7 @@
 import { _decorator, Component, Sprite, SpriteFrame, Vec2, Texture2D, ImageAsset, resources, SpriteAtlas, JsonAsset,Asset } from 'cc';
 import MovieClip from './MovieClip';
 import { BaseMCLoader } from './MCLoader';
+import { SourceMapGenerator } from 'source-map-js/lib/source-map-generator';
 
 const { ccclass, property } = _decorator;
 
@@ -9,15 +10,14 @@ const { ccclass, property } = _decorator;
  * 支持creator plist atlas 动画,支持Egret SpriteSheet 动画
  */
 @ccclass('MCPlayer')
-export class MCPlayer extends Component implements IAnimationPlayer{
-    @property(Sprite)
-    private sprite: Sprite | null = null;
+export class MCPlayer   implements IAnimationPlayer{
+    private sprite: Sprite  = null;
 
     private loader: BaseMCLoader;
     private movieClip: MovieClip | null = null;
 
-    constructor(loader: BaseMCLoader) {
-        super();
+    constructor(sprite:Sprite, loader: BaseMCLoader) {
+        this.sprite = sprite;
         this.loader = loader;
         this.movieClip = new MovieClip();
     }

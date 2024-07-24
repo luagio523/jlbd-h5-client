@@ -1,3 +1,6 @@
+import { Prefab } from "cc";
+import { ActResourceType } from "../base/ActPlayer";
+
 export class ResPathUtil {
     private static readonly BASE_PATHS = {
         MAP: "map/",
@@ -5,7 +8,8 @@ export class ResPathUtil {
         SKILL_EFF: "anim/skillEff/",
         UI_EFF: "anim/eff/",
         DRAGON_BODY: "anim/dragonbody/",
-        BODY: "anim/body/"
+        BODY: "anim/body/",
+        Prefab:"prefab/"
     };
 
     public static readonly DEFAULT_SHADOW = "images/shadow/1";
@@ -40,5 +44,26 @@ export class ResPathUtil {
 
     public static getBodyPath(name: string): string {
         return `${this.BASE_PATHS.BODY}${name}`;
+    }
+    /**
+     * 支持四种不同的资源类型
+     * @param type 
+     * @returns 
+     */
+    public static getBodyActPrefabPath(type: ActResourceType): string {
+        let base =`${this.BASE_PATHS.Prefab}/body/Actbody`
+        switch (type) {
+            case ActResourceType.ACT1:
+                return base+"1";
+            case ActResourceType.ACT2:
+                return base+"1";
+            case ActResourceType.ACT3:
+                return base+"3";
+            case ActResourceType.ACT4:
+                return base+"4";
+            default:
+                throw new Error('Unsupported player type');
+        }
+        return ;
     }
 }

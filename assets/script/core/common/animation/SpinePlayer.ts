@@ -4,16 +4,15 @@ import { Component,_decorator, sp, resources} from "cc";
 const { ccclass, property } = _decorator;
 
 
-@ccclass('SpinePlayer')
-export class SpinePlayer extends Component implements IAnimationPlayer {
-    @property(sp.Skeleton)
-    private skeleton: sp.Skeleton | null = null;
 
+export class SpinePlayer  implements IAnimationPlayer {
+
+    private skeleton: sp.Skeleton | null = null;
     private animationName: string = '';
     private onCompleteCallback: Function | null = null;
 
-    constructor() {
-        super();
+    constructor(skeleton: sp.Skeleton) {
+        this.skeleton = skeleton;
     }
 
     async loadAnimation(spineDataPath: string, animationName: string = "default"): Promise<void> {

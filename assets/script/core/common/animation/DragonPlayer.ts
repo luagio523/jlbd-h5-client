@@ -2,16 +2,16 @@
 import { _decorator, Component, dragonBones, resources } from 'cc';
 const { ccclass, property } = _decorator;
 
-@ccclass('DragonPlayer')
-export class DragonPlayer extends Component implements IAnimationPlayer {
-    @property(dragonBones.ArmatureDisplay)
+
+export class DragonPlayer implements IAnimationPlayer {
+    
     private armatureDisplay: dragonBones.ArmatureDisplay | null = null;
 
     private animationName: string = '';
     private onCompleteCallback: Function | null = null;
 
-    constructor() {
-        super();
+    constructor(armatureDisplay:dragonBones.ArmatureDisplay) {
+        this.armatureDisplay = armatureDisplay;
     }
 
     async loadAnimation(dragonBonesDataPath: string, textureAtlasPath: string, armatureName: string = "Armature"): Promise<void> {

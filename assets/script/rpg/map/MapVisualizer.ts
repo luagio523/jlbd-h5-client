@@ -1,6 +1,6 @@
 
 import { Node, Vec2, Size } from "cc";
-import { ResPathUtil } from "./ResPathUtil";
+import { ResPathUtil } from "../util/ResPathUtil";
 import Thumbnail from "./Thumbnail";
 import TileImage from "./TileImage";
 import app from "../../App";

@@ -2,7 +2,7 @@ import { Node, Vec2, tween, log, _decorator, Vec3, TiledMap, Size } from "cc";
 import { GameMap } from "./GameMap";
 import { MapVisualizer } from "./MapVisualizer";
 import Thumbnail from "./Thumbnail";
-import { ResPathUtil } from "./ResPathUtil";
+import { ResPathUtil } from "../util/ResPathUtil";
 import { CameraController } from "./CameraController";
 const { ccclass, property } = _decorator;
 

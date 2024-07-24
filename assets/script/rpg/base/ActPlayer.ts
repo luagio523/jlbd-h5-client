@@ -1,3 +1,4 @@
+import { Sprite, dragonBones, sp } from "cc";
 import { DragonPlayer } from "../../core/common/animation/DragonPlayer";
 import { SpriteAtlasLoader, SpriteSheetLoader } from "../../core/common/animation/MCLoader";
 import { MCPlayer } from "../../core/common/animation/MCPlayer";
@@ -5,10 +6,12 @@ import { SpinePlayer } from "../../core/common/animation/SpinePlayer";
 import { ActType } from "../enum/Act";
 
 // 抽象基类
-abstract class ActPlayer {
+export abstract class ActPlayer {
     protected player: IAnimationPlayer;
     protected isLooping: boolean = false;
 
+
+    abstract initialize(...args: any[]): ActPlayer;
     abstract changeAct(...args: any[]): Promise<ActPlayer>;
 
     onComplete(callback: (() => void) | null):ActPlayer{
@@ -38,11 +41,18 @@ abstract class ActPlayer {
 class Act1Player extends ActPlayer {
     constructor() {
         super();
+    }
+
+    public initialize(sprite:Sprite): ActPlayer {
         const loader = new SpriteAtlasLoader();
-        this.player = new MCPlayer(loader);
+        this.player = new MCPlayer(sprite,loader);
+        return this;
     }
 
     async changeAct(modelName: string,action: ActType): Promise<ActPlayer> {
+        if(!this.player){
+            throw new Error('player not initialized');
+        }
         let mc = this.getMCKey(modelName,  action);
         let atlasPath = `anim/body/char`;
         await this.player.loadAnimation(atlasPath);
@@ -79,11 +89,19 @@ class Act1Player extends ActPlayer {
 class Act2Player extends ActPlayer {
     constructor() {
         super();
-        const sheetLoader = new SpriteSheetLoader();
-        this.player = new MCPlayer(sheetLoader);
+    }
+
+    public initialize(sprite:Sprite): ActPlayer {
+        const loader = new SpriteSheetLoader();
+        this.player = new MCPlayer(sprite,loader);
+        return this;
     }
 
     async changeAct(modelName: string,action: ActType,  direction: number,gender: number): Promise<ActPlayer> {
+        if(!this.player){
+            throw new Error('player not initialized');
+        }
+
         let mc = this.getMCKey(modelName, gender, direction, action);
         let jsonPath = `anim/sheetbody/${mc}.json`;
         let imgPath = `anim/sheetbody/${mc}.png`;
@@ -120,10 +138,17 @@ class Act2Player extends ActPlayer {
 class Act3Player extends ActPlayer {
     constructor() {
         super();
-        this.player =  new DragonPlayer();
+    }
+
+    public initialize(armatureDisplay:dragonBones.ArmatureDisplay): ActPlayer {
+        this.player =  new DragonPlayer(armatureDisplay);
+        return this;
     }
 
     async changeAct(modelName: string,action: ActType): Promise<ActPlayer> {
+        if(!this.player){
+            throw new Error('player not initialized');
+        }
       
         let jsonPath = `anim/dragonbody/${modelName}_ske`;
         let imgPath = `anim/dragonbody/${modelName}_tex`;
@@ -162,10 +187,16 @@ class Act3Player extends ActPlayer {
 class Act4Player extends ActPlayer {
     constructor() {
         super();
-        this.player =  new SpinePlayer();
+    }
+    public initialize(skeleton: sp.Skeleton): ActPlayer {
+        this.player =  new SpinePlayer(skeleton);
+        return this;
     }
 
     async changeAct(modelName: string, action: ActType = ActType.ACT_IDLE): Promise<ActPlayer> {
+        if(!this.player){
+            throw new Error('player not initialized');
+        }
       
         let jsonPath = `anim/dragonbody/${modelName}_ske`;
         let imgPath = `anim/dragonbody/${modelName}_tex`;
@@ -221,16 +252,16 @@ export  enum  ActResourceType {
 
 // 工厂类
 export class ActPlayerFactory {
-    static createPlayer(type: ActResourceType): ActPlayer {
+    static createPlayer(type: ActResourceType,...args: any): ActPlayer {
         switch (type) {
             case ActResourceType.ACT1:
-                return new Act1Player();
+                return new Act1Player().initialize(args);
             case ActResourceType.ACT2:
-                return new Act2Player();
+                return new Act2Player().initialize(args);
             case ActResourceType.ACT3:
-                return new Act3Player();
+                return new Act3Player().initialize(args);
             case ActResourceType.ACT4:
-                return new Act4Player();
+                return new Act4Player().initialize(args);
             default:
                 throw new Error('Unsupported player type');
         }
