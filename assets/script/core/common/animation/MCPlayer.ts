@@ -9,7 +9,7 @@ const { ccclass, property } = _decorator;
  * 支持creator plist atlas 动画,支持Egret SpriteSheet 动画
  */
 @ccclass('MCPlayer')
-export class MCPlayer extends Component {
+export class MCPlayer extends Component implements IAnimationPlayer{
     @property(Sprite)
     private sprite: Sprite | null = null;
 
@@ -24,10 +24,10 @@ export class MCPlayer extends Component {
 
     async loadAnimation(...args: any[]) {
         await this.loader.loadAnimation(...args);
-        this.setupMovieClip();
+        this.setupAnimation();
     }
 
-    public setupMovieClip(mcKey?: string) {
+    public setupAnimation(mcKey?: string) {
         if (!this.movieClip) {
             this.movieClip = new MovieClip();
             this.movieClip.setFrameUpdateRender(this.updateSprite.bind(this));
@@ -56,12 +56,8 @@ export class MCPlayer extends Component {
         this.movieClip?.playAnime(); 
     }
     stop() { this.movieClip?.stopAnime(); }
-    pause() { this.movieClip?.pauseAnime(); }
-    resume() { this.movieClip?.resumeAnime(); }
     setUpdateGap(gap: number) { this.movieClip?.setUpdateGap(gap); }
     setAnimeTimes(times: number) { this.movieClip?.setAnimeTimes(times); }
-    setEasingFunction(easingFunction: (t: number) => number) { this.movieClip?.setEasingFunction(easingFunction); }
-
     update(dt: number) { this.movieClip?.update(dt); }
     onDestroy() { this.movieClip?.destroy(); }
 }
