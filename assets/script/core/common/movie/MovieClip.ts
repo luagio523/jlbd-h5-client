@@ -69,6 +69,11 @@ export default class MovieClip {
         this.isLoop = animeTimes === 0;
     }
 
+    public onComplete(callback: Function) {
+        this.isLoop = false;
+        this.onCompleteCallback = callback;
+    }
+
     public setEasingFunction(easingFunction: EasingFunction) {
         this.easingFunction = easingFunction;
     }
@@ -81,9 +86,7 @@ export default class MovieClip {
         this.onUpdateCallback = callback;
     }
 
-    public onComplete(callback: Function) {
-        this.onCompleteCallback = callback;
-    }
+   
 
     public update(dt: number) {
         if (this.statusStop || this.statusPause) {
