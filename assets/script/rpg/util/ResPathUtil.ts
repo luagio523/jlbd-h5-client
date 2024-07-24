@@ -51,7 +51,7 @@ export class ResPathUtil {
      * @returns 
      */
     public static getBodyActPrefabPath(type: ActResourceType): string {
-        let base =`${this.BASE_PATHS.Prefab}/body/Actbody`
+        let base =`${this.BASE_PATHS.Prefab}/body/Character`
         switch (type) {
             case ActResourceType.ACT1:
                 return base+"1";

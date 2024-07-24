@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.Prefab",
-    "_name": "heroPlayer",
+    "_name": "Character1",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_native": "",
@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "heroPlayer",
+    "_name": "Character1",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,
@@ -505,7 +505,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "BodyPlayer",
+    "_name": "Body",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -671,7 +671,6 @@
     "__type__": "23424l7l9VCbbPaXWxzPOP9",
     "_name": "",
     "_objFlags": 0,
-    "__editorExtras__": {},
     "node": {
       "__id__": 1
     },
@@ -680,7 +679,7 @@
       "__id__": 29
     },
     "sprite": null,
-    "_id": ""
+    "_id": "a1HpmanbVCgJajgpHRtZh3"
   },
   {
     "__type__": "cc.CompPrefabInfo",

@@ -1,58 +1,76 @@
-import { Prefab, instantiate, Node, Label, Sprite, resources, tween, Vec3, sp, dragonBones, Component } from 'cc';
+import { Prefab, instantiate, Node, Label, Sprite, resources, tween, sp, dragonBones, Component } from 'cc';
 import { ActPlayer, ActPlayerFactory, ActResourceType } from './ActPlayer';
 import { ResPathUtil } from '../util/ResPathUtil';
 
-export class BodyRender {
-    private bodyNode: Node = null;
-    private nameLabel: Label = null;
-    private healthBar: Sprite = null;
-    private manaBar: Sprite = null;
-    private actPlayer:ActPlayer  = null;
-    private actResurceType:ActResourceType = null;
+export class CharacterRenderer {
+    private bodyNode: Node | null = null;
+    private nameLabel: Label | null = null;
+    private healthBar: Sprite | null = null;
+    private manaBar: Sprite | null = null;
+    private actPlayer: ActPlayer | null = null;
+    private actResurceType: ActResourceType | null = null;
 
-    public initialize(type:ActResourceType) {
+    public initialize(type: ActResourceType) {
         this.actResurceType = type;
         this.setupBody();
     }
 
     public setupBody(parent?: Node) {
         const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.actResurceType);
-    
+
         resources.load(actBodyPath, Prefab, (err, prefab) => {
             if (err) {
-                console.error("Failed to load hero prefab:", err);
+                console.error("Failed to load Character prefab:", err);
                 return;
             }
-    
+
             this.createBodyNode(prefab, parent);
             this.setupComponents();
             this.setupActPlayer();
         });
     }
-    
+
     private createBodyNode(prefab: Prefab, parent?: Node) {
         this.bodyNode = instantiate(prefab);
         if (parent) {
             parent.addChild(this.bodyNode);
         }
     }
-    
+
     private setupComponents() {
+        if (!this.bodyNode) {
+            console.error("Body node is not initialized.");
+            return;
+        }
         this.nameLabel = this.getComponentFromChild('NameLabel', Label);
         this.healthBar = this.getComponentFromChild('HealthBar', Sprite);
         this.manaBar = this.getComponentFromChild('ManaBar', Sprite);
     }
-    
+
     private getComponentFromChild<T extends Component>(childName: string, componentType: new () => T): T {
-        return this.bodyNode.getChildByName(childName).getComponent(componentType);
+        if (!this.bodyNode) {
+            throw new Error("Body node is not initialized.");
+        }
+        const childNode = this.bodyNode.getChildByName(childName);
+        if (!childNode) {
+            throw new Error(`Child node ${childName} not found.`);
+        }
+        const component = childNode.getComponent(componentType);
+        if (!component) {
+            throw new Error(`Component ${componentType.name} not found on ${childName}.`);
+        }
+        return component;
     }
-    
+
     private setupActPlayer() {
         const bodyComponent = this.getBodyComponent();
         this.actPlayer = ActPlayerFactory.createPlayer(this.actResurceType, bodyComponent);
     }
-    
+
     private getBodyComponent(): Component {
+        if (!this.actResurceType) {
+            throw new Error("ActResourceType is not initialized.");
+        }
         switch (this.actResurceType) {
             case ActResourceType.ACT1:
             case ActResourceType.ACT2:
@@ -66,7 +84,7 @@ export class BodyRender {
         }
     }
 
-    updateHero(name: string, health: number, mana: number) {
+    public updateCharacterStatus(name: string, health: number, mana: number) {
         if (this.nameLabel) {
             this.nameLabel.string = name;
         }
@@ -89,9 +107,30 @@ export class BodyRender {
         }
     }
 
-    destroy() {
+    public async playAction(actionName: string, callback: () => void) {
+        if (this.actPlayer) {
+            await this.actPlayer.changeAct(actionName);
+            this.actPlayer.onComplete(callback).play();
+        }
+    }
+
+    public destroy() {
         if (this.bodyNode) {
             this.bodyNode.destroy();
+            this.bodyNode = null;
         }
     }
 }
+
+
+
+
+
+// const characterRenderer = new CharacterRenderer();
+// characterRenderer.initialize(ActResourceType.ACT1);
+// characterRenderer.setupBody(parentNode);
+// characterRenderer.updateCharacterStatus('HeroName', 100, 50);
+// characterRenderer.playAction('attack', () => {
+//     console.log('Action completed');
+// });
+// characterRenderer.destroy();

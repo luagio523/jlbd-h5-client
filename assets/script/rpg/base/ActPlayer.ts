@@ -12,10 +12,12 @@ export abstract class ActPlayer {
 
 
     abstract initialize(...args: any[]): ActPlayer;
-    abstract changeAct(...args: any[]): Promise<ActPlayer>;
+    abstract changeAct(...args: any[]): Promise<void>;
 
     onComplete(callback: (() => void) | null):ActPlayer{
-        this.player.onComplete(callback);
+        if(callback){
+            this.player.onComplete(callback);
+        }
         return this;
     }
 
@@ -49,7 +51,7 @@ class Act1Player extends ActPlayer {
         return this;
     }
 
-    async changeAct(modelName: string,action: ActType): Promise<ActPlayer> {
+    async changeAct(modelName: string,action: ActType): Promise<void> {
         if(!this.player){
             throw new Error('player not initialized');
         }
@@ -58,7 +60,6 @@ class Act1Player extends ActPlayer {
         await this.player.loadAnimation(atlasPath);
         this.player.setupAnimation(mc);
         this.setLooping(true); // 默认循环
-        return this;
     }
 
     protected getActionName(action: ActType): string {
@@ -97,7 +98,7 @@ class Act2Player extends ActPlayer {
         return this;
     }
 
-    async changeAct(modelName: string,action: ActType,  direction: number,gender: number): Promise<ActPlayer> {
+    async changeAct(modelName: string,action: ActType,  direction: number,gender: number): Promise<void> {
         if(!this.player){
             throw new Error('player not initialized');
         }
@@ -109,7 +110,7 @@ class Act2Player extends ActPlayer {
         this.player.setupAnimation(mc);
         // 设置默认的循环行为
         this.setLooping(true);
-        return this
+        return 
     }
 
     getMCKey(modelName: string, gender: number = 1, direction: number, action: ActType): string {
@@ -145,7 +146,7 @@ class Act3Player extends ActPlayer {
         return this;
     }
 
-    async changeAct(modelName: string,action: ActType): Promise<ActPlayer> {
+    async changeAct(modelName: string,action: ActType): Promise<void> {
         if(!this.player){
             throw new Error('player not initialized');
         }
@@ -160,7 +161,6 @@ class Act3Player extends ActPlayer {
         this.player.setupAnimation(actionName);
         // 设置默认的循环行为
         this.setLooping(true);
-        return this
     }
 
     private actionMap: { [key in ActType]?: string } = {
@@ -193,7 +193,7 @@ class Act4Player extends ActPlayer {
         return this;
     }
 
-    async changeAct(modelName: string, action: ActType = ActType.ACT_IDLE): Promise<ActPlayer> {
+    async changeAct(modelName: string, action: ActType = ActType.ACT_IDLE): Promise<void> {
         if(!this.player){
             throw new Error('player not initialized');
         }
@@ -208,7 +208,6 @@ class Act4Player extends ActPlayer {
         this.player.setupAnimation(actionName);
         // 设置默认的循环行为
         this.setLooping(true);
-        return this
     }
 
     private actionMap: { [key in ActType]?: string } = {
