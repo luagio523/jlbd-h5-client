@@ -62,7 +62,6 @@ export class DragonPlayer extends Component implements IAnimationPlayer {
     play(playTimes = 0) {
         if (this.armatureDisplay && this.animationName) {
             this.armatureDisplay.playAnimation(this.animationName, playTimes);
-            
         }
     }
 
@@ -82,7 +81,7 @@ export class DragonPlayer extends Component implements IAnimationPlayer {
         this.play(times);
     }
 
-    setOnCompleteCallback(callback: Function) {
+    onComplete(callback: Function) {
         this.onCompleteCallback = callback;
     }
 

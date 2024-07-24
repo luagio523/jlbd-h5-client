@@ -1,20 +1,23 @@
+import { DragonPlayer } from "../../core/common/animation/DragonPlayer";
 import { SpriteAtlasLoader, SpriteSheetLoader } from "../../core/common/animation/MCLoader";
 import { MCPlayer } from "../../core/common/animation/MCPlayer";
+import { SpinePlayer } from "../../core/common/animation/SpinePlayer";
 import { ActType } from "../enum/Act";
 
 // 抽象基类
 abstract class ActPlayer {
-    protected player: MCPlayer;
+    protected player: IAnimationPlayer;
     protected isLooping: boolean = false;
-    protected onCompleteCallback: (() => void) | null = null;
 
-    abstract initialize(modelName: string, gender: number, direction: number, action: ActType): Promise<void>;
-    abstract getMCKey(modelName: string, gender: number, direction: number, action: ActType): string;
+    abstract changeAct(...args: any[]): Promise<ActPlayer>;
+
+    onComplete(callback: (() => void) | null):ActPlayer{
+        this.player.onComplete(callback);
+        return this;
+    }
 
     // 共用方法
-    play(looping: boolean = false, onComplete: (() => void) | null = null) {
-        this.setLooping(looping);
-        this.setOnCompleteCallback(onComplete);
+    play( )  {
         this.player.play();
     }
 
@@ -27,23 +30,13 @@ abstract class ActPlayer {
         this.isLooping = looping;
         this.player.setAnimeTimes(looping ? 0 : 1);
     }
-
-    setOnCompleteCallback(callback: (() => void) | null) {
-        this.onCompleteCallback = callback;
-        this.player.setOnCompleteCallback(() => {
-            if (this.onCompleteCallback) {
-                this.onCompleteCallback();
-            }
-            if (!this.isLooping) {
-                this.stop();
-            }
-        });
-    }
-
-    protected abstract getActionName(action: ActType): string;
+    
 }
 
-// Act1Player 实现
+/**
+ * 基于 SpriteAtlasPlayer 实现
+ * 能够使用creator plist atlas资源
+ */
 class Act1Player extends ActPlayer {
     constructor() {
         super();
@@ -51,20 +44,14 @@ class Act1Player extends ActPlayer {
         this.player = new MCPlayer(loader);
     }
 
-    async initialize(modelName: string, gender: number = 1, direction: number = 0, action: ActType = ActType.ACT_IDLE): Promise<void> {
-        let mc = this.getMCKey(modelName, gender, direction, action);
+    async changeAct(modelName: string,action: ActType): Promise<ActPlayer> {
+        let mc = this.getMCKey(modelName,  action);
         let jsonPath = `anim/body/${mc}.json`;
         let imgPath = `anim/body/${mc}.png`;
         await this.player.loadAnimation(jsonPath, imgPath);
         this.player.setupAnimation(mc);
-
-        // 设置默认的循环行为
-        this.setLooping(this.shouldLoop(action));
-    }
-
-    getMCKey(modelName: string, gender: number = 1, direction: number, action: ActType): string {
-        const actionName = this.getActionName(action);
-        return `${modelName}_${actionName}`;
+        this.setLooping(true); // 默认循环
+        return this;
     }
 
     protected getActionName(action: ActType): string {
@@ -80,14 +67,18 @@ class Act1Player extends ActPlayer {
         return actionMap[action] || 's';
     }
 
-    private shouldLoop(action: ActType): boolean {
-        // 定义哪些动作应该循环
-        const loopingActions = [ActType.ACT_IDLE, ActType.ACT_WALK, ActType.ACT_RUN];
-        return loopingActions.includes(action);
+    getMCKey(modelName: string, action: ActType): string {
+        const actionName = this.getActionName(action);
+        return `${modelName}_${actionName}`;
     }
+    
 }
 
-// Act2Player 实现
+// 
+/**
+ * 基于 SpriteSheetPlayer 实现
+ * 能够使用egret sheet资源
+ */
 class Act2Player extends ActPlayer {
     constructor() {
         super();
@@ -95,15 +86,15 @@ class Act2Player extends ActPlayer {
         this.player = new MCPlayer(sheetLoader);
     }
 
-    async initialize(modelName: string, gender: number = 1, direction: number = 0, action: ActType = ActType.ACT_IDLE): Promise<void> {
+    async changeAct(modelName: string,action: ActType,  direction: number,gender: number): Promise<ActPlayer> {
         let mc = this.getMCKey(modelName, gender, direction, action);
         let jsonPath = `anim/sheetbody/${mc}.json`;
         let imgPath = `anim/sheetbody/${mc}.png`;
         await this.player.loadAnimation(jsonPath, imgPath);
         this.player.setupAnimation(mc);
-
         // 设置默认的循环行为
-        this.setLooping(this.shouldLoop(action));
+        this.setLooping(true);
+        return this
     }
 
     getMCKey(modelName: string, gender: number = 1, direction: number, action: ActType): string {
@@ -122,33 +113,107 @@ class Act2Player extends ActPlayer {
         };
         return actionMap[action] || 's';
     }
+}
 
-    private shouldLoop(action: ActType): boolean {
-        // 定义哪些动作应该循环
-        const loopingActions = [ActType.ACT_IDLE, ActType.ACT_WALK, ActType.ACT_RUN];
-        return loopingActions.includes(action);
+
+/**
+ * 基于 SpriteSheetPlayer 实现
+ * 能够使用egret sheet资源
+ */
+class Act3Player extends ActPlayer {
+    constructor() {
+        super();
+        this.player =  new DragonPlayer();
+    }
+
+    async changeAct(modelName: string,action: ActType): Promise<ActPlayer> {
+      
+        let jsonPath = `anim/dragonbody/${modelName}_ske`;
+        let imgPath = `anim/dragonbody/${modelName}_tex`;
+
+
+        await this.player.loadAnimation(jsonPath, imgPath,modelName);
+        const actionName = this.getActionName(action);
+
+        this.player.setupAnimation(actionName);
+        // 设置默认的循环行为
+        this.setLooping(true);
+        return this
+    }
+
+    private actionMap: { [key in ActType]?: string } = {
+        [ActType.ACT_IDLE]: 'Idle',
+        [ActType.ACT_WALK]: 'Idle',
+        [ActType.ACT_RUN]: 'Idle',
+        [ActType.ACT_ATTACK]: 'Attack A',
+        [ActType.ACT_CAST]: 'Attack B',
+    };
+
+
+    protected getActionName(action: ActType): string {
+        // Act2Player 特定的动作名映射
+        return this.actionMap[action] || 's';
+    }
+}
+
+
+
+/**
+ * 基于 SpriteSheetPlayer 实现
+ * 能够使用egret sheet资源
+ */
+class Act4Player extends ActPlayer {
+    constructor() {
+        super();
+        this.player =  new SpinePlayer();
+    }
+
+    async changeAct(modelName: string, action: ActType = ActType.ACT_IDLE): Promise<ActPlayer> {
+      
+        let jsonPath = `anim/dragonbody/${modelName}_ske`;
+        let imgPath = `anim/dragonbody/${modelName}_tex`;
+
+
+        await this.player.loadAnimation(jsonPath, imgPath,modelName);
+        const actionName = this.getActionName(action);
+
+        this.player.setupAnimation(actionName);
+        // 设置默认的循环行为
+        this.setLooping(true);
+        return this
+    }
+
+    private actionMap: { [key in ActType]?: string } = {
+        [ActType.ACT_IDLE]: 'Idle',
+        [ActType.ACT_WALK]: 'Idle',
+        [ActType.ACT_RUN]: 'Idle',
+        [ActType.ACT_ATTACK]: 'Attack A',
+        [ActType.ACT_CAST]: 'Attack B',
+    };
+
+
+    protected getActionName(action: ActType): string {
+        // Act2Player 特定的动作名映射
+        return this.actionMap[action] || 's';
     }
 }
 
 // 使用示例
 (async () => {
     const player = new Act1Player();
-    await player.initialize("character", 1, 0, ActType.ACT_IDLE);
+    await player.changeAct("character",  ActType.ACT_IDLE);
 
     // 播放循环动作（如待机）
-    player.play(true);
+    player.play();
 
     // 播放非循环动作（如攻击），并在完成后执行回调
-    player.play(false, () => {
-        console.log("攻击动作完成");
-        // 这里可以切换回待机动作或执行其他逻辑
-    });
+    player.play();
 
     // 如果需要中途改变循环状态
     player.setLooping(true);
 
     // 如果需要中途改变完成回调
-    player.setOnCompleteCallback(() => {
+    player.onComplete(() => {
         console.log("新的完成回调");
     });
 })();
@@ -171,7 +236,7 @@ class ActPlayerFactory {
 // 使用示例
 async function useActPlayer() {
     const player = ActPlayerFactory.createPlayer('Act1');
-    await player.initialize('character001', 1, 0, ActType.ACT_IDLE);
+    await player.changeAct('character001', 1, 0, ActType.ACT_IDLE);
     player.play();
 }
 

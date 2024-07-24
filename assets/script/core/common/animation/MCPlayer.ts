@@ -15,11 +15,11 @@ export class MCPlayer extends Component implements IAnimationPlayer{
 
     private loader: BaseMCLoader;
     private movieClip: MovieClip | null = null;
-    private onCompleteCallback: Function | null = null;
 
     constructor(loader: BaseMCLoader) {
         super();
         this.loader = loader;
+        this.movieClip = new MovieClip();
     }
 
     async loadAnimation(...args: any[]) {
@@ -28,21 +28,13 @@ export class MCPlayer extends Component implements IAnimationPlayer{
     }
 
     public setupAnimation(mcKey?: string) {
-        if (!this.movieClip) {
-            this.movieClip = new MovieClip();
-            this.movieClip.setFrameUpdateRender(this.updateSprite.bind(this));
-            this.movieClip.onComplete(() => {
-                if (this.onCompleteCallback) {
-                    this.onCompleteCallback();
-                }
-            });
-        }
+        this.movieClip.setFrameUpdateRender(this.updateSprite.bind(this));
         const frames = this.loader.getAnimationData(mcKey) || [];
         this.movieClip.setFrames(frames);
     }
 
-    setOnCompleteCallback(callback: Function) {
-        this.onCompleteCallback = callback;
+    onComplete(callback: Function) {
+        this.movieClip.onComplete(callback);
     }
     
     private updateSprite(spriteFrame: SpriteFrame, progress: number) {

@@ -5,6 +5,6 @@ interface IAnimationPlayer {
     stop(): void;
     setUpdateGap(gap: number): void;
     setAnimeTimes(times: number): void;
-    setOnCompleteCallback(callback: Function): void;
+    onComplete(callback: Function): void;
     update(dt: number): void;
 }

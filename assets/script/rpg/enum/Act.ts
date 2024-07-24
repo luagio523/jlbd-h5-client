@@ -4,11 +4,20 @@ export enum ActType {
     ACT_WALK = 2,         // 行走状态，角色以走的方式移动
     ACT_RUN = 3,          // 跑步状态，角色以跑的方式快速移动
     ACT_ATTACK = 4,       // 攻击状态，角色执行攻击动作
-    ACT_STAND = 5,        // 站立状态，角色静止站立
-    ACT_DEATH = 6,        // 死亡状态，角色死亡动作和效果
-    ACT_CAST =  7,        //施法
-    ACT_HURT = 11, //受伤
+    ACT_CAST = 5,        //施法
+    ACT_ATTACK2 = 6,       // 攻击状态，角色执行攻击动作2
+    ACT_ATTACK3 = 7,       // 攻击状态，角色执行攻击动作3
+    ACT_ATTACK4 = 8,       // 攻击状态，角色执行攻击动作4
+    ACT_ATTACK5 = 9,       // 攻击状态，角色执行攻击动作5
+    
 
+    ACT_STAND = 10,        // 站立状态，角色静止站立
+
+    ACT_DEATH = 11,        // 死亡状态，角色死亡动作和效果
+    
+    ACT_HURT = 13, //受伤
+
+    
     ACT_JUMP = 20,        // 跳跃状态，角色执行跳跃动作
     ACT_FLY = 21,         // 飞行状态，角色在空中飞行或悬浮
     ACT_SWIM = 22,        // 游泳状态，角色在水中游泳

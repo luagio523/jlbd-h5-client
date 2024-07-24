@@ -74,7 +74,7 @@ export class SpinePlayer extends Component implements IAnimationPlayer {
         this.play(times > 1);
     }
 
-    setOnCompleteCallback(callback: Function) {
+    onComplete(callback: Function) {
         this.onCompleteCallback = callback;
     }
 
