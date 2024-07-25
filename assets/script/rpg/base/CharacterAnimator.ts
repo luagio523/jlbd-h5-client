@@ -21,7 +21,7 @@ export class CharacterAnimator {
     private currentState: AnimationStateType = AnimationStateType.Idle;
     private queuedStates: { state: AnimationStateType; options: ActionOptions }[] = [];
     private stateTransitions: Map<AnimationStateType, StateTransition>;
-
+    private isAnimationPlaying: boolean = false;
     constructor(animationState: ActAnimationState) {
         this.animationState = animationState;
         this.setupAnimationEvents();
@@ -30,18 +30,16 @@ export class CharacterAnimator {
 
     private setupAnimationEvents() {
         this.animationState.onComplete(() => {
+            this.isAnimationPlaying = false;
             this.onAnimationComplete();
         });
     }
 
     private initializeStateTransitions() {
         this.stateTransitions = new Map([
-            [AnimationStateType.Idle, { nextState: null, autoTransition: false }],
             [AnimationStateType.Attack, { nextState: AnimationStateType.Idle, autoTransition: true }],
-            [AnimationStateType.Move, { nextState: null, autoTransition: false }],
             [AnimationStateType.Cast, { nextState: AnimationStateType.Idle, autoTransition: true }],
             [AnimationStateType.Hurt, { nextState: AnimationStateType.Idle, autoTransition: true }],
-            [AnimationStateType.Death, { nextState: null, autoTransition: false }],
             [AnimationStateType.Jump, { nextState: AnimationStateType.Idle, autoTransition: true }],
             [AnimationStateType.Use, { nextState: AnimationStateType.Idle, autoTransition: true }],
         ]);
@@ -63,46 +61,58 @@ export class CharacterAnimator {
     }
 
     public transitionToState(newState: AnimationStateType, options: ActionOptions) {
-        if (newState === this.currentState) return;
+        let shouldPlayAnimation = true;
 
-        let actionOptions: ActionOptions = { ...options };
-
-        if (!actionOptions.action) {
+        if (newState === this.currentState) {
+            // 如果是相同状态，检查是否应该重新播放动画
             switch (newState) {
-                case AnimationStateType.Idle:
-                    actionOptions.action = ActType.ACT_IDLE;
-                    break;
                 case AnimationStateType.Attack:
-                    actionOptions.action = ActType.ACT_ATTACK;
+                case AnimationStateType.Cast:
+                    // 对于攻击和施法，我们允许打断当前动画并重新开始
                     break;
                 case AnimationStateType.Move:
-                    actionOptions.action = ActType.ACT_WALK;
-                    break;
-                case AnimationStateType.Cast:
-                    actionOptions.action = ActType.ACT_CAST;
-                    break;
-                case AnimationStateType.Hurt:
-                    actionOptions.action = ActType.ACT_HURT;
-                    break;
-                case AnimationStateType.Death:
-                    actionOptions.action = ActType.ACT_DEATH;
-                    break;
-                case AnimationStateType.Jump:
-                    actionOptions.action = ActType.ACT_JUMP;
-                    break;
-                case AnimationStateType.Use:
-                    actionOptions.action = ActType.ACT_USE;
+                    // 对于移动，我们可能只想更新方向而不重新开始动画
+                    shouldPlayAnimation = false;
                     break;
                 default:
-                    throw new Error(`Unsupported animation state: ${newState}`);
+                    // 对于其他状态，如果动画正在播放，我们不重新开始
+                    if (this.isAnimationPlaying) {
+                        shouldPlayAnimation = false;
+                    }
             }
         }
 
-        this.animationState.changeAct(actionOptions).then(() => {
-            this.currentState = newState;
-            this.animationState.play();
-        });
+        if (shouldPlayAnimation) {
+
+            if (!options.action) {
+                options.action = this.getDefaultActionForState(newState);
+            }
+
+            this.animationState.changeAct(options).then(() => {
+                this.currentState = newState;
+                this.isAnimationPlaying = true;
+                this.animationState.play();
+            });
+        } else {
+            // 如果不播放新动画，可能需要更新一些状态或参数
+            this.updateStateWithoutPlayingAnimation(newState, options);
+        }
     }
+
+    private getDefaultActionForState(state: AnimationStateType): ActType {
+        switch (state) {
+            case AnimationStateType.Idle: return ActType.ACT_IDLE;
+            case AnimationStateType.Attack: return ActType.ACT_ATTACK;
+            case AnimationStateType.Move: return ActType.ACT_WALK;
+            case AnimationStateType.Cast: return ActType.ACT_CAST;
+            case AnimationStateType.Hurt: return ActType.ACT_HURT;
+            case AnimationStateType.Death: return ActType.ACT_DEATH;
+            case AnimationStateType.Jump: return ActType.ACT_JUMP;
+            case AnimationStateType.Use: return ActType.ACT_USE;
+            default: throw new Error(`Unsupported animation state: ${state}`);
+        }
+    }
+
 
     public mapActionToAnimationStateType(action: ActType): AnimationStateType {
         switch (action) {
@@ -132,13 +142,23 @@ export class CharacterAnimator {
         }
     }
 
+    private updateStateWithoutPlayingAnimation(state: AnimationStateType, options: ActionOptions) {
+        // 根据需要更新状态或参数，但不播放新的动画
+        // 例如，更新移动方向、攻击目标等
+        console.log(`Updating state to ${state} without playing new animation`);
+    }
+
     public queueState(state: AnimationStateType, options: ActionOptions) {
-        if (this.currentState === AnimationStateType.Idle || this.currentState === AnimationStateType.Move) {
+        if (this.currentState === AnimationStateType.Idle || 
+            this.currentState === AnimationStateType.Move || 
+            !this.isAnimationPlaying) {
             this.transitionToState(state, options);
         } else {
             this.queuedStates.push({ state, options });
         }
     }
+
+   
 
     public update(dt: number) {
         this.animationState.update(dt);
