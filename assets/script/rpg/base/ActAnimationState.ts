@@ -12,40 +12,47 @@ export interface ActionOptions {
     action: ActType;
     direction?: number;
     gender?: number;
-    times?: number; // 0表示无限循环
+    frameRate?: number;
+    loop?: boolean;
 }
 
 
 // 抽象基类
 export abstract class ActAnimationState {
     protected player: IAnimationPlayer;
-    protected isLooping: boolean = false;
-    protected act:ActType = ActType.ACT_IDLE;
+    protected currentActionOptions: ActionOptions;
 
     abstract initialize(...args: any[]): ActAnimationState;
-    abstract changeAct(options:ActionOptions): Promise<void>; //播放动作
+    abstract changeAct(options: ActionOptions): Promise<ActAnimationState>;
 
-    public update(dt:number){
+    public update(dt: number) {
         this.player?.update(dt);
     }
 
-    onComplete(callback: ((act:ActType) => void) ):ActAnimationState{
-        if(callback){
-            this.player.onComplete(()=>{
-                callback(this.act);
+    onComplete(callback: ((act: ActionOptions) => void)): ActAnimationState {
+        if (callback) {
+            this.player.onComplete(() => {
+                callback(this.currentActionOptions);
             });
         }
         return this;
     }
 
-    // 共用方法 0次表示无限循环
-    play(times: number = 0)  {
+    play(times: number = 0) {
         this.player.play(times);
     }
 
-    stop() { this.player.stop(); }
-  
-    setFrameRate(frameRate: number) { this.player.setFrameRate(frameRate); }
+    stop() {
+        this.player.stop();
+    }
+
+    setFrameRate(frameRate: number) {
+        this.player.setFrameRate(frameRate);
+    }
+
+    getCurrentActionOptions(): ActionOptions {
+        return this.currentActionOptions;
+    }
 }
 
 /**
@@ -57,30 +64,30 @@ class AtlasAnimationState extends ActAnimationState {
         super();
     }
 
-    public initialize(sprite:Sprite): ActAnimationState {
+    public initialize(sprite: Sprite): ActAnimationState {
         this.player = new MCPlayer(sprite);
-        this.player.setFrameRate(12);
+        this.setFrameRate(12);
         return this;
     }
 
-    async changeAct(options:ActionOptions): Promise<void> {
-        if(!this.player){
+    async changeAct(options: ActionOptions): Promise<ActAnimationState> {
+        if (!this.player) {
             throw new Error('player not initialized');
         }
-        const {
-            modelName,
-            action = ActType.ACT_IDLE,
-        } = options;
 
-        let mc = this.getMCKey(modelName,  action);
-        let atlasPath = `anim/body/char`;
-        await this.player.loadAnimation(AnimResourceType.SpriteAltas,atlasPath);
+        const { modelName, action = ActType.ACT_IDLE } = options;
+        this.currentActionOptions = options;
+
+        const mc = this.getMCKey(modelName, action);
+        const atlasPath = `anim/body/char`;
+
+        await this.player.loadAnimation(AnimResourceType.SpriteAltas, atlasPath);
         this.player.setupAnimation(mc);
-        this.play(options.times || 0);
+
+        return this;
     }
 
     protected getActionName(action: ActType): string {
-        // Act1Player 特定的动作名映射
         const actionMap: { [key in ActType]?: string } = {
             [ActType.ACT_IDLE]: 's',
             [ActType.ACT_WALK]: 'r',
@@ -96,7 +103,6 @@ class AtlasAnimationState extends ActAnimationState {
         const actionName = this.getActionName(action);
         return `${modelName}_${actionName}`;
     }
-    
 }
 
 // 
@@ -109,14 +115,13 @@ class EgretAnimationState extends ActAnimationState {
         super();
     }
 
-    public initialize(sprite:Sprite): ActAnimationState {
+    public initialize(sprite: Sprite): ActAnimationState {
         this.player = new MCPlayer(sprite);
-        this.player.setFrameRate(12);
         return this;
     }
 
-    async changeAct(options:ActionOptions): Promise<void> {
-        if(!this.player){
+    async changeAct(options: ActionOptions): Promise<ActAnimationState> {
+        if (!this.player) {
             throw new Error('player not initialized');
         }
 
@@ -124,14 +129,18 @@ class EgretAnimationState extends ActAnimationState {
             modelName,
             action = ActType.ACT_IDLE,
             gender = 1,
-            direction = 0,
+            direction = 0
         } = options;
 
-        let mc = this.getMCKey(modelName, gender, direction, action);
-        let resoucePath = `anim/sheetbody/${mc}`;
-        await this.player.loadAnimation(AnimResourceType.EgretSpriteSheet,resoucePath);
+        this.currentActionOptions = options;
+
+        const mc = this.getMCKey(modelName, gender, direction, action);
+        const resourcePath = `anim/sheetbody/${mc}`;
+
+        await this.player.loadAnimation(AnimResourceType.EgretSpriteSheet, resourcePath);
         this.player.setupAnimation(mc);
-        this.play(options.times || 0);
+
+        return this;
     }
 
     getMCKey(modelName: string, gender: number = 1, direction: number, action: ActType): string {
@@ -140,7 +149,6 @@ class EgretAnimationState extends ActAnimationState {
     }
 
     protected getActionName(action: ActType): string {
-        // Act2Player 特定的动作名映射
         const actionMap: { [key in ActType]?: string } = {
             [ActType.ACT_IDLE]: 's',
             [ActType.ACT_WALK]: 'r',
@@ -162,28 +170,30 @@ class DragonAnimationState extends ActAnimationState {
         super();
     }
 
-    public initialize(armatureDisplay:dragonBones.ArmatureDisplay): ActAnimationState {
-        this.player =  new DragonPlayer(armatureDisplay);
+    public initialize(armatureDisplay: dragonBones.ArmatureDisplay): ActAnimationState {
+        this.player = new DragonPlayer(armatureDisplay);
         return this;
     }
 
-    async changeAct(options:ActionOptions): Promise<void> {
-        if(!this.player){
+    async changeAct(options: ActionOptions): Promise<ActAnimationState> {
+        if (!this.player) {
             throw new Error('player not initialized');
         }
 
         const {
             modelName,
-            action = ActType.ACT_IDLE,
+            action = ActType.ACT_IDLE
         } = options;
-      
-        let resoucePath = `anim/dragonbody/${modelName}`;
 
+        this.currentActionOptions = options;
 
-        await this.player.loadAnimation(AnimResourceType.DragonBones,resoucePath);
+        const resourcePath = `anim/dragonbody/${modelName}`;
+
+        await this.player.loadAnimation(AnimResourceType.DragonBones, resourcePath);
         const actionName = this.getActionName(action);
-        this.player.setupAnimation(actionName,modelName);
-        this.play(options.times || 0);
+        this.player.setupAnimation(actionName, modelName);
+
+        return this;
     }
 
     private actionMap: { [key in ActType]?: string } = {
@@ -197,10 +207,8 @@ class DragonAnimationState extends ActAnimationState {
         [ActType.ACT_CAST]: 'Attack B',
     };
 
-
     protected getActionName(action: ActType): string {
-        // Act2Player 特定的动作名映射
-        return this.actionMap[action] || 's';
+        return this.actionMap[action] || 'Idle';
     }
 }
 
@@ -214,28 +222,31 @@ class SpineAnimationState extends ActAnimationState {
     constructor() {
         super();
     }
+
     public initialize(skeleton: sp.Skeleton): ActAnimationState {
-        this.player =  new SpinePlayer(skeleton);
+        this.player = new SpinePlayer(skeleton);
         return this;
     }
 
-    async changeAct(options: ActionOptions): Promise<void> {
-        if(!this.player){
+    async changeAct(options: ActionOptions): Promise<ActAnimationState> {
+        if (!this.player) {
             throw new Error('player not initialized');
         }
 
         const {
             modelName,
-            action = ActType.ACT_IDLE,
+            action = ActType.ACT_IDLE
         } = options;
-      
-        let resourcePath = `anim/spinebody/${modelName}`;
 
-        await this.player.loadAnimation(AnimResourceType.Spine,resourcePath);
+        this.currentActionOptions = options;
+
+        const resourcePath = `anim/spinebody/${modelName}`;
+
+        await this.player.loadAnimation(AnimResourceType.Spine, resourcePath);
         const actionName = this.getActionName(action);
+        this.player.setupAnimation(actionName, modelName);
 
-        this.player.setupAnimation(actionName,modelName);
-        this.play(options.times || 0);
+        return this;
     }
 
     private actionMap: { [key in ActType]?: string } = {
@@ -246,10 +257,8 @@ class SpineAnimationState extends ActAnimationState {
         [ActType.ACT_CAST]: 'Attack B',
     };
 
-
     protected getActionName(action: ActType): string {
-        // Act2Player 特定的动作名映射
-        return this.actionMap[action] || 's';
+        return this.actionMap[action] || 'Idle';
     }
 }
 
