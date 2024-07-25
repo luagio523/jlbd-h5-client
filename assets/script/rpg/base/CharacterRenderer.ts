@@ -104,7 +104,7 @@ export class CharacterRenderer {
     public async playAction(options: ActionOptions) {
         if (this.characterAnimator) {
             const animationStateType = this.characterAnimator.mapActionToAnimationStateType(options.action);
-            this.characterAnimator.transitionToState(animationStateType, options.action);
+            this.characterAnimator.transitionToState(animationStateType, options);
         }
     }
 

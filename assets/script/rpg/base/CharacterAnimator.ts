@@ -1,7 +1,6 @@
 import { ActType } from "../enum/Act";
 import { ActAnimationState, ActionOptions } from "./ActAnimationState";
-
-export enum AnimationStateType {
+export enum AnimationStateType{
     Idle,
     Attack,
     Move,
@@ -20,11 +19,13 @@ interface StateTransition {
 export class CharacterAnimator {
     private animationState: ActAnimationState;
     private currentState: AnimationStateType = AnimationStateType.Idle;
-    private queuedStates: AnimationStateType[] = [];
+    private queuedStates: { state: AnimationStateType; options: ActionOptions }[] = [];
+    private stateTransitions: Map<AnimationStateType, StateTransition>;
 
     constructor(animationState: ActAnimationState) {
         this.animationState = animationState;
         this.setupAnimationEvents();
+        this.initializeStateTransitions();
     }
 
     private setupAnimationEvents() {
@@ -33,57 +34,75 @@ export class CharacterAnimator {
         });
     }
 
+    private initializeStateTransitions() {
+        this.stateTransitions = new Map([
+            [AnimationStateType.Idle, { nextState: null, autoTransition: false }],
+            [AnimationStateType.Attack, { nextState: AnimationStateType.Idle, autoTransition: true }],
+            [AnimationStateType.Move, { nextState: null, autoTransition: false }],
+            [AnimationStateType.Cast, { nextState: AnimationStateType.Idle, autoTransition: true }],
+            [AnimationStateType.Hurt, { nextState: AnimationStateType.Idle, autoTransition: true }],
+            [AnimationStateType.Death, { nextState: null, autoTransition: false }],
+            [AnimationStateType.Jump, { nextState: AnimationStateType.Idle, autoTransition: true }],
+            [AnimationStateType.Use, { nextState: AnimationStateType.Idle, autoTransition: true }],
+        ]);
+    }
+
     private onAnimationComplete() {
-        if (this.queuedStates.length > 0) {
-            this.transitionToState(this.queuedStates.shift()!);
-        } else if (this.currentState !== AnimationStateType.Idle && 
-                   this.currentState !== AnimationStateType.Move && 
-                   this.currentState !== AnimationStateType.Death) {
-            this.transitionToState(AnimationStateType.Idle);
+        const transition = this.stateTransitions.get(this.currentState);
+        if (transition && transition.autoTransition) {
+            if (this.queuedStates.length > 0) {
+                const nextStateInfo = this.queuedStates.shift()!;
+                this.transitionToState(nextStateInfo.state, nextStateInfo.options);
+            } else if (transition.nextState !== null) {
+                this.transitionToState(transition.nextState, { modelName: 'character', action: ActType.ACT_IDLE });
+            }
+        } else if (this.queuedStates.length > 0) {
+            const nextStateInfo = this.queuedStates.shift()!;
+            this.transitionToState(nextStateInfo.state, nextStateInfo.options);
         }
     }
 
-    public transitionToState(newState: AnimationStateType, actType?: ActType) {
+    public transitionToState(newState: AnimationStateType, options: ActionOptions) {
         if (newState === this.currentState) return;
 
-        let options: ActionOptions = { modelName: 'character', action: ActType.ACT_IDLE };
+        let actionOptions: ActionOptions = { ...options };
 
-        switch (newState) {
-            case AnimationStateType.Idle:
-                options.action = ActType.ACT_IDLE;
-                break;
-            case AnimationStateType.Attack:
-                options.action = actType || ActType.ACT_ATTACK;
-                break;
-            case AnimationStateType.Move:
-                options.action = actType || ActType.ACT_WALK;
-                break;
-            case AnimationStateType.Cast:
-                options.action = ActType.ACT_CAST;
-                break;
-            case AnimationStateType.Hurt:
-                options.action = ActType.ACT_HURT;
-                break;
-            case AnimationStateType.Death:
-                options.action = ActType.ACT_DEATH;
-                break;
-            case AnimationStateType.Jump:
-                options.action = ActType.ACT_JUMP;
-                break;
-            case AnimationStateType.Use:
-                options.action = ActType.ACT_USE;
-                break;
-            default:
-                throw new Error(`Unsupported animation state: ${newState}`);
+        if (!actionOptions.action) {
+            switch (newState) {
+                case AnimationStateType.Idle:
+                    actionOptions.action = ActType.ACT_IDLE;
+                    break;
+                case AnimationStateType.Attack:
+                    actionOptions.action = ActType.ACT_ATTACK;
+                    break;
+                case AnimationStateType.Move:
+                    actionOptions.action = ActType.ACT_WALK;
+                    break;
+                case AnimationStateType.Cast:
+                    actionOptions.action = ActType.ACT_CAST;
+                    break;
+                case AnimationStateType.Hurt:
+                    actionOptions.action = ActType.ACT_HURT;
+                    break;
+                case AnimationStateType.Death:
+                    actionOptions.action = ActType.ACT_DEATH;
+                    break;
+                case AnimationStateType.Jump:
+                    actionOptions.action = ActType.ACT_JUMP;
+                    break;
+                case AnimationStateType.Use:
+                    actionOptions.action = ActType.ACT_USE;
+                    break;
+                default:
+                    throw new Error(`Unsupported animation state: ${newState}`);
+            }
         }
 
-        this.animationState.changeAct(options).then(() => {
+        this.animationState.changeAct(actionOptions).then(() => {
             this.currentState = newState;
             this.animationState.play();
         });
     }
-
-
 
     public mapActionToAnimationStateType(action: ActType): AnimationStateType {
         switch (action) {
@@ -113,11 +132,11 @@ export class CharacterAnimator {
         }
     }
 
-    public queueState(state: AnimationStateType, actType?: ActType) {
+    public queueState(state: AnimationStateType, options: ActionOptions) {
         if (this.currentState === AnimationStateType.Idle || this.currentState === AnimationStateType.Move) {
-            this.transitionToState(state, actType);
+            this.transitionToState(state, options);
         } else {
-            this.queuedStates.push(state);
+            this.queuedStates.push({ state, options });
         }
     }
 
@@ -131,5 +150,9 @@ export class CharacterAnimator {
 
     public clearQueue() {
         this.queuedStates = [];
+    }
+
+    public setStateTransition(state: AnimationStateType, nextState: AnimationStateType | null, autoTransition: boolean) {
+        this.stateTransitions.set(state, { nextState, autoTransition });
     }
 }
