@@ -1,5 +1,5 @@
 
-import { Asset, Component, DynamicAtlasManager, Game,  SpriteFrame,  Texture2D,  UITransform,  _decorator, assetManager, director, game, macro, profiler, resources, screen, view  } from 'cc';
+import {DynamicAtlasManager, Game,   _decorator,  director, game, macro, profiler  } from 'cc';
 import { DEBUG, JSB } from 'cc/env';
 import { Root } from './core/Root';
 import app from './App';
@@ -18,11 +18,6 @@ macro.CLEANUP_IMAGE_CACHE = false;
 DynamicAtlasManager.instance.enabled = true;
 DynamicAtlasManager.instance.maxFrameSize = 512;
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-}
 
 
 @ccclass('Main')

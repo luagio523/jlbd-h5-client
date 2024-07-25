@@ -6,9 +6,16 @@ import { Notification } from "./mvc/Notification";
 import { SecureManager, SecureOptions } from "./core/common/secure/SecureManager";
 import { testFixedPoint } from './core/common/fixed/fixed';
 
-var characterRenderer:CharacterRenderer   = null;
+
 
 export namespace testcase {
+
+    interface User {
+        id: number;
+        name: string;
+        email: string;
+    }
+    
 
     export function app_test0(){
         app.facade.send(Notification.CREATEROLE_VIEW_SHOW, { name: "test" });
@@ -101,8 +108,7 @@ export namespace testcase {
             // let unit  = await KVManager.getInstance().getUnit("npc_dota_creature_gnoll_assassin");
             // console.log(unit);
    }
-
-    
+   var characterRenderer:CharacterRenderer   = null;
     export function app_test11(){
         characterRenderer = new CharacterRenderer();
         characterRenderer.initialize(ActResourceType.ACT1);
@@ -120,8 +126,6 @@ export namespace testcase {
         }
     }
     
-    
-
 
 }
 
