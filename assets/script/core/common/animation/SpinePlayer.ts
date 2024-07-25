@@ -1,44 +1,44 @@
 
 
 import { Component,_decorator, sp, resources} from "cc";
+import { AnimManager } from "./AnimManager";
+import { IAnimationPlayer } from "./IAnimationPlayer";
+import { AnimResourceType } from "./Type";
 const { ccclass, property } = _decorator;
 
 
 
-export class SpinePlayer  implements IAnimationPlayer {
-
+export class SpinePlayer implements IAnimationPlayer {
     private skeleton: sp.Skeleton | null = null;
     private animationName: string = '';
     private onCompleteCallback: Function | null = null;
+    private animManager: AnimManager;
+    private resourcePath: string = '';
 
     constructor(skeleton: sp.Skeleton) {
         this.skeleton = skeleton;
+        this.animManager = AnimManager.getInstance();
     }
 
-    async loadAnimation(spineDataPath: string, animationName: string = "default"): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            resources.load(spineDataPath, sp.SkeletonData, (err, spineData) => {
-                if (err) {
-                    console.error('Failed to load Spine data:', err);
-                    reject(err);
-                    return;
-                }
-
-                if (this.skeleton) {
-                    this.skeleton.skeletonData = spineData;
-                    this.skeleton.setAnimation(0, animationName, true);
-                    this.skeleton.setCompleteListener(this.onAnimationComplete.bind(this));
-                }
-
-                resolve();
-            });
-        });
+    async loadAnimation(type:AnimResourceType,resourcePath: string): Promise<void> {
+        this.resourcePath = resourcePath;
+        if (!this.animManager.hasAnimation(resourcePath)) {
+            await this.animManager.loadAnimation(type, resourcePath);
+        }
+        
     }
 
     setupAnimation(animationName?: string): void {
-        if (animationName) {
-            this.animationName = animationName;
+        const spineData = this.animManager.getAnimationData(this.resourcePath) as sp.SkeletonData;
+
+        if (spineData && this.skeleton) {
+            this.skeleton.skeletonData = spineData;
+            this.skeleton.setAnimation(0, animationName, true);
+            this.skeleton.setCompleteListener(this.onAnimationComplete.bind(this));
         }
+
+        this.animationName = animationName;
+
         if (this.skeleton) {
             this.playAnimation(this.animationName || 'idle');
         }
@@ -68,8 +68,11 @@ export class SpinePlayer  implements IAnimationPlayer {
         }
     }
 
+    setFrameRate(rate: number): void {
+        this.setUpdateGap(1 / rate);
+    }
+
     setAnimeTimes(times: number) {
-        // Spine 的播放次数可以通过 loop 参数控制，通常不需要手动设置播放次数
         this.play(times > 1);
     }
 
@@ -91,5 +94,6 @@ export class SpinePlayer  implements IAnimationPlayer {
         if (this.skeleton) {
             this.skeleton.setCompleteListener(null);
         }
+        this.animManager.releaseAnimation(this.resourcePath);
     }
 }

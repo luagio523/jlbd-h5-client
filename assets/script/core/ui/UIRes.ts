@@ -111,7 +111,7 @@ export abstract class AbstractResManager<T> implements IResManager<T> {
                 }
             }
         }
-        console.log(`cleanup当前资源总数:${assetManager.assets.count}`);
+        // console.log(`cleanup当前资源总数:${assetManager.assets.count}`);
     }
 
     async createUI(config: IUIConfig): Promise<T> {

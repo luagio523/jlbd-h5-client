@@ -10,7 +10,7 @@ import { modules } from './mvc/modules';
 import { UIManager } from './core/ui/UIManager';
 import { Facade } from './core/mvc/init';
 import {  UI_CONFIG } from './config/UIConfig';
-import { testcase } from './Test';
+import { testcase } from './TestCase';
 
 const { ccclass, property } = _decorator;
 
@@ -84,13 +84,13 @@ export class Main extends Root {
     }
 
     public btnTestClick2() {
-       testcase.app_test13();
+       testcase.app_test11();
     }
 
 
     public btnTestClick() {
-        // testcase.app_test12();
-        testcase.app_test13();
+        testcase.app_test12();
+        // testcase.app_test13();
         
     }
    

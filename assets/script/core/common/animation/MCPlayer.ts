@@ -1,7 +1,8 @@
-import { _decorator, Component, Sprite, SpriteFrame, Vec2, Texture2D, ImageAsset, resources, SpriteAtlas, JsonAsset,Asset } from 'cc';
+import { _decorator, Component, Sprite, SpriteFrame } from 'cc';
 import MovieClip from './MovieClip';
-import { BaseMCLoader } from './MCLoader';
-import { SourceMapGenerator } from 'source-map-js/lib/source-map-generator';
+import { AnimManager } from './AnimManager';
+import { IAnimationPlayer } from './IAnimationPlayer';
+import { AnimResourceType } from './Type';
 
 const { ccclass, property } = _decorator;
 
@@ -10,26 +11,26 @@ const { ccclass, property } = _decorator;
  * 支持creator plist atlas 动画,支持Egret SpriteSheet 动画
  */
 @ccclass('MCPlayer')
-export class MCPlayer   implements IAnimationPlayer{
-    private sprite: Sprite  = null;
+export class MCPlayer implements IAnimationPlayer {
+    private sprite: Sprite;
+    private movieClip: MovieClip;
+    private animManager: AnimManager;
+    private resourcePath: string;
 
-    private loader: BaseMCLoader;
-    private movieClip: MovieClip | null = null;
-
-    constructor(sprite:Sprite, loader: BaseMCLoader) {
+    constructor(sprite: Sprite) {
         this.sprite = sprite;
-        this.loader = loader;
         this.movieClip = new MovieClip();
+        this.animManager = AnimManager.getInstance();
     }
 
-    async loadAnimation(...args: any[]) {
-        await this.loader.loadAnimation(...args);
-        this.setupAnimation();
+    async loadAnimation(type: AnimResourceType, resourcePath: string ) {
+        this.resourcePath = resourcePath;
+        await this.animManager.loadAnimation(type, resourcePath);
     }
 
     public setupAnimation(mcKey?: string) {
         this.movieClip.setFrameUpdateRender(this.updateSprite.bind(this));
-        const frames = this.loader.getAnimationData(mcKey) || [];
+        const frames = this.animManager.getAnimationData(this.resourcePath, mcKey) || [];
         this.movieClip.setFrames(frames);
     }
 
@@ -44,14 +45,17 @@ export class MCPlayer   implements IAnimationPlayer{
         }
     }
 
-    play() { 
-        this.movieClip?.playAnime(); 
+    play() { this.movieClip.playAnime(); }
+    stop() { this.movieClip.stopAnime(); }
+    setFrameRate(rate: number): void { this.movieClip.setFrameRate(rate); }
+    setUpdateGap(gap: number) { this.movieClip.setUpdateGap(gap); }
+    setAnimeTimes(times: number) { this.movieClip.setAnimeTimes(times); }
+    update(dt: number) { this.movieClip.update(dt); }
+    
+    onDestroy() {
+        this.movieClip.destroy();
+        this.animManager.releaseAnimation(this.resourcePath);
     }
-    stop() { this.movieClip?.stopAnime(); }
-    setUpdateGap(gap: number) { this.movieClip?.setUpdateGap(gap); }
-    setAnimeTimes(times: number) { this.movieClip?.setAnimeTimes(times); }
-    update(dt: number) { this.movieClip?.update(dt); }
-    onDestroy() { this.movieClip?.destroy(); }
 }
 
 
@@ -61,16 +65,8 @@ export class MCPlayer   implements IAnimationPlayer{
 
 
 
-// // 使用 SpriteSheetLoader
-// const sheetLoader = new SpriteSheetLoader();
-// const sheetPlayer = new MCPlayer(sheetLoader);
-// await sheetPlayer.loadAnimation('path/to/json', 'path/to/image');
 
-// // 使用 SpriteAtlasLoader
-// const atlasLoader = new SpriteAtlasLoader();
-// const atlasPlayer = new MCPlayer(atlasLoader);
-// await atlasPlayer.loadAnimation('path/to/atlas');
-
+// const sheetPlayer = new MCPlayer();
+// await sheetPlayer.loadAnimation(AnimResourceType.EGRET_SPRITE_SHEET, 'path/to/image');
 // // 播放动画
 // sheetPlayer.play();
-// atlasPlayer.play();

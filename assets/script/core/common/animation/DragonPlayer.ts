@@ -1,49 +1,42 @@
 
-import { _decorator, Component, dragonBones, resources } from 'cc';
+import { _decorator,  dragonBones,  } from 'cc';
+import { IAnimationPlayer } from './IAnimationPlayer';
+import { AnimResourceType } from './Type';
+import { AnimManager } from './AnimManager';
 const { ccclass, property } = _decorator;
 
-
 export class DragonPlayer implements IAnimationPlayer {
-    
     private armatureDisplay: dragonBones.ArmatureDisplay | null = null;
-
+    private resourcePath: string = '';
     private animationName: string = '';
     private onCompleteCallback: Function | null = null;
-
-    constructor(armatureDisplay:dragonBones.ArmatureDisplay) {
+    private animManager: AnimManager;
+    constructor(armatureDisplay: dragonBones.ArmatureDisplay) {
         this.armatureDisplay = armatureDisplay;
+        this.animManager = AnimManager.getInstance();
     }
 
-    async loadAnimation(dragonBonesDataPath: string, textureAtlasPath: string, armatureName: string = "Armature"): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            resources.load(dragonBonesDataPath, dragonBones.DragonBonesAsset, (err, dragonBonesAsset) => {
-                if (err) {
-                    console.error('Failed to load DragonBones data:', err);
-                    reject(err);
-                    return;
-                }
+    // let resoucePath = `anim/dragonbody/${modelName}_ske`;
+    // let imgPath = `anim/dragonbody/${modelName}_tex`;
 
-                resources.load(textureAtlasPath, dragonBones.DragonBonesAtlasAsset, (err, atlasAsset) => {
-                    if (err) {
-                        console.error('Failed to load texture atlas:', err);
-                        reject(err);
-                        return;
-                    }
-
-                    if (this.armatureDisplay) {
-                        this.armatureDisplay.dragonAsset = dragonBonesAsset;
-                        this.armatureDisplay.dragonAtlasAsset = atlasAsset;
-                        this.armatureDisplay.armatureName = armatureName;
-                        this.armatureDisplay.addEventListener(dragonBones.EventObject.COMPLETE, this.onAnimationComplete, this);
-                    }
-
-                    resolve();
-                });
-            });
-        });
+    async loadAnimation(type: AnimResourceType, resourcePath: string): Promise<void> {
+        this.resourcePath = resourcePath;
+        if (!this.animManager.hasAnimation(resourcePath)) {
+            await this.animManager.loadAnimation(type, resourcePath);
+        }
     }
 
-    setupAnimation(animationName?: string): void {
+    setupAnimation(animationName?: string,armatureName?: string): void {
+
+        const {dragonBonesAsset, atlasAsset} = this.animManager.getAnimationData("all");
+        
+        if (this.armatureDisplay) {
+            this.armatureDisplay.dragonAsset = dragonBonesAsset;
+            this.armatureDisplay.dragonAtlasAsset = atlasAsset;
+            this.armatureDisplay.armatureName = armatureName;
+            this.armatureDisplay.addEventListener(dragonBones.EventObject.COMPLETE, this.onAnimationComplete, this);
+        }
+
         if (animationName) {
             this.animationName = animationName;
         }
@@ -75,6 +68,10 @@ export class DragonPlayer implements IAnimationPlayer {
         if (this.armatureDisplay) {
             this.armatureDisplay.timeScale = 1 / gap;
         }
+    }
+
+    setFrameRate(rate: number): void {
+        this.setUpdateGap(1 / rate);
     }
 
     setAnimeTimes(times: number) {
@@ -109,6 +106,58 @@ export class DragonPlayer implements IAnimationPlayer {
 
 
 
+
+
+
+// export class DragonPlayer implements IAnimationPlayer {
+//     private armatureDisplay: dragonBones.ArmatureDisplay | null = null;
+//     private animManager: AnimManager;
+//     private resourcePath: string = '';
+//     private animationName: string = '';
+//     private onCompleteCallback: Function | null = null;
+
+//     constructor(armatureDisplay: dragonBones.ArmatureDisplay) {
+//         this.armatureDisplay = armatureDisplay;
+//         this.animManager = AnimManager.getInstance();
+//     }
+
+//     async loadAnimation(resourcePath: string, armatureName: string = "Armature"): Promise<void> {
+//         this.resourcePath = resourcePath;
+//         if (!this.animManager.hasAnimation(resourcePath)) {
+//             await this.animManager.loadAnimation('dragonbones', resourcePath);
+//         }
+
+//         const assets = this.animManager.getAnimationAssets(resourcePath);
+//         if (assets && assets.length === 2) {
+//             const [dragonBonesAsset, atlasAsset] = assets as [dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset];
+            
+//             if (this.armatureDisplay) {
+//                 this.armatureDisplay.dragonAsset = dragonBonesAsset;
+//                 this.armatureDisplay.dragonAtlasAsset = atlasAsset;
+//                 this.armatureDisplay.armatureName = armatureName;
+//                 this.armatureDisplay.addEventListener(dragonBones.EventObject.COMPLETE, this.onAnimationComplete, this);
+//             }
+//         }
+//     }
+
+//     setupAnimation(animationName?: string): void {
+//         if (animationName) {
+//             this.animationName = animationName;
+//         }
+//         if (this.armatureDisplay) {
+//             this.playAnimation(this.animationName || 'idle');
+//         }
+//     }
+
+//     // ... 其他方法保持不变 ...
+
+//     onDestroy() {
+//         if (this.armatureDisplay) {
+//             this.armatureDisplay.removeEventListener(dragonBones.EventObject.COMPLETE, this.onAnimationComplete, this);
+//         }
+//         this.animManager.releaseAnimation(this.resourcePath);
+//     }
+// }
 
 
 

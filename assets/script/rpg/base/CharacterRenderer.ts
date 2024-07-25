@@ -11,9 +11,8 @@ export class CharacterRenderer {
     private actPlayer: ActPlayer | null = null;
     private actResurceType: ActResourceType | null = null;
 
-    public initialize(type: ActResourceType) {
+    public  initialize(type: ActResourceType)  {
         this.actResurceType = type;
-        this.setupBody();
     }
 
     public async setupBody(parent?: Node): Promise<void> {
@@ -67,6 +66,9 @@ export class CharacterRenderer {
             throw new Error(`Child node ${childName} not found.`);
         }
         const component = childNode.getComponent(componentType);
+        component.node = childNode;
+
+
         if (!component) {
             throw new Error(`Component ${componentType.name} not found on ${childName}.`);
         }
@@ -127,6 +129,12 @@ export class CharacterRenderer {
     public async playAction(options:ActionOptions) {
         if (this.actPlayer) {
             await this.actPlayer.changeAct(options);
+        }
+    }
+
+    public update(dt: number) {
+        if (this.actPlayer) {
+            this.actPlayer.update(dt);
         }
     }
 

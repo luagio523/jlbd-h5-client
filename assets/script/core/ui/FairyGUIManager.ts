@@ -273,7 +273,7 @@ class FairyGuiUIRes extends UIResBase<GComponent> {
 
         const component = UIPackage.createObject(uiPackage.name, config.uiComponentName);
 
-        console.log(`load当前资源总数:${assetManager.assets.count}`);
+        // console.log(`load当前资源总数:${assetManager.assets.count}`);
 
         if (component instanceof GComponent) {
             return component;

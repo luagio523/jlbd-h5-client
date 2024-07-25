@@ -1,11 +1,14 @@
 import { Asset, Node, SpriteAtlas, SpriteFrame, resources } from "cc";
-import { ActResourceType, ActionOptions } from "./rpg/base/ActPlayer";
+import {  ActionOptions } from "./rpg/base/ActPlayer";
 import { CharacterRenderer } from "./rpg/base/CharacterRenderer";
 import app from "./App";
 import { Notification } from "./mvc/Notification";
 import { SecureManager, SecureOptions } from "./core/common/secure/SecureManager";
 import { testFixedPoint } from './core/common/fixed/fixed';
 import { ActType } from "./rpg/enum/Act";
+import scheduler from "./utils/scheduler";
+import { MathUtil } from "./core/common/utils/MathUtil";
+import { AnimResourceType } from "./core/common/animation/Type";
 
 
 
@@ -117,24 +120,31 @@ export namespace testcase {
             // let unit  = await KVManager.getInstance().getUnit("npc_dota_creature_gnoll_assassin");
             // console.log(unit);
    }
-   var characterRenderer:CharacterRenderer   = null;
+
+//    contain anim/sheetbody/body803_1_1r.json
+    var characterRenderer:CharacterRenderer   = null;
     export async function app_test11(){
-        characterRenderer = new CharacterRenderer();
-        characterRenderer.initialize(ActResourceType.ACT1);
+        let characterRenderer = new CharacterRenderer();
+        characterRenderer.initialize(AnimResourceType.EgretSpriteSheet);
         await characterRenderer.setupBody(gameNode);
         characterRenderer.updateCharacterStatus('gamars', 100, 50);
 
         const actionOptions: ActionOptions = {
-            modelName: 'Heavy',
+            modelName: 'body803',
             action: ActType.ACT_RUN,
-            // direction: 2,
-            // gender: 1,
-            callback: () => console.log('Action completed')
+            direction: 0,
+            gender: 1,
+            // callback: () => console.log('Action completed')
         };
 
         characterRenderer.playAction(actionOptions);
 
-        characterRenderer.updatePosition(300, 300);
+        // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
+
+        characterRenderer.updatePosition(500,300);
+        scheduler.scheduleUpdateGlobal((dt:number) => {
+            characterRenderer.update(dt);
+        });
         // characterRenderer.destroy();
     }
     

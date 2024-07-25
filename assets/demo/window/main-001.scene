@@ -846,7 +846,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "button",
+    "_string": "test2",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
@@ -1172,7 +1172,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "button",
+    "_string": "test1",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
