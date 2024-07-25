@@ -1,4 +1,4 @@
-import { Asset, SpriteFrame,  resources } from "cc";
+import { Asset,  resources } from "cc";
 import { BaseMCLoader, LoaderFactory } from "./MCLoader";
 import { AnimResourceType } from "./Type";
 

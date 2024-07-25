@@ -1,4 +1,4 @@
-import { Component, Sprite, dragonBones, resources, sp } from "cc";
+import { Component, Node, Sprite, dragonBones, resources, sp } from "cc";
 import { DragonPlayer } from "../../core/common/animation/DragonPlayer";
 import { MCPlayer } from "../../core/common/animation/MCPlayer";
 import { SpinePlayer } from "../../core/common/animation/SpinePlayer";
@@ -284,22 +284,94 @@ class Act4Player extends ActPlayer {
 
 
 
-// 工厂类
+// // 工厂类
+// export class ActPlayerFactory {
+//     static createPlayer(type: AnimResourceType,comp:Component): ActPlayer {
+//         switch (type) {
+//             case AnimResourceType.SpriteAltas:
+//                 // console.log("--------create act1",comp,"=====",comp.node)
+//                 return new Act1Player().initialize(comp as Sprite);
+//             case AnimResourceType.EgretSpriteSheet:
+//                 return new Act2Player().initialize(comp as Sprite);
+//             case AnimResourceType.DragonBones:
+//                 return new Act3Player().initialize(comp as dragonBones.ArmatureDisplay);
+//             case AnimResourceType.Spine:
+//                 return new Act4Player().initialize(comp as sp.Skeleton);
+//             default:
+//                 throw new Error('Unsupported player type');
+//         }
+//     }
+// }
+
+
+
+
+// export class ActPlayerFactory {
+//     private static playerMap = new Map<AnimResourceType, { new (): ActPlayer }>([
+//         [AnimResourceType.SpriteAltas, Act1Player],
+//         [AnimResourceType.EgretSpriteSheet, Act2Player],
+//         [AnimResourceType.DragonBones, Act3Player],
+//         [AnimResourceType.Spine, Act4Player]
+//     ]);
+
+//     private static componentMap = new Map<AnimResourceType, new () => Component>([
+//         [AnimResourceType.SpriteAltas, Sprite],
+//         [AnimResourceType.EgretSpriteSheet, Sprite],
+//         [AnimResourceType.DragonBones, dragonBones.ArmatureDisplay],
+//         [AnimResourceType.Spine, sp.Skeleton]
+//     ]);
+
+//     static createPlayer(type: AnimResourceType, comp: Component): ActPlayer {
+//         const PlayerClass = this.playerMap.get(type);
+//         const ComponentClass = this.componentMap.get(type);
+
+//         if (!PlayerClass || !ComponentClass) {
+//             throw new Error('Unsupported player type');
+//         }
+
+//         if (!(comp instanceof ComponentClass)) {
+//             throw new Error(`Component is not of type ${ComponentClass.name}`);
+//         }
+
+//         return new PlayerClass().initialize(comp);
+//     }
+// }
+
+
+type AnimActMapping  = {
+    new: new () => ActPlayer;
+    componentType: new () => Component;
+};
+
 export class ActPlayerFactory {
-    static createPlayer(type: AnimResourceType,comp:Component): ActPlayer {
-        switch (type) {
-            case AnimResourceType.SpriteAltas:
-                // console.log("--------create act1",comp,"=====",comp.node)
-                return new Act1Player().initialize(comp as Sprite);
-            case AnimResourceType.EgretSpriteSheet:
-                return new Act2Player().initialize(comp as Sprite);
-            case AnimResourceType.DragonBones:
-                return new Act3Player().initialize(comp as dragonBones.ArmatureDisplay);
-            case AnimResourceType.Spine:
-                return new Act4Player().initialize(comp as sp.Skeleton);
-            default:
-                throw new Error('Unsupported player type');
+    private static playerMap: Map<AnimResourceType, AnimActMapping> = new Map([
+        [AnimResourceType.SpriteAltas, { new: Act1Player, componentType: Sprite }],
+        [AnimResourceType.EgretSpriteSheet, { new: Act2Player, componentType: Sprite }],
+        [AnimResourceType.DragonBones, { new: Act3Player, componentType: dragonBones.ArmatureDisplay }],
+        [AnimResourceType.Spine, { new: Act4Player, componentType: sp.Skeleton }]
+    ] );
+
+    static getComponent(childNode: Node, type: AnimResourceType): Component {
+        const playerInfo = this.playerMap.get(type);
+        if (!playerInfo) {
+            throw new Error(`Unsupported AnimResourceType: ${type}`);
         }
+        const component = childNode.getComponent(playerInfo.componentType);
+        component.node = childNode ;
+        if (!component) {
+            throw new Error(`Component ${playerInfo.componentType.name} not found .`);
+        }
+        return component;
+    }
+
+    static createPlayer(node: Node, type: AnimResourceType): ActPlayer {
+        const component = this.getComponent(node, type);
+        const playerInfo = this.playerMap.get(type);
+        
+        if (!playerInfo) {
+            throw new Error(`Unsupported AnimResourceType: ${type}`);
+        }
+        return new playerInfo.new().initialize(component);
     }
 }
 

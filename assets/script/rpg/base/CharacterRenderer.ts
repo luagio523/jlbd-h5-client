@@ -1,22 +1,23 @@
 import { Prefab, instantiate, Node, Label, Sprite, resources, tween, sp, dragonBones, Component } from 'cc';
-import { ActPlayer, ActPlayerFactory, ActResourceType, ActionOptions } from './ActPlayer';
+import { ActPlayer, ActPlayerFactory,  ActionOptions } from './ActPlayer';
 import { ResPathUtil } from '../util/ResPathUtil';
-import { ActType } from '../enum/Act';
+import { AnimResourceType } from '../../core/common/animation/Type';
+import { ComponentUtil } from '../util/ComponentUil';
 
 export class CharacterRenderer {
-    private bodyNode: Node | null = null;
+    private characterNode: Node | null = null;
     private nameLabel: Label | null = null;
     private healthBar: Sprite | null = null;
     private manaBar: Sprite | null = null;
     private actPlayer: ActPlayer | null = null;
-    private actResurceType: ActResourceType | null = null;
+    private animResourceType: AnimResourceType | null = null;
 
-    public  initialize(type: ActResourceType)  {
-        this.actResurceType = type;
+    public  initialize(type: AnimResourceType)  {
+        this.animResourceType = type;
     }
 
     public async setupBody(parent?: Node): Promise<void> {
-        const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.actResurceType);
+        const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.animResourceType);
     
         try {
             const prefab = await this.loadPrefab(actBodyPath);
@@ -41,61 +42,28 @@ export class CharacterRenderer {
     }
 
     private createBodyNode(prefab: Prefab, parent?: Node) {
-        this.bodyNode = instantiate(prefab);
+        this.characterNode = instantiate(prefab);
         if (parent) {
-            parent.addChild(this.bodyNode);
+            parent.addChild(this.characterNode);
         }
     }
 
     private setupComponents() {
-        if (!this.bodyNode) {
+        if (!this.characterNode) {
             console.error("Body node is not initialized.");
             return;
         }
-        this.nameLabel = this.getComponentFromChild('NameLabel', Label);
-        this.healthBar = this.getComponentFromChild('HealthBar', Sprite);
-        this.manaBar = this.getComponentFromChild('ManaBar', Sprite);
+        this.nameLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'NameLabel', Label);
+        this.healthBar =ComponentUtil.getComponentFromChild(this.characterNode,'HealthBar', Sprite);
+        this.manaBar = ComponentUtil.getComponentFromChild(this.characterNode,'ManaBar', Sprite);
     }
 
-    private getComponentFromChild<T extends Component>(childName: string, componentType: new () => T): T {
-        if (!this.bodyNode) {
-            throw new Error("Body node is not initialized.");
-        }
-        const childNode = this.bodyNode.getChildByName(childName);
-        if (!childNode) {
-            throw new Error(`Child node ${childName} not found.`);
-        }
-        const component = childNode.getComponent(componentType);
-        component.node = childNode;
-
-
-        if (!component) {
-            throw new Error(`Component ${componentType.name} not found on ${childName}.`);
-        }
-        return component;
-    }
 
     private setupActPlayer() {
-        const bodyComponent = this.getBodyComponent();
-        this.actPlayer = ActPlayerFactory.createPlayer(this.actResurceType, bodyComponent);
+        let bodyNode = this.characterNode.getChildByName('Body');
+        this.actPlayer = ActPlayerFactory.createPlayer(bodyNode,this.animResourceType );
     }
 
-    private getBodyComponent(): Component {
-        if (!this.actResurceType) {
-            throw new Error("ActResourceType is not initialized.");
-        }
-        switch (this.actResurceType) {
-            case ActResourceType.ACT1:
-            case ActResourceType.ACT2:
-                return this.getComponentFromChild('Body', Sprite);
-            case ActResourceType.ACT3:
-                return this.getComponentFromChild('Body', dragonBones.ArmatureDisplay);
-            case ActResourceType.ACT4:
-                return this.getComponentFromChild('Body', sp.Skeleton);
-            default:
-                throw new Error(`Unsupported ActResourceType: ${this.actResurceType}`);
-        }
-    }
 
     public updateCharacterStatus(name: string, health: number, mana: number) {
         if (this.nameLabel) {
@@ -121,8 +89,8 @@ export class CharacterRenderer {
     }
 
     public updatePosition(x: number, y: number) {
-        if (this.bodyNode) {
-            this.bodyNode.setPosition(x, y);
+        if (this.characterNode) {
+            this.characterNode.setPosition(x, y);
         }
     }
 
@@ -139,9 +107,9 @@ export class CharacterRenderer {
     }
 
     public destroy() {
-        if (this.bodyNode) {
-            this.bodyNode.destroy();
-            this.bodyNode = null;
+        if (this.characterNode) {
+            this.characterNode.destroy();
+            this.characterNode = null;
         }
     }
 }
@@ -151,7 +119,7 @@ export class CharacterRenderer {
 
 
 // const characterRenderer = new CharacterRenderer();
-// characterRenderer.initialize(ActResourceType.ACT1);
+// characterRenderer.initialize(AnimResourceType.ACT1);
 // characterRenderer.setupBody(parentNode);
 // characterRenderer.updateCharacterStatus('HeroName', 100, 50);
 // characterRenderer.playAction('attack', () => {
