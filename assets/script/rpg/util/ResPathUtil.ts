@@ -1,5 +1,5 @@
 import { Prefab } from "cc";
-import { ActResourceType } from "../base/ActPlayer";
+import { ActResourceType } from "../base/ActAnimationState";
 
 export class ResPathUtil {
     private static readonly BASE_PATHS = {

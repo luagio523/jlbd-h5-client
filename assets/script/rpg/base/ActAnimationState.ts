@@ -17,19 +17,19 @@ export interface ActionOptions {
 
 
 // 抽象基类
-export abstract class ActPlayer {
+export abstract class ActAnimationState {
     protected player: IAnimationPlayer;
     protected isLooping: boolean = false;
 
 
-    abstract initialize(...args: any[]): ActPlayer;
-    abstract changeAct(options:ActionOptions): Promise<void>;
+    abstract initialize(...args: any[]): ActAnimationState;
+    abstract changeAct(options:ActionOptions): Promise<void>; //播放动作
 
     public update(dt:number){
         this.player?.update(dt);
     }
 
-    onComplete(callback: (() => void) | null):ActPlayer{
+    onComplete(callback: (() => void) | null):ActAnimationState{
         if(callback){
             this.player.onComplete(callback);
         }
@@ -55,12 +55,12 @@ export abstract class ActPlayer {
  * 基于 SpriteAtlasPlayer 实现
  * 能够使用creator plist atlas资源
  */
-class Act1Player extends ActPlayer {
+class AtlasAnimationState extends ActAnimationState {
     constructor() {
         super();
     }
 
-    public initialize(sprite:Sprite): ActPlayer {
+    public initialize(sprite:Sprite): ActAnimationState {
         this.player = new MCPlayer(sprite);
         return this;
     }
@@ -113,12 +113,12 @@ class Act1Player extends ActPlayer {
  * 基于 SpriteSheetPlayer 实现
  * 能够使用egret sheet资源
  */
-class Act2Player extends ActPlayer {
+class EgretAnimationState extends ActAnimationState {
     constructor() {
         super();
     }
 
-    public initialize(sprite:Sprite): ActPlayer {
+    public initialize(sprite:Sprite): ActAnimationState {
         this.player = new MCPlayer(sprite);
         return this;
     }
@@ -172,12 +172,12 @@ class Act2Player extends ActPlayer {
  * 基于 SpriteSheetPlayer 实现
  * 能够使用egret sheet资源
  */
-class Act3Player extends ActPlayer {
+class DragonAnimationState extends ActAnimationState {
     constructor() {
         super();
     }
 
-    public initialize(armatureDisplay:dragonBones.ArmatureDisplay): ActPlayer {
+    public initialize(armatureDisplay:dragonBones.ArmatureDisplay): ActAnimationState {
         this.player =  new DragonPlayer(armatureDisplay);
         return this;
     }
@@ -232,11 +232,11 @@ class Act3Player extends ActPlayer {
  * 基于 SpriteSheetPlayer 实现
  * 能够使用egret sheet资源
  */
-class Act4Player extends ActPlayer {
+class SpineAnimationState extends ActAnimationState {
     constructor() {
         super();
     }
-    public initialize(skeleton: sp.Skeleton): ActPlayer {
+    public initialize(skeleton: sp.Skeleton): ActAnimationState {
         this.player =  new SpinePlayer(skeleton);
         return this;
     }
@@ -283,72 +283,22 @@ class Act4Player extends ActPlayer {
 
 
 
-
-// // 工厂类
-// export class ActPlayerFactory {
-//     static createPlayer(type: AnimResourceType,comp:Component): ActPlayer {
-//         switch (type) {
-//             case AnimResourceType.SpriteAltas:
-//                 // console.log("--------create act1",comp,"=====",comp.node)
-//                 return new Act1Player().initialize(comp as Sprite);
-//             case AnimResourceType.EgretSpriteSheet:
-//                 return new Act2Player().initialize(comp as Sprite);
-//             case AnimResourceType.DragonBones:
-//                 return new Act3Player().initialize(comp as dragonBones.ArmatureDisplay);
-//             case AnimResourceType.Spine:
-//                 return new Act4Player().initialize(comp as sp.Skeleton);
-//             default:
-//                 throw new Error('Unsupported player type');
-//         }
-//     }
-// }
-
-
-
-
-// export class ActPlayerFactory {
-//     private static playerMap = new Map<AnimResourceType, { new (): ActPlayer }>([
-//         [AnimResourceType.SpriteAltas, Act1Player],
-//         [AnimResourceType.EgretSpriteSheet, Act2Player],
-//         [AnimResourceType.DragonBones, Act3Player],
-//         [AnimResourceType.Spine, Act4Player]
-//     ]);
-
-//     private static componentMap = new Map<AnimResourceType, new () => Component>([
-//         [AnimResourceType.SpriteAltas, Sprite],
-//         [AnimResourceType.EgretSpriteSheet, Sprite],
-//         [AnimResourceType.DragonBones, dragonBones.ArmatureDisplay],
-//         [AnimResourceType.Spine, sp.Skeleton]
-//     ]);
-
-//     static createPlayer(type: AnimResourceType, comp: Component): ActPlayer {
-//         const PlayerClass = this.playerMap.get(type);
-//         const ComponentClass = this.componentMap.get(type);
-
-//         if (!PlayerClass || !ComponentClass) {
-//             throw new Error('Unsupported player type');
-//         }
-
-//         if (!(comp instanceof ComponentClass)) {
-//             throw new Error(`Component is not of type ${ComponentClass.name}`);
-//         }
-
-//         return new PlayerClass().initialize(comp);
-//     }
-// }
-
-
 type AnimActMapping  = {
-    new: new () => ActPlayer;
+    new: new () => ActAnimationState;
     componentType: new () => Component;
 };
 
-export class ActPlayerFactory {
+/**
+ * 动画播放器工厂
+ * 兼容不同的动画资源类型
+ * 用于创建不同类型的动画资源播放器
+ */
+export class ActAnimationStateFactory {
     private static playerMap: Map<AnimResourceType, AnimActMapping> = new Map([
-        [AnimResourceType.SpriteAltas, { new: Act1Player, componentType: Sprite }],
-        [AnimResourceType.EgretSpriteSheet, { new: Act2Player, componentType: Sprite }],
-        [AnimResourceType.DragonBones, { new: Act3Player, componentType: dragonBones.ArmatureDisplay }],
-        [AnimResourceType.Spine, { new: Act4Player, componentType: sp.Skeleton }]
+        [AnimResourceType.SpriteAltas, { new: AtlasAnimationState, componentType: Sprite }],
+        [AnimResourceType.EgretSpriteSheet, { new: EgretAnimationState, componentType: Sprite }],
+        [AnimResourceType.DragonBones, { new: DragonAnimationState, componentType: dragonBones.ArmatureDisplay }],
+        [AnimResourceType.Spine, { new: SpineAnimationState, componentType: sp.Skeleton }]
     ] );
 
     static getComponent(childNode: Node, type: AnimResourceType): Component {
@@ -364,7 +314,7 @@ export class ActPlayerFactory {
         return component;
     }
 
-    static createPlayer(node: Node, type: AnimResourceType): ActPlayer {
+    static createPlayer(node: Node, type: AnimResourceType): ActAnimationState {
         const component = this.getComponent(node, type);
         const playerInfo = this.playerMap.get(type);
         
@@ -376,8 +326,8 @@ export class ActPlayerFactory {
 }
 
 // // 使用示例
-// async function useActPlayer() {
-//     const player = ActPlayerFactory.createPlayer('Act1');
+// async function useActAnimationState() {
+//     const player = ActAnimationStateFactory.createPlayer('Act1');
 //     await player.changeAct('character001', 1, 0, ActType.ACT_IDLE);
 //     player.play();
 // }
@@ -385,22 +335,3 @@ export class ActPlayerFactory {
 
 
 
-
-
-
-
-// // 使用示例
-// (async () => {
-//     const player = ActPlayerFactory.createPlayer(AnimResourceType.ACT1);
-//     await player.changeAct("character",  ActType.ACT_IDLE);
-//     // 播放非循环动作（如攻击），并在完成后执行回调
-//     player.play();
-
-//     // 如果需要中途改变循环状态
-//     player.setLooping(true);
-
-//     // 如果需要中途改变完成回调
-//     player.onComplete(() => {
-//         console.log("新的完成回调");
-//     });
-// })();

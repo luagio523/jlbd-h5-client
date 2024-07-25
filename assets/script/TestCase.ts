@@ -1,5 +1,5 @@
 import { Asset, Node, SpriteAtlas, SpriteFrame, resources } from "cc";
-import {  ActionOptions } from "./rpg/base/ActPlayer";
+import {  ActionOptions } from "./rpg/base/ActAnimationState";
 import { CharacterRenderer } from "./rpg/base/CharacterRenderer";
 import app from "./App";
 import { Notification } from "./mvc/Notification";

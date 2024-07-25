@@ -1,18 +1,19 @@
 import { Prefab, instantiate, Node, Label, Sprite, resources, tween, sp, dragonBones, Component } from 'cc';
-import { ActPlayer, ActPlayerFactory,  ActionOptions } from './ActPlayer';
 import { ResPathUtil } from '../util/ResPathUtil';
 import { AnimResourceType } from '../../core/common/animation/Type';
 import { ComponentUtil } from '../util/ComponentUil';
+import {  ActAnimationStateFactory, ActionOptions } from './ActAnimationState';
+import {  CharacterAnimator } from './CharacterAnimator';
 
 export class CharacterRenderer {
     private characterNode: Node | null = null;
     private nameLabel: Label | null = null;
     private healthBar: Sprite | null = null;
     private manaBar: Sprite | null = null;
-    private actPlayer: ActPlayer | null = null;
+    private characterAnimator: CharacterAnimator | null = null;
     private animResourceType: AnimResourceType | null = null;
 
-    public  initialize(type: AnimResourceType)  {
+    public initialize(type: AnimResourceType) {
         this.animResourceType = type;
     }
 
@@ -23,7 +24,7 @@ export class CharacterRenderer {
             const prefab = await this.loadPrefab(actBodyPath);
             this.createBodyNode(prefab, parent);
             this.setupComponents();
-            this.setupActPlayer();
+            this.setupCharacterAnimator();
         } catch (error) {
             console.error("Failed to setup Character body:", error);
         }
@@ -54,16 +55,23 @@ export class CharacterRenderer {
             return;
         }
         this.nameLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'NameLabel', Label);
-        this.healthBar =ComponentUtil.getComponentFromChild(this.characterNode,'HealthBar', Sprite);
-        this.manaBar = ComponentUtil.getComponentFromChild(this.characterNode,'ManaBar', Sprite);
+        this.healthBar = ComponentUtil.getComponentFromChild(this.characterNode, 'HealthBar', Sprite);
+        this.manaBar = ComponentUtil.getComponentFromChild(this.characterNode, 'ManaBar', Sprite);
     }
 
-
-    private setupActPlayer() {
+    private setupCharacterAnimator() {
+        if (!this.characterNode) {
+            console.error("Character node is not initialized.");
+            return;
+        }
         let bodyNode = this.characterNode.getChildByName('Body');
-        this.actPlayer = ActPlayerFactory.createPlayer(bodyNode,this.animResourceType );
+        if (!bodyNode) {
+            console.error("Body node not found.");
+            return;
+        }
+        const animationState = ActAnimationStateFactory.createPlayer(bodyNode, this.animResourceType!);
+        this.characterAnimator = new CharacterAnimator(animationState);
     }
-
 
     public updateCharacterStatus(name: string, health: number, mana: number) {
         if (this.nameLabel) {
@@ -79,10 +87,9 @@ export class CharacterRenderer {
 
     private updateBarWithTween(bar: Sprite, progress: number) {
         if (bar) {
-            // 使用 tween 来缓动更新进度条
             tween(bar)
                 .to(0.5, { fillRange: progress }, {
-                    easing: 'quartOut' // 使用四次方缓出效果，你可以根据需要调整
+                    easing: 'quartOut'
                 })
                 .start();
         }
@@ -94,15 +101,17 @@ export class CharacterRenderer {
         }
     }
 
-    public async playAction(options:ActionOptions) {
-        if (this.actPlayer) {
-            await this.actPlayer.changeAct(options);
+    public async playAction(options: ActionOptions) {
+        if (this.characterAnimator) {
+            const animationStateType = this.characterAnimator.mapActionToAnimationStateType(options.action);
+            this.characterAnimator.transitionToState(animationStateType, options.action);
         }
     }
 
+
     public update(dt: number) {
-        if (this.actPlayer) {
-            this.actPlayer.update(dt);
+        if (this.characterAnimator) {
+            this.characterAnimator.update(dt);
         }
     }
 
@@ -111,9 +120,9 @@ export class CharacterRenderer {
             this.characterNode.destroy();
             this.characterNode = null;
         }
+        this.characterAnimator = null;
     }
 }
-
 
 
 
