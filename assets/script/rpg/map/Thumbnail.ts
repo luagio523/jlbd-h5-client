@@ -1,5 +1,5 @@
-import { Sprite, UITransform } from "cc";
-import GameImage from "../../core/common/render/GameImage";
+import { UITransform } from "cc";
+import GameImage from "../../core/common/render/GDImage";
 
 /**
  * 缩略图，友善加载体验

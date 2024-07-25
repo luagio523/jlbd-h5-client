@@ -2,15 +2,11 @@
 import { _decorator, Node, Sprite, SpriteFrame, UITransform, Texture2D, resources, assetManager } from 'cc';
 const { ccclass, property } = _decorator;
 
-@ccclass('GameImage')
-export default class GameImage extends Node {
-    @property(Sprite)
+export default class GDImage extends Node {
     protected renderSprite: Sprite = null!;
 
-    @property
     private _url: string = "";
 
-    @property({type: Function})
     public onLoad: ((url: string) => void) | null = null;
 
     constructor() {
@@ -69,8 +65,8 @@ export default class GameImage extends Node {
         this._url = "";
     }
     
-    public clone(): GameImage {
-        const image = new GameImage();
+    public clone(): GDImage {
+        const image = new GDImage();
         image.source = this._url;
         return image;
     }

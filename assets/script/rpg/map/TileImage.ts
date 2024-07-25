@@ -1,6 +1,6 @@
 import { Asset, Node,  assetManager } from "cc";
 import { IAssetExpire, LRUCache } from "../../core/common/collection/LRUCache";
-import GameImage from "../../core/common/render/GameImage";
+import GameImage from "../../core/common/render/GDImage";
 
 
 
