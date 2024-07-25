@@ -1,4 +1,4 @@
-import { Prefab, instantiate, Node, Label, Sprite, resources, tween, sp, dragonBones, Component } from 'cc';
+import { Prefab, instantiate, Node, Label, Sprite, resources, tween } from 'cc';
 import { ResPathUtil } from '../util/ResPathUtil';
 import { AnimResourceType } from '../../core/common/animation/Type';
 import { ComponentUtil } from '../util/ComponentUil';

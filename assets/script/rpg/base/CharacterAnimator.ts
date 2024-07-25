@@ -88,7 +88,7 @@ export class CharacterAnimator {
                 options.action = this.getDefaultActionForState(newState);
             }
 
-            this.animationState.changeAct(options).then(() => {
+            this.animationState.playAct(options).then(() => {
                 this.currentState = newState;
                 this.isAnimationPlaying = true;
                 this.animationState.play();

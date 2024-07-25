@@ -41,13 +41,7 @@ export class DragonPlayer implements IAnimationPlayer {
             this.animationName = animationName;
         }
         if (this.armatureDisplay) {
-            this.playAnimation(this.animationName || 'idle');
-        }
-    }
-
-    playAnimation(animName: string, playTimes = 0) {
-        if (this.armatureDisplay) {
-            this.armatureDisplay.playAnimation(animName, playTimes);
+            // this.play(0);
         }
     }
 
@@ -96,6 +90,7 @@ export class DragonPlayer implements IAnimationPlayer {
         if (this.armatureDisplay) {
             this.armatureDisplay.removeEventListener(dragonBones.EventObject.COMPLETE, this.onAnimationComplete, this);
         }
+        // this.animManager.releaseAnimation(this.resourcePath); 不需要在这里释放资源，因为可能还有其他地方使用
     }
 
 

@@ -12,7 +12,7 @@ export interface ActionOptions {
     action: ActType;
     direction?: number;
     gender?: number;
-    callback?: () => void;
+    times?: number; // 0表示无限循环
 }
 
 
@@ -20,7 +20,7 @@ export interface ActionOptions {
 export abstract class ActAnimationState {
     protected player: IAnimationPlayer;
     protected isLooping: boolean = false;
-
+    protected act:ActType = ActType.ACT_IDLE;
 
     abstract initialize(...args: any[]): ActAnimationState;
     abstract changeAct(options:ActionOptions): Promise<void>; //播放动作
@@ -29,26 +29,23 @@ export abstract class ActAnimationState {
         this.player?.update(dt);
     }
 
-    onComplete(callback: (() => void) | null):ActAnimationState{
+    onComplete(callback: ((act:ActType) => void) ):ActAnimationState{
         if(callback){
-            this.player.onComplete(callback);
+            this.player.onComplete(()=>{
+                callback(this.act);
+            });
         }
         return this;
     }
 
-    // 共用方法
-    play( )  {this.player.play();}
+    // 共用方法 0次表示无限循环
+    play(times: number = 0)  {
+        this.player.play(times);
+    }
 
     stop() { this.player.stop(); }
   
     setFrameRate(frameRate: number) { this.player.setFrameRate(frameRate); }
-    setAnimeTimes(times: number) { this.player.setAnimeTimes(times); }
-
-    setLooping(looping: boolean) {
-        this.isLooping = looping;
-        this.player.setAnimeTimes(looping ? 0 : 1);
-    }
-    
 }
 
 /**
@@ -62,6 +59,7 @@ class AtlasAnimationState extends ActAnimationState {
 
     public initialize(sprite:Sprite): ActAnimationState {
         this.player = new MCPlayer(sprite);
+        this.player.setFrameRate(12);
         return this;
     }
 
@@ -72,20 +70,13 @@ class AtlasAnimationState extends ActAnimationState {
         const {
             modelName,
             action = ActType.ACT_IDLE,
-            callback,
         } = options;
 
         let mc = this.getMCKey(modelName,  action);
         let atlasPath = `anim/body/char`;
         await this.player.loadAnimation(AnimResourceType.SpriteAltas,atlasPath);
         this.player.setupAnimation(mc);
-        this.player.setFrameRate(12);
-        if (callback){
-            this.player.onComplete(callback);
-        }else{
-            this.setLooping(true); // 默认循环
-        }
-        this.play();
+        this.play(options.times || 0);
     }
 
     protected getActionName(action: ActType): string {
@@ -120,6 +111,7 @@ class EgretAnimationState extends ActAnimationState {
 
     public initialize(sprite:Sprite): ActAnimationState {
         this.player = new MCPlayer(sprite);
+        this.player.setFrameRate(12);
         return this;
     }
 
@@ -133,20 +125,13 @@ class EgretAnimationState extends ActAnimationState {
             action = ActType.ACT_IDLE,
             gender = 1,
             direction = 0,
-            callback,
         } = options;
 
         let mc = this.getMCKey(modelName, gender, direction, action);
         let resoucePath = `anim/sheetbody/${mc}`;
         await this.player.loadAnimation(AnimResourceType.EgretSpriteSheet,resoucePath);
         this.player.setupAnimation(mc);
-        this.player.setFrameRate(12);
-        if (callback){
-            this.player.onComplete(callback);
-        }else{
-            this.setLooping(true); // 默认循环
-        }
-        this.play();
+        this.play(options.times || 0);
     }
 
     getMCKey(modelName: string, gender: number = 1, direction: number, action: ActType): string {
@@ -190,7 +175,6 @@ class DragonAnimationState extends ActAnimationState {
         const {
             modelName,
             action = ActType.ACT_IDLE,
-            callback
         } = options;
       
         let resoucePath = `anim/dragonbody/${modelName}`;
@@ -198,14 +182,8 @@ class DragonAnimationState extends ActAnimationState {
 
         await this.player.loadAnimation(AnimResourceType.DragonBones,resoucePath);
         const actionName = this.getActionName(action);
-
         this.player.setupAnimation(actionName,modelName);
-        if (callback){
-            this.player.onComplete(callback);
-        }else{
-            this.setLooping(true); // 默认循环
-        }
-        this.play();
+        this.play(options.times || 0);
     }
 
     private actionMap: { [key in ActType]?: string } = {
@@ -249,7 +227,6 @@ class SpineAnimationState extends ActAnimationState {
         const {
             modelName,
             action = ActType.ACT_IDLE,
-            callback
         } = options;
       
         let resourcePath = `anim/spinebody/${modelName}`;
@@ -258,11 +235,7 @@ class SpineAnimationState extends ActAnimationState {
         const actionName = this.getActionName(action);
 
         this.player.setupAnimation(actionName,modelName);
-        if (callback){
-            this.player.onComplete(callback);
-        }else{
-            this.setLooping(true); // 默认循环
-        }
+        this.play(options.times || 0);
     }
 
     private actionMap: { [key in ActType]?: string } = {

@@ -6,14 +6,14 @@ import { IAnimationPlayer } from "./IAnimationPlayer";
 import { AnimResourceType } from "./Type";
 const { ccclass, property } = _decorator;
 
-
-
 export class SpinePlayer implements IAnimationPlayer {
     private skeleton: sp.Skeleton | null = null;
     private animationName: string = '';
     private onCompleteCallback: Function | null = null;
     private animManager: AnimManager;
     private resourcePath: string = '';
+    private playTimes: number = 0;
+    private currentPlayCount: number = 0;
 
     constructor(skeleton: sp.Skeleton) {
         this.skeleton = skeleton;
@@ -25,7 +25,6 @@ export class SpinePlayer implements IAnimationPlayer {
         if (!this.animManager.hasAnimation(resourcePath)) {
             await this.animManager.loadAnimation(type, resourcePath);
         }
-        
     }
 
     setupAnimation(animationName?: string): void {
@@ -40,20 +39,41 @@ export class SpinePlayer implements IAnimationPlayer {
         this.animationName = animationName;
 
         if (this.skeleton) {
-            this.playAnimation(this.animationName || 'idle');
+            //this.play();
         }
     }
 
-    playAnimation(animName: string, loop: boolean = true) {
-        if (this.skeleton) {
-            this.skeleton.setAnimation(0, animName, loop);
-        }
-    }
-
-    play(loop: boolean = true) {
+    play(times: number = 0) {
+        this.playTimes = times;
+        this.currentPlayCount = 0;
         if (this.skeleton && this.animationName) {
-            this.skeleton.setAnimation(0, this.animationName, loop);
+            if (times === 0) {
+                this.skeleton.setAnimation(0, this.animationName, true);
+            } else {
+                this.skeleton.setAnimation(0, this.animationName, false);
+            }
         }
+    }
+
+    private onAnimationComplete() {
+        if (this.playTimes === 0) {
+            return;
+        }
+
+        this.currentPlayCount++;
+        if (this.currentPlayCount < this.playTimes) {
+            if (this.skeleton && this.animationName) {
+                this.skeleton.setAnimation(0, this.animationName, false);
+            }
+        } else {
+            if (this.onCompleteCallback) {
+                this.onCompleteCallback();
+            }
+        }
+    }
+
+    onComplete(callback: Function) {
+        this.onCompleteCallback = callback;
     }
 
     stop() {
@@ -72,28 +92,14 @@ export class SpinePlayer implements IAnimationPlayer {
         this.setUpdateGap(1 / rate);
     }
 
-    setAnimeTimes(times: number) {
-        this.play(times > 1);
-    }
-
-    onComplete(callback: Function) {
-        this.onCompleteCallback = callback;
-    }
-
     update(dt: number) {
         // Spine 自动更新，不需要手动调用
-    }
-
-    private onAnimationComplete() {
-        if (this.onCompleteCallback) {
-            this.onCompleteCallback();
-        }
     }
 
     onDestroy() {
         if (this.skeleton) {
             this.skeleton.setCompleteListener(null);
         }
-        this.animManager.releaseAnimation(this.resourcePath);
+        // this.animManager.releaseAnimation(this.resourcePath); 不需要在这里释放资源，因为可能还有其他地方使用
     }
 }
