@@ -1,10 +1,11 @@
-import { SpriteFrame, resources } from "cc";
-import { ActResourceType } from "./rpg/base/ActPlayer";
+import { Asset, Node, SpriteAtlas, SpriteFrame, resources } from "cc";
+import { ActResourceType, ActionOptions } from "./rpg/base/ActPlayer";
 import { CharacterRenderer } from "./rpg/base/CharacterRenderer";
 import app from "./App";
 import { Notification } from "./mvc/Notification";
 import { SecureManager, SecureOptions } from "./core/common/secure/SecureManager";
 import { testFixedPoint } from './core/common/fixed/fixed';
+import { ActType } from "./rpg/enum/Act";
 
 
 
@@ -14,6 +15,14 @@ export namespace testcase {
         id: number;
         name: string;
         email: string;
+    }
+
+    var gameNode:Node = null;
+    var uiNode:Node = null;
+
+    export function app_test_init(game,ui){
+        gameNode = game
+        uiNode = ui
     }
     
 
@@ -109,24 +118,61 @@ export namespace testcase {
             // console.log(unit);
    }
    var characterRenderer:CharacterRenderer   = null;
-    export function app_test11(){
+    export async function app_test11(){
         characterRenderer = new CharacterRenderer();
         characterRenderer.initialize(ActResourceType.ACT1);
-        characterRenderer.setupBody(this.gameNode);
+        await characterRenderer.setupBody(gameNode);
         characterRenderer.updateCharacterStatus('gamars', 100, 50);
-       
+
+        const actionOptions: ActionOptions = {
+            modelName: 'Heavy',
+            action: ActType.ACT_RUN,
+            // direction: 2,
+            // gender: 1,
+            callback: () => console.log('Action completed')
+        };
+
+        characterRenderer.playAction(actionOptions);
+
+        characterRenderer.updatePosition(300, 300);
         // characterRenderer.destroy();
     }
     
     export function app_test12(){
         if(characterRenderer){
-            characterRenderer.playAction('attack', () => {
-                console.log('Action completed');
-            });
+            const actionOptions: ActionOptions = {
+                modelName: 'Heavy',
+                action: ActType.ACT_ATTACK,
+                // direction: 2,
+                // gender: 1,
+                callback: () => console.log('Action completed')
+            };
+            characterRenderer.playAction(actionOptions);
         }
     }
     
 
+    export function app_test13(){
+        resources.load("anim/body/father", SpriteAtlas, (err, asset) => {
+            console.log("loadResource success callback", err, asset);
+            
+        });
+
+        resources.load("anim/body/char", SpriteAtlas, (err, asset) => {
+            console.log("loadResource success callback", err, asset);
+            
+        });
+
+        resources.load("anim/item/gold", SpriteAtlas, (err, asset) => {
+            console.log("loadResource success callback", err, asset);
+            
+        });
+
+        // resources.load("test assets/sheep", SpriteAtlas, (err, atlas) => {
+        //     const frame = atlas.getSpriteFrame('sheep_down_0');
+        //     sprite.spriteFrame = frame;
+        // });
+    }
 }
 
 

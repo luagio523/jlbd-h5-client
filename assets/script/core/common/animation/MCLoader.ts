@@ -11,7 +11,9 @@ export abstract class BaseMCLoader {
 
     protected async loadResource<T extends Asset>(path: string, type: { new (): T }): Promise<T> {
         return new Promise((resolve, reject) => {
+            console.log("loadResource", path);
             resources.load(path, type, (err, asset) => {
+                console.log("loadResource callback", err, asset);
                 if (err) {
                     reject(err);
                 } else {

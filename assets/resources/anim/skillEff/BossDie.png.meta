@@ -1,18 +1,134 @@
 {
-  "ver": "1.0.22",
-  "importer": "texture",
+  "ver": "1.0.27",
+  "importer": "image",
   "imported": true,
-  "uuid": "c3483a80-1ccc-409d-a2d6-bd174006880a",
+  "uuid": "e4468760-83e6-40c9-b9a9-53e50d26b712",
   "files": [
-    ".json"
+    ".json",
+    ".png"
   ],
-  "subMetas": {},
+  "subMetas": {
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "e4468760-83e6-40c9-b9a9-53e50d26b712@6c48a",
+      "displayName": "BossDie",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "wrapModeS": "clamp-to-edge",
+        "wrapModeT": "clamp-to-edge",
+        "imageUuidOrDatabaseUri": "e4468760-83e6-40c9-b9a9-53e50d26b712",
+        "isUuid": true,
+        "visible": false,
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f9941": {
+      "importer": "sprite-frame",
+      "uuid": "e4468760-83e6-40c9-b9a9-53e50d26b712@f9941",
+      "displayName": "BossDie",
+      "id": "f9941",
+      "name": "spriteFrame",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": 0,
+        "trimX": 2,
+        "trimY": 2,
+        "width": 395,
+        "height": 252,
+        "rawWidth": 399,
+        "rawHeight": 256,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "pixelsToUnit": 100,
+        "pivotX": 0.5,
+        "pivotY": 0.5,
+        "meshType": 0,
+        "vertices": {
+          "rawPosition": [
+            -197.5,
+            -126,
+            0,
+            197.5,
+            -126,
+            0,
+            -197.5,
+            126,
+            0,
+            197.5,
+            126,
+            0
+          ],
+          "indexes": [
+            0,
+            1,
+            2,
+            2,
+            1,
+            3
+          ],
+          "uv": [
+            2,
+            254,
+            397,
+            254,
+            2,
+            2,
+            397,
+            2
+          ],
+          "nuv": [
+            0.005012531328320802,
+            0.0078125,
+            0.9949874686716792,
+            0.0078125,
+            0.005012531328320802,
+            0.9921875,
+            0.9949874686716792,
+            0.9921875
+          ],
+          "minPos": [
+            -197.5,
+            -126,
+            0
+          ],
+          "maxPos": [
+            197.5,
+            126,
+            0
+          ]
+        },
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "e4468760-83e6-40c9-b9a9-53e50d26b712@6c48a",
+        "atlasUuid": ""
+      },
+      "ver": "1.0.12",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
   "userData": {
-    "wrapModeS": "repeat",
-    "wrapModeT": "repeat",
-    "minfilter": "linear",
-    "magfilter": "linear",
-    "mipfilter": "none",
-    "anisotropy": 0
+    "type": "sprite-frame",
+    "hasAlpha": true,
+    "fixAlphaTransparencyArtifacts": false,
+    "redirect": "e4468760-83e6-40c9-b9a9-53e50d26b712@6c48a"
   }
 }

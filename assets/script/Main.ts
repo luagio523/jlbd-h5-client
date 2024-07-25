@@ -63,6 +63,8 @@ export class Main extends Root {
         app.facade.registerModules(modules)
         this.initUI();
         this.test();
+
+        testcase.app_test_init(this.gameNode,this.guiNode)
     }
 
     /** 初始化游戏UI */
@@ -82,12 +84,14 @@ export class Main extends Root {
     }
 
     public btnTestClick2() {
-       testcase.app_test11();
+       testcase.app_test13();
     }
 
 
     public btnTestClick() {
-        testcase.app_test12();
+        // testcase.app_test12();
+        testcase.app_test13();
+        
     }
    
     protected async test() {

@@ -5,6 +5,16 @@ import { MCPlayer } from "../../core/common/animation/MCPlayer";
 import { SpinePlayer } from "../../core/common/animation/SpinePlayer";
 import { ActType } from "../enum/Act";
 
+
+export interface ActionOptions {
+    modelName: string;
+    action: ActType;
+    direction?: number;
+    gender?: number;
+    callback?: () => void;
+}
+
+
 // 抽象基类
 export abstract class ActPlayer {
     protected player: IAnimationPlayer;
@@ -12,7 +22,7 @@ export abstract class ActPlayer {
 
 
     abstract initialize(...args: any[]): ActPlayer;
-    abstract changeAct(...args: any[]): Promise<void>;
+    abstract changeAct(options:ActionOptions): Promise<void>;
 
     onComplete(callback: (() => void) | null):ActPlayer{
         if(callback){
@@ -51,15 +61,26 @@ class Act1Player extends ActPlayer {
         return this;
     }
 
-    async changeAct(modelName: string,action: ActType): Promise<void> {
+    async changeAct(options:ActionOptions): Promise<void> {
         if(!this.player){
             throw new Error('player not initialized');
         }
+        const {
+            modelName,
+            action = ActType.ACT_IDLE,
+            callback,
+        } = options;
+
         let mc = this.getMCKey(modelName,  action);
         let atlasPath = `anim/body/char`;
         await this.player.loadAnimation(atlasPath);
         this.player.setupAnimation(mc);
-        this.setLooping(true); // 默认循环
+        if (callback){
+            this.player.onComplete(callback);
+        }else{
+            this.setLooping(true); // 默认循环
+        }
+        // this.play();
     }
 
     protected getActionName(action: ActType): string {
@@ -98,19 +119,30 @@ class Act2Player extends ActPlayer {
         return this;
     }
 
-    async changeAct(modelName: string,action: ActType,  direction: number,gender: number): Promise<void> {
+    async changeAct(options:ActionOptions): Promise<void> {
         if(!this.player){
             throw new Error('player not initialized');
         }
+
+        const {
+            modelName,
+            action = ActType.ACT_IDLE,
+            gender = 1,
+            direction = 0,
+            callback,
+        } = options;
 
         let mc = this.getMCKey(modelName, gender, direction, action);
         let jsonPath = `anim/sheetbody/${mc}.json`;
         let imgPath = `anim/sheetbody/${mc}.png`;
         await this.player.loadAnimation(jsonPath, imgPath);
         this.player.setupAnimation(mc);
-        // 设置默认的循环行为
-        this.setLooping(true);
-        return 
+        if (callback){
+            this.player.onComplete(callback);
+        }else{
+            this.setLooping(true); // 默认循环
+        }
+        this.play();
     }
 
     getMCKey(modelName: string, gender: number = 1, direction: number, action: ActType): string {
@@ -146,10 +178,16 @@ class Act3Player extends ActPlayer {
         return this;
     }
 
-    async changeAct(modelName: string,action: ActType): Promise<void> {
+    async changeAct(options:ActionOptions): Promise<void> {
         if(!this.player){
             throw new Error('player not initialized');
         }
+
+        const {
+            modelName,
+            action = ActType.ACT_IDLE,
+            callback
+        } = options;
       
         let jsonPath = `anim/dragonbody/${modelName}_ske`;
         let imgPath = `anim/dragonbody/${modelName}_tex`;
@@ -159,8 +197,12 @@ class Act3Player extends ActPlayer {
         const actionName = this.getActionName(action);
 
         this.player.setupAnimation(actionName);
-        // 设置默认的循环行为
-        this.setLooping(true);
+        if (callback){
+            this.player.onComplete(callback);
+        }else{
+            this.setLooping(true); // 默认循环
+        }
+        this.play();
     }
 
     private actionMap: { [key in ActType]?: string } = {
@@ -193,10 +235,16 @@ class Act4Player extends ActPlayer {
         return this;
     }
 
-    async changeAct(modelName: string, action: ActType = ActType.ACT_IDLE): Promise<void> {
+    async changeAct(options: ActionOptions): Promise<void> {
         if(!this.player){
             throw new Error('player not initialized');
         }
+
+        const {
+            modelName,
+            action = ActType.ACT_IDLE,
+            callback
+        } = options;
       
         let jsonPath = `anim/dragonbody/${modelName}_ske`;
         let imgPath = `anim/dragonbody/${modelName}_tex`;
@@ -206,8 +254,11 @@ class Act4Player extends ActPlayer {
         const actionName = this.getActionName(action);
 
         this.player.setupAnimation(actionName);
-        // 设置默认的循环行为
-        this.setLooping(true);
+        if (callback){
+            this.player.onComplete(callback);
+        }else{
+            this.setLooping(true); // 默认循环
+        }
     }
 
     private actionMap: { [key in ActType]?: string } = {
@@ -225,21 +276,6 @@ class Act4Player extends ActPlayer {
     }
 }
 
-// 使用示例
-(async () => {
-    const player = ActPlayerFactory.createPlayer(ActResourceType.ACT1);
-    await player.changeAct("character",  ActType.ACT_IDLE);
-    // 播放非循环动作（如攻击），并在完成后执行回调
-    player.play();
-
-    // 如果需要中途改变循环状态
-    player.setLooping(true);
-
-    // 如果需要中途改变完成回调
-    player.onComplete(() => {
-        console.log("新的完成回调");
-    });
-})();
 
 
 export  enum  ActResourceType {
@@ -254,6 +290,7 @@ export class ActPlayerFactory {
     static createPlayer(type: ActResourceType,...args: any): ActPlayer {
         switch (type) {
             case ActResourceType.ACT1:
+                console.log("--------create act1")
                 return new Act1Player().initialize(args);
             case ActResourceType.ACT2:
                 return new Act2Player().initialize(args);
@@ -281,3 +318,18 @@ export class ActPlayerFactory {
 
 
 
+// // 使用示例
+// (async () => {
+//     const player = ActPlayerFactory.createPlayer(ActResourceType.ACT1);
+//     await player.changeAct("character",  ActType.ACT_IDLE);
+//     // 播放非循环动作（如攻击），并在完成后执行回调
+//     player.play();
+
+//     // 如果需要中途改变循环状态
+//     player.setLooping(true);
+
+//     // 如果需要中途改变完成回调
+//     player.onComplete(() => {
+//         console.log("新的完成回调");
+//     });
+// })();

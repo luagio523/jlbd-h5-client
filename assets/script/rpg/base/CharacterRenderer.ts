@@ -1,6 +1,7 @@
 import { Prefab, instantiate, Node, Label, Sprite, resources, tween, sp, dragonBones, Component } from 'cc';
-import { ActPlayer, ActPlayerFactory, ActResourceType } from './ActPlayer';
+import { ActPlayer, ActPlayerFactory, ActResourceType, ActionOptions } from './ActPlayer';
 import { ResPathUtil } from '../util/ResPathUtil';
+import { ActType } from '../enum/Act';
 
 export class CharacterRenderer {
     private bodyNode: Node | null = null;
@@ -15,18 +16,28 @@ export class CharacterRenderer {
         this.setupBody();
     }
 
-    public setupBody(parent?: Node) {
+    public async setupBody(parent?: Node): Promise<void> {
         const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.actResurceType);
-
-        resources.load(actBodyPath, Prefab, (err, prefab) => {
-            if (err) {
-                console.error("Failed to load Character prefab:", err);
-                return;
-            }
-
+    
+        try {
+            const prefab = await this.loadPrefab(actBodyPath);
             this.createBodyNode(prefab, parent);
             this.setupComponents();
             this.setupActPlayer();
+        } catch (error) {
+            console.error("Failed to setup Character body:", error);
+        }
+    }
+    
+    private loadPrefab(path: string): Promise<Prefab> {
+        return new Promise((resolve, reject) => {
+            resources.load(path, Prefab, (err, prefab) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(prefab);
+                }
+            });
         });
     }
 
@@ -107,10 +118,15 @@ export class CharacterRenderer {
         }
     }
 
-    public async playAction(actionName: string, callback: () => void) {
+    public updatePosition(x: number, y: number) {
+        if (this.bodyNode) {
+            this.bodyNode.setPosition(x, y);
+        }
+    }
+
+    public async playAction(options:ActionOptions) {
         if (this.actPlayer) {
-            await this.actPlayer.changeAct(actionName);
-            this.actPlayer.onComplete(callback).play();
+            await this.actPlayer.changeAct(options);
         }
     }
 
