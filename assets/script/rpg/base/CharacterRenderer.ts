@@ -1,30 +1,38 @@
-import { Prefab, instantiate, Node, Label, Sprite, resources, tween } from 'cc';
+import { Node, Label, Sprite, Prefab, resources, instantiate, tween } from 'cc';
+import { CharacterAnimator } from './CharacterAnimator';
+import { ActAnimationStateFactory, ActionOptions } from './ActAnimationState';
 import { ResPathUtil } from '../util/ResPathUtil';
 import { AnimResourceType } from '../../core/common/animation/Type';
 import { ComponentUtil } from '../util/ComponentUil';
-import {  ActAnimationStateFactory, ActionOptions } from './ActAnimationState';
-import {  CharacterAnimator } from './CharacterAnimator';
 
 export class CharacterRenderer {
     private characterNode: Node | null = null;
     private nameLabel: Label | null = null;
+    private levelLabel: Label | null = null;
     private healthBar: Sprite | null = null;
     private manaBar: Sprite | null = null;
     private characterAnimator: CharacterAnimator | null = null;
+    private shadowNode: Node | null = null;
+    private effectsNode: Node | null = null;
+    private statusEffectsNode: Node | null = null;
+
     private animResourceType: AnimResourceType | null = null;
 
     public initialize(type: AnimResourceType) {
         this.animResourceType = type;
     }
 
-    public async setupBody(parent?: Node): Promise<void> {
-        const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.animResourceType);
+    public async setupCharacter(parent?: Node): Promise<void> {
+        await this.setupBody(parent);
+        this.setupComponents();
+    }
+
+    private async setupBody(parent?: Node): Promise<void> {
+        const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.animResourceType!);
     
         try {
             const prefab = await this.loadPrefab(actBodyPath);
             this.createBodyNode(prefab, parent);
-            this.setupComponents();
-            this.setupCharacterAnimator();
         } catch (error) {
             console.error("Failed to setup Character body:", error);
         }
@@ -33,20 +41,15 @@ export class CharacterRenderer {
     private loadPrefab(path: string): Promise<Prefab> {
         return new Promise((resolve, reject) => {
             resources.load(path, Prefab, (err, prefab) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(prefab);
-                }
+                if (err) reject(err);
+                else resolve(prefab);
             });
         });
     }
 
     private createBodyNode(prefab: Prefab, parent?: Node) {
         this.characterNode = instantiate(prefab);
-        if (parent) {
-            parent.addChild(this.characterNode);
-        }
+        if (parent) parent.addChild(this.characterNode);
     }
 
     private setupComponents() {
@@ -55,63 +58,74 @@ export class CharacterRenderer {
             return;
         }
         this.nameLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'NameLabel', Label);
+        this.levelLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'LevelLabel', Label);
         this.healthBar = ComponentUtil.getComponentFromChild(this.characterNode, 'HealthBar', Sprite);
         this.manaBar = ComponentUtil.getComponentFromChild(this.characterNode, 'ManaBar', Sprite);
+        
+        this.shadowNode = this.characterNode.getChildByName('Shadow');
+        this.effectsNode = this.characterNode.getChildByName('Effects');
+        this.statusEffectsNode = this.characterNode.getChildByName('StatusEffects');
+
+        const bodyNode = this.characterNode.getChildByName('Body');
+        if (bodyNode) {
+            const animationState = ActAnimationStateFactory.createPlayer(bodyNode, this.animResourceType!);
+            this.characterAnimator = new CharacterAnimator(animationState);
+        }
     }
 
-    private setupCharacterAnimator() {
-        if (!this.characterNode) {
-            console.error("Character node is not initialized.");
-            return;
-        }
-        let bodyNode = this.characterNode.getChildByName('Body');
-        if (!bodyNode) {
-            console.error("Body node not found.");
-            return;
-        }
-        const animationState = ActAnimationStateFactory.createPlayer(bodyNode, this.animResourceType!);
-        this.characterAnimator = new CharacterAnimator(animationState);
-    }
-
-    public updateCharacterStatus(name: string, health: number, mana: number) {
-        if (this.nameLabel) {
-            this.nameLabel.string = name;
-        }
-        if (this.healthBar) {
-            this.updateBarWithTween(this.healthBar, health);
-        }
-        if (this.manaBar) {
-            this.updateBarWithTween(this.manaBar, mana);
-        }
+    public updateCharacterStatus(name: string, level: number, health: number, mana: number) {
+        if (this.nameLabel) this.nameLabel.string = name;
+        if (this.levelLabel) this.levelLabel.string = `Lv.${level}`;
+        if (this.healthBar) this.updateBarWithTween(this.healthBar, health);
+        if (this.manaBar) this.updateBarWithTween(this.manaBar, mana);
     }
 
     private updateBarWithTween(bar: Sprite, progress: number) {
-        if (bar) {
-            tween(bar)
-                .to(0.5, { fillRange: progress }, {
-                    easing: 'quartOut'
-                })
-                .start();
-        }
+        tween(bar).to(0.5, { fillRange: progress }, { easing: 'quartOut' }).start();
     }
 
     public updatePosition(x: number, y: number) {
-        if (this.characterNode) {
-            this.characterNode.setPosition(x, y);
-        }
+        if (this.characterNode) this.characterNode.setPosition(x, y);
     }
 
     public async playAction(options: ActionOptions) {
         if (this.characterAnimator) {
-           
             this.characterAnimator.transitionToState(options);
         }
     }
 
-    public update(dt: number) {
-        if (this.characterAnimator) {
-            this.characterAnimator.update(dt);
+    public showEffect(effectNode: Node) {
+        if (this.effectsNode) {
+            this.effectsNode.addChild(effectNode);
         }
+    }
+
+    public hideEffect(effectNode: Node) {
+        if (effectNode.parent === this.effectsNode) {
+            this.effectsNode.removeChild(effectNode);
+        }
+    }
+
+    public showStatusEffect(effectNode: Node) {
+        if (this.statusEffectsNode) {
+            this.statusEffectsNode.addChild(effectNode);
+        }
+    }
+
+    public hideStatusEffect(effectNode: Node) {
+        if (effectNode.parent === this.statusEffectsNode) {
+            this.statusEffectsNode.removeChild(effectNode);
+        }
+    }
+
+    public setShadowVisible(visible: boolean) {
+        if (this.shadowNode) {
+            this.shadowNode.active = visible;
+        }
+    }
+
+    public update(dt: number) {
+        if (this.characterAnimator) this.characterAnimator.update(dt);
     }
 
     public destroy() {
@@ -121,16 +135,8 @@ export class CharacterRenderer {
         }
         this.characterAnimator = null;
     }
+
+    public getNode(): Node | null {
+        return this.characterNode;
+    }
 }
-
-
-
-
-// const characterRenderer = new CharacterRenderer();
-// characterRenderer.initialize(AnimResourceType.ACT1);
-// characterRenderer.setupBody(parentNode);
-// characterRenderer.updateCharacterStatus('HeroName', 100, 50);
-// characterRenderer.playAction('attack', () => {
-//     console.log('Action completed');
-// });
-// characterRenderer.destroy();
