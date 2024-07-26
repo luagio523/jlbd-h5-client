@@ -1,5 +1,5 @@
 import { _decorator, Component, Texture2D, UIOpacity, resources, tween, warn, Node, Vec3, Sprite, SpriteFrame, NodePool } from "cc";
-import app from "../../App";
+import { AudioManager } from "../../../core/common/audio/AudioManager";
 
 const { ccclass, property } = _decorator;
 
@@ -13,6 +13,7 @@ export class Footprint extends Component {
 
     private nodePool: NodePool = new NodePool();
     private footLayer: Node | null = null;
+    private audioManager: AudioManager = AudioManager.getInstance();
 
     onLoad() {
         this.loadDefaultTexture();
@@ -88,7 +89,7 @@ export class Footprint extends Component {
     }
 
     private playFootstepSound() {
-        app.audio.playSFX("walk");
+        this.audioManager.playSFX("walk");
     }
 
     private createFootprintNode(): Node {

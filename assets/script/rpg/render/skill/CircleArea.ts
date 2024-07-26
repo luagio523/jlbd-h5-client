@@ -1,7 +1,7 @@
 import { Node, Vec2 } from 'cc';
 import { SkillAreaBase, SkillAreaParams } from './SkillArea';
 
-export class SkillAreaCircle extends SkillAreaBase {
+export class CircleArea extends SkillAreaBase {
     private radius: number;
 
     constructor(node: Node, params: CircleAreaParams) {

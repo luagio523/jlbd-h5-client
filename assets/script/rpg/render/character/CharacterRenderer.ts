@@ -1,9 +1,9 @@
 import { Node } from 'cc';
 
-import { AnimResourceType } from '../../core/animation/Type';
+import { AnimResourceType } from '../../../core/animation/Type';
 import { CharacterNode } from './CharacterNode';
-import { CharacterAnimator } from '../base/CharacterAnimator';
-import { ActAnimationStateFactory, ActionOptions } from '../base/ActAnimationState';
+import { CharacterAnimator } from '../../base/CharacterAnimator';
+import { ActAnimationStateFactory, ActionOptions } from '../../base/ActAnimationState';
 
 export class CharacterRenderer {
     private characterNode: CharacterNode | null = null;

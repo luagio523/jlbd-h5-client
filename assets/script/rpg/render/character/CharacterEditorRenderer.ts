@@ -1,9 +1,9 @@
 import { Node, Label, Sprite, Prefab, resources, instantiate, tween } from 'cc';
-import { ResPathUtil } from '../util/ResPathUtil';
-import { AnimResourceType } from '../../core/animation/Type';
-import { ComponentUtil } from '../util/ComponentUil';
-import { CharacterAnimator } from '../base/CharacterAnimator';
-import { ActAnimationStateFactory, ActionOptions } from '../base/ActAnimationState';
+import { CharacterAnimator } from '../../base/CharacterAnimator';
+import { AnimResourceType } from '../../../core/animation/Type';
+import { ResPathUtil } from '../../util/ResPathUtil';
+import { ComponentUtil } from '../../util/ComponentUil';
+import { ActAnimationStateFactory, ActionOptions } from '../../base/ActAnimationState';
 
 export class CharacterEditorRenderer {
     private characterNode: Node | null = null;
@@ -27,7 +27,6 @@ export class CharacterEditorRenderer {
 
     public async setupBody(parent?: Node): Promise<void> {
         const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.animResourceType!);
-    
         try {
             const prefab = await this.loadPrefab(actBodyPath);
             this.createBodyNode(prefab, parent);

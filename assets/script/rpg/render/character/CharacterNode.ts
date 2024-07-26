@@ -1,7 +1,7 @@
 import { Node, Label, Sprite, UITransform, Vec3, Color } from 'cc';
 import { BaseBodyNode, createBodyNode } from './BodyNode';
 import { StatusBar } from './StatusBar';
-import { AnimResourceType } from '../../core/animation/Type';
+import { AnimResourceType } from '../../../core/animation/Type';
 
 export class CharacterNode {
     // 静态常量定义

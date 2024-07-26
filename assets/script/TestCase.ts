@@ -9,7 +9,7 @@ import scheduler from "./utils/scheduler";
 import { MathUtil } from "./core/common/utils/MathUtil";
 import { AnimResourceType } from "./core/animation/Type";
 import { CharacterEditorRenderer } from "./rpg/render/CharacterEditorRenderer";
-import { CharacterRenderer } from "./rpg/render/CharacterRenderer";
+import { CharacterRenderer } from "./rpg/render/character/CharacterRenderer";
 
 
 

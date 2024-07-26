@@ -1,5 +1,5 @@
 import { Color, Graphics, Node, Label, Vec3, tween, Sprite, UITransform, resources, SpriteFrame, Animation, Vec2,UIOpacity } from 'cc';
-import { AudioManager } from '../../core/common/audio/AudioManager';
+import { AudioManager } from '../../../core/common/audio/AudioManager';
 
 export class SkillAreaBase {
     protected node: Node;
@@ -115,7 +115,7 @@ export class SkillAreaBase {
         this.node.setPosition(position);
     }
 
-    protected updateShapeParameters(params: any) {
+    public updateShapeParameters(params: any) {
         // To be implemented by subclasses
     }
 
