@@ -1,6 +1,5 @@
 import { Asset, Node, SpriteAtlas, SpriteFrame, resources } from "cc";
 import {  ActionOptions } from "./rpg/base/ActAnimationState";
-import { CharacterRenderer } from "./rpg/base/CharacterRenderer";
 import app from "./App";
 import { Notification } from "./mvc/Notification";
 import { SecureManager, SecureOptions } from "./core/common/secure/SecureManager";
@@ -9,6 +8,8 @@ import { ActType } from "./rpg/enum/Act";
 import scheduler from "./utils/scheduler";
 import { MathUtil } from "./core/common/utils/MathUtil";
 import { AnimResourceType } from "./core/common/animation/Type";
+import { CharacterEditorRenderer } from "./rpg/render/CharacterEditorRenderer";
+import { CharacterRenderer } from "./rpg/render/CharacterRenderer";
 
 
 
@@ -122,11 +123,11 @@ export namespace testcase {
    }
 
 //    contain anim/sheetbody/body803_1_1r.json
-    var characterRenderer:CharacterRenderer   = null;
+    var characterRenderer:CharacterEditorRenderer   = null;
     export async function app_test11(){
-        let characterRenderer = new CharacterRenderer();
+        let characterRenderer = new CharacterEditorRenderer();
         characterRenderer.initialize(AnimResourceType.EgretSpriteSheet);
-        await characterRenderer.setupBody(gameNode);
+        await characterRenderer.setupCharacter(gameNode);
         characterRenderer.updateCharacterStatus('gamars', 100, 50);
 
         const actionOptions: ActionOptions = {
@@ -155,10 +156,35 @@ export namespace testcase {
                 action: ActType.ACT_ATTACK,
                 // direction: 2,
                 // gender: 1,
-                callback: () => console.log('Action completed')
             };
             characterRenderer.playAction(actionOptions);
         }
+    }
+
+    
+    export async function app_test15(){
+        let characterRenderer = new CharacterRenderer();
+        characterRenderer.initialize(AnimResourceType.EgretSpriteSheet);
+        await characterRenderer.setupCharacter(gameNode);
+        characterRenderer.updateCharacterStatus('gamars', 100, 50);
+
+        const actionOptions: ActionOptions = {
+            modelName: 'body803',
+            action: ActType.ACT_RUN,
+            direction: 0,
+            gender: 1,
+            // callback: () => console.log('Action completed')
+        };
+
+        characterRenderer.playAction(actionOptions);
+
+        // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
+
+        characterRenderer.updatePosition(500,300);
+        scheduler.scheduleUpdateGlobal((dt:number) => {
+            characterRenderer.update(dt);
+        });
+        // characterRenderer.destroy();
     }
     
 

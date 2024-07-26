@@ -1,9 +1,9 @@
 import { Node, Label, Sprite, Prefab, resources, instantiate, tween } from 'cc';
-import { CharacterAnimator } from './CharacterAnimator';
-import { ActAnimationStateFactory, ActionOptions } from './ActAnimationState';
 import { ResPathUtil } from '../util/ResPathUtil';
 import { AnimResourceType } from '../../core/common/animation/Type';
 import { ComponentUtil } from '../util/ComponentUil';
+import { CharacterAnimator } from '../base/CharacterAnimator';
+import { ActAnimationStateFactory, ActionOptions } from '../base/ActAnimationState';
 
 export class CharacterEditorRenderer {
     private characterNode: Node | null = null;
@@ -25,7 +25,7 @@ export class CharacterEditorRenderer {
         this.setupComponents();
     }
 
-    private async setupBody(parent?: Node): Promise<void> {
+    public async setupBody(parent?: Node): Promise<void> {
         const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.animResourceType!);
     
         try {
@@ -71,7 +71,7 @@ export class CharacterEditorRenderer {
         }
     }
 
-    public updateCharacterStatus(name: string, level: number, health: number, mana: number) {
+    public updateCharacterStatus(name: string, level: number, health: number =0, mana: number=0) {
         if (this.nameLabel) this.nameLabel.string = name;
         if (this.levelLabel) this.levelLabel.string = `Lv.${level}`;
         if (this.healthBar) this.updateBarWithTween(this.healthBar, health);

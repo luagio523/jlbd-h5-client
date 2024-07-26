@@ -1,8 +1,9 @@
 import { Node } from 'cc';
-import { CharacterAnimator } from './CharacterAnimator';
-import { ActAnimationStateFactory, ActionOptions } from './ActAnimationState';
+
 import { AnimResourceType } from '../../core/common/animation/Type';
 import { CharacterNode } from './CharacterNode';
+import { CharacterAnimator } from '../base/CharacterAnimator';
+import { ActAnimationStateFactory, ActionOptions } from '../base/ActAnimationState';
 
 export class CharacterRenderer {
     private characterNode: CharacterNode | null = null;
@@ -14,6 +15,7 @@ export class CharacterRenderer {
     }
 
     public async setupCharacter(parent?: Node): Promise<void> {
+        console.log("Setting up character...");
         this.characterNode = new CharacterNode(this.animResourceType!, 100, 100); // 默认尺寸，可以根据需要调整
         if (parent) parent.addChild(this.characterNode.getNode());
 
@@ -33,7 +35,7 @@ export class CharacterRenderer {
         }
     }
 
-    public updateCharacterStatus(name: string, level: number, health: number, mana: number) {
+    public updateCharacterStatus(name: string, level: number=1, health: number=0, mana: number=0) {
         if (this.characterNode) {
             this.characterNode.setName(name);
             this.characterNode.setLevel(level);

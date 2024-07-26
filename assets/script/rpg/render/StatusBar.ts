@@ -56,7 +56,7 @@ export class StatusBar {
 
     private loadSpriteFrame(path: string): Promise<SpriteFrame> {
         return new Promise((resolve, reject) => {
-            resources.load(path, SpriteFrame, (err, spriteFrame) => {
+            resources.load(path+"/spriteFrame", SpriteFrame, (err, spriteFrame) => {
                 if (err) {
                     console.error(`Failed to load sprite frame: ${path}`, err);
                     reject(err);

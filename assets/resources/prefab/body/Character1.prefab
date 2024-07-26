@@ -1320,8 +1320,8 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": -0.5940000000000509,
-      "y": -26.73599999999999,
+      "x": 0.811,
+      "y": -25.039,
       "z": 0
     },
     "_lrot": {
@@ -1361,7 +1361,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 25.353515625,
+      "width": 25.34765625,
       "height": 15.120000000000001
     },
     "_anchorPoint": {
@@ -1397,7 +1397,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "label",
+    "_string": "zeus",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 12,
