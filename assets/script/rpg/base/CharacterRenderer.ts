@@ -1,21 +1,12 @@
-import { Node, Label, Sprite, Prefab, resources, instantiate, tween } from 'cc';
+import { Node } from 'cc';
 import { CharacterAnimator } from './CharacterAnimator';
 import { ActAnimationStateFactory, ActionOptions } from './ActAnimationState';
-import { ResPathUtil } from '../util/ResPathUtil';
 import { AnimResourceType } from '../../core/common/animation/Type';
-import { ComponentUtil } from '../util/ComponentUil';
+import { CharacterNode } from './CharacterNode';
 
 export class CharacterRenderer {
-    private characterNode: Node | null = null;
-    private nameLabel: Label | null = null;
-    private levelLabel: Label | null = null;
-    private healthBar: Sprite | null = null;
-    private manaBar: Sprite | null = null;
+    private characterNode: CharacterNode | null = null;
     private characterAnimator: CharacterAnimator | null = null;
-    private shadowNode: Node | null = null;
-    private effectsNode: Node | null = null;
-    private statusEffectsNode: Node | null = null;
-
     private animResourceType: AnimResourceType | null = null;
 
     public initialize(type: AnimResourceType) {
@@ -23,69 +14,38 @@ export class CharacterRenderer {
     }
 
     public async setupCharacter(parent?: Node): Promise<void> {
-        await this.setupBody(parent);
-        this.setupComponents();
+        this.characterNode = new CharacterNode(this.animResourceType!, 100, 100); // 默认尺寸，可以根据需要调整
+        if (parent) parent.addChild(this.characterNode.getNode());
+
+        await this.setupComponents();
     }
 
-    private async setupBody(parent?: Node): Promise<void> {
-        const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.animResourceType!);
-    
-        try {
-            const prefab = await this.loadPrefab(actBodyPath);
-            this.createBodyNode(prefab, parent);
-        } catch (error) {
-            console.error("Failed to setup Character body:", error);
-        }
-    }
-    
-    private loadPrefab(path: string): Promise<Prefab> {
-        return new Promise((resolve, reject) => {
-            resources.load(path, Prefab, (err, prefab) => {
-                if (err) reject(err);
-                else resolve(prefab);
-            });
-        });
-    }
-
-    private createBodyNode(prefab: Prefab, parent?: Node) {
-        this.characterNode = instantiate(prefab);
-        if (parent) parent.addChild(this.characterNode);
-    }
-
-    private setupComponents() {
+    private async setupComponents() {
         if (!this.characterNode) {
-            console.error("Body node is not initialized.");
+            console.error("Character node is not initialized.");
             return;
         }
-        this.nameLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'nameLabel', Label);
-        this.levelLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'levelLabel', Label);
-        this.healthBar = ComponentUtil.getComponentFromChild(this.characterNode, 'healthBar', Sprite);
-        this.manaBar = ComponentUtil.getComponentFromChild(this.characterNode, 'manaBar', Sprite);
-        
-        this.shadowNode = this.characterNode.getChildByName('shadow');
-        // this.effectsNode = this.characterNode.getChildByName('effects');
-        // this.statusEffectsNode = this.characterNode.getChildByName('statusEffects');
 
-        const bodyNode = this.characterNode.getChildByName('Body');
+        const bodyNode = this.characterNode.getBodyNode();
         if (bodyNode) {
-            const animationState = ActAnimationStateFactory.createPlayer(bodyNode, this.animResourceType!);
+            const animationState = ActAnimationStateFactory.createPlayer(bodyNode.getNode(), this.animResourceType!);
             this.characterAnimator = new CharacterAnimator(animationState);
         }
     }
 
     public updateCharacterStatus(name: string, level: number, health: number, mana: number) {
-        if (this.nameLabel) this.nameLabel.string = name;
-        if (this.levelLabel) this.levelLabel.string = `Lv.${level}`;
-        if (this.healthBar) this.updateBarWithTween(this.healthBar, health);
-        if (this.manaBar) this.updateBarWithTween(this.manaBar, mana);
-    }
-
-    private updateBarWithTween(bar: Sprite, progress: number) {
-        tween(bar).to(0.5, { fillRange: progress }, { easing: 'quartOut' }).start();
+        if (this.characterNode) {
+            this.characterNode.setName(name);
+            this.characterNode.setLevel(level);
+            this.characterNode.setHealth(health);
+            this.characterNode.setMana(mana);
+        }
     }
 
     public updatePosition(x: number, y: number) {
-        if (this.characterNode) this.characterNode.setPosition(x, y);
+        if (this.characterNode) {
+            this.characterNode.setPosition(x, y);
+        }
     }
 
     public async playAction(options: ActionOptions) {
@@ -94,49 +54,29 @@ export class CharacterRenderer {
         }
     }
 
-    public showEffect(effectNode: Node) {
-        if (this.effectsNode) {
-            this.effectsNode.addChild(effectNode);
-        }
-    }
-
-    public hideEffect(effectNode: Node) {
-        if (effectNode.parent === this.effectsNode) {
-            this.effectsNode.removeChild(effectNode);
-        }
-    }
-
-    public showStatusEffect(effectNode: Node) {
-        if (this.statusEffectsNode) {
-            this.statusEffectsNode.addChild(effectNode);
-        }
-    }
-
-    public hideStatusEffect(effectNode: Node) {
-        if (effectNode.parent === this.statusEffectsNode) {
-            this.statusEffectsNode.removeChild(effectNode);
-        }
-    }
-
-    public setShadowVisible(visible: boolean) {
-        if (this.shadowNode) {
-            this.shadowNode.active = visible;
+    public setBodySize(width: number, height: number) {
+        if (this.characterNode) {
+            this.characterNode.setBodySize(width, height);
         }
     }
 
     public update(dt: number) {
-        if (this.characterAnimator) this.characterAnimator.update(dt);
+        if (this.characterAnimator) {
+            this.characterAnimator.update(dt);
+        }
     }
 
     public destroy() {
         if (this.characterNode) {
-            this.characterNode.destroy();
+            this.characterNode.getNode().destroy();
             this.characterNode = null;
         }
         this.characterAnimator = null;
     }
 
     public getNode(): Node | null {
-        return this.characterNode;
+        return this.characterNode ? this.characterNode.getNode() : null;
     }
+
+    
 }
