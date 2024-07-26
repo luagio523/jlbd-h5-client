@@ -4,10 +4,11 @@
 
 #缩略图偏移
 
-#Plist动画
-#龙骨动画
-#模型prefab
-
+#egret动画  80%
+#Plist动画 80%
+#龙骨动画  70%
+#模型prefab  60%
+# 动画位置  
 
 #fairygui UI  30%
 #UI 组件
