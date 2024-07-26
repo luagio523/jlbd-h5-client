@@ -1,34 +1,44 @@
 
-import { _decorator,  dragonBones,  } from 'cc';
+import { Component, _decorator,  dragonBones,  } from 'cc';
 import { IAnimationPlayer } from './IAnimationPlayer';
 import { AnimResourceType } from './Type';
-import { AnimManager } from './AnimManager';
+import { AnimResManager } from './AnimResManager';
 const { ccclass, property } = _decorator;
 
 export class DragonPlayer implements IAnimationPlayer {
-    private armatureDisplay: dragonBones.ArmatureDisplay | null = null;
+    private armatureDisplay: dragonBones.ArmatureDisplay  = null;
+    private resourceType: AnimResourceType =null;
     private resourcePath: string = '';
     private animationName: string = '';
     private onCompleteCallback: Function | null = null;
-    private animManager: AnimManager;
+    private AnimResManager: AnimResManager;
     constructor(armatureDisplay: dragonBones.ArmatureDisplay) {
         this.armatureDisplay = armatureDisplay;
-        this.animManager = AnimManager.getInstance();
+        this.AnimResManager = AnimResManager.getInstance();
     }
 
     // let resoucePath = `anim/dragonbody/${modelName}_ske`;
     // let imgPath = `anim/dragonbody/${modelName}_tex`;
 
     async loadAnimation(type: AnimResourceType, resourcePath: string): Promise<void> {
+        this.resourceType = type;
         this.resourcePath = resourcePath;
-        if (!this.animManager.hasAnimation(resourcePath)) {
-            await this.animManager.loadAnimation(type, resourcePath);
+        if (!this.AnimResManager.hasAnimation(resourcePath)) {
+            await this.AnimResManager.loadAnimation(type, resourcePath);
         }
+    }
+
+    public getResourceType(): AnimResourceType{
+        return this.resourceType;
+    }
+
+    setComponent(component: Component): void{
+        this.armatureDisplay = component as dragonBones.ArmatureDisplay;
     }
 
     setupAnimation(animationName?: string,armatureName?: string): void {
 
-        const {dragonBonesAsset, atlasAsset} = this.animManager.getAnimationData(this.resourcePath,"default");
+        const {dragonBonesAsset, atlasAsset} = this.AnimResManager.getAnimationData(this.resourcePath,"default");
         
         if (this.armatureDisplay) {
             this.armatureDisplay.dragonAsset = dragonBonesAsset;
@@ -40,9 +50,7 @@ export class DragonPlayer implements IAnimationPlayer {
         if (animationName) {
             this.animationName = animationName;
         }
-        if (this.armatureDisplay) {
-            // this.play(0);
-        }
+       
     }
 
     
@@ -51,12 +59,14 @@ export class DragonPlayer implements IAnimationPlayer {
             this.armatureDisplay.playAnimation(this.animationName, playTimes);
         }
     }
+    
 
     stop() {
-        if (this.armatureDisplay) {
+        if (this.armatureDisplay && this.armatureDisplay.armature()) {
             this.armatureDisplay.armature().animation.stop();
         }
     }
+
 
     setUpdateGap(gap: number) {
         if (this.armatureDisplay) {
@@ -86,13 +96,24 @@ export class DragonPlayer implements IAnimationPlayer {
         }
     }
 
-    onDestroy() {
+    public dispose() {
         if (this.armatureDisplay) {
+            // 停止动画播放
+            this.stop();
+            // 移除事件监听器
             this.armatureDisplay.removeEventListener(dragonBones.EventObject.COMPLETE, this.onAnimationComplete, this);
-        }
-        // this.animManager.releaseAnimation(this.resourcePath); 不需要在这里释放资源，因为可能还有其他地方使用
-    }
 
+            // 注意：不需要手动从世界时钟中移除或销毁armature
+            // DragonBones会在适当的时候处理这些
+            // 清除引用
+            this.armatureDisplay = null;
+        }
+        // 清除其他引用
+        this.resourceType = null;
+        this.resourcePath = '';
+        this.animationName = '';
+        this.onCompleteCallback = null;
+    }
 
 }
 
@@ -106,23 +127,23 @@ export class DragonPlayer implements IAnimationPlayer {
 
 // export class DragonPlayer implements IAnimationPlayer {
 //     private armatureDisplay: dragonBones.ArmatureDisplay | null = null;
-//     private animManager: AnimManager;
+//     private AnimResManager: AnimResManager;
 //     private resourcePath: string = '';
 //     private animationName: string = '';
 //     private onCompleteCallback: Function | null = null;
 
 //     constructor(armatureDisplay: dragonBones.ArmatureDisplay) {
 //         this.armatureDisplay = armatureDisplay;
-//         this.animManager = AnimManager.getInstance();
+//         this.AnimResManager = AnimResManager.getInstance();
 //     }
 
 //     async loadAnimation(resourcePath: string, armatureName: string = "Armature"): Promise<void> {
 //         this.resourcePath = resourcePath;
-//         if (!this.animManager.hasAnimation(resourcePath)) {
-//             await this.animManager.loadAnimation('dragonbones', resourcePath);
+//         if (!this.AnimResManager.hasAnimation(resourcePath)) {
+//             await this.AnimResManager.loadAnimation('dragonbones', resourcePath);
 //         }
 
-//         const assets = this.animManager.getAnimationAssets(resourcePath);
+//         const assets = this.AnimResManager.getAnimationAssets(resourcePath);
 //         if (assets && assets.length === 2) {
 //             const [dragonBonesAsset, atlasAsset] = assets as [dragonBones.DragonBonesAsset, dragonBones.DragonBonesAtlasAsset];
             
@@ -149,7 +170,7 @@ export class DragonPlayer implements IAnimationPlayer {
 //         if (this.armatureDisplay) {
 //             this.armatureDisplay.removeEventListener(dragonBones.EventObject.COMPLETE, this.onAnimationComplete, this);
 //         }
-//         this.animManager.releaseAnimation(this.resourcePath);
+//         this.AnimResManager.releaseAnimation(this.resourcePath);
 //     }
 // }
 

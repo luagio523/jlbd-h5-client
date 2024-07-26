@@ -1,6 +1,6 @@
 import { Node, Label, Sprite, Prefab, resources, instantiate, tween } from 'cc';
 import { ResPathUtil } from '../util/ResPathUtil';
-import { AnimResourceType } from '../../core/common/animation/Type';
+import { AnimResourceType } from '../../core/animation/Type';
 import { ComponentUtil } from '../util/ComponentUil';
 import { CharacterAnimator } from '../base/CharacterAnimator';
 import { ActAnimationStateFactory, ActionOptions } from '../base/ActAnimationState';

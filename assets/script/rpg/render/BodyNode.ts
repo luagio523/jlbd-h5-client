@@ -1,5 +1,5 @@
 import { Node, Sprite, SpriteFrame, dragonBones, sp, UITransform, Vec3 } from 'cc';
-import { AnimResourceType } from '../../core/common/animation/Type';
+import { AnimResourceType } from '../../core/animation/Type';
 
 export abstract class BaseBodyNode {
     protected node: Node;

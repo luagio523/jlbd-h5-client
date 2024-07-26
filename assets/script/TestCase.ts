@@ -7,7 +7,7 @@ import { testFixedPoint } from './core/common/fixed/fixed';
 import { ActType } from "./rpg/enum/Act";
 import scheduler from "./utils/scheduler";
 import { MathUtil } from "./core/common/utils/MathUtil";
-import { AnimResourceType } from "./core/common/animation/Type";
+import { AnimResourceType } from "./core/animation/Type";
 import { CharacterEditorRenderer } from "./rpg/render/CharacterEditorRenderer";
 import { CharacterRenderer } from "./rpg/render/CharacterRenderer";
 

@@ -1,10 +1,10 @@
 import { Component, Node, Sprite, dragonBones, resources, sp } from "cc";
-import { DragonPlayer } from "../../core/common/animation/DragonPlayer";
-import { MCPlayer } from "../../core/common/animation/MCPlayer";
-import { SpinePlayer } from "../../core/common/animation/SpinePlayer";
+import { DragonPlayer } from "../../core/animation/DragonPlayer";
+import { MCPlayer } from "../../core/animation/MCPlayer";
+import { SpinePlayer } from "../../core/animation/SpinePlayer";
 import { ActType } from "../enum/Act";
-import { AnimResourceType } from "../../core/common/animation/Type";
-import { IAnimationPlayer } from "../../core/common/animation/IAnimationPlayer";
+import { AnimResourceType } from "../../core/animation/Type";
+import { IAnimationPlayer } from "../../core/animation/IAnimationPlayer";
 
 
 export interface ActionOptions {

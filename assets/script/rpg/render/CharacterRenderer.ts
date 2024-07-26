@@ -1,6 +1,6 @@
 import { Node } from 'cc';
 
-import { AnimResourceType } from '../../core/common/animation/Type';
+import { AnimResourceType } from '../../core/animation/Type';
 import { CharacterNode } from './CharacterNode';
 import { CharacterAnimator } from '../base/CharacterAnimator';
 import { ActAnimationStateFactory, ActionOptions } from '../base/ActAnimationState';

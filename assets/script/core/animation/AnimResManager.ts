@@ -2,19 +2,19 @@ import { Asset,  resources } from "cc";
 import { BaseMCLoader, LoaderFactory } from "./MCLoader";
 import { AnimResourceType } from "./Type";
 
-export class AnimManager {
-    private static instance: AnimManager;
+export class AnimResManager {
+    private static instance: AnimResManager;
     private loaders: Map<string, BaseMCLoader> = new Map();
     private loadedAssets: Map<string, Asset[]> = new Map();
     private loaderPool: Map<string, BaseMCLoader[]> = new Map();
 
     private constructor() {}
 
-    public static getInstance(): AnimManager {
-        if (!AnimManager.instance) {
-            AnimManager.instance = new AnimManager();
+    public static getInstance(): AnimResManager {
+        if (!AnimResManager.instance) {
+            AnimResManager.instance = new AnimResManager();
         }
-        return AnimManager.instance;
+        return AnimResManager.instance;
     }
 
     private getLoader(type: AnimResourceType): BaseMCLoader {
