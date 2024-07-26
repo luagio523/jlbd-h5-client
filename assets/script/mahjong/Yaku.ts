@@ -1,5 +1,6 @@
 import { Player } from "./Player";
 import { Tile, TileType } from "./Tile";
+import { Winning } from "./Winning";
 
 
 
@@ -10,10 +11,13 @@ interface YakuhaiResult {
 }
 
 
-
-
 export class Yaku {
-    // 已实现的役
+    static canWin(hand: Tile[], melds: Tile[][]): boolean {
+        return Winning.canWin(hand, melds);
+    }
+
+
+    // 已实现的役 立直
     static checkRiichi(player: Player): boolean {
         return player.riichi;
     }
