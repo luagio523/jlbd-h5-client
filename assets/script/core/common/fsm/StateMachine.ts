@@ -7,7 +7,7 @@ interface ITransitionDir<State> {
     onTransition?: (from: State, to: State) => void;
 }
 
-type ITransitions<T, State> = {
+export type ITransitions<T, State> = {
     [P in keyof T]: ITransitionDir<State> | ITransitionDir<State>[];
 }
 
