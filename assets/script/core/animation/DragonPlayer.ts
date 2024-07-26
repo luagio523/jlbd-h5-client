@@ -96,16 +96,15 @@ export class DragonPlayer implements IAnimationPlayer {
         }
     }
 
-    public dispose() {
+    public reset() {
         if (this.armatureDisplay) {
             // 停止动画播放
             this.stop();
             // 移除事件监听器
+            this.armatureDisplay.dragonAsset = null;
+            this.armatureDisplay.dragonAtlasAsset = null;
+            this.armatureDisplay.armatureName = null;
             this.armatureDisplay.removeEventListener(dragonBones.EventObject.COMPLETE, this.onAnimationComplete, this);
-
-            // 注意：不需要手动从世界时钟中移除或销毁armature
-            // DragonBones会在适当的时候处理这些
-            // 清除引用
             this.armatureDisplay = null;
         }
         // 清除其他引用

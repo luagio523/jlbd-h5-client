@@ -44,6 +44,7 @@ export class SpinePlayer implements IAnimationPlayer {
                 this.animationName = animationName;
             }
             this.skeleton.setCompleteListener(this.onAnimationComplete.bind(this));
+            
         }
     }
 
@@ -100,10 +101,10 @@ export class SpinePlayer implements IAnimationPlayer {
         // Spine 自动更新，不需要手动调用
     }
 
-    dispose() {
+    public reset() {
+        this.stop();  // 停止动画并重置到初始姿势
         if (this.skeleton) {
-             // 停止当前正在播放的动画
-            this.stop();
+            this.skeleton.skeletonData = null;
             this.skeleton.setCompleteListener(null);
             this.skeleton = null;
         }

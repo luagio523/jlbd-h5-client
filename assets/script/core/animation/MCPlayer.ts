@@ -16,6 +16,7 @@ export class MCPlayer implements IAnimationPlayer {
     private resourceType: AnimResourceType = null;
     private resourcePath: string = '';
     private AnimResManager: AnimResManager;
+    private initialSpriteFrame: SpriteFrame | null = null;
 
     constructor(sprite: Sprite) {
         this.sprite = sprite;
@@ -25,6 +26,7 @@ export class MCPlayer implements IAnimationPlayer {
 
     setComponent(component: Component): void {
         this.sprite = component as Sprite;
+        this.initialSpriteFrame = this.sprite.spriteFrame;
     }
 
     async loadAnimation(type: AnimResourceType, resourcePath: string): Promise<void> {
@@ -65,8 +67,17 @@ export class MCPlayer implements IAnimationPlayer {
         this.movieClip.playAnime();
     }
 
+   
     stop(): void {
         this.movieClip.stopAnime();
+        this.resetSprite(); //还原到初始状态
+    }
+
+    private resetSprite(): void {
+        if (this.sprite && this.initialSpriteFrame) {
+            this.sprite.spriteFrame = this.initialSpriteFrame;
+            this.sprite.node.setPosition(0, 0); // 重置位置
+        }
     }
 
     setFrameRate(rate: number): void {
@@ -85,7 +96,7 @@ export class MCPlayer implements IAnimationPlayer {
         this.movieClip.update(dt);
     }
     
-    dispose(): void {
+    reset(): void {
         this.stop();
         this.movieClip.destroy();
         this.sprite = null;

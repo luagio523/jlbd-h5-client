@@ -14,7 +14,7 @@ export interface IAnimationPlayer {
     setFrameRate(rate: number): void;
     onComplete(callback: Function): void;
     update(dt: number): void;
-    dispose():void;
+    reset():void;
 }
 
 
