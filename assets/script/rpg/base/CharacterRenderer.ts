@@ -57,14 +57,14 @@ export class CharacterRenderer {
             console.error("Body node is not initialized.");
             return;
         }
-        this.nameLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'NameLabel', Label);
-        this.levelLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'LevelLabel', Label);
-        this.healthBar = ComponentUtil.getComponentFromChild(this.characterNode, 'HealthBar', Sprite);
-        this.manaBar = ComponentUtil.getComponentFromChild(this.characterNode, 'ManaBar', Sprite);
+        this.nameLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'nameLabel', Label);
+        this.levelLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'levelLabel', Label);
+        this.healthBar = ComponentUtil.getComponentFromChild(this.characterNode, 'healthBar', Sprite);
+        this.manaBar = ComponentUtil.getComponentFromChild(this.characterNode, 'manaBar', Sprite);
         
-        this.shadowNode = this.characterNode.getChildByName('Shadow');
-        this.effectsNode = this.characterNode.getChildByName('Effects');
-        this.statusEffectsNode = this.characterNode.getChildByName('StatusEffects');
+        this.shadowNode = this.characterNode.getChildByName('shadow');
+        // this.effectsNode = this.characterNode.getChildByName('effects');
+        // this.statusEffectsNode = this.characterNode.getChildByName('statusEffects');
 
         const bodyNode = this.characterNode.getChildByName('Body');
         if (bodyNode) {

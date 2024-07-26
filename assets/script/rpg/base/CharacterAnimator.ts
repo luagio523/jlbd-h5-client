@@ -24,6 +24,7 @@ export class CharacterAnimator {
     private baseAction: ActType = ActType.ACT_IDLE;
     private queuedActions: ActionOptions[] = [];
     private isAnimationPlaying: boolean = false;
+    private currentOptions: ActionOptions;
 
     constructor(animationState: ActAnimationState) {
         this.animationState = animationState;
@@ -47,6 +48,8 @@ export class CharacterAnimator {
     }
 
     public transitionToState(options: ActionOptions) {
+        this.currentOptions = { ...options };  // 保存完整的 options
+
         if (this.isLoopingAction(options.action)) {
             this.baseAction = options.action;
         }
@@ -67,7 +70,11 @@ export class CharacterAnimator {
     }
 
     private returnToBaseAction() {
-        this.playAction({ modelName: 'character', action: this.baseAction });
+        const baseOptions: ActionOptions = {
+            ...this.currentOptions,
+            action: this.baseAction
+        };
+        this.playAction(baseOptions);
     }
 
     private isLoopingAction(action: ActType): boolean {
