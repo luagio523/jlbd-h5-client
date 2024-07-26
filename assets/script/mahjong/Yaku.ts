@@ -1,6 +1,16 @@
 import { Player } from "./Player";
 import { Tile, TileType } from "./Tile";
 import { Winning } from "./Winning";
+import { Chinitsu } from "./hands/Chinitsu";
+import { Chuuren } from "./hands/Chuuren";
+import { Daisangen } from "./hands/Daisangen";
+import { Honroutou } from "./hands/Honroutou";
+import { KokushiMusou } from "./hands/KokushiMusou";
+import { Ryuuiisou } from "./hands/Ryuuiisou";
+import { Sanankou } from "./hands/Sanankou";
+import { Shousangen } from "./hands/Shousangen";
+import { Suuankou } from "./hands/Suuankou";
+import { Suushiihou } from "./hands/Suushiihou";
 
 
 
@@ -86,7 +96,6 @@ export class Yaku {
     }
 
 
-
     static checkSanshokuDoujun(hand: Tile[]): boolean {
         // TODO: 实现三色同顺的检查逻辑
         return false;
@@ -101,15 +110,13 @@ export class Yaku {
         // TODO: 实现三色同刻的检查逻辑
         return false;
     }
-
+    // 三暗刻的检查逻辑
     static checkSanankou(hand: Tile[]): boolean {
-        // TODO: 实现三暗刻的检查逻辑
-        return false;
+        return Sanankou.verifySanankou(hand);
     }
-
+     // 小三元的检查逻辑
     static checkShousangen(hand: Tile[]): boolean {
-        // TODO: 实现小三元的检查逻辑
-        return false;
+        return Shousangen.verifyShousangen(hand);
     }
 
     static checkHonitsu(hand: Tile[]): boolean {
@@ -119,7 +126,7 @@ export class Yaku {
 
     static checkChinitsu(hand: Tile[]): boolean {
         // TODO: 实现清一色的检查逻辑
-        return false;
+        return Chinitsu.verifyChinitsu(hand);
     }
 
     static checkRyanpeikou(hand: Tile[]): boolean {
@@ -131,40 +138,36 @@ export class Yaku {
         // TODO: 实现纯全带幺九的检查逻辑
         return false;
     }
-
+    // 混老头的检查逻辑
     static checkHonroutou(hand: Tile[]): boolean {
-        // TODO: 实现混老头的检查逻辑
-        return false;
+        return Honroutou.verifyHonroutou(hand);
     }
 
+    //四暗刻的检查逻辑
     static checkSuuankou(hand: Tile[]): boolean {
-        // TODO: 实现四暗刻的检查逻辑
-        return false;
+        return Suuankou.verifySuuankou(hand);
     }
 
+    //大三元
     static checkDaisangen(hand: Tile[]): boolean {
-        // TODO: 实现大三元的检查逻辑
-        return false;
+        return Daisangen.verifyDaisangen(hand);
     }
-
+    
+    //国士无双的检查逻辑
     static checkKokushimusou(hand: Tile[]): boolean {
-        // TODO: 实现国士无双的检查逻辑
-        return false;
+        return KokushiMusou.verifyKokushiMusou(hand)
     }
-
+    //大四喜
     static checkSuushiihou(hand: Tile[]): boolean {
-        // TODO: 实现四喜和的检查逻辑
-        return false;
+        return Suushiihou.verifySuushiihou(hand)
     }
-
+    //实现九莲宝灯
     static checkChuuren(hand: Tile[]): boolean {
-        // TODO: 实现九莲宝灯的检查逻辑
-        return false;
+        return Chuuren.verifyChuuren(hand)
     }
-
+    // 绿一色的检查逻辑
     static checkRyuuiisou(hand: Tile[]): boolean {
-        // TODO: 实现绿一色的检查逻辑
-        return false;
+        return Ryuuiisou.verifyRyuuiisou(hand);
     }
 
     // 辅助方法
@@ -212,3 +215,31 @@ export class Yaku {
 //     console.log(`三元牌刻子数量: ${result.dragonTriplets.length}`);
 //     console.log(`风牌刻子数量: ${result.windTriplets.length}`);
 // }
+
+
+
+
+// import { Tile, TileType } from "./Tile";
+// import { Player } from "./Player";
+// import { Yaku } from "./Yaku";
+
+// const player = new Player();
+// player.hand = [
+//   new Tile(TileType.Man, 1),
+//   new Tile(TileType.Man, 1),
+//   new Tile(TileType.Man, 1),
+//   new Tile(TileType.Man, 2),
+//   new Tile(TileType.Man, 3),
+//   new Tile(TileType.Pin, 4),
+//   new Tile(TileType.Pin, 4),
+//   new Tile(TileType.Pin, 4),
+//   new Tile(TileType.Sou, 7),
+//   new Tile(TileType.Sou, 8),
+//   new Tile(TileType.Sou, 9),
+//   new Tile(TileType.Dragon, 'White'),
+//   new Tile(TileType.Dragon, 'White'),
+//   new Tile(TileType.Dragon, 'White')
+// ];
+
+// const canWin = player.canDeclareWin();
+// console.log(`玩家是否可以和牌: ${canWin}`);
