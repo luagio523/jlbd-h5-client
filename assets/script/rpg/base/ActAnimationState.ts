@@ -119,6 +119,7 @@ class EgretAnimationState extends ActAnimationState {
 
     public initialize(sprite: Sprite): ActAnimationState {
         this.player = new MCPlayer(sprite);
+        this.player.setFrameRate(12)
         return this;
     }
 
@@ -131,8 +132,13 @@ class EgretAnimationState extends ActAnimationState {
             modelName,
             action = ActType.ACT_IDLE,
             gender = 1,
-            direction = 0
+            direction = 0,
+            frameRate
         } = options;
+        
+        if(frameRate){
+            this.player.setFrameRate(frameRate)
+        }
 
         this.currentActionOptions = options;
 
