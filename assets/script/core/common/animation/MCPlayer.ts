@@ -1,4 +1,4 @@
-import { _decorator, Component, Sprite, SpriteFrame, UITransform } from 'cc';
+import { _decorator, Component, Sprite, SpriteFrame, sys, UITransform } from 'cc';
 import MovieClip from './MovieClip';
 import { AnimManager } from './AnimManager';
 import { IAnimationPlayer } from './IAnimationPlayer';
@@ -38,11 +38,13 @@ export class MCPlayer implements IAnimationPlayer {
     onComplete(callback: Function) {
         this.movieClip.onComplete(callback);
     }
-    
+    private time = sys.now()
     private updateSprite(spriteFrame: SpriteFrame, progress: number) {
         if (this.sprite) {
             this.sprite.spriteFrame = spriteFrame;
             this.sprite.node.setPosition(spriteFrame.offset.x, spriteFrame.offset.y);
+
+
 
             //   // 设置精灵帧节点大小
             // const uiTransform = this.sprite.node.getComponent(UITransform);

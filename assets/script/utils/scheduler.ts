@@ -17,7 +17,7 @@ export default class scheduler{
     }
 
     public static scheduleUpdateGlobal(func:any):any{
-        return app.timer.frameLoop(func)
+        return app.timer.addUpdater(func)
     }
 
     public static scheduleOnce(func:any,interval:any):any{

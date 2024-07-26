@@ -53,7 +53,7 @@ export class CharacterAnimator {
             this.baseAction = options.action;
         }
         
-        if (this.isInterruptibleAction(this.currentActionOption) || !this.isAnimationPlaying) {
+        if (this.checkActionInterruptibility(this.currentActionOption) || !this.isAnimationPlaying) {
             this.playAction(options);
         } else {
             this.queuedActions.push(options);
@@ -73,22 +73,29 @@ export class CharacterAnimator {
             ...this.currentOptions,
             action: this.baseAction
         };
+        baseOptions.times = 0  // 循环
         this.playAction(baseOptions);
     }
 
     private isLoopingAction(option: ActionOptions): boolean {
-        if(!option){
-            return false
+        if(option){
+            if( option.times == 0 ){
+                return true 
+            }
+            let action = option.action
+            return action === ActType.ACT_IDLE || action === ActType.ACT_WALK || action === ActType.ACT_RUN;
         }
-        if( option.times == 0 ){
-            return true 
-        }
-        let action = option.action
-        return action === ActType.ACT_IDLE || action === ActType.ACT_WALK || action === ActType.ACT_RUN;
+        return false 
     }
 
-    private isInterruptibleAction(action: ActionOptions): boolean {
-        return this.isLoopingAction(action);
+    /**
+     * 检测是否可以中断
+     * 基本上都可以被中断，尤其是循环的action
+     * @param action 
+     * @returns 
+     */
+    private checkActionInterruptibility(action: ActionOptions): boolean {
+        return true;
     }
 
     public update(dt: number) {

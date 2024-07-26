@@ -1,3 +1,5 @@
+import { sys } from "cc";
+
 export type EasingFunction = (t: number) => number;
 
 export default class MovieClip {
