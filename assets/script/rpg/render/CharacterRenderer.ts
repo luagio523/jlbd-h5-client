@@ -16,7 +16,7 @@ export class CharacterRenderer {
 
     public async setupCharacter(parent?: Node): Promise<void> {
         console.log("Setting up character...");
-        this.characterNode = new CharacterNode(this.animResourceType!, 100, 100); // 默认尺寸，可以根据需要调整
+        this.characterNode = await CharacterNode.create(this.animResourceType!, 100, 100); // 默认尺寸，可以根据需要调整
         if (parent) parent.addChild(this.characterNode.getNode());
 
         await this.setupComponents();

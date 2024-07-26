@@ -10,11 +10,11 @@ export class StatusBar {
 
     public static async create(width: number = 100, height: number = 10): Promise<StatusBar> {
         const statusBar = new StatusBar(width, height);
-        await statusBar.preloadTextures();
+        await statusBar.setupStatusBar();
         return statusBar;
     }
 
-    private constructor(width: number, height: number) {
+    public constructor(width: number, height: number) {
         // 创建主节点
         this.node = new Node('StatusBar');
         const transform = this.node.addComponent(UITransform);
@@ -35,11 +35,10 @@ export class StatusBar {
         this.foregroundSprite = fgNode.addComponent(Sprite);
         this.foregroundSprite.type = Sprite.Type.FILLED;
         this.foregroundSprite.fillType = Sprite.FillType.HORIZONTAL;
-        this.foregroundSprite.fillStart = 0;
-        this.foregroundSprite.fillRange = 1;
+      
     }
 
-    private async preloadTextures(): Promise<void> {
+    public async setupStatusBar(): Promise<void> {
         const texturePaths = [
             'anim/eff/bloodBg',
             'anim/eff/bloodGeen',
@@ -52,6 +51,9 @@ export class StatusBar {
         // 设置背景和初始前景
         this.backgroundSprite.spriteFrame = this.stageSpriteFrames[0];
         this.foregroundSprite.spriteFrame = this.stageSpriteFrames[1];
+
+        this.foregroundSprite.fillStart = 0;
+        this.foregroundSprite.fillRange = 1;
     }
 
     private loadSpriteFrame(path: string): Promise<SpriteFrame> {

@@ -56,7 +56,7 @@ export class SpriteSheetLoader extends BaseMCLoader {
     }
 
     private async createSpriteFrames(animationData:any,texture: Texture2D) {
-        console.log('createSpriteFrames', animationData);
+        // console.log('createSpriteFrames', animationData);
 
         const mcKeys = Object.keys(animationData.mc);
         mcKeys.forEach(mcKey => {

@@ -170,9 +170,10 @@ export namespace testcase {
 
         const actionOptions: ActionOptions = {
             modelName: 'body803',
-            action: ActType.ACT_RUN,
-            direction: 0,
-            gender: 1,
+            action: ActType.ACT_ATTACK,
+            direction: 1,
+            gender: 0,
+            times:5,
             // callback: () => console.log('Action completed')
         };
 

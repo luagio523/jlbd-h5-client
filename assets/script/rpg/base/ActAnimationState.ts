@@ -13,7 +13,7 @@ export interface ActionOptions {
     direction?: number;
     gender?: number;
     frameRate?: number;
-    loop?: boolean;
+    times?:number;
 }
 
 
@@ -75,12 +75,14 @@ class AtlasAnimationState extends ActAnimationState {
             throw new Error('player not initialized');
         }
 
-        const { modelName, action = ActType.ACT_IDLE } = options;
+        const { modelName, action = ActType.ACT_IDLE,frameRate } = options;
         this.currentActionOptions = options;
 
         const mc = this.getMCKey(modelName, action);
         const atlasPath = `anim/body/char`;
-
+        if(frameRate){
+            this.setFrameRate(frameRate)
+        }
         await this.player.loadAnimation(AnimResourceType.SpriteAltas, atlasPath);
         this.player.setupAnimation(mc);
 
@@ -124,7 +126,7 @@ class EgretAnimationState extends ActAnimationState {
         if (!this.player) {
             throw new Error('player not initialized');
         }
-
+        // console.log("change act",options)
         const {
             modelName,
             action = ActType.ACT_IDLE,

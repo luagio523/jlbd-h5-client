@@ -1,5 +1,5 @@
-import { Node, Label, Sprite, UITransform, Vec3 } from 'cc';
-import { BaseBodyNode,  createBodyNode } from './BodyNode';
+import { Node, Label, Sprite, UITransform, Vec3, Color } from 'cc';
+import { BaseBodyNode, createBodyNode } from './BodyNode';
 import { StatusBar } from './StatusBar';
 import { AnimResourceType } from '../../core/common/animation/Type';
 
@@ -7,7 +7,7 @@ export class CharacterNode {
     // 静态常量定义
     private static HEALTH_BAR_OFFSET = 20;
     private static MANA_BAR_OFFSET = 10;
-    private static NAME_LABEL_OFFSET = 30;
+    private static NAME_LABEL_OFFSET = 32;
     private static LEVEL_LABEL_HORIZONTAL_OFFSET = 10;
 
     private node: Node;
@@ -40,29 +40,37 @@ export class CharacterNode {
         // shadowSprite.spriteFrame = ...;
         this.node.addChild(this.shadowNode);
 
-        // 初始化等级标签
-        this.levelLabel = new Node('LevelLabel').addComponent(Label);
-        this.node.addChild(this.levelLabel.node);
-
         // 初始化名字标签
         this.nameLabel = new Node('NameLabel').addComponent(Label);
+        this.nameLabel.fontSize = 14; // 设置名字标签的字体大小
         this.node.addChild(this.nameLabel.node);
 
-        // 异步初始化状态条
-        this.initStatusBars();
-    }
+        // 初始化等级标签
+        this.levelLabel = new Node('LevelLabel').addComponent(Label);
+        this.levelLabel.fontSize = 10; // 设置等级标签的字体大小
+        this.node.addChild(this.levelLabel.node);
 
-    private async initStatusBars() {
         // 初始化生命状态条
-        this.healthBar = await StatusBar.create(100, 10);
+        this.healthBar = new StatusBar(100, 10);
         this.node.addChild(this.healthBar.getNode());
 
         // 初始化魔法进度条
-        this.manaBar = await StatusBar.create(100, 10);
+        this.manaBar = new StatusBar(100, 10);
         this.node.addChild(this.manaBar.getNode());
 
         // 设置初始位置
         this.adjustComponents();
+    }
+
+    public static async create(bodyType: AnimResourceType, width: number = 100, height: number = 100): Promise<CharacterNode> {
+        const characterNode = new CharacterNode(bodyType, width, height);
+        await characterNode.setupCharacterNode();
+        return characterNode;
+    }
+
+    private async setupCharacterNode() {
+        await this.healthBar.setupStatusBar();
+        await this.manaBar.setupStatusBar();
     }
 
     private adjustComponents() {

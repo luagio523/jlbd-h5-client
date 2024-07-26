@@ -1,4 +1,4 @@
-import { _decorator, Component, Sprite, SpriteFrame } from 'cc';
+import { _decorator, Component, Sprite, SpriteFrame, UITransform } from 'cc';
 import MovieClip from './MovieClip';
 import { AnimManager } from './AnimManager';
 import { IAnimationPlayer } from './IAnimationPlayer';
@@ -24,6 +24,7 @@ export class MCPlayer implements IAnimationPlayer {
     }
 
     async loadAnimation(type: AnimResourceType, resourcePath: string ) {
+        // console.log("loadAnimation",type, resourcePath)
         this.resourcePath = resourcePath;
         await this.animManager.loadAnimation(type, resourcePath);
     }
@@ -42,10 +43,20 @@ export class MCPlayer implements IAnimationPlayer {
         if (this.sprite) {
             this.sprite.spriteFrame = spriteFrame;
             this.sprite.node.setPosition(spriteFrame.offset.x, spriteFrame.offset.y);
+
+            //   // 设置精灵帧节点大小
+            // const uiTransform = this.sprite.node.getComponent(UITransform);
+            // if (uiTransform) {
+            //     const originalSize = spriteFrame.originalSize;
+            //     uiTransform.setContentSize(originalSize.width, originalSize.height);
+            // }
         }
     }
 
-    play() { this.movieClip.playAnime(); }
+    play(times:number = 0) {
+        this.movieClip.setAnimeTimes(times)
+        this.movieClip.playAnime(); 
+    }
     stop() { this.movieClip.stopAnime(); }
     setFrameRate(rate: number): void { this.movieClip.setFrameRate(rate); }
     setUpdateGap(gap: number) { this.movieClip.setUpdateGap(gap); }

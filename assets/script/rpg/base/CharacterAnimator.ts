@@ -20,7 +20,7 @@ interface StateTransition {
 
 export class CharacterAnimator {
     private animationState: ActAnimationState;
-    private currentAction: ActType = ActType.ACT_IDLE;
+    private currentActionOption: ActionOptions;
     private baseAction: ActType = ActType.ACT_IDLE;
     private queuedActions: ActionOptions[] = [];
     private isAnimationPlaying: boolean = false;
@@ -49,12 +49,11 @@ export class CharacterAnimator {
 
     public transitionToState(options: ActionOptions) {
         this.currentOptions = { ...options };  // 保存完整的 options
-
-        if (this.isLoopingAction(options.action)) {
+        if (this.isLoopingAction(options)) {
             this.baseAction = options.action;
         }
         
-        if (this.isInterruptibleAction(this.currentAction) || !this.isAnimationPlaying) {
+        if (this.isInterruptibleAction(this.currentActionOption) || !this.isAnimationPlaying) {
             this.playAction(options);
         } else {
             this.queuedActions.push(options);
@@ -63,9 +62,9 @@ export class CharacterAnimator {
 
     private playAction(options: ActionOptions) {
         this.animationState.changeAct(options).then(() => {
-            this.currentAction = options.action;
+            this.currentActionOption = options;
             this.isAnimationPlaying = true;
-            this.animationState.play();
+            this.animationState.play(options.times||0);
         });
     }
 
@@ -77,11 +76,18 @@ export class CharacterAnimator {
         this.playAction(baseOptions);
     }
 
-    private isLoopingAction(action: ActType): boolean {
+    private isLoopingAction(option: ActionOptions): boolean {
+        if(!option){
+            return false
+        }
+        if( option.times == 0 ){
+            return true 
+        }
+        let action = option.action
         return action === ActType.ACT_IDLE || action === ActType.ACT_WALK || action === ActType.ACT_RUN;
     }
 
-    private isInterruptibleAction(action: ActType): boolean {
+    private isInterruptibleAction(action: ActionOptions): boolean {
         return this.isLoopingAction(action);
     }
 
@@ -89,8 +95,8 @@ export class CharacterAnimator {
         this.animationState.update(dt);
     }
 
-    public getCurrentAction(): ActType {
-        return this.currentAction;
+    public getCurrentAction(): ActionOptions {
+        return this.currentActionOption;
     }
 
     public clearQueue() {
