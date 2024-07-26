@@ -1,12 +1,14 @@
-// SkillAreaTypes.ts
-import { Color, Vec3, Vec2, Node } from 'cc';
+import {  Node } from 'cc';
 import { SkillAreaBase, SkillAreaParams } from './SkillArea';
 import { CircleArea, CircleAreaParams } from './CircleArea';
 import { RectangleArea, RectangleAreaParams } from './RectangleArea';
 import { SectorArea, SectorAreaParams } from './SectorArea';
 import { PolygonArea, PolygonAreaParams } from './PolygonArea';
 import { PathArea, PathAreaParams } from './PathArea';
-
+/**
+ * 技能指示区域类型
+ * 用于boss技能的指示区域
+ */
 export enum SkillAreaType {
     Circle,
     Rectangle,
