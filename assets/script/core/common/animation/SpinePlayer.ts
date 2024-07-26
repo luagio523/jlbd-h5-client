@@ -28,7 +28,7 @@ export class SpinePlayer implements IAnimationPlayer {
     }
 
     setupAnimation(animationName?: string): void {
-        const spineData = this.animManager.getAnimationData(this.resourcePath) as sp.SkeletonData;
+        const spineData = this.animManager.getAnimationData(this.resourcePath,"default") as sp.SkeletonData;
 
         if (spineData && this.skeleton) {
             this.skeleton.skeletonData = spineData;

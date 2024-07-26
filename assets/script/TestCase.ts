@@ -161,33 +161,6 @@ export namespace testcase {
         }
     }
 
-    
-    export async function app_test15(){
-        let characterRenderer = new CharacterRenderer();
-        characterRenderer.initialize(AnimResourceType.EgretSpriteSheet);
-        await characterRenderer.setupCharacter(gameNode);
-        characterRenderer.updateCharacterStatus('gamars', 100, 50);
-
-        const actionOptions: ActionOptions = {
-            modelName: 'body803',
-            action: ActType.ACT_ATTACK,
-            direction: 1,
-            gender: 0,
-            times:5,
-            // callback: () => console.log('Action completed')
-        };
-
-        characterRenderer.playAction(actionOptions);
-
-        // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
-
-        characterRenderer.updatePosition(500,300);
-        scheduler.scheduleUpdateGlobal((dt:number) => {
-            characterRenderer.update(dt);
-        });
-        // characterRenderer.destroy();
-    }
-    
 
     export function app_test13(){
         resources.load("anim/body/father", SpriteAtlas, (err, asset) => {
@@ -210,6 +183,62 @@ export namespace testcase {
         //     sprite.spriteFrame = frame;
         // });
     }
+
+    
+    export async function app_test15(){
+        let characterRenderer = new CharacterRenderer();
+        characterRenderer.initialize(AnimResourceType.DragonBones);
+        await characterRenderer.setupCharacter(gameNode);
+        characterRenderer.updateCharacterStatus('gamars', 100, 50);
+
+        const actionOptions: ActionOptions = {
+            modelName: 'Alfadriel',
+            action: ActType.ACT_IDLE,
+            // direction: 1,
+            // gender: 0,
+            // times:5,
+            // callback: () => console.log('Action completed')
+        };
+
+        characterRenderer.playAction(actionOptions);
+
+        // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
+
+        characterRenderer.updatePosition(500,300);
+        scheduler.scheduleUpdateGlobal((dt:number) => {
+            characterRenderer.update(dt);
+        });
+        // characterRenderer.destroy();
+    }
+    
+
+    export async function app_test16(){
+        let characterRenderer = new CharacterRenderer();
+        characterRenderer.initialize(AnimResourceType.Spine);
+        await characterRenderer.setupCharacter(gameNode);
+        characterRenderer.updateCharacterStatus('gamars', 100, 50);
+
+        const actionOptions: ActionOptions = {
+            modelName: 'raptor-pro',
+            action: ActType.ACT_WALK,
+            // direction: 1,
+            // gender: 0,
+            // times:5,
+            // callback: () => console.log('Action completed')
+        };
+
+        characterRenderer.playAction(actionOptions);
+
+        // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
+
+        characterRenderer.updatePosition(500,300);
+        scheduler.scheduleUpdateGlobal((dt:number) => {
+            characterRenderer.update(dt);
+        });
+        // characterRenderer.destroy();
+    }
+
+    
 }
 
 

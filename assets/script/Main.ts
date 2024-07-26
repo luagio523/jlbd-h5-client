@@ -84,12 +84,12 @@ export class Main extends Root {
     }
 
     public btnTestClick2() {
-       testcase.app_test15();
+       testcase.app_test16();
     }
 
 
     public btnTestClick() {
-        testcase.app_test15();
+        testcase.app_test16();
         // testcase.app_test13();
         
     }

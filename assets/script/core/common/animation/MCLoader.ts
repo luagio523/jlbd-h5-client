@@ -135,18 +135,21 @@ export class SpriteAtlasLoader extends BaseMCLoader {
     
 }
 
+   // let resoucePath = `anim/dragonbody/${modelName}_ske`;
+    // let imgPath = `anim/dragonbody/${modelName}_tex`;
+
 
 export class DragonLoader extends BaseMCLoader {
     async loadAnimation(resourcePath: string): Promise<Asset[]> {
         const [dragonBonesAsset, atlasAsset] = await Promise.all([
-            this.loadResource<dragonBones.DragonBonesAsset>(resourcePath, dragonBones.DragonBonesAsset),
-            this.loadResource<dragonBones.DragonBonesAtlasAsset>(resourcePath, dragonBones.DragonBonesAtlasAsset)
+            this.loadResource<dragonBones.DragonBonesAsset>(resourcePath+"_ske", dragonBones.DragonBonesAsset),
+            this.loadResource<dragonBones.DragonBonesAtlasAsset>(resourcePath+"_tex", dragonBones.DragonBonesAtlasAsset)
         ]);
-        this.animationDataMap.set('dragon',  {dragonBonesAsset: dragonBonesAsset, atlasAsset: atlasAsset } )
+        this.animationDataMap.set('default',  {dragonBonesAsset: dragonBonesAsset, atlasAsset: atlasAsset } )
         return [dragonBonesAsset, atlasAsset];
     }
 
-    getAnimationData(key: string = 'dragon'): { dragonBonesAsset: dragonBones.DragonBonesAsset, atlasAsset: dragonBones.DragonBonesAtlasAsset }  {
+    getAnimationData(key: string = 'default'): { dragonBonesAsset: dragonBones.DragonBonesAsset, atlasAsset: dragonBones.DragonBonesAtlasAsset }  {
         return this.animationDataMap.get(key) || null;
     }
 }
@@ -156,7 +159,7 @@ export class SpineLoader extends BaseMCLoader {
     async loadAnimation(resourcePath: string): Promise<Asset[]> {
         try {
             const spineData = await this.loadResource<sp.SkeletonData>(resourcePath, sp.SkeletonData);
-            this.animationDataMap.set('skeleton', spineData);
+            this.animationDataMap.set('default', spineData);
             return [spineData];
         } catch (error) {
             console.error('Error loading Spine animation:', error);
@@ -164,7 +167,7 @@ export class SpineLoader extends BaseMCLoader {
         }
     }
 
-    getAnimationData(key: string = 'skeleton'): sp.SkeletonData | null {
+    getAnimationData(key: string = 'default'): sp.SkeletonData | null {
         return this.animationDataMap.get(key) || null;
     }
 }

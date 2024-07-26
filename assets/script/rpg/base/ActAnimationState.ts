@@ -135,7 +135,7 @@ class EgretAnimationState extends ActAnimationState {
             direction = 0,
             frameRate
         } = options;
-        
+
         if(frameRate){
             this.player.setFrameRate(frameRate)
         }
@@ -258,15 +258,16 @@ class SpineAnimationState extends ActAnimationState {
     }
 
     private actionMap: { [key in ActType]?: string } = {
-        [ActType.ACT_IDLE]: 'Idle',
-        [ActType.ACT_WALK]: 'Idle',
-        [ActType.ACT_RUN]: 'Idle',
-        [ActType.ACT_ATTACK]: 'Attack A',
-        [ActType.ACT_CAST]: 'Attack B',
+        [ActType.ACT_IDLE]: 'walk',
+        [ActType.ACT_WALK]: 'walk',
+        [ActType.ACT_RUN]: 'walk',
+        [ActType.ACT_ATTACK]: 'walk',
+        [ActType.ACT_CAST]: 'walk',
+        [ActType.ACT_JUMP]: 'jump',
     };
 
     protected getActionName(action: ActType): string {
-        return this.actionMap[action] || 'Idle';
+        return this.actionMap[action] || 'walk';
     }
 }
 

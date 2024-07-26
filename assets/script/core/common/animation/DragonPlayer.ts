@@ -28,7 +28,7 @@ export class DragonPlayer implements IAnimationPlayer {
 
     setupAnimation(animationName?: string,armatureName?: string): void {
 
-        const {dragonBonesAsset, atlasAsset} = this.animManager.getAnimationData("all");
+        const {dragonBonesAsset, atlasAsset} = this.animManager.getAnimationData(this.resourcePath,"default");
         
         if (this.armatureDisplay) {
             this.armatureDisplay.dragonAsset = dragonBonesAsset;
@@ -144,7 +144,6 @@ export class DragonPlayer implements IAnimationPlayer {
 //         }
 //     }
 
-//     // ... 其他方法保持不变 ...
 
 //     onDestroy() {
 //         if (this.armatureDisplay) {
