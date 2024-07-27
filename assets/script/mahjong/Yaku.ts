@@ -1,13 +1,20 @@
 import { Player } from "./Player";
-import { Tile, TileType } from "./Tile";
+import { Tile, TileType, WindType } from "./Tile";
 import { Winning } from "./Winning";
 import { Chinitsu } from "./hands/Chinitsu";
 import { Chuuren } from "./hands/Chuuren";
 import { Daisangen } from "./hands/Daisangen";
+import { Honitsu } from "./hands/Honitsu";
 import { Honroutou } from "./hands/Honroutou";
+import { Ittsu } from "./hands/Ittsu";
+import { Junchan } from "./hands/Junchan";
 import { KokushiMusou } from "./hands/KokushiMusou";
+import { Peikou } from "./hands/Peikou";
+import { Pinfu } from "./hands/Pinfu";
 import { Ryuuiisou } from "./hands/Ryuuiisou";
 import { Sanankou } from "./hands/Sanankou";
+import { SanshokuDoujun } from "./hands/SanshokuDoujun";
+import { SanshokuDouko } from "./hands/SanshokuDouko";
 import { Shousangen } from "./hands/Shousangen";
 import { Suuankou } from "./hands/Suuankou";
 import { Suushiihou } from "./hands/Suushiihou";
@@ -22,10 +29,11 @@ interface YakuhaiResult {
 
 
 export class Yaku {
+    //胡牌
     static canWin(hand: Tile[], melds: Tile[][]): boolean {
-        return Winning.canWin(hand, melds);
+        
+        return false;
     }
-
 
     // 已实现的役 立直
     static checkRiichi(player: Player): boolean {
@@ -48,22 +56,16 @@ export class Yaku {
     }
 
     // 需要实现或完善的役
-    static checkPinfu(hand: Tile[], winningTile: Tile): boolean {
+    static checkPinfu(hand: Tile[], winningTile: Tile,  playerWind: WindType, roundWind: WindType): boolean {
         // TODO: 实现平和的检查逻辑
-        return false;
+        return Pinfu.verifyPinfu(hand, winningTile,playerWind,roundWind);
     }
  
 
-    static checkIipeikou(hand: Tile[]): boolean {
-        // TODO: 完善一杯口的检查逻辑
-        // 需要检查是否有两个相同的顺子
-        // 这里只是一个简化的示例
-        const sequences = hand.filter(tile => tile.type !== TileType.Wind && tile.type !== TileType.Dragon);
-        const sequenceStrings = sequences.map(tile => `${tile.type}${tile.value}`);
-        return new Set(sequenceStrings).size < sequenceStrings.length;
+    static checkIipeikou(hand: Tile[], melds: Tile[][]): boolean {
+       return Peikou.verifyIipeikou(hand,melds);
     }
 
-   
 
     //役牌的检查逻辑
     static checkYakuhai(hand: Tile[], melds: Tile[][], playerWind: string, roundWind: string): YakuhaiResult {
@@ -95,79 +97,72 @@ export class Yaku {
         };
     }
 
-
-    static checkSanshokuDoujun(hand: Tile[]): boolean {
-        // TODO: 实现三色同顺的检查逻辑
-        return false;
+    // 实现三色同顺的检查逻辑
+    static checkSanshokuDoujun(hand: Tile[], melds: Tile[][]): boolean {
+        return SanshokuDoujun.verifySanshokuDoujun(hand, melds);
     }
-
-    static checkIttsu(hand: Tile[]): boolean {
-        // TODO: 实现一气通贯的检查逻辑
-        return false;
+    //实现一气通贯的检查逻辑
+    static checkIttsu(hand: Tile[], melds: Tile[][]): boolean {
+        return Ittsu.verifyIttsu(hand, melds);
     }
-
-    static checkSanshokuDouko(hand: Tile[]): boolean {
-        // TODO: 实现三色同刻的检查逻辑
-        return false;
+    //实现三色同刻的检查逻辑
+    static checkSanshokuDouko(hand: Tile[], melds: Tile[][]): boolean {
+        return SanshokuDouko.verifySanshokuDouko(hand, melds);
     }
     // 三暗刻的检查逻辑
-    static checkSanankou(hand: Tile[]): boolean {
-        return Sanankou.verifySanankou(hand);
+    static checkSanankou(hand: Tile[], melds: Tile[][]): boolean {
+        return Sanankou.verifySanankou(hand, melds);
     }
      // 小三元的检查逻辑
-    static checkShousangen(hand: Tile[]): boolean {
-        return Shousangen.verifyShousangen(hand);
+    static checkShousangen(hand: Tile[], melds: Tile[][]): boolean {
+        return Shousangen.verifyShousangen(hand, melds);
     }
-
-    static checkHonitsu(hand: Tile[]): boolean {
-        // TODO: 实现混一色的检查逻辑
-        return false;
+    //实现混一色的检查逻辑
+    static checkHonitsu(hand: Tile[], melds: Tile[][]): boolean {
+        return Honitsu.verifyHonitsu(hand, melds);
     }
-
-    static checkChinitsu(hand: Tile[]): boolean {
-        // TODO: 实现清一色的检查逻辑
-        return Chinitsu.verifyChinitsu(hand);
+    //实现清一色的检查逻辑
+    static checkChinitsu(hand: Tile[], melds: Tile[][]): boolean {
+        return Chinitsu.verifyChinitsu(hand, melds);
     }
-
-    static checkRyanpeikou(hand: Tile[]): boolean {
-        // TODO: 实现两杯口的检查逻辑
-        return false;
+     //  实现两杯口的检查逻辑
+    static checkRyanpeikou(hand: Tile[], melds: Tile[][]): boolean {
+        return Peikou.verifyRyanpeikou(hand, melds);
     }
-
-    static checkJunchan(hand: Tile[]): boolean {
-        // TODO: 实现纯全带幺九的检查逻辑
-        return false;
+    //纯全带幺九的检查逻辑
+    static checkJunchan(hand: Tile[], melds: Tile[][]): boolean {
+        return Junchan.verifyJunchan(hand, melds);
     }
     // 混老头的检查逻辑
-    static checkHonroutou(hand: Tile[]): boolean {
-        return Honroutou.verifyHonroutou(hand);
+    static checkHonroutou(hand: Tile[], melds: Tile[][]): boolean {
+        return Honroutou.verifyHonroutou(hand, melds);
     }
 
     //四暗刻的检查逻辑
-    static checkSuuankou(hand: Tile[]): boolean {
-        return Suuankou.verifySuuankou(hand);
+    static checkSuuankou(hand: Tile[], melds: Tile[][]): boolean {
+        return Suuankou.verifySuuankou(hand, melds);
     }
 
     //大三元
-    static checkDaisangen(hand: Tile[]): boolean {
-        return Daisangen.verifyDaisangen(hand);
+    static checkDaisangen(hand: Tile[], melds: Tile[][]): boolean {
+        return Daisangen.verifyDaisangen(hand, melds);
     }
     
     //国士无双的检查逻辑
-    static checkKokushimusou(hand: Tile[]): boolean {
+    static checkKokushimusou(hand: Tile[], melds: Tile[][]): boolean {
         return KokushiMusou.verifyKokushiMusou(hand)
     }
     //大四喜
-    static checkSuushiihou(hand: Tile[]): boolean {
+    static checkSuushiihou(hand: Tile[], melds: Tile[][]): boolean {
         return Suushiihou.verifySuushiihou(hand)
     }
     //实现九莲宝灯
-    static checkChuuren(hand: Tile[]): boolean {
+    static checkChuuren(hand: Tile[], melds: Tile[][]): boolean {
         return Chuuren.verifyChuuren(hand)
     }
     // 绿一色的检查逻辑
-    static checkRyuuiisou(hand: Tile[]): boolean {
-        return Ryuuiisou.verifyRyuuiisou(hand);
+    static checkRyuuiisou(hand: Tile[], melds: Tile[][]): boolean {
+        return Ryuuiisou.verifyRyuuiisou(hand, melds);
     }
 
     // 辅助方法
