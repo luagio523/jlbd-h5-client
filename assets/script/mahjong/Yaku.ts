@@ -56,12 +56,11 @@ export class Yaku {
     }
 
     // 需要实现或完善的役
-    static checkPinfu(hand: Tile[], winningTile: Tile,  playerWind: WindType, roundWind: WindType): boolean {
-        // TODO: 实现平和的检查逻辑
-        return Pinfu.verifyPinfu(hand, winningTile,playerWind,roundWind);
+    static checkPinfu(hand: Tile[],melds: Tile[][], winningTile: Tile,  playerWind: WindType, roundWind: WindType): boolean {
+        return Pinfu.verifyPinfu(hand,melds, winningTile,playerWind,roundWind);
     }
  
-
+    //检查一杯口
     static checkIipeikou(hand: Tile[], melds: Tile[][]): boolean {
        return Peikou.verifyIipeikou(hand,melds);
     }
