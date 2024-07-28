@@ -37,6 +37,7 @@ export abstract class UIElement {
             });
         });
     }
+    
     public update(dt:number):void{
 
     }
