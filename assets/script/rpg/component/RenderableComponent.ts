@@ -1,20 +1,20 @@
 import { Node } from "cc";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { ActType } from "../enum/Act";
-import { CharacterRenderer } from "../render/character/Character";
+import { Character } from "../render/character/Character";
 
 export class RenderableComponent extends ECSComponent {
-    public  characterRenderer:CharacterRenderer = null;
-    public  constructor(characterRenderer?:CharacterRenderer){
+    public  character:Character = null;
+    public  constructor(character?:Character){
         super();
-        this.initialize(characterRenderer);
+        this.initialize(character);
     }
 
-    public initialize(characterRenderer?:CharacterRenderer):void{
-        if(characterRenderer == null){
+    public initialize(character?:Character):void{
+        if(character == null){
             return 
         }
-        this.characterRenderer = characterRenderer;
+        this.character = character;
     }
 
     public changeAct(act:ActType):void{
@@ -22,6 +22,6 @@ export class RenderableComponent extends ECSComponent {
     }
 
     public getNode():Node{
-        return this.characterRenderer.getNode();
+        return this.character.getNode();
     }
 }
