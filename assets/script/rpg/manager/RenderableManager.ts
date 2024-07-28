@@ -1,6 +1,11 @@
 import { AnimResourceType } from "../../core/animation/Type";
 import { CharacterRenderer } from "../render/character/CharacterRenderer";
 
+export interface CharacterParams {
+    type:AnimResourceType
+    Width:number
+    Height:number
+}
 
 export class RenderableManager {
     private static instance: RenderableManager;
@@ -18,9 +23,8 @@ export class RenderableManager {
     }
 
     public async createCharacterRender(type:AnimResourceType):Promise<CharacterRenderer> {
-        let characterRenderer = new CharacterRenderer();
-        characterRenderer.initialize(type);
-        await characterRenderer.setupCharacter();
+        let characterRenderer = new CharacterRenderer(type);
+        await characterRenderer.setup();
 
         // const actionOptions: ActionOptions = {
         //     modelName: 'Thief',

@@ -3,6 +3,7 @@ import { IEffect } from '../effect/Effect';
 import { classMap } from '../effect/__private';
 /**
  * 效果管理器
+ * 适合复杂效果，以及需要频繁创建和销毁的效果
  * 如击飞等
  */
 export class EffectManager {

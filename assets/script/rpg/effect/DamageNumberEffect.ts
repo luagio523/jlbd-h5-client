@@ -4,27 +4,28 @@ import { BaseEffect } from './Effect';
 import { Effect } from './__private';
 @Effect('DamageNumberEffect')
 export class DamageNumberEffect extends BaseEffect {
-    apply(target: Node, damage: number, duration: number = 1): void {
+    private damageNumber: DamageNumber;
 
-        // 创建一个新的节点来显示伤害数字
-        const damageNode = new Node('DamageNumber');
-        const label = damageNode.addComponent(Label);
-        label.string = damage.toString();
-        label.color = new Color(255, 0, 0, 255); // 红色
-        label.fontSize = 40;
+    constructor() {
+        super();
+        this.damageNumber = null;
+    }
 
-        // 将伤害数字节点添加到目标节点上
-        target.addChild(damageNode);
+    async apply(target: Node, damage: number, duration: number = 1): Promise<void> {
+        this.damageNumber = await DamageNumber.create(40);
+        this.damageNumber.setText(damage);
+        this.damageNumber.setColor(Color.RED);
+        this.damageNumber.setPosition(0, 50); // 初始位置（略微偏上）
+        target.addChild(this.damageNumber.getNode());
 
-        // 设置初始位置（略微偏上）
-        damageNode.setPosition(new Vec3(0, 50, 0));
+        const damageNode = this.damageNumber.getNode();
+        const label = this.damageNumber.getLabel();
 
         // 创建上浮和淡出的动画
         tween(damageNode)
             .by(duration, { position: new Vec3(0, 100, 0) })
             .call(() => {
-                damageNode.removeFromParent();
-                damageNode.destroy();
+                this.damageNumber.reset();
                 this.complete();
             })
             .start();
@@ -36,6 +37,9 @@ export class DamageNumberEffect extends BaseEffect {
     }
 
     reset(): void {
-        
+        if (this.damageNumber) {
+            this.damageNumber.reset();
+            this.damageNumber = null;
+        }
     }
 }

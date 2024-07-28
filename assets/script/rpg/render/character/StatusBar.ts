@@ -1,33 +1,22 @@
 
 import { Node, Sprite, SpriteFrame, UITransform, Color, Vec3, resources } from 'cc';
+import { UIElement } from '../UIElement';
 
-export class StatusBar {
-    private node: Node;
+export class StatusBar extends UIElement {
     private backgroundSprite: Sprite;
     private foregroundSprite: Sprite;
     private stageSpriteFrames: SpriteFrame[] = [];
     private currentStage: number = 0;
 
-    public static async create(width: number = 100, height: number = 10): Promise<StatusBar> {
-        const statusBar = new StatusBar(width, height);
-        await statusBar.setupStatusBar();
-        return statusBar;
-    }
+    private constructor(width: number, height: number) {
+        super('StatusBar', width, height);
 
-    public constructor(width: number, height: number) {
-        // 创建主节点
-        this.node = new Node('StatusBar');
-        const transform = this.node.addComponent(UITransform);
-        transform.setContentSize(width, height);
-
-        // 创建背景
         const bgNode = new Node('Background');
         bgNode.setParent(this.node);
         const bgTransform = bgNode.addComponent(UITransform);
         bgTransform.setContentSize(width, height);
         this.backgroundSprite = bgNode.addComponent(Sprite);
 
-        // 创建前景
         const fgNode = new Node('Foreground');
         fgNode.setParent(this.node);
         const fgTransform = fgNode.addComponent(UITransform);
@@ -35,38 +24,29 @@ export class StatusBar {
         this.foregroundSprite = fgNode.addComponent(Sprite);
         this.foregroundSprite.type = Sprite.Type.FILLED;
         this.foregroundSprite.fillType = Sprite.FillType.HORIZONTAL;
-      
     }
 
-    public async setupStatusBar(): Promise<void> {
+    public static async create(width: number = 100, height: number = 10): Promise<StatusBar> {
+        const statusBar = new StatusBar(width, height);
+        await statusBar.setup();
+        return statusBar;
+    }
+
+    public async setup(): Promise<void> {
         const texturePaths = [
             'anim/eff/bloodBg',
             'anim/eff/bloodGeen',
             'anim/eff/bloodRed'
         ];
 
-        const loadPromises = texturePaths.map(path => this.loadSpriteFrame(path));
+        const loadPromises = texturePaths.map(path => this.loadResource<SpriteFrame>(path + "/spriteFrame", SpriteFrame));
         this.stageSpriteFrames = await Promise.all(loadPromises);
 
-        // 设置背景和初始前景
         this.backgroundSprite.spriteFrame = this.stageSpriteFrames[0];
         this.foregroundSprite.spriteFrame = this.stageSpriteFrames[1];
 
         this.foregroundSprite.fillStart = 0;
         this.foregroundSprite.fillRange = 1;
-    }
-
-    private loadSpriteFrame(path: string): Promise<SpriteFrame> {
-        return new Promise((resolve, reject) => {
-            resources.load(path+"/spriteFrame", SpriteFrame, (err, spriteFrame) => {
-                if (err) {
-                    console.error(`Failed to load sprite frame: ${path}`, err);
-                    reject(err);
-                } else {
-                    resolve(spriteFrame);
-                }
-            });
-        });
     }
 
     public setProgress(progress: number): void {
@@ -85,27 +65,15 @@ export class StatusBar {
     }
 
     public setSize(width: number, height: number): void {
-        const transform = this.node.getComponent(UITransform);
-        if (transform) {
-            transform.setContentSize(width, height);
-        }
-        
-        const bgTransform = this.backgroundSprite.node.getComponent(UITransform);
-        if (bgTransform) {
-            bgTransform.setContentSize(width, height);
-        }
-        
-        const fgTransform = this.foregroundSprite.node.getComponent(UITransform);
-        if (fgTransform) {
-            fgTransform.setContentSize(width, height);
-        }
+        super.setSize(width, height);
+        this.backgroundSprite.node.getComponent(UITransform).setContentSize(width, height);
+        this.foregroundSprite.node.getComponent(UITransform).setContentSize(width, height);
     }
 
-    public setPosition(x: number, y: number, z: number = 0): void {
-        this.node.setPosition(new Vec3(x, y, z));
-    }
-
-    public getNode(): Node {
-        return this.node;
+    public reset(): void {
+        this.setProgress(1);
+        this.setStage(1);
+        this.foregroundSprite.color = Color.WHITE;
+        this.node.removeFromParent();
     }
 }
