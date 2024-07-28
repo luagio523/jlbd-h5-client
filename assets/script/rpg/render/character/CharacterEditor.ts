@@ -1,11 +1,12 @@
-import { Node, Label, Sprite, Prefab, resources, instantiate, tween } from 'cc';
+import { Node, Label, Sprite, Prefab, resources, instantiate, tween, UITransform, Color } from 'cc';
 import { CharacterAnimator } from '../../base/CharacterAnimator';
 import { AnimResourceType } from '../../../core/animation/Type';
 import { ResPathUtil } from '../../util/ResPathUtil';
 import { ComponentUtil } from '../../util/ComponentUil';
 import { ActAnimationStateFactory, ActionOptions } from '../../base/ActAnimationState';
+import { UIElement } from '../UIElement';
 
-export class CharacterEditorRenderer {
+export class CharacterEditor extends UIElement {
     private characterNode: Node | null = null;
     private nameLabel: Label | null = null;
     private levelLabel: Label | null = null;
@@ -13,46 +14,19 @@ export class CharacterEditorRenderer {
     private manaBar: Sprite | null = null;
     private characterAnimator: CharacterAnimator | null = null;
     private shadowNode: Node | null = null;
-
     private animResourceType: AnimResourceType | null = null;
 
-    public initialize(type: AnimResourceType) {
+    constructor(type: AnimResourceType, width: number = 400, height: number=400) {
+        super("CharacterEditor", width, height);
         this.animResourceType = type;
     }
 
-    public async setupCharacter(parent?: Node): Promise<void> {
-        await this.setupBody(parent);
-        this.setupComponents();
-    }
-
-    public async setupBody(parent?: Node): Promise<void> {
+    public async setup(): Promise<void> {
         const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.animResourceType!);
-        try {
-            const prefab = await this.loadPrefab(actBodyPath);
-            this.createBodyNode(prefab, parent);
-        } catch (error) {
-            console.error("Failed to setup Character body:", error);
-        }
-    }
-    
-    private loadPrefab(path: string): Promise<Prefab> {
-        return new Promise((resolve, reject) => {
-            resources.load(path, Prefab, (err, prefab) => {
-                if (err) reject(err);
-                else resolve(prefab);
-            });
-        });
-    }
-
-    private createBodyNode(prefab: Prefab, parent?: Node) {
-        this.characterNode = instantiate(prefab);
-        if (parent) parent.addChild(this.characterNode);
-    }
-
-    private setupComponents() {
-        if (!this.characterNode) {
-            console.error("Body node is not initialized.");
-            return;
+        const prefab = await this.loadResource<Prefab>(actBodyPath, Prefab)
+        if(prefab){
+            this.characterNode = instantiate(prefab);
+            this.node.addChild(this.characterNode);
         }
         this.nameLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'nameLabel', Label);
         this.levelLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'levelLabel', Label);
@@ -60,8 +34,6 @@ export class CharacterEditorRenderer {
         this.manaBar = ComponentUtil.getComponentFromChild(this.characterNode, 'manaBar', Sprite);
         
         this.shadowNode = this.characterNode.getChildByName('shadow');
-        // this.effectsNode = this.characterNode.getChildByName('effects');
-        // this.statusEffectsNode = this.characterNode.getChildByName('statusEffects');
 
         const bodyNode = this.characterNode.getChildByName('Body');
         if (bodyNode) {
@@ -70,7 +42,8 @@ export class CharacterEditorRenderer {
         }
     }
 
-    public updateCharacterStatus(name: string, level: number, health: number =0, mana: number=0) {
+
+    public updateCharacterStatus(name: string, level: number, health: number = 0, mana: number = 0) {
         if (this.nameLabel) this.nameLabel.string = name;
         if (this.levelLabel) this.levelLabel.string = `Lv.${level}`;
         if (this.healthBar) this.updateBarWithTween(this.healthBar, health);
@@ -81,31 +54,35 @@ export class CharacterEditorRenderer {
         tween(bar).to(0.5, { fillRange: progress }, { easing: 'quartOut' }).start();
     }
 
-    public updatePosition(x: number, y: number) {
-        if (this.characterNode) this.characterNode.setPosition(x, y);
-    }
-
     public async playAction(options: ActionOptions) {
         if (this.characterAnimator) {
             this.characterAnimator.transitionToState(options);
         }
     }
 
-    
-
     public update(dt: number) {
         if (this.characterAnimator) this.characterAnimator.update(dt);
     }
 
-    public destroy() {
+    public reset(): void {
         if (this.characterNode) {
+            this.characterNode.removeFromParent();
             this.characterNode.destroy();
             this.characterNode = null;
         }
         this.characterAnimator = null;
+        this.nameLabel = null;
+        this.levelLabel = null;
+        this.healthBar = null;
+        this.manaBar = null;
+        this.shadowNode = null;
     }
 
-    public getNode(): Node | null {
+    public setColor(color: Color): void {
+        // Implement if needed
+    }
+
+    public getCharacterNode(): Node | null {
         return this.characterNode;
     }
 }

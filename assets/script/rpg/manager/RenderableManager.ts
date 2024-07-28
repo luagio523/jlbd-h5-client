@@ -1,19 +1,15 @@
 import { AnimResourceType } from "../../core/animation/Type";
-import { CharacterRenderer } from "../render/character/CharacterRenderer";
+import { Character } from "../render/character/Character";
+import { DamageNumber } from "../render/effect/DamageNumber";
 
-export interface CharacterParams {
-    type:AnimResourceType
-    Width:number
-    Height:number
-}
 
 export class RenderableManager {
     private static instance: RenderableManager;
+    private damageNumberPool: DamageNumber[] = [];
 
     private constructor() {}
 
-    public initialize() {
-    }
+    public initialize() {}
 
     public static getInstance(): RenderableManager {
         if (!RenderableManager.instance) {
@@ -21,18 +17,43 @@ export class RenderableManager {
         }
         return RenderableManager.instance;
     }
+    /**
+     * 创建角色UI对象
+     * 无需回收，由更上层处理
+     * @param type 
+     * @returns 
+     */
+    public async createCharacter(type: AnimResourceType): Promise<Character> {
+        let character: Character;
+        character = await Character.create(type);
+        await character.setup();
 
-    public async createCharacterRender(type:AnimResourceType):Promise<CharacterRenderer> {
-        let characterRenderer = new CharacterRenderer(type);
-        await characterRenderer.setup();
-
-        // const actionOptions: ActionOptions = {
-        //     modelName: 'Thief',
-        //     action: ActType.ACT_WALK,
-        // };
-        return characterRenderer;
+        return character;
     }
 
+    /**
+     * 创建伤害数字对象
+     * @param fontSize 
+     * @returns 
+     */
+    public async createDamageNumber(fontSize: number = 12): Promise<DamageNumber> {
+        let damageNumber: DamageNumber;
 
+        if (this.damageNumberPool.length > 0) {
+            damageNumber = this.damageNumberPool.pop()!;
+        } else {
+            damageNumber = await DamageNumber.create(fontSize);
+            await damageNumber.setup();
+        }
 
+        return damageNumber;
+    }
+    /**
+     * 回收伤害数字对象
+     * @param damageNumber 
+     */
+    public recycleDamageNumber(damageNumber: DamageNumber) {
+        damageNumber.reset();
+        this.damageNumberPool.push(damageNumber);
+    }
 }

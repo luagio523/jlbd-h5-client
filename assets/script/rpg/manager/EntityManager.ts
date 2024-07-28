@@ -11,7 +11,6 @@ import GameEntity from "../entity/Entity";
 import { ActType } from "../enum/Act";
 import { EntityType } from "../enum/Type";
 import EntityFactory from "../factory/EntityFactory";
-import { CharacterRenderer } from "../render/character/CharacterRenderer";
 import { KVManager } from "./KVManager";
 import { RenderableManager } from "./RenderableManager";
 import { SceneManager } from "./SceneManager";

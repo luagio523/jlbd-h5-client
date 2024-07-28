@@ -1,7 +1,7 @@
 import { Node } from "cc";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { ActType } from "../enum/Act";
-import { CharacterRenderer } from "../render/character/CharacterRenderer";
+import { CharacterRenderer } from "../render/character/Character";
 
 export class RenderableComponent extends ECSComponent {
     public  characterRenderer:CharacterRenderer = null;

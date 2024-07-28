@@ -8,7 +8,7 @@ import { ActType } from "./rpg/enum/Act";
 import scheduler from "./utils/scheduler";
 import { MathUtil } from "./core/common/utils/MathUtil";
 import { AnimResourceType } from "./core/animation/Type";
-import { CharacterRenderer } from "./rpg/render/character/CharacterRenderer";
+import { CharacterRenderer } from "./rpg/render/character/Character";
 import { CharacterEditorRenderer } from "./rpg/render/character/CharacterEditorRenderer";
 
 
@@ -125,9 +125,9 @@ export namespace testcase {
 //    contain anim/sheetbody/body803_1_1r.json
     var characterRenderer:CharacterEditorRenderer   = null;
     export async function app_test11(){
-        let characterRenderer = new CharacterEditorRenderer();
-        characterRenderer.initialize(AnimResourceType.EgretSpriteSheet);
-        await characterRenderer.setupCharacter(gameNode);
+        let characterRenderer = new CharacterEditorRenderer(AnimResourceType.EgretSpriteSheet);
+        await characterRenderer.setup();
+        gameNode.addChild(characterRenderer.getNode());
         characterRenderer.updateCharacterStatus('gamars', 100, 50);
 
         const actionOptions: ActionOptions = {
@@ -142,7 +142,7 @@ export namespace testcase {
 
         // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
 
-        characterRenderer.updatePosition(500,300);
+        characterRenderer.setPosition(500,300);
         scheduler.scheduleUpdateGlobal((dt:number) => {
             characterRenderer.update(dt);
         });
@@ -186,9 +186,9 @@ export namespace testcase {
 
     
     export async function app_test15(){
-        let characterRenderer = new CharacterRenderer();
-        characterRenderer.initialize(AnimResourceType.SpriteAltas);
-        await characterRenderer.setupCharacter(gameNode);
+        let characterRenderer = new CharacterRenderer(AnimResourceType.SpriteAltas);
+        await characterRenderer.setup();
+        gameNode.addChild(characterRenderer.getNode());
         characterRenderer.updateCharacterStatus('role', 100, 50);
 
         const actionOptions: ActionOptions = {
@@ -204,7 +204,7 @@ export namespace testcase {
 
         // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
 
-        characterRenderer.updatePosition(500,300);
+        characterRenderer.setPosition(500,300);
         scheduler.scheduleUpdateGlobal((dt:number) => {
             characterRenderer.update(dt);
         });
@@ -213,9 +213,9 @@ export namespace testcase {
     
 
     export async function app_test16(){
-        let characterRenderer = new CharacterRenderer();
-        characterRenderer.initialize(AnimResourceType.SpriteAltas);
-        await characterRenderer.setupCharacter(gameNode);
+        let characterRenderer = new CharacterRenderer(AnimResourceType.SpriteAltas);
+        await characterRenderer.setup();
+        gameNode.addChild(characterRenderer.getNode());
         characterRenderer.updateCharacterStatus('role', 100, 50);
 
         const actionOptions: ActionOptions = {

@@ -3,8 +3,10 @@ import { createBodyNode } from './BodyNode';
 import { StatusBar } from './StatusBar';
 import { AnimResourceType } from '../../../core/animation/Type';
 import { UIElement } from '../UIElement';
+import { ActAnimationStateFactory, ActionOptions } from '../../base/ActAnimationState';
+import { CharacterAnimator } from '../../base/CharacterAnimator';
 
-export class CharacterNode extends UIElement {
+export class Character extends UIElement {
     private static HEALTH_BAR_OFFSET = 20;
     private static MANA_BAR_OFFSET = 10;
     private static NAME_LABEL_OFFSET = 32;
@@ -17,8 +19,12 @@ export class CharacterNode extends UIElement {
     private levelLabel: Label;
     private nameLabel: Label;
 
-    private constructor(bodyType: AnimResourceType, width: number = 100, height: number = 100) {
-        super('CharacterNode', width, height);
+    private characterAnimator: CharacterAnimator | null = null;
+    private animResourceType: AnimResourceType | null = null;
+
+
+    private constructor(bodyType: AnimResourceType, width: number = 400, height: number = 400) {
+        super('Character', width, height);
 
         this.transform.setAnchorPoint(0.5, 0);
 
@@ -28,6 +34,9 @@ export class CharacterNode extends UIElement {
             bodyTransform.setAnchorPoint(0.5, 0);
         }
         this.node.addChild(this.bodyNode.getNode());
+
+        const animationState = ActAnimationStateFactory.createPlayer(this.bodyNode.getNode(), this.animResourceType!);
+        this.characterAnimator = new CharacterAnimator(animationState);
 
         this.shadowNode = new Node('Shadow');
         const shadowTransform = this.shadowNode.addComponent(UITransform);
@@ -52,8 +61,8 @@ export class CharacterNode extends UIElement {
         this.adjustComponents();
     }
 
-    public static create(bodyType: AnimResourceType, width: number = 100, height: number = 100): CharacterNode {
-        const characterNode = new CharacterNode(bodyType, width, height);
+    public static create(bodyType: AnimResourceType, width: number = 100, height: number = 100): Character {
+        const characterNode = new Character(bodyType, width, height);
         return characterNode;
     }
 
@@ -66,17 +75,17 @@ export class CharacterNode extends UIElement {
         const bodyHeight = this.bodyNode.getNode().getComponent(UITransform)?.height || 0;
 
         if (this.healthBar) {
-            this.healthBar.setPosition(0, bodyHeight + CharacterNode.HEALTH_BAR_OFFSET);
+            this.healthBar.setPosition(0, bodyHeight + Character.HEALTH_BAR_OFFSET);
         }
 
         if (this.manaBar) {
-            this.manaBar.setPosition(0, bodyHeight + CharacterNode.MANA_BAR_OFFSET);
+            this.manaBar.setPosition(0, bodyHeight + Character.MANA_BAR_OFFSET);
         }
 
-        this.nameLabel.node.setPosition(0, bodyHeight + CharacterNode.NAME_LABEL_OFFSET);
+        this.nameLabel.node.setPosition(0, bodyHeight + Character.NAME_LABEL_OFFSET);
 
         const healthBarWidth = this.healthBar?.getNode().getComponent(UITransform)?.width || 0;
-        this.levelLabel.node.setPosition(healthBarWidth / 2 + CharacterNode.LEVEL_LABEL_HORIZONTAL_OFFSET, bodyHeight + CharacterNode.HEALTH_BAR_OFFSET);
+        this.levelLabel.node.setPosition(healthBarWidth / 2 + Character.LEVEL_LABEL_HORIZONTAL_OFFSET, bodyHeight + Character.HEALTH_BAR_OFFSET);
     }
 
     public setBodySize(width: number, height: number) {
@@ -108,7 +117,15 @@ export class CharacterNode extends UIElement {
         this.nameLabel.string = name;
     }
 
+    public async playAction(options: ActionOptions) {
+        if (this.characterAnimator) {
+            this.characterAnimator.transitionToState(options);
+        }
+    }
+
+
     public reset(): void {
+        this.characterAnimator = null;
         this.healthBar.reset();
         this.manaBar.reset();
         this.nameLabel.string = '';
@@ -116,14 +133,6 @@ export class CharacterNode extends UIElement {
         this.node.removeFromParent();
     }
 
-    public setColor(color: Color): void {
-        // You can implement this method if needed
-    }
-
-    public static setOffsets(healthBarOffset: number, manaBarOffset: number, nameLabelOffset: number, levelLabelHorizontalOffset: number) {
-        CharacterNode.HEALTH_BAR_OFFSET = healthBarOffset;
-        CharacterNode.MANA_BAR_OFFSET = manaBarOffset;
-        CharacterNode.NAME_LABEL_OFFSET = nameLabelOffset;
-        CharacterNode.LEVEL_LABEL_HORIZONTAL_OFFSET = levelLabelHorizontalOffset;
-    }
+    
+    
 }
