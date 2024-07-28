@@ -8,8 +8,8 @@ import { ActType } from "./rpg/enum/Act";
 import scheduler from "./utils/scheduler";
 import { MathUtil } from "./core/common/utils/MathUtil";
 import { AnimResourceType } from "./core/animation/Type";
-import { CharacterEditorRenderer } from "./rpg/render/CharacterEditorRenderer";
 import { CharacterRenderer } from "./rpg/render/character/CharacterRenderer";
+import { CharacterEditorRenderer } from "./rpg/render/character/CharacterEditorRenderer";
 
 
 
@@ -187,9 +187,9 @@ export namespace testcase {
     
     export async function app_test15(){
         let characterRenderer = new CharacterRenderer();
-        characterRenderer.initialize(AnimResourceType.DragonBones);
+        characterRenderer.initialize(AnimResourceType.SpriteAltas);
         await characterRenderer.setupCharacter(gameNode);
-        characterRenderer.updateCharacterStatus('gamars', 100, 50);
+        characterRenderer.updateCharacterStatus('role', 100, 50);
 
         const actionOptions: ActionOptions = {
             modelName: 'Alfadriel',
@@ -214,12 +214,12 @@ export namespace testcase {
 
     export async function app_test16(){
         let characterRenderer = new CharacterRenderer();
-        characterRenderer.initialize(AnimResourceType.Spine);
+        characterRenderer.initialize(AnimResourceType.SpriteAltas);
         await characterRenderer.setupCharacter(gameNode);
-        characterRenderer.updateCharacterStatus('gamars', 100, 50);
+        characterRenderer.updateCharacterStatus('role', 100, 50);
 
         const actionOptions: ActionOptions = {
-            modelName: 'raptor-pro',
+            modelName: 'Thief',
             action: ActType.ACT_WALK,
             // direction: 1,
             // gender: 0,

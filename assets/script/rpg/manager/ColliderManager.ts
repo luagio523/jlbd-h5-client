@@ -1,5 +1,3 @@
-import { Intersection2D, Rect } from "cc";
-import { GameEntityManager } from "./GameEntityManager";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { TransformComponent } from "../component/TransformComponent";
 import { ShapeComponent } from "../component/ShapeComponent";

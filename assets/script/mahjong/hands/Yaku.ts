@@ -79,6 +79,29 @@ export class Yaku {
 
 
 
+// // 使用示例
+
+// const hand: Tile[] = [
+//     new Tile(TileType.Dragon, DragonType.Red),
+//     new Tile(TileType.Dragon, DragonType.Red),
+//     new Tile(TileType.Dragon, DragonType.Red),
+//     new Tile(TileType.Wind, WindType.East),
+//     new Tile(TileType.Wind, WindType.East),
+//     new Tile(TileType.Wind, WindType.East),
+//     new Tile(TileType.Wind, WindType.South),
+//     new Tile(TileType.Man, 1),
+//     new Tile(TileType.Man, 2),
+// ];
+
+// const melds: Tile[][] = []; // 没有副露
+// const playerWind: WindType = WindType.East; // 示例玩家风
+// const roundWind: WindType = WindType.East; // 示例圈风
+
+// // 检查役牌
+// const result = YakuhaiChecker.checkYakuhai(hand, melds, playerWind, roundWind);
+// console.log("是否为役牌:", result.isYakuhai);
+// console.log("三元牌刻子:", result.dragonTriplets);
+// console.log("风牌刻子:", result.windTriplets);
 
 
 

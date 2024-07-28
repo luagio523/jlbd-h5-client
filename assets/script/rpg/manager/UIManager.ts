@@ -7,7 +7,7 @@ import { AbilityBehavior } from "../enum/Type";
 import { BaseAbility } from "../ability/BaseAbility";
 import { InputComponent } from "../component/InputComponent";
 import { AbilityIndicatorFactory } from "../factory/AbilityIndicatorFactory";
-import { GameEntityManager } from "./GameEntityManager";
+import { GameEntityManager } from "./EntityManager";
 
 
 export class UIManager {

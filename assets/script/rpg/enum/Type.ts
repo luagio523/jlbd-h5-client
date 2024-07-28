@@ -110,6 +110,7 @@ export enum ClickBehavior {
 
 export enum EntityType {
     Default,
+    Role,
     Hero,
     NPC,
     Monster,
