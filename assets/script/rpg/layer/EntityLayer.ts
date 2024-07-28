@@ -18,14 +18,14 @@ export class EntityLayer extends Node {
     addEntity(entity: ECSEntity): void {
         const renderable = entity.getComponent(RenderableComponent);
         if (renderable) {
-            this.addChild(renderable.node);    
+            this.addChild(renderable.getNode());    
         }
     }
 
     removeEntity(entity: ECSEntity): void {
         const renderable = entity.getComponent(RenderableComponent);
         if (renderable) {
-           this.removeChild(renderable.node);
+           this.removeChild(renderable.getNode());
         }
     }
 
