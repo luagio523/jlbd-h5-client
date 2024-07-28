@@ -8,8 +8,8 @@ import { ActType } from "./rpg/enum/Act";
 import scheduler from "./utils/scheduler";
 import { MathUtil } from "./core/common/utils/MathUtil";
 import { AnimResourceType } from "./core/animation/Type";
-import { CharacterRenderer } from "./rpg/render/character/Character";
-import { CharacterEditorRenderer } from "./rpg/render/character/CharacterEditorRenderer";
+import { Character } from "./rpg/render/character/Character";
+import { CharacterEditor } from "./rpg/render/character/CharacterEditor";
 
 
 
@@ -123,9 +123,9 @@ export namespace testcase {
    }
 
 //    contain anim/sheetbody/body803_1_1r.json
-    var characterRenderer:CharacterEditorRenderer   = null;
+    var characterRenderer:CharacterEditor   = null;
     export async function app_test11(){
-        let characterRenderer = new CharacterEditorRenderer(AnimResourceType.EgretSpriteSheet);
+        let characterRenderer = new CharacterEditor(AnimResourceType.EgretSpriteSheet);
         await characterRenderer.setup();
         gameNode.addChild(characterRenderer.getNode());
         characterRenderer.updateCharacterStatus('gamars', 100, 50);
@@ -186,10 +186,9 @@ export namespace testcase {
 
     
     export async function app_test15(){
-        let characterRenderer = new CharacterRenderer(AnimResourceType.SpriteAltas);
+        let characterRenderer = Character.create(AnimResourceType.SpriteAltas);
         await characterRenderer.setup();
         gameNode.addChild(characterRenderer.getNode());
-        characterRenderer.updateCharacterStatus('role', 100, 50);
 
         const actionOptions: ActionOptions = {
             modelName: 'Alfadriel',
@@ -213,10 +212,9 @@ export namespace testcase {
     
 
     export async function app_test16(){
-        let characterRenderer = new CharacterRenderer(AnimResourceType.SpriteAltas);
+        let characterRenderer = Character.create(AnimResourceType.SpriteAltas);
         await characterRenderer.setup();
         gameNode.addChild(characterRenderer.getNode());
-        characterRenderer.updateCharacterStatus('role', 100, 50);
 
         const actionOptions: ActionOptions = {
             modelName: 'Thief',
@@ -231,7 +229,6 @@ export namespace testcase {
 
         // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
 
-        characterRenderer.updatePosition(500,300);
         scheduler.scheduleUpdateGlobal((dt:number) => {
             characterRenderer.update(dt);
         });

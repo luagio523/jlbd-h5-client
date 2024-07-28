@@ -10,7 +10,7 @@ export abstract class UIElement {
         this.transform.setContentSize(width, height);
     }
 
-    public abstract setup(...args: any): Promise<void>;
+    public abstract setup(...args: any): Promise<void>; // setup UI element 用于加载配置等
     public abstract reset(): void;
 
     public setPosition(x: number, y: number, z: number = 0): void {
@@ -37,5 +37,7 @@ export abstract class UIElement {
             });
         });
     }
+    public update(dt:number):void{
 
+    }
 }
