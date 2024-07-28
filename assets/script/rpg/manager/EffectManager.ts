@@ -5,8 +5,6 @@ import { classMap } from '../effect/__private';
  * 效果管理器
  * 如击飞等
  */
-
-
 export class EffectManager {
     private static instance: EffectManager;
     private effectPools: Map<string, IEffect[]> = new Map();
@@ -47,7 +45,6 @@ export class EffectManager {
         if (!this.effectPools.has(name)) {
             this.effectPools.set(name, []);
         }
-        effect.reset();
         this.effectPools.get(name).push(effect);
         this.activeEffects.delete(effect);
     }
@@ -57,7 +54,6 @@ export class EffectManager {
             effect.update(dt);
         }
     }
-
     
 }
   

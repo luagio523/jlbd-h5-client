@@ -6,7 +6,6 @@ import { Node } from 'cc';
 export interface IEffect {
     apply(target: Node, ...args: any[]): void;
     onComplete(callback: () => void): void;
-    reset(): void;
     update(dt: number): void;
     complete(): void;
 }
