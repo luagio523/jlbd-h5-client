@@ -1,18 +1,66 @@
-
 import { Tile, TileType, DragonType } from "../Tile";
-//大三元
+
 export class Daisangen {
+    /**
+     * 验证是否为大三元和牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 是否为大三元和牌
+     */
     public static verifyDaisangen(hand: Tile[], melds: Tile[][]): boolean {
-        // 展开嵌套数组
-        const meldTiles = melds.reduce((acc, meld) => acc.concat(meld), []);
-        
-        // 检查总牌数是否为14张
-        const totalTiles = hand.length + meldTiles.length;
-        if (totalTiles !== 14) {
-            return false;
+        return this.checkDaisangen(hand, melds).isComplete;
+    }
+
+    /**
+     * 检查是否为大三元听牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 是否为大三元听牌
+     */
+    public static isDaisangenTenpai(hand: Tile[], melds: Tile[][]): boolean {
+        return this.checkDaisangen(hand, melds).isTenpai;
+    }
+
+    /**
+     * 获取大三元听牌时的待牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 待牌数组
+     */
+    public static getDaisangenWaitingTiles(hand: Tile[], melds: Tile[][]): Tile[] {
+        return this.checkDaisangen(hand, melds).waitingTiles;
+    }
+
+    /**
+     * 检查大三元的状态
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 包含完成状态、听牌状态和待牌的对象
+     */
+    public static checkDaisangenState(hand: Tile[], melds: Tile[][]): { 
+        isComplete: boolean; 
+        isTenpai: boolean; 
+        waitingTiles: Tile[];
+    } {
+        return this.checkDaisangen(hand, melds);
+    }
+
+    /**
+     * 检查大三元的状态
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 包含完成状态、听牌状态和待牌的对象
+     */
+    private static checkDaisangen(hand: Tile[], melds: Tile[][]): { 
+        isComplete: boolean; 
+        isTenpai: boolean; 
+        waitingTiles: Tile[];
+    } {
+        const totalTiles = hand.length + melds.reduce((sum, meld) => sum + meld.length, 0);
+        if (totalTiles !== 13 && totalTiles !== 14) {
+            return { isComplete: false, isTenpai: false, waitingTiles: [] };
         }
 
-        // 统计三元牌的数量
         const dragonCounts: { [key in DragonType]: number } = {
             [DragonType.White]: 0,
             [DragonType.Green]: 0,
@@ -26,24 +74,39 @@ export class Daisangen {
             }
         });
 
-        // 统计鸣牌中的三元牌
+        // 统计副露中的三元牌
         melds.forEach(meld => {
             if (meld[0].type === TileType.Dragon) {
                 dragonCounts[meld[0].value as DragonType] += meld.length;
             }
         });
 
-        // 检查每种三元牌是否都至少有3张
-        for (const count of Object.values(dragonCounts)) {
-            if (count < 3) {
-                return false;
+        let dragonTriples = 0;
+        let dragonPairs = 0;
+        let dragonSingles = 0;
+        const waitingTiles: Tile[] = [];
+
+        for (const [dragon, count] of Object.entries(dragonCounts)) {
+            if (count >= 3) {
+                dragonTriples++;
+            } else if (count === 2) {
+                dragonPairs++;
+                waitingTiles.push(new Tile(TileType.Dragon, dragon as DragonType));
+            } else if (count === 1) {
+                dragonSingles++;
+                waitingTiles.push(new Tile(TileType.Dragon, dragon as DragonType));
+                waitingTiles.push(new Tile(TileType.Dragon, dragon as DragonType));
             }
         }
 
-        // 如果所有三元牌都至少有3张，则是大三元
-        return true;
+        const isComplete = dragonTriples === 3 && totalTiles === 14;
+        const isTenpai = (dragonTriples === 2 && dragonPairs === 1 && totalTiles === 13) ||
+                         (dragonTriples === 2 && dragonSingles === 1 && totalTiles === 13);
+
+        return { isComplete, isTenpai, waitingTiles };
     }
 }
+
 
 
 
@@ -81,3 +144,17 @@ export class Daisangen {
 
 // const isNotDaisangen = Daisangen.verifyDaisangen(hand2, melds2);
 // console.log(isNotDaisangen); // 输出: false
+
+
+// // 独立检查是否为大三元和牌
+// console.log("是否为大三元:", Daisangen.verifyDaisangen(hand, melds));
+
+// // 独立检查是否为大三元听牌
+// console.log("是否为大三元听牌:", Daisangen.isDaisangenTenpai(hand, melds));
+
+// // 独立获取大三元听牌的待牌
+// console.log("大三元听牌的待牌:", Daisangen.getDaisangenWaitingTiles(hand, melds).map(tile => tile.toString()));
+
+// // 一次性获取完整的状态信息
+// const state = Daisangen.checkDaisangenState(hand, melds);
+// console.log("完整状态:", state);

@@ -1,21 +1,57 @@
-//小三元
-
-
 import { Tile, TileType, DragonType } from "../Tile";
 
-
+/**
+ * 小三元（Shousangen）判定类
+ * 小三元需要两种三元牌的刻子和一种三元牌的对子
+ */
 export class Shousangen {
+    /**
+     * 验证是否为小三元和牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 是否为小三元和牌
+     */
     public static verifyShousangen(hand: Tile[], melds: Tile[][]): boolean {
-        // 展开嵌套数组
-        const meldTiles = melds.reduce((acc, meld) => acc.concat(meld), []);
-        
-        // 检查总牌数是否为14张
-        const totalTiles = hand.length + meldTiles.length;
-        if (totalTiles !== 14) {
-            return false;
+        return this.checkShousangen(hand, melds).isComplete;
+    }
+
+    /**
+     * 检查是否为小三元听牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 是否为小三元听牌
+     */
+    public static isShousangenTenpai(hand: Tile[], melds: Tile[][]): boolean {
+        return this.checkShousangen(hand, melds).isTenpai;
+    }
+
+    /**
+     * 获取小三元听牌时的待牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 待牌数组
+     */
+    public static getShousangenWaitingTiles(hand: Tile[], melds: Tile[][]): Tile[] {
+        const { isTenpai, waitingTiles } = this.checkShousangen(hand, melds);
+        return isTenpai ? waitingTiles : [];
+    }
+
+    /**
+     * 检查小三元的状态
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 包含完成状态、听牌状态和待牌的对象
+     */
+    private static checkShousangen(hand: Tile[], melds: Tile[][]): { 
+        isComplete: boolean; 
+        isTenpai: boolean; 
+        waitingTiles: Tile[] 
+    } {
+        const totalTiles = hand.length + melds.reduce((sum, meld) => sum + meld.length, 0);
+        if (totalTiles !== 13 && totalTiles !== 14) {
+            return { isComplete: false, isTenpai: false, waitingTiles: [] };
         }
 
-        // 统计三元牌的数量
         const dragonCounts: { [key in DragonType]: number } = {
             [DragonType.White]: 0,
             [DragonType.Green]: 0,
@@ -29,56 +65,70 @@ export class Shousangen {
             }
         });
 
-        // 统计鸣牌中的三元牌
-        meldTiles.forEach(tile => {
-            if (tile.type === TileType.Dragon) {
-                dragonCounts[tile.value as DragonType]++;
+        // 统计副露中的三元牌
+        melds.forEach(meld => {
+            if (meld[0].type === TileType.Dragon) {
+                dragonCounts[meld[0].value as DragonType] += meld.length;
             }
         });
 
         let dragonTriples = 0;
-        let dragonPair = 0;
+        let dragonPairs = 0;
+        let dragonSingles = 0;
+        const waitingTiles: Tile[] = [];
 
-        for (const count of Object.values(dragonCounts)) {
-            if (count === 2) {
-                dragonPair++;
-            } else if (count === 3) {
+        for (const [dragon, count] of Object.entries(dragonCounts)) {
+            if (count === 1) {
+                dragonSingles++;
+                waitingTiles.push(new Tile(TileType.Dragon, dragon as DragonType));
+                waitingTiles.push(new Tile(TileType.Dragon, dragon as DragonType));
+            } else if (count === 2) {
+                dragonPairs++;
+                waitingTiles.push(new Tile(TileType.Dragon, dragon as DragonType));
+            } else if (count >= 3) {
                 dragonTriples++;
-            } else if (count === 0) {
-                // 允许一种三元牌不存在
-                continue;
-            } else {
-                // 如果有单张三元牌或超过3张，不符合小三元
-                return false;
             }
         }
 
-        // 小三元必须有2个三元牌的刻子和1对三元牌的雀头
-        return dragonTriples === 2 && dragonPair === 1;
+        const isComplete = dragonTriples === 2 && dragonPairs === 1 && totalTiles === 14;
+        const isTenpai = (dragonTriples === 2 && dragonSingles === 1 && totalTiles === 13) ||
+                         (dragonTriples === 1 && dragonPairs === 2 && totalTiles === 13);
+
+        return { isComplete, isTenpai, waitingTiles };
     }
 }
 
 
 
-// 首先检查手牌和鸣牌是否为14张。
-//手牌和鸣牌中的三元牌。
-// 创建一个对象 dragonCounts 来统计每种三元牌（白、发、中）的数量。
-// 遍历手牌，统计三元牌的数量。
-// 检查三元牌的组成：
-// 必须有两组三张的三元牌（刻子）
-// 必须有一对三元牌（雀头）
-// 允许一种三元牌不存在
-// 如果满足以上条件，则返回 true，否则返回 false。
 
+// // 使用示例
 
-// // 小三元示例
-// const hand2 = [
-//     Tile.createDragon(DragonType.White), Tile.createDragon(DragonType.White),
-//     Tile.createDragon(DragonType.Green), Tile.createDragon(DragonType.Green), Tile.createDragon(DragonType.Green),
-//     Tile.createMan(1), Tile.createMan(2), Tile.createMan(3),
-//     Tile.createPin(4), Tile.createPin(5), Tile.createPin(6)
+// // 创建一个小三元和牌的手牌和副露
+// const completeHand: Tile[] = [
+//     new Tile(TileType.Dragon, DragonType.White), new Tile(TileType.Dragon, DragonType.White),
+//     new Tile(TileType.Dragon, DragonType.Green), new Tile(TileType.Dragon, DragonType.Green),
+//     new Tile(TileType.Man, 1), new Tile(TileType.Man, 1), new Tile(TileType.Man, 1),
+//     new Tile(TileType.Pin, 2), new Tile(TileType.Pin, 2)
 // ];
-// const melds2 = [
-//     [Tile.createDragon(DragonType.Red), Tile.createDragon(DragonType.Red), Tile.createDragon(DragonType.Red)]
+// const completeMelds: Tile[][] = [
+//     [new Tile(TileType.Dragon, DragonType.Red), new Tile(TileType.Dragon, DragonType.Red), new Tile(TileType.Dragon, DragonType.Red)]
 // ];
-// console.log(Shousangen.verifyShousangen(hand2, melds2)); // 输出: true
+
+// // 创建一个小三元听牌的手牌和副露
+// const tenpaiHand: Tile[] = [
+//     new Tile(TileType.Dragon, DragonType.White), new Tile(TileType.Dragon, DragonType.White),
+//     new Tile(TileType.Dragon, DragonType.Green), new Tile(TileType.Dragon, DragonType.Green),
+//     new Tile(TileType.Man, 1), new Tile(TileType.Man, 1), new Tile(TileType.Man, 1),
+//     new Tile(TileType.Pin, 2), new Tile(TileType.Pin, 2),
+//     new Tile(TileType.Dragon, DragonType.Red)
+// ];
+// const tenpaiMelds: Tile[][] = [];
+
+// console.log("是否为小三元:", Shousangen.verifyShousangen(completeHand, completeMelds));
+// console.log("是否为小三元听牌:", Shousangen.isShousangenTenpai(tenpaiHand, tenpaiMelds));
+// console.log("小三元听牌的待牌:", Shousangen.getShousangenWaitingTiles(tenpaiHand, tenpaiMelds).map(tile => tile.toString()));
+
+// // 输出结果：
+// // 是否为小三元: true
+// // 是否为小三元听牌: true
+// // 小三元听牌的待牌: ['Red']

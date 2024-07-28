@@ -1,47 +1,95 @@
-
 import { Tile, TileType } from "../Tile";
-// 实现九莲宝灯的检查逻辑
+
 export class Chuuren {
+    private static readonly BASE_PATTERN = [3, 1, 1, 1, 1, 1, 1, 1, 3];
+
+    /**
+     * 验证是否为九莲宝灯和牌
+     * @param hand 手牌数组
+     * @returns 是否为九莲宝灯和牌
+     */
     public static verifyChuuren(hand: Tile[]): boolean {
-        // 检查手牌数量是否为14张
-        if (hand.length !== 14) {
-            return false;
+        return this.checkChuuren(hand).isComplete;
+    }
+
+    /**
+     * 检查是否为九莲宝灯听牌
+     * @param hand 手牌数组
+     * @returns 是否为九莲宝灯听牌
+     */
+    public static isChuurenTenpai(hand: Tile[]): boolean {
+        return this.checkChuuren(hand).isTenpai;
+    }
+
+    /**
+     * 获取九莲宝灯听牌时的待牌
+     * @param hand 手牌数组
+     * @returns 待牌数组
+     */
+    public static getChuurenWaitingTiles(hand: Tile[]): Tile[] {
+        return this.checkChuuren(hand).waitingTiles;
+    }
+
+    /**
+     * 检查九莲宝灯的状态
+     * @param hand 手牌数组
+     * @returns 包含完成状态、听牌状态和待牌的对象
+     */
+    public static checkChuurenState(hand: Tile[]): { 
+        isComplete: boolean; 
+        isTenpai: boolean; 
+        waitingTiles: Tile[];
+        suitType?: TileType;
+    } {
+        return this.checkChuuren(hand);
+    }
+
+    /**
+     * 检查九莲宝灯的状态
+     * @param hand 手牌数组
+     * @returns 包含完成状态、听牌状态、待牌和花色类型的对象
+     */
+    private static checkChuuren(hand: Tile[]): { 
+        isComplete: boolean; 
+        isTenpai: boolean; 
+        waitingTiles: Tile[];
+        suitType?: TileType;
+    } {
+        if (hand.length !== 13 && hand.length !== 14) {
+            return { isComplete: false, isTenpai: false, waitingTiles: [] };
         }
 
-        // 获取第一张牌的类型
         const firstTileType = hand[0].type;
-
-        // 检查所有牌是否属于同一种数牌
-        if (!hand.every(tile => tile.type === firstTileType) || 
-            ![TileType.Man, TileType.Pin, TileType.Sou].includes(firstTileType)) {
-            return false;
+        if (![TileType.Man, TileType.Pin, TileType.Sou].includes(firstTileType) ||
+            !hand.every(tile => tile.type === firstTileType)) {
+            return { isComplete: false, isTenpai: false, waitingTiles: [] };
         }
 
-        // 统计每个数字的出现次数
-        const counts = new Array(10).fill(0); // 索引0不使用，1-9对应牌的数字
+        const counts = new Array(10).fill(0);
         hand.forEach(tile => counts[tile.value as number]++);
 
-        // 检查是否符合九莲宝灯的基本构成
-        const basePattern = [3, 1, 1, 1, 1, 1, 1, 1, 3];
-        let extraTile = false;
+        let diff = 0;
+        const waitingTiles: Tile[] = [];
 
         for (let i = 1; i <= 9; i++) {
-            if (counts[i] < basePattern[i - 1]) {
-                return false;
-            } else if (counts[i] === basePattern[i - 1] + 1) {
-                if (extraTile) {
-                    return false; // 已经有一个额外的牌了，不能再有多余的牌
-                }
-                extraTile = true;
-            } else if (counts[i] > basePattern[i - 1] + 1) {
-                return false; // 某个数字的牌过多
+            diff += counts[i] - this.BASE_PATTERN[i - 1];
+            if (counts[i] < this.BASE_PATTERN[i - 1]) {
+                waitingTiles.push(new Tile(firstTileType, i));
             }
         }
 
-        // 确保有且仅有一个额外的牌
-        return extraTile;
+        const isComplete = diff === 1 && hand.length === 14;
+        const isTenpai = diff === 0 && hand.length === 13;
+
+        return { 
+            isComplete, 
+            isTenpai, 
+            waitingTiles: isTenpai ? waitingTiles : [],
+            suitType: firstTileType
+        };
     }
 }
+
 
 
 
@@ -62,3 +110,16 @@ export class Chuuren {
 
 // const isChuuren = Chuuren.verifyChuuren(hand);
 // console.log(isChuuren); // 输出: true
+
+// // 独立检查是否为九莲宝灯和牌
+// console.log("是否为九莲宝灯:", Chuuren.verifyChuuren(hand));
+
+// // 独立检查是否为九莲宝灯听牌
+// console.log("是否为九莲宝灯听牌:", Chuuren.isChuurenTenpai(hand));
+
+// // 独立获取九莲宝灯听牌的待牌
+// console.log("九莲宝灯听牌的待牌:", Chuuren.getChuurenWaitingTiles(hand).map(tile => tile.toString()));
+
+// // 一次性获取完整的状态信息
+// const state = Chuuren.checkChuurenState(hand);
+// console.log("完整状态:", state);

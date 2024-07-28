@@ -1,15 +1,21 @@
 import { DragonType, Tile, TileType, WindType } from "../Tile";
 
-
 export class Pinfu {
-    // 验证平和
-    public static verifyPinfu(hand: Tile[],melds: Tile[][], winningTile: Tile, playerWind: WindType, roundWind: WindType): boolean {
-        // 检查是否门前清（这需要额外的信息，比如玩家的鸣牌）
+    /**
+     * 验证平和和牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @param winningTile 和牌
+     * @param playerWind 玩家风
+     * @param roundWind 圆风
+     * @returns 是否为平和和牌
+     */
+    public static verifyPinfu(hand: Tile[], melds: Tile[][], winningTile: Tile, playerWind: WindType, roundWind: WindType): boolean {
         // 检查是否门前清
         if (melds.length > 0) return false;
 
-        // 合并手牌和和牌
-        // const fullHand = [...hand, winningTile]; 并不需要
+        // 检查手牌数量
+        if (hand.length !== 14) return false;
 
         // 检查是否有非役牌雀头
         const pairs = this.findPairs(hand);
@@ -25,7 +31,13 @@ export class Pinfu {
         return this.isTwoSidedWait(sequences, winningTile);
     }
 
-    // 检查是否为役牌
+    /**
+     * 检查是否为役牌
+     * @param tile 待检查的牌
+     * @param playerWind 玩家风
+     * @param roundWind 圆风
+     * @returns 是否为役牌
+     */
     private static isYakuhai(tile: Tile, playerWind: WindType, roundWind: WindType): boolean {
         if (tile.type === TileType.Dragon) {
             return true; // 三元牌总是役牌
@@ -36,7 +48,11 @@ export class Pinfu {
         return false;
     }
 
-    // 查找对子
+    /**
+     * 查找对子
+     * @param tiles 牌数组
+     * @returns 对子数组
+     */
     private static findPairs(tiles: Tile[]): Tile[][] {
         const pairs: Tile[][] = [];
         const tileCount: { [key: string]: number } = {};
@@ -70,7 +86,11 @@ export class Pinfu {
         return pairs;
     }
 
-    // 查找顺子
+    /**
+     * 查找顺子
+     * @param tiles 牌数组
+     * @returns 顺子数组
+     */
     private static findSequences(tiles: Tile[]): Tile[][] {
         const sequences: Tile[][] = [];
         const sortedTiles = tiles.filter(tile => tile.type === TileType.Man || tile.type === TileType.Pin || tile.type === TileType.Sou)
@@ -109,7 +129,12 @@ export class Pinfu {
         return sequences;
     }
 
-    // 检查是否为两面待牌
+    /**
+     * 检查是否为两面待牌
+     * @param sequences 顺子数组
+     * @param winningTile 和牌
+     * @returns 是否为两面待牌
+     */
     private static isTwoSidedWait(sequences: Tile[][], winningTile: Tile): boolean {
         for (const seq of sequences) {
             if (seq.some(tile => tile.type === winningTile.type && tile.value === winningTile.value)) {
@@ -122,5 +147,6 @@ export class Pinfu {
         return false;
     }
 }
+
 
 

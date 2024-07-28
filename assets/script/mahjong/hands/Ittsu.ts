@@ -1,43 +1,113 @@
-
 import { Tile, TileType } from "../Tile";
-// 实现一气通贯的检查逻辑
 
 export class Ittsu {
+    /**
+     * 验证是否为一气通贯和牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 是否为一气通贯和牌
+     */
     public static verifyIttsu(hand: Tile[], melds: Tile[][]): boolean {
-        // 展开嵌套数组
-        const meldTiles = melds.reduce((acc, meld) => acc.concat(meld), []);
-        
-        // 检查总牌数是否为14张
-        const totalTiles = hand.length + meldTiles.length;
-        if (totalTiles !== 14) {
-            return false;
+        return this.checkIttsu(hand, melds).isComplete;
+    }
+
+    /**
+     * 检查是否为一气通贯听牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 是否为一气通贯听牌
+     */
+    public static isIttsuTenpai(hand: Tile[], melds: Tile[][]): boolean {
+        return this.checkIttsu(hand, melds).isTenpai;
+    }
+
+    /**
+     * 获取一气通贯听牌时的待牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 待牌数组
+     */
+    public static getIttsuWaitingTiles(hand: Tile[], melds: Tile[][]): Tile[] {
+        return this.checkIttsu(hand, melds).waitingTiles;
+    }
+
+    /**
+     * 检查一气通贯的状态
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 包含完成状态、听牌状态和待牌的对象
+     */
+    public static checkIttsuState(hand: Tile[], melds: Tile[][]): { 
+        isComplete: boolean; 
+        isTenpai: boolean; 
+        waitingTiles: Tile[];
+        completeSuit?: TileType;
+    } {
+        return this.checkIttsu(hand, melds);
+    }
+
+    /**
+     * 检查一气通贯的状态
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 包含完成状态、听牌状态、待牌和完成的花色的对象
+     */
+    private static checkIttsu(hand: Tile[], melds: Tile[][]): { 
+        isComplete: boolean; 
+        isTenpai: boolean; 
+        waitingTiles: Tile[];
+        completeSuit?: TileType;
+    } {
+        const totalTiles = hand.length + melds.reduce((sum, meld) => sum + meld.length, 0);
+        if (totalTiles !== 13 && totalTiles !== 14) {
+            return { isComplete: false, isTenpai: false, waitingTiles: [] };
         }
 
-        // 获取所有牌
-        const allTiles = [...hand, ...meldTiles];
+        // const allTiles = [...hand, ...melds.flat()];
+        const allTiles = [...hand, ...melds.reduce((acc, val) => acc.concat(val), [])];
 
-        // 分别检查万、筒、索三种花色
-        return this.checkSuit(allTiles, TileType.Man) ||
-               this.checkSuit(allTiles, TileType.Pin) ||
-               this.checkSuit(allTiles, TileType.Sou);
+        for (const suitType of [TileType.Man, TileType.Pin, TileType.Sou]) {
+            const result = this.checkSuit(allTiles, suitType);
+            if (result.isComplete) {
+                return { ...result, completeSuit: suitType };
+            }
+            if (result.isTenpai) {
+                return result;
+            }
+        }
+
+        return { isComplete: false, isTenpai: false, waitingTiles: [] };
     }
 
-    private static checkSuit(tiles: Tile[], suitType: TileType): boolean {
-        // 过滤出指定花色的牌
+    private static checkSuit(tiles: Tile[], suitType: TileType): {
+        isComplete: boolean;
+        isTenpai: boolean;
+        waitingTiles: Tile[];
+    } {
         const suitTiles = tiles.filter(tile => tile.type === suitType);
+        const numbers = new Array(10).fill(0); // 索引0不使用
 
-        // 创建一个数组来记录每个数字的出现情况
-        const numbers = new Array(10).fill(false); // 索引0不使用
-
-        // 标记出现的数字
         suitTiles.forEach(tile => {
-            numbers[tile.value as number] = true;
+            numbers[tile.value as number]++;
         });
 
-        // 检查是否存在1-9的连续序列
-        return numbers.slice(1).every(exists => exists);
+        const isComplete = numbers.slice(1).every(count => count > 0);
+        if (isComplete) {
+            return { isComplete: true, isTenpai: false, waitingTiles: [] };
+        }
+
+        const missingNumbers = numbers.slice(1).reduce((acc, count, index) => {
+            if (count === 0) acc.push(index + 1);
+            return acc;
+        }, [] as number[]);
+
+        const isTenpai = missingNumbers.length === 1;
+        const waitingTiles = isTenpai ? [new Tile(suitType, missingNumbers[0])] : [];
+
+        return { isComplete: false, isTenpai, waitingTiles };
     }
 }
+
 
 
 // 首先检查总牌数（手牌 + 鸣牌）是否为14张。
@@ -76,3 +146,15 @@ export class Ittsu {
 // const isNotIttsu = Ittsu.verifyIttsu(hand2, melds2);
 // console.log(isNotIttsu); // 输出: false
 
+// // 独立检查是否为一气通贯和牌
+// console.log("是否为一气通贯:", Ittsu.verifyIttsu(hand, melds));
+
+// // 独立检查是否为一气通贯听牌
+// console.log("是否为一气通贯听牌:", Ittsu.isIttsuTenpai(hand, melds));
+
+// // 独立获取一气通贯听牌的待牌
+// console.log("一气通贯听牌的待牌:", Ittsu.getIttsuWaitingTiles(hand, melds).map(tile => tile.toString()));
+
+// // 一次性获取完整的状态信息
+// const state = Ittsu.checkIttsuState(hand, melds);
+// console.log("完整状态:", state);

@@ -1,43 +1,133 @@
-
 import { Tile, TileType } from "../Tile";
-//混老头
+//混全带幺九
 export class Honroutou {
+    /**
+     * 验证是否为混老头和牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 是否为混老头和牌
+     */
     public static verifyHonroutou(hand: Tile[], melds: Tile[][]): boolean {
-        // 展开嵌套数组
-        const meldTiles = melds.reduce((acc, meld) => acc.concat(meld), []);
-        
-        // 检查总牌数是否为14张
-        const totalTiles = hand.length + meldTiles.length;
-        if (totalTiles !== 14) {
-            return false;
+        return this.checkHonroutou(hand, melds).isComplete;
+    }
+
+    /**
+     * 检查是否为混老头听牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 是否为混老头听牌
+     */
+    public static isHonroutouTenpai(hand: Tile[], melds: Tile[][]): boolean {
+        return this.checkHonroutou(hand, melds).isTenpai;
+    }
+
+    /**
+     * 获取混老头听牌时的待牌
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 待牌数组
+     */
+    public static getHonroutouWaitingTiles(hand: Tile[], melds: Tile[][]): Tile[] {
+        return this.checkHonroutou(hand, melds).waitingTiles;
+    }
+
+    /**
+     * 检查混老头的状态
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 包含完成状态、听牌状态和待牌的对象
+     */
+    public static checkHonroutouState(hand: Tile[], melds: Tile[][]): { 
+        isComplete: boolean; 
+        isTenpai: boolean; 
+        waitingTiles: Tile[];
+    } {
+        return this.checkHonroutou(hand, melds);
+    }
+
+    /**
+     * 检查混老头的状态
+     * @param hand 手牌数组
+     * @param melds 副露数组
+     * @returns 包含完成状态、听牌状态和待牌的对象
+     */
+    private static checkHonroutou(hand: Tile[], melds: Tile[][]): { 
+        isComplete: boolean; 
+        isTenpai: boolean; 
+        waitingTiles: Tile[];
+    } {
+        const totalTiles = hand.length + melds.reduce((sum, meld) => sum + meld.length, 0);
+        if (totalTiles !== 13 && totalTiles !== 14) {
+            return { isComplete: false, isTenpai: false, waitingTiles: [] };
         }
 
-        // 获取所有牌
-        const allTiles = [...hand, ...meldTiles];
+        // const allTiles = [...hand, ...melds.flat()];
+        const allTiles = [...hand, ...melds.reduce((acc, val) => acc.concat(val), [])];
 
-        // 检查是否所有牌都是幺九牌或字牌
-        const isYaochuuOrHonor = (tile: Tile): boolean => {
-            if (tile.type === TileType.Wind || tile.type === TileType.Dragon) {
-                return true;
-            }
-            if ((tile.type === TileType.Man || tile.type === TileType.Pin || tile.type === TileType.Sou) && 
-                (tile.value === 1 || tile.value === 9)) {
-                return true;
-            }
-            return false;
-        };
-
-        // 检查所有牌
-        for (const tile of allTiles) {
-            if (!isYaochuuOrHonor(tile)) {
-                return false;
-            }
+        if (!allTiles.every(this.isYaochuuOrHonor)) {
+            return { isComplete: false, isTenpai: false, waitingTiles: [] };
         }
 
-        // 如果所有牌都通过了检查，则是混老头
-        return true;
+        const isComplete = totalTiles === 14;
+        if (isComplete) {
+            return { isComplete: true, isTenpai: false, waitingTiles: [] };
+        }
+
+        // 检查听牌状态
+        const tileCounts = this.countTiles(allTiles);
+        const waitingTiles = this.getWaitingTiles(tileCounts);
+        const isTenpai = waitingTiles.length > 0;
+
+        return { isComplete: false, isTenpai, waitingTiles };
+    }
+
+    /**
+     * 检查一张牌是否为幺九牌或字牌
+     * @param tile 待检查的牌
+     * @returns 是否为幺九牌或字牌
+     */
+    private static isYaochuuOrHonor(tile: Tile): boolean {
+        if (tile.type === TileType.Wind || tile.type === TileType.Dragon) {
+            return true;
+        }
+        if ((tile.type === TileType.Man || tile.type === TileType.Pin || tile.type === TileType.Sou) && 
+            (tile.value === 1 || tile.value === 9)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 统计牌的数量
+     * @param tiles 牌数组
+     * @returns 牌数量统计对象
+     */
+    private static countTiles(tiles: Tile[]): Map<string, number> {
+        const counts = new Map<string, number>();
+        for (const tile of tiles) {
+            const key = `${tile.type}-${tile.value}`;
+            counts.set(key, (counts.get(key) || 0) + 1);
+        }
+        return counts;
+    }
+
+    /**
+     * 获取待牌
+     * @param tileCounts 牌数量统计对象
+     * @returns 待牌数组
+     */
+    private static getWaitingTiles(tileCounts: Map<string, number>): Tile[] {
+        const waitingTiles: Tile[] = [];
+        for (const [key, count] of tileCounts.entries()) {
+            if (count === 1 || count === 4) {
+                const [type, value] = key.split('-');
+                waitingTiles.push(new Tile(type as TileType, value as any));
+            }
+        }
+        return waitingTiles;
     }
 }
+
 
 
 
@@ -74,3 +164,19 @@ export class Honroutou {
 
 // const isNotHonroutou = Honroutou.verifyHonroutou(hand2, melds2);
 // console.log(isNotHonroutou); // 输出: false
+
+// const hand: Tile[] = [/* ... */];
+// const melds: Tile[][] = [/* ... */];
+
+// // 独立检查是否为混老头和牌
+// console.log("是否为混老头:", Honroutou.verifyHonroutou(hand, melds));
+
+// // 独立检查是否为混老头听牌
+// console.log("是否为混老头听牌:", Honroutou.isHonroutouTenpai(hand, melds));
+
+// // 独立获取混老头听牌的待牌
+// console.log("混老头听牌的待牌:", Honroutou.getHonroutouWaitingTiles(hand, melds).map(tile => tile.toString()));
+
+// // 一次性获取完整的状态信息
+// const state = Honroutou.checkHonroutouState(hand, melds);
+// console.log("完整状态:", state);
