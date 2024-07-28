@@ -14,7 +14,7 @@ export interface IEffect {
  *  所有效果的基类
  *  子类必须实现调用 complete() 方法来结束效果
  */
-export abstract class BaseEffect extends EventTarget implements IEffect {
+export abstract class BaseEffect implements IEffect {
     protected completeCallbacks: (() => void)[] = [];
 
     abstract apply(target: Node, ...args: any[]): void;
