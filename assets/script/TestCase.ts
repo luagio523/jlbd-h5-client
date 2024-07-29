@@ -7,8 +7,8 @@ import { testFixedPoint } from './core/common/fixed/fixed';
 import { ActType } from "./rpg/enum/Act";
 import scheduler from "./utils/scheduler";
 import { AnimResourceType } from "./core/animation/Type";
-import { Character } from "./rpg/render/unit/Unit";
-import { CharacterEditor } from "./rpg/render/unit/UnitEditor";
+import { Unit } from "./rpg/render/unit/Unit";
+import { UnitEditor } from "./rpg/render/unit/UnitEditor";
 import { GameWorld } from "./rpg/GameWorld";
 import { EntityData,  } from "./rpg/data/EntityData";
 import { EntityType } from "./rpg/enum/Type";
@@ -126,12 +126,12 @@ export namespace testcase {
     }
 
     //    contain anim/sheetbody/body803_1_1r.json
-    var characterRenderer: CharacterEditor = null;
+    var unitRenderer: UnitEditor = null;
     export async function app_test11() {
-        let characterRenderer = new CharacterEditor(AnimResourceType.EgretSpriteSheet);
-        await characterRenderer.setup();
-        gameNode.addChild(characterRenderer.getNode());
-        characterRenderer.updateCharacterStatus('gamars', 100, 50);
+        let unitRenderer = new UnitEditor(AnimResourceType.EgretSpriteSheet);
+        await unitRenderer.setup();
+        gameNode.addChild(unitRenderer.getNode());
+        unitRenderer.updateUnitStatus('gamars', 100, 50);
 
         const actionOptions: ActionOptions = {
             modelName: 'body803',
@@ -141,26 +141,26 @@ export namespace testcase {
             // callback: () => console.log('Action completed')
         };
 
-        characterRenderer.playAction(actionOptions);
+        unitRenderer.playAction(actionOptions);
 
-        // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
+        // unitRenderer.updatePosition(Math.random()*1000,Math.random()*700);
 
-        characterRenderer.setPosition(500, 300);
+        unitRenderer.setPosition(500, 300);
         scheduler.scheduleUpdateGlobal((dt: number) => {
-            characterRenderer.update(dt);
+            unitRenderer.update(dt);
         });
-        // characterRenderer.destroy();
+        // unitRenderer.destroy();
     }
 
     export function app_test12() {
-        if (characterRenderer) {
+        if (unitRenderer) {
             const actionOptions: ActionOptions = {
                 modelName: 'Heavy',
                 action: ActType.ACT_ATTACK,
                 // direction: 2,
                 // gender: 1,
             };
-            characterRenderer.playAction(actionOptions);
+            unitRenderer.playAction(actionOptions);
         }
     }
 
@@ -189,9 +189,9 @@ export namespace testcase {
 
 
     export async function app_test15() {
-        let characterRenderer = Character.create(AnimResourceType.SpriteAltas);
-        await characterRenderer.setup();
-        gameNode.addChild(characterRenderer.getNode());
+        let unitRenderer = Unit.create(AnimResourceType.SpriteAltas);
+        await unitRenderer.setup();
+        gameNode.addChild(unitRenderer.getNode());
 
         const actionOptions: ActionOptions = {
             modelName: 'Alfadriel',
@@ -202,22 +202,22 @@ export namespace testcase {
             // callback: () => console.log('Action completed')
         };
 
-        characterRenderer.playAction(actionOptions);
+        unitRenderer.playAction(actionOptions);
 
-        // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
+        // unitRenderer.updatePosition(Math.random()*1000,Math.random()*700);
 
-        characterRenderer.setPosition(500, 300);
+        unitRenderer.setPosition(500, 300);
         scheduler.scheduleUpdateGlobal((dt: number) => {
-            characterRenderer.update(dt);
+            unitRenderer.update(dt);
         });
-        // characterRenderer.destroy();
+        // unitRenderer.destroy();
     }
 
 
     export async function app_test16() {
-        let characterRenderer = Character.create(AnimResourceType.SpriteAltas);
-        await characterRenderer.setup();
-        gameNode.addChild(characterRenderer.getNode());
+        let unitRenderer = Unit.create(AnimResourceType.SpriteAltas);
+        await unitRenderer.setup();
+        gameNode.addChild(unitRenderer.getNode());
 
         const actionOptions: ActionOptions = {
             modelName: 'Thief',
@@ -228,14 +228,14 @@ export namespace testcase {
             // callback: () => console.log('Action completed')
         };
 
-        characterRenderer.playAction(actionOptions);
+        unitRenderer.playAction(actionOptions);
 
-        // characterRenderer.updatePosition(Math.random()*1000,Math.random()*700);
+        // unitRenderer.updatePosition(Math.random()*1000,Math.random()*700);
 
         scheduler.scheduleUpdateGlobal((dt: number) => {
-            characterRenderer.update(dt);
+            unitRenderer.update(dt);
         });
-        // characterRenderer.destroy();
+        // unitRenderer.destroy();
     }
 
 

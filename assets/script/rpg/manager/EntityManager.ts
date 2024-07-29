@@ -53,11 +53,7 @@ export class EntityManager {
         let characterRenderer = await this.renderableManager.createCharacter(modelType  as AnimResourceType);
         render.initialize(characterRenderer);
 
-        // const actionOptions: ActionOptions = {
-        //     modelName: 'Thief',
-        //     action: ActType.ACT_WALK,
-        // };
-        // characterRenderer.playAction(actionOptions);
+ 
 
         return entity;
     }

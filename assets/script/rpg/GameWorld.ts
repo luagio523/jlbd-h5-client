@@ -12,6 +12,8 @@ import MapManager from "./manager/MapManager";
 import { InitRoleEvent, RPGEvent } from "./event/Event";
 import { EntityType } from "./enum/Type";
 import { UnitRenderComponent } from "./component/UnitRenderComponent";
+import { ActionOptions } from "./base/UnitAnimationState";
+import { ActType } from "./enum/Act";
 const { ccclass, property } = _decorator;
 
 export class GameWorld   {
@@ -83,10 +85,18 @@ export class GameWorld   {
     private async initRole(evt: InitRoleEvent): Promise<void> {
         const data = EntityData.create( evt.name,evt.id, EntityType.Role);
         const role = await this.entityManager.createEntity(data);
-        
-        let uint = role.getComponent(UnitRenderComponent)
         this.sceneManager.addEntity(role);
+        let uint = role.getComponent(UnitRenderComponent).unit;
+        uint.setPosition(400, 400);
+        
         // this.sceneManager.initialize(this.node);
+
+
+        const actionOptions: ActionOptions = {
+            modelName: 'Thief',
+            action: ActType.ACT_WALK,
+        };
+        uint.playAction(actionOptions);
     }
 
 
