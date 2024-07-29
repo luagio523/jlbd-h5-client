@@ -1,5 +1,7 @@
-import { Node, Sprite, Material, resources, tween, Vec3, Color, UITransform, _decorator } from 'cc';
+import { Node, Sprite, Material, resources, tween, Vec3, Color, UITransform, _decorator, Tween } from 'cc';
 import { Effect } from './__private';
+import { BaseEffect } from './Effect';
+import scheduler from '../../utils/scheduler';
 
 const { ccclass, property } = _decorator;
 
@@ -25,7 +27,7 @@ export class ParalysisEffect extends BaseEffect {
         this.applyVisualEffect(target);
 
         // 设置定时器以结束效果
-        this.scheduleOnce(() => {
+        scheduler.scheduleOnce(() => {
             this.reset();
             this.complete();
         }, duration);

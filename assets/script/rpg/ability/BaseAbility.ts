@@ -1,10 +1,7 @@
 import { ECSEntity } from "../ecs/ECSEntity";
-import { ModifierManager } from "../manager/ModifierManager";
 import { DamageType } from "../enum/Damage";
-import { AttackComponent } from "../component/AttackComponent";
 import { AbilityBehavior } from "../enum/Type";
-import { Vec2 } from "cc";
-import { AbilityData } from "../data/AbilityData";
+import { AbilityKV } from "../data/kv/AbilityKV";
 
 // OnAbilityPhaseStart(): boolean; 这个函数在英雄开始释放技能，也就是技能施法前摇的时候被调用。如果这个函数返回true，英雄会继续施法，然后OnSpellStart() 会被调用。如果返回false，英雄将取消施法，并且OnSpellStart() 不会被调用。
 // 这两者的主要区别在于，OnSpellStart(): void; 是在技能成功释放后调用的，而 OnAbilityPhaseStart(): boolean; 是在技能开始施法的时候调用。所以这两者的主要区别在于它们影响技能何时启动，以及技能的效果何时产生。
@@ -17,7 +14,7 @@ import { AbilityData } from "../data/AbilityData";
 export abstract class BaseAbility {
     protected abilityName: string;
     protected index: number;
-    protected abilityData: AbilityData;
+    protected abilityKV: AbilityKV;
     protected level: number;
     protected toggled: boolean;
     protected caster: ECSEntity | null;
@@ -26,10 +23,10 @@ export abstract class BaseAbility {
     private activated: boolean; // 是否已经开始施法
 
 
-    constructor(abilityName: string, index: number, abilityData: AbilityData) {
+    constructor(abilityName: string, index: number, abilityKV: AbilityKV) {
         this.abilityName = abilityName;
         this.index = index;
-        this.abilityData = abilityData;
+        this.abilityKV = abilityKV;
         this.level = 0;
         this.toggled = false;
         this.caster = null;
@@ -65,27 +62,27 @@ export abstract class BaseAbility {
     }
 
     public GetSpecialValueFor(name: string): number {
-        return this.abilityData.GetLevelSpecialValueFor(name, this.level);
+        return this.abilityKV.GetLevelSpecialValueFor(name, this.level);
     }
 
     public GetMaxLevel(): number {
-        return this.abilityData.GetMaxLevel();
+        return this.abilityKV.GetMaxLevel();
     }
 
     public GetCooldownTime(): number {
-        return this.abilityData.GetCooldown(this.level);
+        return this.abilityKV.GetCooldown(this.level);
     }
 
     public GetManaCost(): number {
-        return this.abilityData.GetManaCost(this.level);
+        return this.abilityKV.GetManaCost(this.level);
     }
 
     public GetCastRange(): number {
-        return this.abilityData.GetCastRange();
+        return this.abilityKV.GetCastRange();
     }
 
-    public GetAbilityData(): AbilityData {
-        return this.abilityData;
+    public GetAbilityKV(): AbilityKV {
+        return this.abilityKV;
     }
 
     public UpdateCooldown(deltaTime: number): void {
@@ -117,19 +114,19 @@ export abstract class BaseAbility {
     }
 
     public GetBehavior(): AbilityBehavior {
-        return this.abilityData.GetAbilityBehavior();
+        return this.abilityKV.GetAbilityBehavior();
     }
 
     public GetCastPoint(): number {
-        return this.abilityData.GetCastPoint(this.level);
+        return this.abilityKV.GetCastPoint(this.level);
     }
     
     public GetChannelTime(): number {
-        return this.abilityData.GetChannelTime(this.level);
+        return this.abilityKV.GetChannelTime(this.level);
     }
 
     public GetAbilityDamage(): number { 
-        return this.abilityData.GetAbilityDamage(this.level); 
+        return this.abilityKV.GetAbilityDamage(this.level); 
     }
     
     
@@ -164,8 +161,8 @@ export abstract class BaseAbility {
 
 
 // export class BaseAttackAbility extends BaseAbility {
-//     constructor(abilityData: AbilityData) {
-//         super("base_attack", 0, abilityData);
+//     constructor(abilityKV: AbilityData) {
+//         super("base_attack", 0, abilityKV);
 //     }
 
 //     public OnAttack(target: ECSEntity | null): void {
@@ -201,8 +198,8 @@ export abstract class BaseAbility {
 // import { BladeFuryModifier } from './BladeFuryModifier';
 
 // export class BladeFuryAbility extends BaseAbility {
-//     constructor(abilityName: string, index: number, abilityData: AbilityData) {
-//         super(abilityName, index, abilityData);
+//     constructor(abilityName: string, index: number, abilityKV: AbilityData) {
+//         super(abilityName, index, abilityKV);
 //     }
 
 //     public OnSpellStart(): void {
@@ -426,8 +423,8 @@ export abstract class BaseAbility {
 
 
 // class BladeFuryAbility extends BaseAbility {
-//     constructor(abilityData: AbilityData) {
-//         super("juggernaut_blade_fury", 0, abilityData);
+//     constructor(abilityKV: AbilityData) {
+//         super("juggernaut_blade_fury", 0, abilityKV);
 //     }
 
 //     public OnSpellStart(): void {
@@ -516,8 +513,8 @@ export abstract class BaseAbility {
 
 
 // class AttackAbility extends BaseAbility {
-//     constructor(abilityData: AbilityData) {
-//         super("attack", 0, abilityData);
+//     constructor(abilityKV: AbilityData) {
+//         super("attack", 0, abilityKV);
 //     }
 
 //     public OnSpellStart(): void {
@@ -563,8 +560,8 @@ export abstract class BaseAbility {
 
 
 // class BasicAttackAbility extends BaseAbility {
-//     constructor(abilityData: AbilityData) {
-//         super("basic_attack", 0, abilityData);
+//     constructor(abilityKV: AbilityData) {
+//         super("basic_attack", 0, abilityKV);
 //     }
 
 //     public OnSpellStart(): void {

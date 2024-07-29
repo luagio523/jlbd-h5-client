@@ -26,9 +26,8 @@ export class StatusBar extends UIElement {
         this.foregroundSprite.fillType = Sprite.FillType.HORIZONTAL;
     }
 
-    public static async create(width: number = 100, height: number = 10): Promise<StatusBar> {
+    public static  create(width: number = 100, height: number = 10): StatusBar {
         const statusBar = new StatusBar(width, height);
-        await statusBar.setup();
         return statusBar;
     }
 

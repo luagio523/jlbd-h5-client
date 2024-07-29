@@ -31,8 +31,9 @@ export class KVManager extends Component {
     }
 
     public async getHero(heroName: string): Promise<KVNode | undefined> {
+        let key = 'hero_'+heroName.toLowerCase();
         const heroesKV = await this.getKVData('config/npc_heroes_custom');
-        return heroesKV['DOTAHeroes'][heroName] as KVNode;
+        return heroesKV['DOTAHeroes'][key] as KVNode;
     }
 
     public async getItem(itemName: string): Promise<KVNode | undefined> {        

@@ -5,15 +5,13 @@
 import { AnimResourceType } from "../../core/animation/Type";
 import { ActionOptions } from "../base/ActAnimationState";
 import { RenderableComponent } from "../component/RenderableComponent";
-import { HeroData } from "../data/HeroData";
+import { EntityData } from "../data/EntityData";
+import { HeroKV } from "../data/kv/HeroKV";
 import { ECSEntity } from "../ecs/ECSEntity";
 import GameEntity from "../entity/Entity";
-import { ActType } from "../enum/Act";
-import { EntityType } from "../enum/Type";
 import EntityFactory from "../factory/EntityFactory";
 import { KVManager } from "./KVManager";
 import { RenderableManager } from "./RenderableManager";
-import { SceneManager } from "./SceneManager";
 
 
 
@@ -27,7 +25,6 @@ export class EntityManager {
 
     private entityFactory: EntityFactory = EntityFactory.getInstance();
     private renderableManager:RenderableManager = RenderableManager.getInstance();
-    private sceneManager:SceneManager = SceneManager.getInstance();
     private constructor() {}
 
     public static getInstance(): EntityManager {
@@ -38,24 +35,28 @@ export class EntityManager {
     }
 
 
-    public async addEntity(name: string): Promise<void> {
-        const entity = this.entityFactory.createEntity(EntityType.Role);
-        // const kvData = KVManager.getInstance().getKVData(name);
-        // const heroData = new HeroData()
-        // heroData.deserialize(kvData); 
-        let render = entity.getComponent(RenderableComponent);
-        let resourceType = AnimResourceType.SpriteAltas;
-        let characterRenderer = await this.renderableManager.createCharacterRender(resourceType);
-        render.initialize(characterRenderer);
+    public async createEntity(data: EntityData): Promise<ECSEntity> {
+        const kvData = await KVManager.getInstance().getHero(data.name);
+        console.log("createEntity",kvData);
+        const herokv = new HeroKV()
+        herokv.deserialize(kvData); 
+       
+        console.log("createEntity",herokv);
 
-        const actionOptions: ActionOptions = {
-            modelName: 'Thief',
-            action: ActType.ACT_WALK,
-         
-        };
-        characterRenderer.playAction(actionOptions);
+        const entity = this.entityFactory.createEntity(data.type);
+       
+        // let render = entity.getComponent(RenderableComponent);
+        // let resourceType = AnimResourceType.SpriteAltas;
+        // let characterRenderer = await this.renderableManager.createCharacter(resourceType);
+        // render.initialize(characterRenderer);
 
-        this.sceneManager.addEntity(entity); // 加入场景
+        // const actionOptions: ActionOptions = {
+        //     modelName: 'Thief',
+        //     action: ActType.ACT_WALK,
+        // };
+        // characterRenderer.playAction(actionOptions);
+
+        return entity;
     }
     
     removeEntity(entity: GameEntity): void {

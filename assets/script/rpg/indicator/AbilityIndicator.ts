@@ -1,7 +1,7 @@
 import { Vec2 } from "cc";
 import { BaseAbility } from "../ability/BaseAbility";
 import { AbilityBehavior } from "../enum/Type";
-import { RangeIndicator } from "../base/RangeIndicator";
+import { RangeIndicator } from "./RangeIndicator";
 
 export abstract class AbilityIndicator {
     protected ability: BaseAbility;

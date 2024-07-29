@@ -1,10 +1,10 @@
-import { ItemData } from "../data/ItemData";
+import { ItemKV } from "../data/kv/ItemKV";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { InventorySlot } from "../enum/Item";
 
 
 export class EquipmentComponent extends ECSComponent {
-    private equipment: Map<InventorySlot, ItemData | null> = new Map<InventorySlot, ItemData | null>();
+    private equipment: Map<InventorySlot, ItemKV | null> = new Map<InventorySlot, ItemKV | null>();
 
     constructor() {
         super();
@@ -20,7 +20,7 @@ export class EquipmentComponent extends ECSComponent {
         });
     }
 
-    public equip(item: ItemData): boolean {
+    public equip(item: ItemKV): boolean {
         const slot = item.GetItemSlots()[0];
         if (this.canEquip(slot)) {
             this.unequip(slot);
@@ -34,7 +34,7 @@ export class EquipmentComponent extends ECSComponent {
         this.equipment.set(slot, null);
     }
 
-    public getEquippedItem(slot: InventorySlot): ItemData | null {
+    public getEquippedItem(slot: InventorySlot): ItemKV | null {
         return this.equipment.get(slot) || null;
     }
 
@@ -50,7 +50,7 @@ export class EquipmentComponent extends ECSComponent {
     //     }
     // }
 
-    // private applyItemAttributes(heroData: HeroData, item: ItemData): void {
+    // private applyItemAttributes(heroData: HeroData, item: ItemKV): void {
     //     for (const { attribute, value } of item.GetItemAttributes()) {
     //         switch (attribute) {
     //             case ItemAttribute.STRENGTH:

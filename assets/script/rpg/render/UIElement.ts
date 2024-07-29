@@ -25,13 +25,7 @@ export abstract class UIElement {
         return this.node;
     }
 
-    public getUIOpacity(): UIOpacity {
-        let uiOpacity = this.node.getComponent(UIOpacity);
-        if (!uiOpacity) {
-            uiOpacity = this.node.addComponent(UIOpacity);
-        }
-        return uiOpacity;
-    }
+    
 
     protected async loadResource<T>(path: string, type: typeof Asset): Promise<T> {
         return new Promise((resolve, reject) => {

@@ -1,0 +1,52 @@
+// petrify.effect
+
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: sprite-vs:vert
+      frag: sprite-fs:frag
+      blendState:
+        targets:
+        - blend: true
+          blendSrc: src_alpha
+          blendDst: one_minus_src_alpha
+          blendSrcAlpha: src_alpha
+          blendDstAlpha: one_minus_src_alpha
+      properties:
+        mainTexture:    { value: white }
+        stoneTexture:   { value: gray }
+        petrifyProgress: { value: 0.0, range: [0.0, 1.0] }
+}%
+
+CCProgram sprite-vs %{
+  // 顶点着色器代码
+  // ...
+}%
+
+CCProgram sprite-fs %{
+  precision highp float;
+  #include <cc-global>
+
+  in vec4 v_color;
+  in vec2 v_uv0;
+
+  uniform sampler2D mainTexture;
+  uniform sampler2D stoneTexture;
+  uniform Constant {
+    float petrifyProgress;
+  };
+
+  void main () {
+    vec4 originalColor = texture(mainTexture, v_uv0);
+    vec4 stoneColor = texture(stoneTexture, v_uv0);
+    
+    // 混合原始颜色和石头颜色
+    vec4 finalColor = mix(originalColor, stoneColor, petrifyProgress);
+
+    // 添加一些裂纹效果
+    float crack = fract(sin(dot(v_uv0, vec2(12.9898, 78.233))) * 43758.5453);
+    finalColor.rgb *= 1.0 - (crack * petrifyProgress * 0.2);
+
+    gl_FragColor = finalColor;
+  }
+}%

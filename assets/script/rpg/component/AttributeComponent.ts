@@ -1,4 +1,4 @@
-import { HeroData } from "../data/HeroData";
+import { HeroData } from "../data/HeroKV";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { Attributes } from "../enum/Type";
 
