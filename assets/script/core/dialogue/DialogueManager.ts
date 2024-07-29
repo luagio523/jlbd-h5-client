@@ -1,6 +1,7 @@
 import { _decorator, resources, JsonAsset } from 'cc';
 import { MessageManager } from '../common/event/MessageManager';
 import { DialogueEvent } from './Dialogue';
+import { StorageManager } from '../common/storage/StorageManager';
 const { ccclass } = _decorator;
 
 @ccclass('DialogueManager')
@@ -71,11 +72,11 @@ export class DialogueManager {
             segmentId: this.currentSegmentId,
             dialogueIndex: this.currentDialogueIndex
         };
-        localStorage.setItem("dialogueProgress", JSON.stringify(progress));
+        StorageManager.getInstance().setItem("dialogueProgress", progress);
     }
 
     loadProgress() {
-        const progress = JSON.parse(localStorage.getItem("dialogueProgress"));
+        const progress = StorageManager.getInstance().getItem<any>("dialogueProgress");
         if (progress && progress.segmentId === this.currentSegmentId) {
             this.currentDialogueIndex = progress.dialogueIndex;
         }
