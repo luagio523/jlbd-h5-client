@@ -1,13 +1,14 @@
-import { Camera, Node, Rect, TiledMap, TiledMapAsset, Vec3, resources } from "cc";
+import { Camera, Node, Rect, TiledMap, TiledMapAsset, Vec2, Vec3, resources } from "cc";
 import { GameMap } from "../map/GameMap";
 import { MapDisplay } from "../map/MapDisplay";
-import { EnterMapEvent } from "../event/Event";
+import { EnterMapEvent, InitedMapEvent } from "../event/Event";
 import app from "../../App";
 import { EventDispatcher } from "../event/EventManager";
 import { ColliderManager } from "./ColliderManager";
 import { AdaptionManager } from "../../core/common/Adaption/AdaptionManager";
 import { CameraController } from "../map/CameraController";
 import { CameraEffectsManager } from "./CameraEffectsManager";
+import { SLayerType, SceneManager } from "./SceneManager";
 
 
 export default class MapManager {
@@ -39,30 +40,25 @@ export default class MapManager {
         return this.gameMap;
     }
 
-    public initialize(mapDisplay: MapDisplay, cameraNode: Node): void {
-        if (this.mapDisplay) {
-            return;
-        }
+    public initialize(cameraNode: Node): void {
+        this.mapDisplay = new MapDisplay()
+        SceneManager.getInstance().addToLayer(SLayerType.Map,this.mapDisplay); //添加到场景
 
         this.setupCamera(cameraNode);//设置相机
         CameraEffectsManager.getInstance().initialize(this.cameraController); //设置相机特效管理器
-
         ColliderManager.getInstance().initialize(this.gameMap);
 
-        let adaptionManager = AdaptionManager.getInstance();
+        let adaptionManager = AdaptionManager.getInstance(); //适配
         adaptionManager.on("adaption-updated", (safeArea) => {
             this.adaptForMap(safeArea);
         });
 
         this.gameMap = new GameMap();
         this.gameMap.updateVisibleArea(adaptionManager.getSafeArea());
-        
 
-        this.mapDisplay = mapDisplay;   //地图显示层
         this.mapDisplay.initialize(this.gameMap,this.cameraController);
         this.mapDisplay.updateVisibleArea(adaptionManager.getSafeArea());
         this.tiledMap = this.mapDisplay.getTiledMap();
-        
     }
 
     private setupCamera(cameraNode: Node): void {
@@ -79,16 +75,22 @@ export default class MapManager {
         this.cameraController.deadZoneWidth = 100;
         this.cameraController.deadZoneHeight = 100;
     }
-
-    public updateCameraTarget(targetNode: Node): void {
+    /**
+     * 设置相机跟踪目标
+     * @param targetNode 
+     */
+    public setCameraTarget(targetNode: Node): void {
         if (this.cameraController) {
             this.cameraController.target = targetNode;
         }
     }
-
-    public setCameraPosition(position: Vec3): void {
-        if (this.cameraNode) {
-            this.cameraNode.setPosition(position);
+    /**
+     * 设置相机焦点
+     * @param position 
+     */
+    public setCameraFocus(position: Vec2): void {
+        if (this.mapDisplay) {
+            this.mapDisplay.setCameraFocus(position);
         }
     }
 
@@ -108,8 +110,6 @@ export default class MapManager {
     }
 
     public async enterMap(mapID: string): Promise<void> {
-        app.log.logView({ mapID }, 'enterMap');
-        
         if (!this.mapDisplay) {
             throw new Error("Map display must be initialized first.");
         }
@@ -124,7 +124,7 @@ export default class MapManager {
             this.gameMap.initWithTiledMap(mapID, this.tiledMap);
             this.mapDisplay.setupMap();
 
-            this.eventDispatcher.trigger(new EnterMapEvent());
+            this.eventDispatcher.trigger(new InitedMapEvent());
         } catch (err) {
             console.error("Error entering map:", err);
             throw err;
@@ -132,8 +132,6 @@ export default class MapManager {
     }
 
     private loadTiledMapAsset(mapPath: string): Promise<TiledMapAsset> {
-        app.log.logView({ mapPath }, 'loadTiledMapAsset');
-        
         return new Promise((resolve, reject) => {
             resources.load(mapPath, TiledMapAsset, (err, tiledMapAsset) => {
                 if (err) {

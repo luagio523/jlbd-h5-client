@@ -1,19 +1,12 @@
 
 import { _decorator, Component, Node, Vec3, director } from 'cc';
+import { GameWorld } from '../../rpg/GameWorld';
 const { ccclass, property } = _decorator;
 
 /** 游戏世界管理 */
 @ccclass('GameManager')
 export class GameManager extends Component {
-    // private static instance: GameManager | null = null;
-    //  // 获取单例实例
-    //  public static getInstance(): GameManager {
-    //     if (!GameManager.instance) {
-    //         GameManager.instance = new GameManager();
-    //     }
-    //     return GameManager.instance;
-    // }
-
+    private gameWorld:GameWorld
     /** 游戏根节点 */
     private gameRoot!: Node;
     private cameraNode!: Node;
@@ -25,16 +18,15 @@ export class GameManager extends Component {
         this.initialize(gameRoot, cameraNode);
     }
 
-   
-
     public initialize(gameRoot: Node, cameraNode: Node): void {
         this.gameRoot = gameRoot;
         this.cameraNode = cameraNode;
+        this.gameWorld = new GameWorld(this.gameRoot, this.cameraNode);
     }
 
     /** 获取游戏根节点 */
-    public getGameRoot(): Node {
-        return this.gameRoot;
+    public getGameWorld(): GameWorld {
+        return this.gameWorld;
     }
 
     /** 设置游戏动画速度 */
@@ -59,6 +51,9 @@ export class GameManager extends Component {
 
     private updateDt(dt: number) {
         // 实现更新逻辑
+        if(this.gameWorld){
+            this.gameWorld.update(dt);
+        }
     }
 
     /** 暂停游戏 */
@@ -76,48 +71,5 @@ export class GameManager extends Component {
         // 实现重启逻辑
     }
 
-    /** 添加节点到游戏根节点 */
-    public addToGameRoot(node: Node): void {
-        this.gameRoot.addChild(node);
-    }
-
-    /** 从游戏根节点移除节点 */
-    public removeFromGameRoot(node: Node): void {
-        this.gameRoot.removeChild(node);
-    }
-
-    /** 设置游戏根节点位置 */
-    public setGameRootPosition(position: Vec3): void {
-        this.gameRoot.setPosition(position);
-    }
-
-    /** 获取游戏根节点的子节点 */
-    public getGameChild(name: string): Node | null {
-        return this.gameRoot.getChildByName(name);
-    }
-
-    /** 获取游戏根节点的所有子节点 */
-    public getAllGameChildren(): Node[] {
-        return this.gameRoot.children;
-    }
-
-    /** 清空游戏根节点的所有子节点 */
-    public clearGameRoot(): void {
-        this.gameRoot.removeAllChildren();
-    }
-
-    /** 设置游戏根节点的激活状态 */
-    public setGameRootActive(active: boolean): void {
-        this.gameRoot.active = active;
-    }
-
-    /** 获取游戏根节点的激活状态 */
-    public isGameRootActive(): boolean {
-        return this.gameRoot.active;
-    }
-
-    /** 获取相机节点 */
-    public getCameraNode(): Node {
-        return this.cameraNode;
-    }
+    
 }

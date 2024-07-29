@@ -1,3 +1,4 @@
+import { Vec2 } from "cc";
 import { BaseAbility } from "../ability/BaseAbility";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { ActType } from "../enum/Act";
@@ -38,25 +39,25 @@ export function ecsclass(name: string) {
 
 
 
-export class ApplyDamageEvent implements IEvent{
+export class ApplyDamageEvent implements IEvent {
     public readonly type = RPGEvent.ApplyDamage
     constructor(
         public readonly attacker: ECSEntity,
         public readonly victim: ECSEntity,
         public readonly damage: number,
         public readonly damageType: DamageType,
-        public readonly ability?:BaseAbility,
-        public readonly damageFlag?:DamageFlag,
-    ) {}
+        public readonly ability?: BaseAbility,
+        public readonly damageFlag?: DamageFlag,
+    ) { }
 }
 
 
-export class AttackEvent implements IEvent{
+export class AttackEvent implements IEvent {
     public readonly type = RPGEvent.ApplyDamage
     constructor(
         public readonly attacker: ECSEntity,
         public readonly victim: ECSEntity,
-    ) {}
+    ) { }
 }
 
 
@@ -64,26 +65,26 @@ export class AttackEvent implements IEvent{
 export class DelayedEvent implements IEvent {
     public readonly type = RPGEvent.Delayed
     constructor(
-        public readonly  callback: () => void,
-        public readonly  delay: number
-    ) {}
+        public readonly callback: () => void,
+        public readonly delay: number
+    ) { }
 }
 
 export class AnimationEvent implements IEvent {
     public readonly type = RPGEvent.Animation
     constructor(
-        public readonly  attacker: ECSEntity,
-        public readonly  act: ActType,
-    ) {}
+        public readonly attacker: ECSEntity,
+        public readonly act: ActType,
+    ) { }
 }
 
 
 export class ProjectileEvent implements IEvent {
     public readonly type = RPGEvent.Projectile
     constructor(
-        public readonly  attacker: ECSEntity,
-        public readonly  target: ECSEntity,
-    ) {}
+        public readonly attacker: ECSEntity,
+        public readonly target: ECSEntity,
+    ) { }
 }
 
 
@@ -91,9 +92,9 @@ export class ProjectileEvent implements IEvent {
 export class CastAbilityEvent implements IEvent {
     public readonly type = RPGEvent.AbilityStart
     constructor(
-        public readonly  caster: ECSEntity,
-        public readonly  ability: BaseAbility,
-    ) {}
+        public readonly caster: ECSEntity,
+        public readonly ability: BaseAbility,
+    ) { }
 }
 
 
@@ -101,17 +102,17 @@ export class CastAbilityEvent implements IEvent {
 export class AbilityPhaseStartEvent implements IEvent {
     public readonly type = RPGEvent.AbilityPhaseStart
     constructor(
-        public readonly  caster: ECSEntity,
-        public readonly  ability: BaseAbility,
-    ) {}
+        public readonly caster: ECSEntity,
+        public readonly ability: BaseAbility,
+    ) { }
 }
 
 export class AbilityPhaseInterruptedEvent implements IEvent {
     public readonly type = RPGEvent.AbilityPhaseInterrupted
     constructor(
-        public readonly  caster: ECSEntity,
-        public readonly  ability: BaseAbility,
-    ) {}
+        public readonly caster: ECSEntity,
+        public readonly ability: BaseAbility,
+    ) { }
 }
 
 
@@ -119,33 +120,40 @@ export class AbilityPhaseInterruptedEvent implements IEvent {
 export class AbilityStartEvent implements IEvent {
     public readonly type = RPGEvent.AbilityStart
     constructor(
-        public readonly  caster: ECSEntity,
-        public readonly  ability: BaseAbility,
-    ) {}
+        public readonly caster: ECSEntity,
+        public readonly ability: BaseAbility,
+    ) { }
 }
 
 export class AbilityEndEvent implements IEvent {
     public readonly type = RPGEvent.AbilityEnd
     constructor(
-        public readonly  caster: ECSEntity,
-        public readonly  ability: BaseAbility,
-    ) {}
+        public readonly caster: ECSEntity,
+        public readonly ability: BaseAbility,
+    ) { }
 }
 
 
+export class InitedMapEvent implements IEvent {
+    public readonly type = RPGEvent.InitedMapEvent
+    constructor(
 
+    ) { }
+}
 
 
 export class EnterMapEvent implements IEvent {
     public readonly type = RPGEvent.EnterMap
     constructor(
-    ) {}
+        public readonly mapId: string,
+        public readonly lookAt: Vec2,
+    ) { }
 }
 
 
 
 
-export  enum  RPGEvent {
+export enum RPGEvent {
     ApplyAttack = "ApplyAttack",
     ApplyDamage = "ApplyDamage",
     Delayed = "Delayed",
@@ -157,6 +165,6 @@ export  enum  RPGEvent {
     CastAbility = "CastAbility",
     AbilityStart = "AbilityStart",
     AbilityEnd = "AbilityEnd",
-
+    InitedMapEvent = "InitedMapEvent",
     EnterMap = "EnterMap",
 }
