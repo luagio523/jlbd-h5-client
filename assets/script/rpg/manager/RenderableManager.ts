@@ -2,6 +2,7 @@ import { AnimResourceType } from "../../core/animation/Type";
 import { Character } from "../render/character/Character";
 import { Footprint } from "../render/character/Footprint";
 import { DamageNumber } from "../render/effect/DamageNumber";
+import { ScreenTint } from "../render/effect/ScreenTint";
 
 
 export class RenderableManager {
@@ -76,5 +77,23 @@ export class RenderableManager {
     public recycleFootprint(footprint: Footprint) {
         footprint.reset();
         this.footprintPool.push(footprint);
+    }
+
+
+
+    private screenTintPool: ScreenTint[] = [];
+
+
+    public async createScreenTint(width: number, height: number): Promise<ScreenTint> {
+        if (this.screenTintPool.length > 0) {
+            return this.screenTintPool.pop()!;
+        } else {
+            return await ScreenTint.create(width, height);
+        }
+    }
+
+    public recycleScreenTint(screenTint: ScreenTint) {
+        screenTint.reset();
+        this.screenTintPool.push(screenTint);
     }
 }

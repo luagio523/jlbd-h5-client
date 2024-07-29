@@ -1,4 +1,4 @@
-import { Node, UITransform, Vec3, Color, resources, Asset } from 'cc';
+import { Node, UITransform, Vec3, Color, resources, Asset, UIOpacity } from 'cc';
 
 export abstract class UIElement {
     protected node: Node;
@@ -25,6 +25,14 @@ export abstract class UIElement {
         return this.node;
     }
 
+    public getUIOpacity(): UIOpacity {
+        let uiOpacity = this.node.getComponent(UIOpacity);
+        if (!uiOpacity) {
+            uiOpacity = this.node.addComponent(UIOpacity);
+        }
+        return uiOpacity;
+    }
+
     protected async loadResource<T>(path: string, type: typeof Asset): Promise<T> {
         return new Promise((resolve, reject) => {
             resources.load(path, type, (err, resource) => {
@@ -37,7 +45,7 @@ export abstract class UIElement {
             });
         });
     }
-    
+
     public update(dt:number):void{
 
     }
