@@ -1,18 +1,18 @@
 import { Node, Label, Sprite, Prefab, resources, instantiate, tween, UITransform, Color } from 'cc';
-import { CharacterAnimator } from '../../base/CharacterAnimator';
+import { UnitAnimator } from '../../base/UnitAnimator';
 import { AnimResourceType } from '../../../core/animation/Type';
 import { ResPathUtil } from '../../util/ResPathUtil';
 import { ComponentUtil } from '../../util/ComponentUil';
-import { ActAnimationStateFactory, ActionOptions } from '../../base/ActAnimationState';
+import { UnitAnimationStateFactory, ActionOptions } from '../../base/UnitAnimationState';
 import { UIElement } from '../UIElement';
 
-export class CharacterEditor extends UIElement {
-    private characterNode: Node | null = null;
+export class UnitEditor extends UIElement {
+    private unitNode: Node | null = null;
     private nameLabel: Label | null = null;
     private levelLabel: Label | null = null;
     private healthBar: Sprite | null = null;
     private manaBar: Sprite | null = null;
-    private characterAnimator: CharacterAnimator | null = null;
+    private unitAnimator: UnitAnimator | null = null;
     private shadowNode: Node | null = null;
     private animResourceType: AnimResourceType | null = null;
 
@@ -25,20 +25,20 @@ export class CharacterEditor extends UIElement {
         const actBodyPath = ResPathUtil.getBodyActPrefabPath(this.animResourceType!);
         const prefab = await this.loadResource<Prefab>(actBodyPath, Prefab)
         if(prefab){
-            this.characterNode = instantiate(prefab);
-            this.node.addChild(this.characterNode);
+            this.unitNode = instantiate(prefab);
+            this.node.addChild(this.unitNode);
         }
-        this.nameLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'nameLabel', Label);
-        this.levelLabel = ComponentUtil.getComponentFromChild(this.characterNode, 'levelLabel', Label);
-        this.healthBar = ComponentUtil.getComponentFromChild(this.characterNode, 'healthBar', Sprite);
-        this.manaBar = ComponentUtil.getComponentFromChild(this.characterNode, 'manaBar', Sprite);
+        this.nameLabel = ComponentUtil.getComponentFromChild(this.unitNode, 'nameLabel', Label);
+        this.levelLabel = ComponentUtil.getComponentFromChild(this.unitNode, 'levelLabel', Label);
+        this.healthBar = ComponentUtil.getComponentFromChild(this.unitNode, 'healthBar', Sprite);
+        this.manaBar = ComponentUtil.getComponentFromChild(this.unitNode, 'manaBar', Sprite);
         
-        this.shadowNode = this.characterNode.getChildByName('shadow');
+        this.shadowNode = this.unitNode.getChildByName('shadow');
 
-        const bodyNode = this.characterNode.getChildByName('Body');
+        const bodyNode = this.unitNode.getChildByName('Body');
         if (bodyNode) {
-            const animationState = ActAnimationStateFactory.createPlayer(bodyNode, this.animResourceType!);
-            this.characterAnimator = new CharacterAnimator(animationState);
+            const animationState = UnitAnimationStateFactory.createPlayer(bodyNode, this.animResourceType!);
+            this.unitAnimator = new CharacterAnimator(animationState);
         }
     }
 
@@ -55,22 +55,22 @@ export class CharacterEditor extends UIElement {
     }
 
     public async playAction(options: ActionOptions) {
-        if (this.characterAnimator) {
-            this.characterAnimator.transitionToState(options);
+        if (this.unitAnimator) {
+            this.unitAnimator.transitionToState(options);
         }
     }
 
     public update(dt: number) {
-        if (this.characterAnimator) this.characterAnimator.update(dt);
+        if (this.unitAnimator) this.unitAnimator.update(dt);
     }
 
     public reset(): void {
-        if (this.characterNode) {
-            this.characterNode.removeFromParent();
-            this.characterNode.destroy();
-            this.characterNode = null;
+        if (this.unitNode) {
+            this.unitNode.removeFromParent();
+            this.unitNode.destroy();
+            this.unitNode = null;
         }
-        this.characterAnimator = null;
+        this.unitAnimator = null;
         this.nameLabel = null;
         this.levelLabel = null;
         this.healthBar = null;
@@ -83,6 +83,6 @@ export class CharacterEditor extends UIElement {
     }
 
     public getCharacterNode(): Node | null {
-        return this.characterNode;
+        return this.unitNode;
     }
 }

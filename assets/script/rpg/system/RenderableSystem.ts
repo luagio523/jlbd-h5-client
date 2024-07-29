@@ -1,5 +1,5 @@
 import { BaseSystem } from "./BaseSystem";
-import { RenderableComponent } from "../component/RenderableComponent";
+import { RenderableComponent } from "../component/UnitRenderComponent";
 
 export class RenderableSystem extends BaseSystem {
 

@@ -1,5 +1,5 @@
 import { ActType } from "../enum/Act";
-import { ActAnimationState, ActionOptions } from "./ActAnimationState";
+import { UnitAnimationState, ActionOptions } from "./UnitAnimationState";
 
 export enum AnimationStateType {
     Idle,
@@ -18,15 +18,15 @@ interface StateTransition {
 }
 
 
-export class CharacterAnimator {
-    private animationState: ActAnimationState;
+export class UnitAnimator {
+    private animationState: UnitAnimationState;
     private currentActionOption: ActionOptions;
     private baseAction: ActType = ActType.ACT_IDLE;
     private queuedActions: ActionOptions[] = [];
     private isAnimationPlaying: boolean = false;
     private currentOptions: ActionOptions;
 
-    constructor(animationState: ActAnimationState) {
+    constructor(animationState: UnitAnimationState) {
         this.animationState = animationState;
         this.setupAnimationEvents();
     }

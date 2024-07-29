@@ -3,8 +3,8 @@
 //怪物追踪，利用rvo移动，检测格子阻挡。如果A被阻挡，A找寻A*寻路。 顺便找到附近的符合条件怪物，加入移动群组，A作为群组领导。
 
 import { AnimResourceType } from "../../core/animation/Type";
-import { ActionOptions } from "../base/ActAnimationState";
-import { RenderableComponent } from "../component/RenderableComponent";
+import { ActionOptions } from "../base/UnitAnimationState";
+import {  UnitRenderComponent } from "../component/UnitRenderComponent";
 import { EntityData } from "../data/EntityData";
 import { HeroKV } from "../data/kv/HeroKV";
 import { ECSEntity } from "../ecs/ECSEntity";
@@ -44,7 +44,7 @@ export class EntityManager {
         console.log("createEntity",herokv);
 
         const entity = this.entityFactory.createEntity(data.type);
-        let render = entity.getComponent(RenderableComponent);
+        let render = entity.getComponent(UnitRenderComponent);
 
         let modelType = herokv.GetModelType();
 

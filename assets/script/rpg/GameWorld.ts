@@ -1,6 +1,6 @@
 // GameWorld.js
 
-import { _decorator, Component, Node } from "cc";
+import { _decorator, Component, Node, RenderableComponent } from "cc";
 import { EntityData, } from "./data/EntityData";
 import { ECSManager } from "./ecs/ESCManager";
 import { EntityManager } from "./manager/EntityManager";
@@ -9,7 +9,9 @@ import { RenderableSystem } from "./system/RenderableSystem";
 import { EventManager } from "./event/EventManager";
 import { MapDisplay } from "./map/MapDisplay";
 import MapManager from "./manager/MapManager";
-import { RPGEvent } from "./event/Event";
+import { InitRoleEvent, RPGEvent } from "./event/Event";
+import { EntityType } from "./enum/Type";
+import { UnitRenderComponent } from "./component/UnitRenderComponent";
 const { ccclass, property } = _decorator;
 
 export class GameWorld   {
@@ -78,8 +80,11 @@ export class GameWorld   {
     }
 
 
-    private async initRole(data: EntityData): Promise<void> {
+    private async initRole(evt: InitRoleEvent): Promise<void> {
+        const data = EntityData.create( evt.name,evt.id, EntityType.Role);
         const role = await this.entityManager.createEntity(data);
+        
+        let uint = role.getComponent(UnitRenderComponent)
         this.sceneManager.addEntity(role);
         // this.sceneManager.initialize(this.node);
     }

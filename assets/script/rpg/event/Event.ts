@@ -155,7 +155,7 @@ export class EnterMapEvent implements IEvent {
 export class InitRoleEvent implements IEvent {
     public readonly type = RPGEvent.InitRoleEvent
     constructor(
-        public readonly id: string,
+        public readonly id: number,
         public readonly name: string,
     ) { }
 }

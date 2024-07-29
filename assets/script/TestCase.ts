@@ -1,5 +1,5 @@
 import { Asset, Node, SpriteAtlas, SpriteFrame, resources } from "cc";
-import { ActionOptions } from "./rpg/base/ActAnimationState";
+import { ActionOptions } from "./rpg/base/UnitAnimationState";
 import app from "./App";
 import { Notification } from "./mvc/Notification";
 import { SecureManager, SecureOptions } from "./core/common/secure/SecureManager";
@@ -7,8 +7,8 @@ import { testFixedPoint } from './core/common/fixed/fixed';
 import { ActType } from "./rpg/enum/Act";
 import scheduler from "./utils/scheduler";
 import { AnimResourceType } from "./core/animation/Type";
-import { Character } from "./rpg/render/character/Character";
-import { CharacterEditor } from "./rpg/render/character/CharacterEditor";
+import { Character } from "./rpg/render/unit/Unit";
+import { CharacterEditor } from "./rpg/render/unit/UnitEditor";
 import { GameWorld } from "./rpg/GameWorld";
 import { EntityData,  } from "./rpg/data/EntityData";
 import { EntityType } from "./rpg/enum/Type";
@@ -241,9 +241,9 @@ export namespace testcase {
 
     export function app_test17() {
         app.game.getGameWorld().start()
-        EventManager.getInstance().dispatchEvent(new InitRoleEvent("1","Thief"))
+        EventManager.getInstance().dispatchEvent(new InitRoleEvent(1,"Thief"))
     }
 
 }
-
+           
 

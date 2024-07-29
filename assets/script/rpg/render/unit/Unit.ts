@@ -1,12 +1,12 @@
 import { Node, Label, Sprite, UITransform, Vec3, Color } from 'cc';
-import { createBodyNode } from './BodyNode';
+import { createUnitBody } from './UnitBody';
 import { StatusBar } from './StatusBar';
 import { AnimResourceType } from '../../../core/animation/Type';
 import { UIElement } from '../UIElement';
-import { ActAnimationStateFactory, ActionOptions } from '../../base/ActAnimationState';
-import { CharacterAnimator } from '../../base/CharacterAnimator';
+import { UnitAnimationStateFactory, ActionOptions } from '../../base/UnitAnimationState';
+import { UnitAnimator } from '../../base/UnitAnimator';
 
-export class Character extends UIElement {
+export class Unit extends UIElement {
     private static HEALTH_BAR_OFFSET = 20;
     private static MANA_BAR_OFFSET = 10;
     private static NAME_LABEL_OFFSET = 32;
@@ -19,25 +19,25 @@ export class Character extends UIElement {
     private levelLabel: Label;
     private nameLabel: Label;
 
-    private characterAnimator: CharacterAnimator | null = null;
+    private unitAnimator: UnitAnimator | null = null;
     private animResourceType: AnimResourceType | null = null;
 
 
     private constructor(bodyType: AnimResourceType, width: number = 400, height: number = 400) {
-        super('Character', width, height);
+        super('Unit', width, height);
         this.animResourceType = bodyType;
         this.transform.setAnchorPoint(0.5, 0);
 
 
-        this.bodyNode = createBodyNode(bodyType, width, height);
+        this.bodyNode = createUnitBody(bodyType, width, height);
         const bodyTransform = this.bodyNode.getNode().getComponent(UITransform);
         if (bodyTransform) {
             bodyTransform.setAnchorPoint(0.5, 0);
         }
         this.node.addChild(this.bodyNode.getNode());
 
-        const animationState = ActAnimationStateFactory.createPlayer(this.bodyNode.getNode(), this.animResourceType!);
-        this.characterAnimator = new CharacterAnimator(animationState);
+        const animationState = UnitAnimationStateFactory.createPlayer(this.bodyNode.getNode(), this.animResourceType!);
+        this.unitAnimator = new UnitAnimator(animationState);
 
         this.shadowNode = new Node('Shadow');
         const shadowTransform = this.shadowNode.addComponent(UITransform);
@@ -62,9 +62,9 @@ export class Character extends UIElement {
         this.adjustComponents();
     }
 
-    public static create(bodyType: AnimResourceType, width: number = 100, height: number = 100): Character {
-        const characterNode = new Character(bodyType, width, height);
-        return characterNode;
+    public static create(bodyType: AnimResourceType, width: number = 100, height: number = 100): Unit {
+        const unitNode = new Unit(bodyType, width, height);
+        return unitNode;
     }
 
     public async setup(): Promise<void> {
@@ -76,17 +76,17 @@ export class Character extends UIElement {
         const bodyHeight = this.bodyNode.getNode().getComponent(UITransform)?.height || 0;
 
         if (this.healthBar) {
-            this.healthBar.setPosition(0, bodyHeight + Character.HEALTH_BAR_OFFSET);
+            this.healthBar.setPosition(0, bodyHeight + Unit.HEALTH_BAR_OFFSET);
         }
 
         if (this.manaBar) {
-            this.manaBar.setPosition(0, bodyHeight + Character.MANA_BAR_OFFSET);
+            this.manaBar.setPosition(0, bodyHeight + Unit.MANA_BAR_OFFSET);
         }
 
-        this.nameLabel.node.setPosition(0, bodyHeight + Character.NAME_LABEL_OFFSET);
+        this.nameLabel.node.setPosition(0, bodyHeight + Unit.NAME_LABEL_OFFSET);
 
         const healthBarWidth = this.healthBar?.getNode().getComponent(UITransform)?.width || 0;
-        this.levelLabel.node.setPosition(healthBarWidth / 2 + Character.LEVEL_LABEL_HORIZONTAL_OFFSET, bodyHeight + Character.HEALTH_BAR_OFFSET);
+        this.levelLabel.node.setPosition(healthBarWidth / 2 + Unit.LEVEL_LABEL_HORIZONTAL_OFFSET, bodyHeight + Unit.HEALTH_BAR_OFFSET);
     }
 
     public setBodySize(width: number, height: number) {
@@ -119,14 +119,14 @@ export class Character extends UIElement {
     }
 
     public async playAction(options: ActionOptions) {
-        if (this.characterAnimator) {
-            this.characterAnimator.transitionToState(options);
+        if (this.unitAnimator) {
+            this.unitAnimator.transitionToState(options);
         }
     }
 
 
     public reset(): void {
-        this.characterAnimator = null;
+        this.unitAnimator = null;
         this.healthBar.reset();
         this.manaBar.reset();
         this.nameLabel.string = '';

@@ -1,6 +1,6 @@
 import { _decorator, Component, Node, Vec3 } from 'cc';
 import { Timer } from '../../core/common/timer/Timer';
-import { RenderableComponent } from '../component/RenderableComponent';
+import { RenderableComponent } from '../component/UnitRenderComponent';
 import { ECSEntity } from '../ecs/ECSEntity';
 const { ccclass, property } = _decorator;
 

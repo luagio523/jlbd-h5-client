@@ -1,6 +1,6 @@
 import { AnimResourceType } from "../../core/animation/Type";
-import { Character } from "../render/character/Character";
-import { Footprint } from "../render/character/Footprint";
+import { Character } from "../render/unit/Unit";
+import { Footprint } from "../render/unit/Footprint";
 import { DamageNumber } from "../render/effect/DamageNumber";
 import { ScreenTint } from "../render/effect/ScreenTint";
 

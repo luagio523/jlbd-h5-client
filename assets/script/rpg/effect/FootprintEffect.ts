@@ -2,7 +2,7 @@ import { Node, UIOpacity, Vec3, tween } from 'cc';
 import { BaseEffect } from './Effect';
 import { Effect } from './__private';
 import { RenderableManager } from '../manager/RenderableManager';
-import { Footprint } from '../render/character/Footprint';
+import { Footprint } from '../render/unit/Footprint';
 import { AudioManager } from '../../core/common/audio/AudioManager';
 import scheduler from '../../utils/scheduler';
 

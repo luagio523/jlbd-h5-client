@@ -1,6 +1,6 @@
 import GameEntity from "../entity/Entity";
 import { EntityType } from "../enum/Type";
-import { RenderableComponent } from "../component/RenderableComponent";
+import { RenderableComponent } from "../component/UnitRenderComponent";
 
 
 /**
