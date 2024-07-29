@@ -26,10 +26,8 @@ export class RenderableManager {
      * @returns 
      */
     public async createCharacter(type: AnimResourceType): Promise<Character> {
-        let character: Character;
-        character = await Character.create(type);
+        let character =  Character.create(type);
         await character.setup();
-
         return character;
     }
 

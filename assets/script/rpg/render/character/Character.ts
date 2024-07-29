@@ -25,8 +25,9 @@ export class Character extends UIElement {
 
     private constructor(bodyType: AnimResourceType, width: number = 400, height: number = 400) {
         super('Character', width, height);
-
+        this.animResourceType = bodyType;
         this.transform.setAnchorPoint(0.5, 0);
+
 
         this.bodyNode = createBodyNode(bodyType, width, height);
         const bodyTransform = this.bodyNode.getNode().getComponent(UITransform);

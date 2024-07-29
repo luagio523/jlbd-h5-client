@@ -44,11 +44,14 @@ export class EntityManager {
         console.log("createEntity",herokv);
 
         const entity = this.entityFactory.createEntity(data.type);
-       
-        // let render = entity.getComponent(RenderableComponent);
-        // let resourceType = AnimResourceType.SpriteAltas;
-        // let characterRenderer = await this.renderableManager.createCharacter(resourceType);
-        // render.initialize(characterRenderer);
+        let render = entity.getComponent(RenderableComponent);
+
+        let modelType = herokv.GetModelType();
+
+        console.log("createEntity",modelType);
+
+        let characterRenderer = await this.renderableManager.createCharacter(modelType  as AnimResourceType);
+        render.initialize(characterRenderer);
 
         // const actionOptions: ActionOptions = {
         //     modelName: 'Thief',
