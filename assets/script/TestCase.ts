@@ -12,6 +12,8 @@ import { CharacterEditor } from "./rpg/render/character/CharacterEditor";
 import { GameWorld } from "./rpg/GameWorld";
 import { EntityData,  } from "./rpg/data/EntityData";
 import { EntityType } from "./rpg/enum/Type";
+import { EventManager } from "./rpg/event/EventManager";
+import { InitRoleEvent } from "./rpg/event/Event";
 
 
 export namespace testcase {
@@ -239,6 +241,7 @@ export namespace testcase {
 
     export function app_test17() {
         app.game.getGameWorld().start()
+        EventManager.getInstance().dispatchEvent(new InitRoleEvent("1","Thief"))
     }
 
 }

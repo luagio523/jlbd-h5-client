@@ -26,18 +26,18 @@ export class WorldActor extends BaseActor {
 	public executeEnterWorld(role:any) {
 		console.log(`WorldActor enter world ${role}`)
 
-		SceneManager.getInstance().initialize(app.game.getGameRoot());//初始化场景
+		// SceneManager.getInstance().initialize(app.game.getGameRoot());//初始化场景
 
-		let display = new MapDisplay();
-		SceneManager.getInstance().addToLayer(SLayerType.Map,display);
+		// let display = new MapDisplay();
+		// SceneManager.getInstance().addToLayer(SLayerType.Map,display);
 
-        MapManager.getInstance().initialize(display,app.game.getCameraNode());//初始化地图
+        // MapManager.getInstance().initialize(display,app.game.getCameraNode());//初始化地图
 
-        MapManager.getInstance().enterMap("map004");
+        // MapManager.getInstance().enterMap("map004");
 
-        EventManager.getInstance().registerListener(RPGEvent.EnterMap, function (event) {
-            console.log("enter map", event);     
-        });
+        // EventManager.getInstance().registerListener(RPGEvent.EnterMap, function (event) {
+        //     console.log("enter map", event);     
+        // });
 	}
 
 	/*---------------------------------[models]------------------------------------*/

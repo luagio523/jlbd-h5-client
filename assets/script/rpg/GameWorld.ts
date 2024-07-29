@@ -64,7 +64,7 @@ export class GameWorld   {
     }
 
     private initEvent(): void {
-        this.eventManager.registerListener('createRole', this.createRole.bind(this))
+        this.eventManager.registerListener(RPGEvent.InitRoleEvent, this.initRole.bind(this))
 
         this.eventManager.registerListener(RPGEvent.EnterMap, this.enterMap.bind(this))
     }
@@ -78,12 +78,9 @@ export class GameWorld   {
     }
 
 
-    private async createRole(data: EntityData): Promise<void> {
-        // 创建主角
+    private async initRole(data: EntityData): Promise<void> {
         const role = await this.entityManager.createEntity(data);
-        // // 将主角添加到场景中
         this.sceneManager.addEntity(role);
-
         // this.sceneManager.initialize(this.node);
     }
 

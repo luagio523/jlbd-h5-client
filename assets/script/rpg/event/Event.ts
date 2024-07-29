@@ -152,6 +152,14 @@ export class EnterMapEvent implements IEvent {
 
 
 
+export class InitRoleEvent implements IEvent {
+    public readonly type = RPGEvent.InitRoleEvent
+    constructor(
+        public readonly id: string,
+        public readonly name: string,
+    ) { }
+}
+
 
 export enum RPGEvent {
     ApplyAttack = "ApplyAttack",
@@ -167,4 +175,6 @@ export enum RPGEvent {
     AbilityEnd = "AbilityEnd",
     InitedMapEvent = "InitedMapEvent",
     EnterMap = "EnterMap",
+
+    InitRoleEvent ="InitRoleEvent",
 }
