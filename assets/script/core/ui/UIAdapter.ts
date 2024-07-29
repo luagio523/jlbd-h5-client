@@ -11,7 +11,7 @@ export interface IUIAdapter<T = any> {
 
 // FairyGUI 实现
 export class FairyUIAdapter implements IUIAdapter {
-    private ui: GComponent;
+    protected ui: GComponent;
 
     injectUI(ui: GComponent): void {
         this.ui = ui;
@@ -114,7 +114,7 @@ export class FairyUIAdapter implements IUIAdapter {
 
 
 export class CreatorUIAdapter implements IUIAdapter {
-    private ui: Node;
+    protected ui: Node;
 
     injectUI(ui: Node): void {
         this.ui = ui;
