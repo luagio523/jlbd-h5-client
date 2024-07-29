@@ -12,7 +12,14 @@ import { ECSSystems } from "./ECSSystems";
 
 
 export class ECSManager {
-    static readonly Inst: ECSManager = new ECSManager();
+    private static instance: ECSManager;
+    public static getInstance(): ECSManager {
+        if (!ECSManager.instance) {
+            ECSManager.instance = new ECSManager();
+        }
+        return ECSManager.instance;
+    }
+  
 
     /**
      * 所有系统

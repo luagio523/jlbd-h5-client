@@ -3,7 +3,7 @@ import { ECSEntity } from "../ecs/ECSEntity";
 import { ECSSystem } from "../ecs/ECSSystem";
 import { Constructor } from "../ecs/__private";
 import { IEvent } from "../event/Event";
-import { EventListenerManager } from "../event/EventListenerManager";
+import { EventListenerManager } from "../event/EventManager";
 import { EventQueueManager } from "../event/EventQueueManager";
 
 export class BaseSystem extends ECSSystem{

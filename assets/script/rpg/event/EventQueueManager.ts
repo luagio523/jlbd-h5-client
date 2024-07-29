@@ -1,5 +1,5 @@
 import { IEvent } from "./Event";
-import { EventListenerManager } from "./EventListenerManager";
+import { EventManager } from "./EventManager";
 
 export class EventQueueManager {
     private static instance: EventQueueManager;
@@ -33,7 +33,7 @@ export class EventQueueManager {
     public dispatch() {
         // 这里是简化的处理，实际情况下可能需要考虑事件的优先级等因素
         this.queues.forEach((events, type) => {
-            const listeners = EventListenerManager.getInstance().getListeners(type);
+            const listeners = EventManager.getInstance().getListeners(type);
             events.forEach(event => {
                 listeners.forEach(listener => listener(event));
             });

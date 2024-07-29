@@ -3,7 +3,7 @@ import { GameMap } from "../map/GameMap";
 import { MapDisplay } from "../map/MapDisplay";
 import { EnterMapEvent } from "../event/Event";
 import app from "../../App";
-import { EventDispatcher } from "../event/EventListenerManager";
+import { EventDispatcher } from "../event/EventManager";
 import { ColliderManager } from "./ColliderManager";
 import { AdaptionManager } from "../../core/common/Adaption/AdaptionManager";
 import { CameraController } from "../map/CameraController";

@@ -8,7 +8,7 @@ import WorldProxy from "./WorldProxy"
 import { SLayerType, SceneManager } from "../../rpg/manager/SceneManager"
 import MapManager from "../../rpg/manager/MapManager"
 import { MapDisplay } from "../../rpg/map/MapDisplay"
-import { EventManager } from "../../rpg/event/EventListenerManager"
+import { EventManager } from "../../rpg/event/EventManager"
 import {  RPGEvent } from "../../rpg/event/Event"
 
 @mvc.component("WorldActor")

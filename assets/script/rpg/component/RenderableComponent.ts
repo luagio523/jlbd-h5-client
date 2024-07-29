@@ -24,4 +24,9 @@ export class RenderableComponent extends ECSComponent {
     public getNode():Node{
         return this.character.getNode();
     }
+
+
+    public update(dt:number):void{
+        this.character.update(dt);
+    }
 }
