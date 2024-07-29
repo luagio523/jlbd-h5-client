@@ -1,6 +1,7 @@
 import { _decorator, Node } from 'cc';
 import { DialogueUI } from './DialogueUI'; // 确保路径正确
 import { GComponent } from 'fairygui-cc';
+import { DialogueAnimation } from '../Dialogue';
 
 const { ccclass } = _decorator;
 
@@ -11,7 +12,7 @@ export class AnimationDialogueUI extends DialogueUI {
         super.injectUI(ui)
     }
 
-    show(dialogue:any) {
+    show(dialogue:DialogueAnimation) {
         
     }
 

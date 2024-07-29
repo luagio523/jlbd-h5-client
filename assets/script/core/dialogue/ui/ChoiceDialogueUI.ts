@@ -1,6 +1,7 @@
 import { _decorator, Node, Button, Label, instantiate } from 'cc';
 import { DialogueUI } from './DialogueUI'; // 确保路径正确
 import { GComponent } from 'fairygui-cc';
+import { DialogueChoice } from '../Dialogue';
 
 const { ccclass, property } = _decorator;
 
@@ -31,7 +32,7 @@ export class ChoiceDialogueUI extends DialogueUI {
     }
 
 
-    show(dialogue:any) {
+    show(dialogue:DialogueChoice) {
         this.clearChoices(); // 清空之前的选择项
         let options = dialogue.options;
         options.forEach(option => {

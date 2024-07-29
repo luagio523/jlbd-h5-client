@@ -1,3 +1,6 @@
+/**
+ * 剧情事件类型
+ */
 export  const DialogueEvent = {
     ShowDialogue: "showDialogue",
     PlayAnimation: "playAnimation",
@@ -8,7 +11,7 @@ export  const DialogueEvent = {
 
 
 // 定义对话类型的接口
-export interface Dialogue {
+export interface DialogueSpeaker {
     speaker: string; // 发言者
     text: string; // 对话文本
     avatar: string; // 角色头像的路径

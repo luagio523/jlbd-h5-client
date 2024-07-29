@@ -1,6 +1,7 @@
 import { _decorator, Node, Label } from 'cc';
 import { DialogueUI } from './DialogueUI';
 import { GComponent } from 'fairygui-cc';
+import { DialogueSpeaker } from '../Dialogue';
 
 const { ccclass, property } = _decorator;
 
@@ -16,7 +17,7 @@ export class TextDialogueUI extends DialogueUI {
     
     }
 
-    show(dialogue:any) {
+    show(dialogue:DialogueSpeaker) {
         
     }
 
