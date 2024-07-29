@@ -1,6 +1,7 @@
 import { Vec2 } from "cc";
 import { ECSComponent } from "../ecs/ECSComponent";
-
+import { ecsclass } from "../ecs/__private";
+ecsclass("TransformComponent")
 export class TransformComponent extends ECSComponent {
     position: Vec2;
     rotation: number;

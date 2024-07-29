@@ -1,6 +1,8 @@
 import { Vec2 } from "cc";
 import { ECSComponent } from "../ecs/ECSComponent";
+import { ecsclass } from "../ecs/__private";
 
+ecsclass("MovableComponent")
 export class MovableComponent extends ECSComponent {
     private baseSpeed: number;
     private speed: number;

@@ -1,6 +1,6 @@
 import { Vec2 } from "cc";
 import { ECSComponent } from "../ecs/ECSComponent";
-
+import { ecsclass } from "../ecs/__private";
 
 export enum PathfindingState {
     NONE,
@@ -9,7 +9,7 @@ export enum PathfindingState {
     REACHED_TARGET,
     PATH_INVALID
 }
-
+ecsclass("PathfindingComponent")
 export class PathfindingComponent extends ECSComponent {
     private targetPosition: Vec2 | null = null;
     private currentPath: Vec2[] = [];

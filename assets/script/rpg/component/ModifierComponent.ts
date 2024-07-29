@@ -4,7 +4,7 @@ import { Modifier, ModifierEventDispatcher } from "../ability/Modifier";
 import { ModifierEvent } from "../enum/ModifierEvent";
 import { ModifierAttribute } from "../enum/Modifier";
 import { ModifierState } from "../enum/ModifierState";
-
+import { ecsclass } from "../ecs/__private";
 
 
 // Modifier状态跟踪
@@ -22,6 +22,8 @@ import { ModifierState } from "../enum/ModifierState";
 // 当单位装备或卸下影响攻击速度的物品时。
 
 
+
+ecsclass("ModifierComponent")
 export class ModifierComponent extends ECSComponent {
 
 

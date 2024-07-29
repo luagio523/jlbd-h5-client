@@ -33,6 +33,10 @@ export enum UnitState
     death = 4,
 }
 
+
+
+import { ecsclass } from "../ecs/__private";
+ecsclass("UnitComponent")
 export class UnitComponent extends ECSComponent {
     public state: UnitState = UnitState.none;
     public moveSpeed: number = 200;

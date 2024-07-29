@@ -1,8 +1,9 @@
-import { HeroData } from "../data/HeroKV";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { Attributes } from "../enum/Type";
 
-// AttributeComponent.ts
+import { HeroKV } from "../data/kv/HeroKV";
+import { ecsclass } from "../ecs/__private";
+ecsclass("AttributeComponent")
 export class AttributeComponent extends ECSComponent {
     private level: number = 1;
     private primaryAttribute: Attributes;
@@ -22,13 +23,13 @@ export class AttributeComponent extends ECSComponent {
     private baseArmor: number = 0;
     private baseMagicResistance: number = 0;
 
-    constructor(heroData: HeroData) {
+    constructor(heroData: HeroKV) {
         super();
         this.initializeAttributes(heroData);
         this.updateAttributes();
     }
 
-    private initializeAttributes(heroData: HeroData): void {
+    private initializeAttributes(heroData: HeroKV): void {
         this.primaryAttribute = heroData.GetPrimaryAttribute();
         this.baseStrength = heroData.GetBaseStrength();
         this.baseAgility = heroData.GetBaseAgility();

@@ -1,8 +1,10 @@
 import { ItemKV } from "../data/kv/ItemKV";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { InventorySlot } from "../enum/Item";
+import { ecsclass } from "../ecs/__private";
 
 
+ecsclass("EquipmentComponent")
 export class EquipmentComponent extends ECSComponent {
     private equipment: Map<InventorySlot, ItemKV | null> = new Map<InventorySlot, ItemKV | null>();
 

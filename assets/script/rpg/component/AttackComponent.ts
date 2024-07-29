@@ -1,19 +1,19 @@
-import { HeroData } from "../data/HeroKV";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { DamageType } from "../enum/Damage";
 import { AttackCapability, AttackType } from "../enum/Type";
 import { Cooldown } from "../render/CoolDown";
 
-
-
+import { HeroKV } from "../data/kv/HeroKV";
+import { ecsclass } from "../ecs/__private";
+ecsclass("AttackComponent")
 export class AttackComponent extends ECSComponent {
     public attackCapability: AttackCapability;
     public baseAttackDamageMin: number;
     public baseAttackDamageMax: number;
     public attackRange: number;
     public attackRate: number;
-    private actualAttackRate:number; //实际攻击频率
+    private actualAttackRate: number; //实际攻击频率
     public attackAnimationPoint: number;
     public attackAcquisitionRange: number;
     public attackType: AttackType;
@@ -22,13 +22,13 @@ export class AttackComponent extends ECSComponent {
     private attacksMade: number = 0;
     private attackCooldown: Cooldown;
 
-    constructor(heroData: HeroData) {
+    constructor(heroData: HeroKV) {
         super();
         this.initializeAttack(heroData);
     }
-   
 
-    private initializeAttack(heroData: HeroData): void {
+
+    private initializeAttack(heroData: HeroKV): void {
         this.attackCapability = this.determineAttackCapability(heroData.GetAttackRange());
         [this.baseAttackDamageMin, this.baseAttackDamageMax] = heroData.GetAttackDamage();
         this.attackRange = heroData.GetAttackRange();
@@ -53,9 +53,9 @@ export class AttackComponent extends ECSComponent {
     }
 
     public getBaseAttackRate(): number {
-        return  this.attackRate;
+        return this.attackRate;
     }
-    
+
 
     public setTarget(target: ECSEntity | null): void {
         this.target = target;

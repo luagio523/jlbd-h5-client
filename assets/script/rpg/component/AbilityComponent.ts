@@ -2,7 +2,8 @@ import { BaseAbility } from "../ability/BaseAbility";
 import { ECSComponent } from "../ecs/ECSComponent";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { DamageType } from "../enum/Damage";
-
+import { ecsclass } from "../ecs/__private";
+ecsclass("AttackComponent")
 export class AbilityComponent extends ECSComponent {
     private abilities: BaseAbility[] = [];
 

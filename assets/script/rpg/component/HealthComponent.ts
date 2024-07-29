@@ -1,8 +1,9 @@
 import { ECSComponent } from "../ecs/ECSComponent";
+import { ecsclass } from "../ecs/__private";
 
 
 
-
+ecsclass("HealthComponent")
 export class HealthComponent extends ECSComponent {
     entityId: string;
     private maxHealth: number;

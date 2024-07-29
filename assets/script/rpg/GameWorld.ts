@@ -102,7 +102,6 @@ export class GameWorld   {
 
     update(dt: number) {
         if(!this.isInit) return 
-
         this.ecs.update(dt);  // 持续更新 ECS 状态
     }
 }

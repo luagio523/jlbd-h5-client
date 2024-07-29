@@ -1,4 +1,6 @@
 
+import { ecsclass } from "../ecs/__private";
+ecsclass("TrackAttackComponent")
 export class TrackAttackComponent {
     public trackTarget: any = null; // entity;
     // public attackId: number = 90001; // 追上以后, 发起攻击方式Id;

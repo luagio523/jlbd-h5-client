@@ -63,7 +63,8 @@ export enum ControlMode
      */
     joystick = 1,
 }
-
+import { ecsclass } from "../ecs/__private";
+ecsclass("RoleComponent")
 export class RoleComponent {
     public roleId: number = -1;
     public playerType: PlayerType = PlayerType.none;
