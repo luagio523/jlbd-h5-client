@@ -18,18 +18,18 @@ export interface ActionOptions {
 
 
 // 抽象基类
-export abstract class ActAnimationState {
+export abstract class UnitAnimationState {
     protected player: IAnimationPlayer;
     protected currentActionOptions: ActionOptions;
 
-    abstract initialize(...args: any[]): ActAnimationState;
-    abstract changeAct(options: ActionOptions): Promise<ActAnimationState>;
+    abstract initialize(...args: any[]): UnitAnimationState;
+    abstract changeAct(options: ActionOptions): Promise<UnitAnimationState>;
 
     public update(dt: number) {
         this.player?.update(dt);
     }
 
-    onComplete(callback: ((act: ActionOptions) => void)): ActAnimationState {
+    onComplete(callback: ((act: ActionOptions) => void)): UnitAnimationState {
         if (callback) {
             this.player.onComplete(() => {
                 callback(this.currentActionOptions);
@@ -59,18 +59,18 @@ export abstract class ActAnimationState {
  * 基于 SpriteAtlasPlayer 实现
  * 能够使用creator plist atlas资源
  */
-class AtlasAnimationState extends ActAnimationState {
+class AtlasAnimationState extends UnitAnimationState {
     constructor() {
         super();
     }
 
-    public initialize(sprite: Sprite): ActAnimationState {
+    public initialize(sprite: Sprite): UnitAnimationState {
         this.player = new MCPlayer(sprite);
         this.setFrameRate(12);
         return this;
     }
 
-    async changeAct(options: ActionOptions): Promise<ActAnimationState> {
+    async changeAct(options: ActionOptions): Promise<UnitAnimationState> {
         if (!this.player) {
             throw new Error('player not initialized');
         }
@@ -112,18 +112,18 @@ class AtlasAnimationState extends ActAnimationState {
  * 基于 SpriteSheetPlayer 实现
  * 能够使用egret sheet资源
  */
-class EgretAnimationState extends ActAnimationState {
+class EgretAnimationState extends UnitAnimationState {
     constructor() {
         super();
     }
 
-    public initialize(sprite: Sprite): ActAnimationState {
+    public initialize(sprite: Sprite): UnitAnimationState {
         this.player = new MCPlayer(sprite);
         this.player.setFrameRate(12)
         return this;
     }
 
-    async changeAct(options: ActionOptions): Promise<ActAnimationState> {
+    async changeAct(options: ActionOptions): Promise<UnitAnimationState> {
         if (!this.player) {
             throw new Error('player not initialized');
         }
@@ -173,17 +173,17 @@ class EgretAnimationState extends ActAnimationState {
  * 基于 SpriteSheetPlayer 实现
  * 能够使用egret sheet资源
  */
-class DragonAnimationState extends ActAnimationState {
+class DragonAnimationState extends UnitAnimationState {
     constructor() {
         super();
     }
 
-    public initialize(armatureDisplay: dragonBones.ArmatureDisplay): ActAnimationState {
+    public initialize(armatureDisplay: dragonBones.ArmatureDisplay): UnitAnimationState {
         this.player = new DragonPlayer(armatureDisplay);
         return this;
     }
 
-    async changeAct(options: ActionOptions): Promise<ActAnimationState> {
+    async changeAct(options: ActionOptions): Promise<UnitAnimationState> {
         if (!this.player) {
             throw new Error('player not initialized');
         }
@@ -226,17 +226,17 @@ class DragonAnimationState extends ActAnimationState {
  * 基于 SpriteSheetPlayer 实现
  * 能够使用egret sheet资源
  */
-class SpineAnimationState extends ActAnimationState {
+class SpineAnimationState extends UnitAnimationState {
     constructor() {
         super();
     }
 
-    public initialize(skeleton: sp.Skeleton): ActAnimationState {
+    public initialize(skeleton: sp.Skeleton): UnitAnimationState {
         this.player = new SpinePlayer(skeleton);
         return this;
     }
 
-    async changeAct(options: ActionOptions): Promise<ActAnimationState> {
+    async changeAct(options: ActionOptions): Promise<UnitAnimationState> {
         if (!this.player) {
             throw new Error('player not initialized');
         }
@@ -275,7 +275,7 @@ class SpineAnimationState extends ActAnimationState {
 
 
 type AnimActMapping  = {
-    new: new () => ActAnimationState;
+    new: new () => UnitAnimationState;
     componentType: new () => Component;
 };
 
@@ -284,7 +284,7 @@ type AnimActMapping  = {
  * 兼容不同的动画资源类型
  * 用于创建不同类型的动画资源播放器
  */
-export class ActAnimationStateFactory {
+export class UnitAnimationStateFactory {
     private static playerMap: Map<AnimResourceType, AnimActMapping> = new Map([
         [AnimResourceType.SpriteAltas, { new: AtlasAnimationState, componentType: Sprite }],
         [AnimResourceType.EgretSpriteSheet, { new: EgretAnimationState, componentType: Sprite }],
@@ -305,7 +305,7 @@ export class ActAnimationStateFactory {
         return component;
     }
 
-    static createPlayer(node: Node, type: AnimResourceType): ActAnimationState {
+    static createPlayer(node: Node, type: AnimResourceType): UnitAnimationState {
         const component = this.getComponent(node, type);
         const playerInfo = this.playerMap.get(type);
         
@@ -317,8 +317,8 @@ export class ActAnimationStateFactory {
 }
 
 // // 使用示例
-// async function useActAnimationState() {
-//     const player = ActAnimationStateFactory.createPlayer('Act1');
+// async function useUnitAnimationState() {
+//     const player = UnitAnimationStateFactory.createPlayer('Act1');
 //     await player.changeAct('character001', 1, 0, ActType.ACT_IDLE);
 //     player.play();
 // }

@@ -3,11 +3,11 @@ import { AnimResourceType } from '../../../core/animation/Type';
 import { UIElement } from '../UIElement';
 
 
-export class SpriteBodyNode extends UIElement {
+export class SpriteUnitBody extends UIElement {
     private sprite: Sprite;
 
     constructor(width: number = 100, height: number = 100) {
-        super("SpriteBodyNode",width, height);
+        super("SpriteUnitBody",width, height);
         this.sprite = this.node.addComponent(Sprite);
     }
 
@@ -27,11 +27,11 @@ export class SpriteBodyNode extends UIElement {
     }
 }
 
-export class DragonBonesBodyNode extends UIElement {
+export class DragonBonesUnitBody extends UIElement {
     private dragonBones: dragonBones.ArmatureDisplay;
 
     constructor(width: number = 100, height: number = 100) {
-        super("SpriteBodyNode",width, height);
+        super("SpriteUnitBody",width, height);
         this.dragonBones = this.node.addComponent(dragonBones.ArmatureDisplay);
     }
 
@@ -55,11 +55,11 @@ export class DragonBonesBodyNode extends UIElement {
     }
 }
 
-export class SpineBodyNode  extends UIElement {
+export class SpineUnitBody  extends UIElement {
     private spine: sp.Skeleton;
 
     constructor(width: number = 100, height: number = 100) {
-        super("SpineBodyNode",width, height);
+        super("SpineUnitBody",width, height);
         this.spine = this.node.addComponent(sp.Skeleton);
     }
 
@@ -80,15 +80,15 @@ export class SpineBodyNode  extends UIElement {
     }
 }
 
-export function createBodyNode(type: AnimResourceType, width: number = 100, height: number = 100): UIElement {
+export function createUnitBody(type: AnimResourceType, width: number = 100, height: number = 100): UIElement {
     switch (type) {
         case AnimResourceType.SpriteAltas:
         case AnimResourceType.EgretSpriteSheet:
-            return new SpriteBodyNode(width, height);
+            return new SpriteUnitBody(width, height);
         case AnimResourceType.DragonBones:
-            return new DragonBonesBodyNode(width, height);
+            return new DragonBonesUnitBody(width, height);
         case AnimResourceType.Spine:
-            return new SpineBodyNode(width, height);
+            return new SpineUnitBody(width, height);
         default:
             throw new Error(`Unsupported AnimResourceType: ${type}`);
     }

@@ -17,7 +17,7 @@ export class UnitEditor extends UIElement {
     private animResourceType: AnimResourceType | null = null;
 
     constructor(type: AnimResourceType, width: number = 400, height: number=400) {
-        super("CharacterEditor", width, height);
+        super("UnitEditor", width, height);
         this.animResourceType = type;
     }
 
@@ -38,12 +38,12 @@ export class UnitEditor extends UIElement {
         const bodyNode = this.unitNode.getChildByName('Body');
         if (bodyNode) {
             const animationState = UnitAnimationStateFactory.createPlayer(bodyNode, this.animResourceType!);
-            this.unitAnimator = new CharacterAnimator(animationState);
+            this.unitAnimator = new UnitAnimator(animationState);
         }
     }
 
 
-    public updateCharacterStatus(name: string, level: number, health: number = 0, mana: number = 0) {
+    public updateUnitStatus(name: string, level: number, health: number = 0, mana: number = 0) {
         if (this.nameLabel) this.nameLabel.string = name;
         if (this.levelLabel) this.levelLabel.string = `Lv.${level}`;
         if (this.healthBar) this.updateBarWithTween(this.healthBar, health);
@@ -82,7 +82,7 @@ export class UnitEditor extends UIElement {
         // Implement if needed
     }
 
-    public getCharacterNode(): Node | null {
+    public getUnitNode(): Node | null {
         return this.unitNode;
     }
 }

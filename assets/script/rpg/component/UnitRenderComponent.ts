@@ -4,33 +4,33 @@ import { ActType } from "../enum/Act";
 import { Unit } from "../render/unit/Unit";
 
 export class UnitRenderComponent extends ECSComponent {
-    public  unit:Unit = null;
-    public  constructor(unit?:Unit){
+    public unit: Unit = null;
+    public constructor(unit?: Unit) {
         super();
         this.initialize(unit);
     }
 
-    public initialize(unit?:Unit):void{
-        if(unit == null){
-            return 
+    public initialize(unit?: Unit): void {
+        if (unit == null) {
+            return
         }
         this.unit = unit;
     }
 
-    public changeAct(act:ActType):void{
+   
 
-    }
-
-    public getNode():Node{
+    public getNode(): Node {
         return this.unit.getNode();
     }
 
 
-    public update(dt:number):void{
+    public update(dt: number): void {
         this.unit.update(dt);
     }
 
-    public setPosition(x:number,y:number):void{
-        this.unit.setPosition(x,y);
+    public setPosition(x: number, y: number): void {
+        this.unit.setPosition(x, y);
     }
+
+
 }
