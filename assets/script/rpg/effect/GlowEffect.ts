@@ -1,77 +1,71 @@
-import { Node, Color, tween, Sprite, Material, resources, Vec4 } from 'cc';
+import { Node, tween, Sprite, Material, resources, UIOpacity, Color } from 'cc';
 import { BaseEffect } from './Effect';
 import { Effect } from './__private';
-import scheduler from '../../utils/scheduler';
 
 @Effect('GlowEffect')
 export class GlowEffect extends BaseEffect {
     private originalMaterial: Material | null = null;
+    private originalOpacity: number = 255;
     private sprite: Sprite | null = null;
+    private uiOpacity: UIOpacity | null = null;
     private glowMaterial: Material | null = null;
-    private glowTween: any = null;
 
-    constructor() {
-        super();
-    }
-
-    async apply(target: Node, color: Color, intensity: number = 1, duration: number = 1): Promise<void> {
-        const sprite = target.getComponent(Sprite);
-        if (!sprite) {
+    async apply(target: Node, color: Color = Color.WHITE, intensity: number = 1, duration: number = 3): Promise<void> {
+        this.sprite = target.getComponent(Sprite);
+        if (!this.sprite) {
             console.error('Sprite component not found on target node');
             return;
         }
-        this.sprite = sprite;
 
-        // 保存原始材质
-        if (!this.originalMaterial) {
-            this.originalMaterial = sprite.customMaterial;
+        // 获取或添加 UIOpacity 组件
+        this.uiOpacity = target.getComponent(UIOpacity);
+        if (!this.uiOpacity) {
+            this.uiOpacity = target.addComponent(UIOpacity);
         }
 
-        // 加载外发光材质
+        // 保存原始不透明度和材质
+        this.originalOpacity = this.uiOpacity.opacity;
+        this.originalMaterial = this.sprite.customMaterial;
+
+        // 加载发光材质
         this.glowMaterial = await this.loadMaterial('path/to/glow-material');
         if (!this.glowMaterial) {
             console.error('Failed to load glow material');
             return;
         }
 
-        // 设置初始外发光颜色和强度
-        const glowColorVec4 = new Vec4(color.r / 255, color.g / 255, color.b / 255, 0);
-        this.glowMaterial.setProperty('glowColor', glowColorVec4);
-        this.glowMaterial.setProperty('glowIntensity', 0);
+        // 设置发光材质的颜色和强度
+        this.glowMaterial.setProperty('glowColor', color);
+        this.glowMaterial.setProperty('glowIntensity', intensity);
 
-        // 应用外发光材质
-        sprite.customMaterial = this.glowMaterial;
+        // 应用发光材质
+        this.sprite.customMaterial = this.glowMaterial;
 
-        // 创建脉冲效果
-        this.createPulseEffect(glowColorVec4, intensity, duration);
-
-        // 设置定时器以结束效果
-        scheduler.scheduleOnce(() => {
-            this.reset();
-            this.complete();
-        }, duration);
+        // 创建闪烁效果
+        this.createFlashingEffect(duration);
     }
 
-    private createPulseEffect(color: Vec4, maxIntensity: number, duration: number): void {
-        const halfDuration = duration / 2;
-        const pulseCount = Math.floor(duration / 0.5); // 每0.5秒一次脉冲
+    private createFlashingEffect(duration: number): void {
+        const flashDuration = 0.5; // 每次闪烁的持续时间
+        const flashCount = Math.floor(duration / flashDuration);
 
-        this.glowTween = tween(this.glowMaterial)
-            .repeat(pulseCount,
+        tween(this.uiOpacity)
+            .repeat(flashCount,
                 tween()
-                    .to(halfDuration / pulseCount, { glowIntensity: maxIntensity }, { easing: 'sineIn' })
-                    .to(halfDuration / pulseCount, { glowIntensity: 0 }, { easing: 'sineOut' })
+                    .to(flashDuration / 2, { opacity: 255 })
+                    .to(flashDuration / 2, { opacity: 100 })
             )
+            .call(() => {
+                this.reset();
+                this.complete();
+            })
             .start();
     }
 
     reset(): void {
-        if (this.sprite && this.originalMaterial) {
+        if (this.sprite && this.originalMaterial && this.uiOpacity) {
             this.sprite.customMaterial = this.originalMaterial;
-        }
-        if (this.glowTween) {
-            this.glowTween.stop();
-            this.glowTween = null;
+            this.uiOpacity.opacity = this.originalOpacity;
         }
     }
 
