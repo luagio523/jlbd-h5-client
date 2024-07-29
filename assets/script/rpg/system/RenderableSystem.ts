@@ -1,11 +1,12 @@
 import { BaseSystem } from "./BaseSystem";
-import { RenderableComponent } from "../component/UnitRenderComponent";
+import { UnitRenderComponent } from "../component/UnitRenderComponent";
 
 export class RenderableSystem extends BaseSystem {
 
 
     update(deltaTime: number) {
-        const components = this.getComponents(RenderableComponent);
+        console.log("RenderableSystem update",deltaTime);
+        const components = this.getComponents(UnitRenderComponent);
         for (const component of components) {
             component.update(deltaTime);
         }

@@ -1,6 +1,6 @@
 import { _decorator, Component, Node, Vec3 } from 'cc';
 import { Timer } from '../../core/common/timer/Timer';
-import { RenderableComponent } from '../component/UnitRenderComponent';
+import { UnitRenderComponent } from '../component/UnitRenderComponent';
 import { ECSEntity } from '../ecs/ECSEntity';
 const { ccclass, property } = _decorator;
 
@@ -16,14 +16,14 @@ export class EntityLayer extends Node {
     }
 
     addEntity(entity: ECSEntity): void {
-        const renderable = entity.getComponent(RenderableComponent);
+        const renderable = entity.getComponent(UnitRenderComponent);
         if (renderable) {
             this.addChild(renderable.getNode());    
         }
     }
 
     removeEntity(entity: ECSEntity): void {
-        const renderable = entity.getComponent(RenderableComponent);
+        const renderable = entity.getComponent(UnitRenderComponent);
         if (renderable) {
            this.removeChild(renderable.getNode());
         }

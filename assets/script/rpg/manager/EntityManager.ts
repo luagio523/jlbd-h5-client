@@ -47,11 +47,15 @@ export class EntityManager {
         let render = entity.getComponent(UnitRenderComponent);
 
         let modelType = herokv.GetModelType();
+        let modelName = herokv.GetHeroName();
+        let model = herokv.GetModel();
+        let gender = herokv.GetGender();
+        let frameRate = herokv.GetFrameRate();
 
         console.log("createEntity",modelType);
 
-        let characterRenderer = await this.renderableManager.createCharacter(modelType  as AnimResourceType);
-        render.initialize(characterRenderer);
+        let unitRenderer = await this.renderableManager.createCharacter(modelType  as AnimResourceType);
+        render.initialize(unitRenderer,model,modelName,gender,frameRate);
 
  
 

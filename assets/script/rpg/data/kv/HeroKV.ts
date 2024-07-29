@@ -43,8 +43,11 @@ export class HeroKV extends KVReader {
 
     // 模型和声音相关属性
     protected model: string; // Model path
+    protected modelName: string; // Model path
+    protected gender: number; // Gender
     protected modelType: string; // Model type
     protected modelScale: number; // Model scale
+    protected frameRate: number; // Frame rate
     protected soundSet: string; // Sound set
     protected particleFolder: string; // Particle folder
     protected gameSoundsFile: string; // Game sounds file
@@ -100,6 +103,8 @@ export class HeroKV extends KVReader {
         this.model = data.Model; // Model path
         this.modelType = data.ModelType; // Model type
         this.modelScale = parseFloat(data.ModelScale); // Model scale
+        this.gender = parseFloat(data.Gender); // Gender
+        this.frameRate = parseFloat(data.FrameRate)||12; // Frame rate
         this.soundSet = data.SoundSet; // Sound set
         this.particleFolder = data.particle_folder; // Particle folder
         this.gameSoundsFile = data.GameSoundsFile; // Game sounds file
@@ -263,6 +268,14 @@ export class HeroKV extends KVReader {
 
     public GetModelScale(): number {
         return this.modelScale;
+    }
+
+    public GetFrameRate(): number {
+        return this.frameRate;
+    }
+
+    public GetGender(): number {
+        return this.gender;
     }
 
     public GetSoundSet(): string {

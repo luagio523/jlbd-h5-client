@@ -1,6 +1,6 @@
 import GameEntity from "../entity/Entity";
 import { EntityType } from "../enum/Type";
-import { RenderableComponent } from "../component/UnitRenderComponent";
+import { UnitRenderComponent } from "../component/UnitRenderComponent";
 
 
 /**
@@ -49,10 +49,10 @@ export default class EntityFactory {
 		// 根据实体类型初始化特定的组件或属性
 		switch (type) {
 			case EntityType.Role:
-				entity.addComponent(new RenderableComponent());
+				entity.addComponent(new UnitRenderComponent());
 				break;
 			case EntityType.Hero:
-				entity.addComponent(new RenderableComponent());
+				entity.addComponent(new UnitRenderComponent());
 				break;
 			case EntityType.Creep:
 				// 初始化小兵特有的组件

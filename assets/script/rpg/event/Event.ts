@@ -10,19 +10,7 @@ export interface IEvent {
 
 
 
-/**
- * ecsclass() 装饰器为 class 添加有效的 name 属性
- *
- * @param name
- */
-export function ecsclass(name: string) {
-    return (ctor: Function) => {
-        Object.defineProperty(ctor, "name", {
-            value: name,
-            writable: false,
-        });
-    };
-}
+
 
 
 

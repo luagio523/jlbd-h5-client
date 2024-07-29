@@ -125,6 +125,11 @@ export class Unit extends UIElement {
     }
 
 
+    public update(dt: number) {
+        if (this.unitAnimator) this.unitAnimator.update(dt);
+    }
+
+
     public reset(): void {
         this.unitAnimator = null;
         this.healthBar.reset();

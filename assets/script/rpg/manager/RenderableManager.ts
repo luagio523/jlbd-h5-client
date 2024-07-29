@@ -1,5 +1,5 @@
 import { AnimResourceType } from "../../core/animation/Type";
-import { Character } from "../render/unit/Unit";
+import { Unit } from "../render/unit/Unit";
 import { Footprint } from "../render/unit/Footprint";
 import { DamageNumber } from "../render/effect/DamageNumber";
 import { ScreenTint } from "../render/effect/ScreenTint";
@@ -25,8 +25,8 @@ export class RenderableManager {
      * @param type 
      * @returns 
      */
-    public async createCharacter(type: AnimResourceType): Promise<Character> {
-        let character =  Character.create(type);
+    public async createCharacter(type: AnimResourceType): Promise<Unit> {
+        let character =  Unit.create(type);
         await character.setup();
         return character;
     }
