@@ -1,4 +1,4 @@
-import { Node, Color, tween, UIOpacity, Sprite, UITransform } from 'cc';
+import { Node, Color, tween, UITransform } from 'cc';
 
 import { BaseEffect } from './Effect';
 import { Effect } from './__private';

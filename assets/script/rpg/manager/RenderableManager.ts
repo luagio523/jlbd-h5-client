@@ -96,4 +96,7 @@ export class RenderableManager {
         screenTint.reset();
         this.screenTintPool.push(screenTint);
     }
+
+
+
 }
