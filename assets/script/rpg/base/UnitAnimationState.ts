@@ -8,6 +8,7 @@ import { IAnimationPlayer } from "../../core/animation/IAnimationPlayer";
 
 
 export interface ActionOptions {
+    model?:string;
     modelName: string;
     action: ActType;
     direction?: number;
@@ -75,11 +76,11 @@ class AtlasAnimationState extends UnitAnimationState {
             throw new Error('player not initialized');
         }
 
-        const { modelName, action = ActType.ACT_IDLE,frameRate } = options;
+        const { model,modelName, action = ActType.ACT_IDLE,frameRate } = options;
         this.currentActionOptions = options;
 
         const mc = this.getMCKey(modelName, action);
-        const atlasPath = `anim/body/char`;
+        const atlasPath = model??`anim/body/char`;
         if(frameRate){
             this.setFrameRate(frameRate)
         }
@@ -129,6 +130,7 @@ class EgretAnimationState extends UnitAnimationState {
         }
         // console.log("change act",options)
         const {
+            model,
             modelName,
             action = ActType.ACT_IDLE,
             gender = 1,
@@ -143,7 +145,7 @@ class EgretAnimationState extends UnitAnimationState {
         this.currentActionOptions = options;
 
         const mc = this.getMCKey(modelName, gender, direction, action);
-        const resourcePath = `anim/sheetbody/${mc}`;
+        const resourcePath = model??`anim/sheetbody/${mc}`;
 
         await this.player.loadAnimation(AnimResourceType.EgretSpriteSheet, resourcePath);
         this.player.setupAnimation(mc);
@@ -189,13 +191,14 @@ class DragonAnimationState extends UnitAnimationState {
         }
 
         const {
+            model,
             modelName,
             action = ActType.ACT_IDLE
         } = options;
 
         this.currentActionOptions = options;
 
-        const resourcePath = `anim/dragonbody/${modelName}`;
+        const resourcePath = model??`anim/dragonbody/${modelName}`;
 
         await this.player.loadAnimation(AnimResourceType.DragonBones, resourcePath);
         const actionName = this.getActionName(action);
@@ -242,13 +245,14 @@ class SpineAnimationState extends UnitAnimationState {
         }
 
         const {
+            model,
             modelName,
             action = ActType.ACT_IDLE
         } = options;
 
         this.currentActionOptions = options;
 
-        const resourcePath = `anim/spinebody/${modelName}`;
+        const resourcePath = model??`anim/spinebody/${modelName}`;
 
         await this.player.loadAnimation(AnimResourceType.Spine, resourcePath);
         const actionName = this.getActionName(action);
