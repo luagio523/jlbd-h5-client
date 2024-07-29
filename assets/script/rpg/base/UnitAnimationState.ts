@@ -30,6 +30,8 @@ export abstract class UnitAnimationState {
         this.player?.update(dt);
     }
 
+
+
     onComplete(callback: ((act: ActionOptions) => void)): UnitAnimationState {
         if (callback) {
             this.player.onComplete(() => {
@@ -54,6 +56,21 @@ export abstract class UnitAnimationState {
     getCurrentActionOptions(): ActionOptions {
         return this.currentActionOptions;
     }
+
+
+    public static  isEqual(options1: ActionOptions, options2: ActionOptions): boolean {
+        if (!options1 || !options2) return false; // 其中一个为空，认为不相等
+        // 比较必需的属性
+        if (options1.model !== options2.model ||options1.modelName !== options2.modelName) return false;
+    
+        // 比较 action、direction 和 gender
+        if (options1.action !== options2.action || 
+            options1.direction !== options2.direction || 
+            options1.gender !== options2.gender) {
+            return false;
+        }
+        return true; // 所有检查通过，两个对象相等
+    }
 }
 
 /**
@@ -76,9 +93,16 @@ class AtlasAnimationState extends UnitAnimationState {
             throw new Error('player not initialized');
         }
 
-        const { model,modelName, action = ActType.ACT_IDLE,frameRate } = options;
-        this.currentActionOptions = options;
+        if(UnitAnimationState.isEqual(options,this.currentActionOptions)){
+            if(options.frameRate !== this.currentActionOptions.frameRate){
+                this.setFrameRate(options.frameRate)
+            }
+            return this;
+        }
 
+        const { model,modelName, action ,frameRate } = options;
+
+        this.currentActionOptions = options;
         const mc = this.getMCKey(modelName, action);
         const atlasPath = model??`anim/body/char`;
         if(frameRate){
@@ -128,7 +152,12 @@ class EgretAnimationState extends UnitAnimationState {
         if (!this.player) {
             throw new Error('player not initialized');
         }
-        // console.log("change act",options)
+        if(UnitAnimationState.isEqual(options,this.currentActionOptions)){
+            if(options.frameRate !== this.currentActionOptions.frameRate){
+                this.setFrameRate(options.frameRate)
+            }
+            return this;
+        } 
         const {
             model,
             modelName,
@@ -190,6 +219,13 @@ class DragonAnimationState extends UnitAnimationState {
             throw new Error('player not initialized');
         }
 
+        if(UnitAnimationState.isEqual(options,this.currentActionOptions)){
+            if(options.frameRate !== this.currentActionOptions.frameRate){
+                this.setFrameRate(options.frameRate)
+            }
+            return this;
+        } 
+
         const {
             model,
             modelName,
@@ -243,6 +279,13 @@ class SpineAnimationState extends UnitAnimationState {
         if (!this.player) {
             throw new Error('player not initialized');
         }
+
+        if(UnitAnimationState.isEqual(options,this.currentActionOptions)){
+            if(options.frameRate !== this.currentActionOptions.frameRate){
+                this.setFrameRate(options.frameRate)
+            }
+            return this;
+        } 
 
         const {
             model,

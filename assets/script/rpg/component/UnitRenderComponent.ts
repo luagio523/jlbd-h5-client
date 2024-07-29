@@ -1,6 +1,5 @@
 import { Node } from "cc";
 import { ECSComponent } from "../ecs/ECSComponent";
-import { ActType } from "../enum/Act";
 import { Unit } from "../render/unit/Unit";
 
 export class UnitRenderComponent extends ECSComponent {
@@ -17,8 +16,6 @@ export class UnitRenderComponent extends ECSComponent {
         this.unit = unit;
     }
 
-   
-
     public getNode(): Node {
         return this.unit.getNode();
     }
@@ -31,6 +28,5 @@ export class UnitRenderComponent extends ECSComponent {
     public setPosition(x: number, y: number): void {
         this.unit.setPosition(x, y);
     }
-
 
 }
