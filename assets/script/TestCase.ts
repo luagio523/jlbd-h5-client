@@ -238,15 +238,7 @@ export namespace testcase {
 
 
     export function app_test17() {
-        const gameWorld = new GameWorld()
-
-        let data = {
-            id:1,
-            name:"Thief",
-            type:EntityType.Role,
-        };
-
-        gameWorld.createRole(data)
+        app.game.getGameWorld().start()
     }
 
 }

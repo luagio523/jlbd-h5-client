@@ -29,21 +29,22 @@ export class GameWorld   {
     }
 
     public initialize(): void {
-        if(!this.isInit){
-            this.entityManager = EntityManager.getInstance();
-            this.sceneManager = SceneManager.getInstance();
-            this.ecs = ECSManager.getInstance();
-            this.eventManager = EventManager.getInstance();
-            this.mapManager = MapManager.getInstance();
-            this.initECS();
-            this.initEvent();
-            this.initScene();
-            this.isInit = true
-        }
+       
+        this.entityManager = EntityManager.getInstance();
+        this.sceneManager = SceneManager.getInstance();
+        this.ecs = ECSManager.getInstance();
+        this.eventManager = EventManager.getInstance();
+        this.mapManager = MapManager.getInstance();
+        this.initECS();
+        this.initEvent();
+        this.initScene();
+        this.isInit = true
     }
 
     start() {
-        this.initialize();
+        if(!this.isInit){
+            this.initialize();
+        }
         this.ecs.start();
     }
 
