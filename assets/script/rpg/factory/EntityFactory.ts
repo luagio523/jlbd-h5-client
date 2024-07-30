@@ -2,6 +2,8 @@ import GameEntity from "../entity/Entity";
 import { EntityType } from "../enum/Type";
 import { UnitRenderComponent } from "../component/UnitRenderComponent";
 import { InputComponent } from "../component/InputComponent";
+import { TransformComponent } from "../component/TransformComponent";
+import { MovableComponent } from "../component/MovableComponent";
 
 
 /**
@@ -50,6 +52,8 @@ export default class EntityFactory {
 		// 根据实体类型初始化特定的组件或属性
 		switch (type) {
 			case EntityType.Role:
+				entity.addComponent(new MovableComponent());
+				entity.addComponent(new TransformComponent());
 				entity.addComponent(new InputComponent());
 				entity.addComponent(new UnitRenderComponent());
 				break;
