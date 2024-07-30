@@ -9,7 +9,7 @@ import { SLayerType, SceneManager } from "../../rpg/manager/SceneManager"
 import MapManager from "../../rpg/manager/MapManager"
 import { MapDisplay } from "../../rpg/map/MapDisplay"
 import { EventManager } from "../../rpg/event/EventManager"
-import {  RPGEvent } from "../../rpg/event/Event"
+import {  EnterMapEvent, InitRoleEvent, RPGEvent } from "../../rpg/event/Event"
 
 @mvc.component("WorldActor")
 export class WorldActor extends BaseActor {
@@ -26,18 +26,13 @@ export class WorldActor extends BaseActor {
 	public executeEnterWorld(role:any) {
 		console.log(`WorldActor enter world ${role}`)
 
-		// SceneManager.getInstance().initialize(app.game.getGameRoot());//初始化场景
+		//load role data
 
-		// let display = new MapDisplay();
-		// SceneManager.getInstance().addToLayer(SLayerType.Map,display);
+		role.position = {x:100,y:100}
 
-        // MapManager.getInstance().initialize(display,app.game.getCameraNode());//初始化地图
-
-        // MapManager.getInstance().enterMap("map004");
-
-        // EventManager.getInstance().registerListener(RPGEvent.EnterMap, function (event) {
-        //     console.log("enter map", event);     
-        // });
+		app.game.getGameWorld().start()
+		EventManager.getInstance().dispatchEvent(new EnterMapEvent("map004",role.position))
+		EventManager.getInstance().dispatchEvent(new InitRoleEvent(1,"Thief"))
 	}
 
 	/*---------------------------------[models]------------------------------------*/
