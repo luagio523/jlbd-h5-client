@@ -1,21 +1,20 @@
 // GameWorld.js
 
-import { _decorator, Component, Node, RenderableComponent } from "cc";
+import { _decorator, Node,  } from "cc";
 import { EntityData, } from "./data/EntityData";
 import { ECSManager } from "./ecs/ESCManager";
 import { EntityManager } from "./manager/EntityManager";
-import { SceneManager, SLayerType } from "./manager/SceneManager";
+import { SceneManager,  } from "./manager/SceneManager";
 import { RenderableSystem } from "./system/RenderableSystem";
 import { EventManager } from "./event/EventManager";
-import { MapDisplay } from "./map/MapDisplay";
 import MapManager from "./manager/MapManager";
 import { EnterMapEvent, InitRoleEvent, RPGEvent } from "./event/Event";
 import { EntityType } from "./enum/Type";
 import { UnitRenderComponent } from "./component/UnitRenderComponent";
 import { ActionOptions } from "./base/UnitAnimationState";
 import { ActType } from "./enum/Act";
-import app from "../App";
-import { Joystick } from "../modules/game/Joystick";
+import { InputManager } from "./manager/InputManager";
+import { UIManager } from "./manager/UIManager";
 const { ccclass, property } = _decorator;
 
 export class GameWorld   {
@@ -24,6 +23,8 @@ export class GameWorld   {
     private eventManager: EventManager;
     private mapManager: MapManager;
     private ecs: ECSManager;
+    public inputManger:InputManager;
+    public uiManger:UIManager;
 
     private rootNode!: Node;
     private cameraNode!: Node;
@@ -41,6 +42,8 @@ export class GameWorld   {
         this.ecs = ECSManager.getInstance();
         this.eventManager = EventManager.getInstance();
         this.mapManager = MapManager.getInstance();
+        this.inputManger = InputManager.getInstance();
+        this.uiManger = new UIManager();
         this.initECS();
         this.initEvent();
         this.initScene();

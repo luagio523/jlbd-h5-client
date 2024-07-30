@@ -5,6 +5,7 @@ import { mvc } from "../../core/mvc/__private"
 import { GComponent } from "fairygui-cc"
 import { Joystick } from "./Joystick"
 import { Notification } from "../../mvc/Notification"
+import app from "../../App"
 /**
  * HeadUpDisplayMediator
  */
@@ -28,7 +29,11 @@ export default class HeadUpDisplayMediator extends BaseMediator {
 		const cptHand = this.viewAdapter.findChild<GComponent>("cpt_hand");
 		this.joystick = new Joystick();
 		this.joystick.injectUI(cptHand)
+		this.joystick.onJoyStickMove((direction,angle) => {
+			console.log("angle:", angle, "direction:", direction)
 
+			app.game.getGameWorld().inputManger.updateJoystickState(direction,angle)
+		})
 		this.viewAdapter.safeClick("btn_map",this.onBtnMapClick, this);
 
 	}

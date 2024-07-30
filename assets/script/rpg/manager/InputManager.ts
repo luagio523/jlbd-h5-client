@@ -85,8 +85,8 @@ export class InputManager {
         }
     }
 
-    public updateJoystickState(direction:Vec2,angel:number = 0): void {
-        this.handleInput('joystick', { direction, angel });
+    public updateJoystickState(angel:number = 0): void {
+        this.handleInput('joystick', angel );
     }
 }
 

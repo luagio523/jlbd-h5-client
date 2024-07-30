@@ -5,22 +5,33 @@ import { ecsclass } from "../ecs/__private";
 ecsclass("InputComponent")
 export class InputComponent extends ECSComponent {
     joystickDirection: Vec2; // 摇杆的方向，范围从-1到1
-    joystickActive: boolean; // 摇杆是否被操作激活
-
+    joystickActive: boolean; // 摇杆是否被按下
+    angle:number; // 摇杆的角度，范围从-180到180    
     constructor() {
         super();
-        this.joystickDirection = new Vec2(0, 0);
-        this.joystickActive = false;
     }
 
-    public setJoystickInput(active: boolean, direction: Vec2): void {
-        this.joystickActive = active;
-        this.joystickDirection = direction;
+    public setJoystickInput(angle:number): void {
+        if(angle == 255){
+            this.joystickActive = false;
+        }else{
+            this.joystickActive = true;
+        }
+        this.angle = angle;
+        this.joystickDirection = this.decompressAngleToVec2(angle);
     }
 
-    public resetJoystickInput(): void {
-        this.joystickActive = false;
-        this.joystickDirection.set(0, 0);
+    public  decompressAngleToVec2(compressedAngle: number): Vec2 | null {
+        if (compressedAngle === 255) {
+            return new Vec2(0, 0); // 返回中心位置
+        }
+
+        const angle = (compressedAngle / 254) * 360;
+        const radians = angle * (Math.PI / 180);
+        const x = Math.cos(radians);
+        const y = Math.sin(radians);
+
+        return new Vec2(x, y).normalize();
     }
     
 }

@@ -75,11 +75,11 @@ export class UIManager {
         }
     }
 
-    private handleJoystickInput = (eventType: string, event: any) => {
+    private handleJoystickInput = (eventType: string, angle: number) => {
         const currentEntity = this.entityManager.getPlayerControlledEntity();
         const inputComponent = currentEntity.getComponent(InputComponent);
         if (inputComponent) {
-            inputComponent.setJoystickInput(event.x, event.y);
+            inputComponent.setJoystickInput(angle);
         }
     }
 
