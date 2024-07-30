@@ -123,9 +123,7 @@ export class ECSEntity {
         const name = constructor.name;
         const component = this.components.get(name);
         if (!component) {
-            throw new RangeError(
-                `[ECS] not found component '${name}' in entity '${this.id}'`
-            );
+            return null;
         }
         return component as T;
     }

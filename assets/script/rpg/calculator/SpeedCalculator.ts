@@ -42,7 +42,7 @@ export class SpeedCalculator {
             baseSpeed = Math.max(Constants.MIN_MOVEMENT_SPEED, Math.min(Constants.MAX_MOVEMENT_SPEED, baseSpeed));
         }
     
-        return baseSpeed;
+        return baseSpeed ; // dt单位为秒,这里除以100是为了转换为/秒
     }
     
  

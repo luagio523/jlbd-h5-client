@@ -90,14 +90,13 @@ export class GameWorld   {
 
 
     private async initRole(evt: InitRoleEvent): Promise<void> {
-        const data = EntityData.create( evt.name,evt.id, EntityType.Role);
+        const data = EntityData.create( EntityType.Role,evt.name,evt.pos);
         const role = await this.entityManager.createEntity(data); // 创建角色实体
         this.entityManager.setPlayerControlledEntity(role);  // 设置玩家控制的实体
         this.ecs.entities.add(role);  // 将角色实体添加到 ECS 中
         this.sceneManager.addEntity(role);  // 将角色实体添加到场景中
 
         let uint = role.getComponent(UnitRenderComponent).unit;
-        uint.setPosition(400, 400);
         
         // this.sceneManager.initialize(this.node);
         const actionOptions: ActionOptions = {

@@ -4,34 +4,37 @@ import { ECSComponent } from "../ecs/ECSComponent";
 import { ecsclass } from "../ecs/__private";
 ecsclass("InputComponent")
 export class InputComponent extends ECSComponent {
-    joystickDirection: Vec2; // 摇杆的方向，范围从-1到1
+    joystickDirection: Vec2; // 摇杆的方向，范围从-1到1 //已经归一normalize了
     joystickActive: boolean; // 摇杆是否被按下
-    angle:number; // 摇杆的角度，范围从-180到180    
     constructor() {
         super();
     }
 
-    public setJoystickInput(angle:number): void {
-        if(angle == 255){
+    public setJoystickInput(angle: number): void {
+        if (angle === 255) {
             this.joystickActive = false;
-        }else{
+            this.joystickDirection = new Vec2(0, 0); // 中心位置
+            return;
+        } else {
             this.joystickActive = true;
         }
-        this.angle = angle;
-        this.joystickDirection = this.decompressAngleToVec2(angle);
-    }
-
-    public  decompressAngleToVec2(compressedAngle: number): Vec2 | null {
-        if (compressedAngle === 255) {
-            return new Vec2(0, 0); // 返回中心位置
+    
+        // 计算方向向量
+        const normalizedAngle = (angle / 254) * 360; // 将压缩角度映射到0-360
+        const radians = normalizedAngle * (Math.PI / 180);
+        this.joystickDirection = new Vec2(Math.cos(radians), Math.sin(radians));
+    
+        // 反转 y 轴
+        this.joystickDirection.y = -this.joystickDirection.y;
+    
+        // 归一化方向向量
+        const length = Math.sqrt(this.joystickDirection.x * this.joystickDirection.x + this.joystickDirection.y * this.joystickDirection.y);
+        if (length > 0) {
+            this.joystickDirection.x /= length;
+            this.joystickDirection.y /= length;
         }
-
-        const angle = (compressedAngle / 254) * 360;
-        const radians = angle * (Math.PI / 180);
-        const x = Math.cos(radians);
-        const y = Math.sin(radians);
-
-        return new Vec2(x, y).normalize();
+    
+        console.log("Joystick input direction:", this.joystickDirection);
     }
     
 }

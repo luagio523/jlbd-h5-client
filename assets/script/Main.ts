@@ -11,6 +11,7 @@ import { UIManager } from './core/ui/UIManager';
 import { Facade } from './core/mvc/init';
 import {  UI_CONFIG } from './config/UIConfig';
 import { testcase } from './TestCase';
+import { Notification } from './mvc/Notification';
 
 const { ccclass, property } = _decorator;
 
@@ -95,7 +96,8 @@ export class Main extends Root {
     }
    
     protected async test() {
-        testcase.app_test4();
+        // testcase.app_test4();
+        app.facade.send(Notification.CREATEROLE_VIEW_SHOW);
     }
 
     update(dt: number) {

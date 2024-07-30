@@ -85,8 +85,8 @@ export class InputManager {
         }
     }
 
-    public updateJoystickState(angel:number = 0): void {
-        this.handleInput('joystick', angel );
+    public updateJoystickState(angle:number ): void {
+        this.handleInput('joystick', angle );
     }
 }
 

@@ -152,6 +152,7 @@ export class InitRoleEvent implements IEvent {
     constructor(
         public readonly id: number,
         public readonly name: string,
+        public readonly pos: Vec2,
     ) { }
 }
 

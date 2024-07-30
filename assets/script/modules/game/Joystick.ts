@@ -1,3 +1,9 @@
+
+
+
+
+
+
 import { Vec2 } from "cc";
 import { Event, GButton, GComponent, GObject, GTween, EaseType } from "fairygui-cc";
 import { FairyUIAdapter } from "../../core/ui/UIAdapter";
@@ -118,34 +124,11 @@ export class Joystick extends FairyUIAdapter {
 
     private getCompressedAngle(x: number, y: number): number {
         let angle = Math.atan2(y, x) * 180 / Math.PI;
-
         if (angle < 0) angle += 360; // 压缩角度到0-254范围
         return Math.round(angle * 254 / 360);
     }
-
-    public static decompressAngleToVec2(compressedAngle: number): Vec2 | null {
-        if (compressedAngle === 255) {
-            return new Vec2(0, 0); // 返回中心位置
-        }
-
-        const angle = (compressedAngle / 254) * 360;
-        const radians = angle * (Math.PI / 180);
-
-        const x = Math.cos(radians);
-        const y = Math.sin(radians);
-
-        return new Vec2(x, y).normalize();
-    }
+   
 }
-
-
-
-
-// import { Vec2 } from "cc";
-// import { Event, GButton, GComponent, GObject, GRoot, GTween, EaseType } from "fairygui-cc";
-// import { FairyUIAdapter } from "../../core/ui/UIAdapter";
-// import app from "../../App";
-// import { TrigLookupTables } from "../../core/common/math/TrigLookupTables";
 
 // export class Joystick extends FairyUIAdapter {
 //     public static readonly JOYSTICK_MOVE = "joystick_move";
@@ -159,7 +142,8 @@ export class Joystick extends FairyUIAdapter {
 //     private lastSentAngle: number = -1;
 //     private radiusSquared: number;
 //     private tween: any = null;
-//     private onJoyStickMoveCallback: (direction: Vec2,angle: number ) => void;
+//     private direction: Vec2 = new Vec2();
+//     private onJoyStickMoveCallback: (direction: Vec2 ) => void;
 
 //     public injectUI(ui: GComponent): void {
 //         super.injectUI(ui)
@@ -254,15 +238,14 @@ export class Joystick extends FairyUIAdapter {
 //         const angle = this.getCompressedAngle();
 //         if (angle !== this.lastSentAngle) {
 //             this.lastSentAngle = angle;
-
 //             if(this.onJoyStickMoveCallback) {
-//                 this.onJoyStickMoveCallback(this.direction.clone(),angle);
+//                 this.onJoyStickMoveCallback(this.direction.normalize());
 //             }
 //         }
 //     }
 
 
-//     public onJoyStickMove(callback: ( direction: Vec2,angle: number) => void): void {
+//     public onJoyStickMove(callback: ( direction: Vec2) => void): void {
 //         this.onJoyStickMoveCallback = callback;
 //     }
 
@@ -278,20 +261,7 @@ export class Joystick extends FairyUIAdapter {
 //     }
 
     
-//     public static decompressAngleToVec2(compressedAngle: number): Vec2 | null {
-//         if (compressedAngle === 255) {
-//             return new Vec2(0, 0); // or return a specific direction like { x: 0, y: 0 }
-//         }
     
-//         const angle = (compressedAngle / 254) * 360;
-    
-//         const radians = angle * (Math.PI / 180);
-    
-//         const x = Math.cos(radians);
-//         const y = Math.sin(radians);
-    
-//         return new Vec2(x, y).normalize();
-//     }
     
 
 //     // private getCompressedAngle(): number {
@@ -305,3 +275,7 @@ export class Joystick extends FairyUIAdapter {
 //     // }
     
 // }
+
+
+
+

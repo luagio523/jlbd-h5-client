@@ -8,6 +8,7 @@ export class MovableComponent extends ECSComponent {
     private speed: number;
     private acceleration: number;
     private maxSpeed: number;
+    private speedPerSecond: number;
 
     constructor() {
         super();
@@ -24,18 +25,23 @@ export class MovableComponent extends ECSComponent {
     public getBaseSpeed(): number {
         return this.baseSpeed;
     }
+   
 
-    public getSpeed(): number {
-        return this.speed;
+   // 获取每秒速度
+    public getSpeedPerSecond(): number {
+        return this.speedPerSecond;
     }
 
     public setAcceleration(acceleration: number): void {
         this.acceleration = acceleration;
     }
 
-    public updateSpeed(newSpeed: number, dt: number): void {
-        this.speed = Math.max(0, Math.min(newSpeed, this.maxSpeed));
-        
+    public updateSpeed(newSpeed: number): void {
+        this.speed = newSpeed;
+        this.speedPerSecond = 10+this.speed / 100;
+    }
+
+    public accelerateSpeed( dt: number): void {
         if (this.acceleration !== 0) {
             this.speed += this.acceleration * dt;
             this.speed = Math.max(0, Math.min(this.speed, this.maxSpeed));

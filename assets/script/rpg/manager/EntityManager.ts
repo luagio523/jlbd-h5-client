@@ -5,6 +5,7 @@
 import { AnimResourceType } from "../../core/animation/Type";
 import { ActionOptions } from "../base/UnitAnimationState";
 import { MovableComponent } from "../component/MovableComponent";
+import { TransformComponent } from "../component/TransformComponent";
 import {  UnitRenderComponent } from "../component/UnitRenderComponent";
 import { EntityData } from "../data/EntityData";
 import { HeroKV } from "../data/kv/HeroKV";
@@ -51,6 +52,9 @@ export class EntityManager {
 
         let movable = entity.getComponent(MovableComponent);
         movable.initialize(herokv.GetBaseMoveSpeed());
+
+        let transform = entity.getComponent(TransformComponent);
+        transform.setPosition(data.pos)
 
         this.setPlayerControlledEntity(entity);
 

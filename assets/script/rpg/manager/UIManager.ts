@@ -9,6 +9,8 @@ import { EntityManager } from "./EntityManager";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { EventManager } from "../event/EventManager";
 import { TriggerAbilityEvent } from "../event/Event";
+import { Direction } from "../base/Direction";
+import { Vec2 } from "cc";
 
 
 export class UIManager {

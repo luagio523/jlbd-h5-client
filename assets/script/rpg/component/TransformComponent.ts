@@ -11,24 +11,33 @@ export class TransformComponent extends ECSComponent {
 
     constructor() {
         super();
-        this.position = Vec2.ZERO;
+        this.position = new Vec2(0,0);
         this.rotation = 0;
         this.heading = new Vec2(0,1).rotate( this.rotation);
         this.turnRate = 1;
     }
 
-    setTargetPosition(target: Vec2): void {
+    public setTargetPosition(target: Vec2): void {
         this.targetPosition = target;
     }
 
-    updatePosition(deltaTime: number, speed: number): void {
+    public setPosition(position: Vec2): void {
+        if(position){
+            this.position = new Vec2(position.x, position.y);
+        }else{
+            this.position = new Vec2(0,0);
+        }
+        
+    }
+
+    public updatePosition(deltaTime: number, speed: number): void {
         if (this.targetPosition) {
             const movement = this.heading.multiplyScalar(speed * deltaTime);
             this.position = this.position.add(movement);
         }
     }
 
-    updateHeading(deltaTime: number): void {
+    public updateHeading(deltaTime: number): void {
         if (this.targetPosition) {
             const desiredDirection = this.targetPosition.subtract(this.position).normalize();
             const angle = this.heading.signAngle(desiredDirection);
