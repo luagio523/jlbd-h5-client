@@ -37,7 +37,6 @@ export class GameWorld   {
     }
 
     public initialize(): void {
-       
         this.entityManager = EntityManager.getInstance();
         this.sceneManager = SceneManager.getInstance();
         this.ecs = ECSManager.getInstance();
@@ -45,9 +44,11 @@ export class GameWorld   {
         this.mapManager = MapManager.getInstance();
         this.inputManger = InputManager.getInstance();
         this.uiManger = new UIManager();
+
         this.initECS();
         this.initEvent();
         this.initScene();
+        
         this.isInit = true
     }
 
@@ -92,6 +93,7 @@ export class GameWorld   {
     private async initRole(evt: InitRoleEvent): Promise<void> {
         const data = EntityData.create( EntityType.Role,evt.name,evt.pos);
         const role = await this.entityManager.createEntity(data); // 创建角色实体
+
         this.entityManager.setPlayerControlledEntity(role);  // 设置玩家控制的实体
         this.ecs.entities.add(role);  // 将角色实体添加到 ECS 中
         this.sceneManager.addEntity(role);  // 将角色实体添加到场景中

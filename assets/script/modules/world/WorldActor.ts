@@ -28,11 +28,11 @@ export class WorldActor extends BaseActor {
 
 		//load role data
 
-		role.position = {x:100,y:100}
+		role.position = {x:600,y:800}
 
 		app.game.getGameWorld().start()
 		EventManager.getInstance().dispatchEvent(new EnterMapEvent("map004",role.position))
-		EventManager.getInstance().dispatchEvent(new InitRoleEvent(1,"Thief",role.position))
+		// EventManager.getInstance().dispatchEvent(new InitRoleEvent(1,"Thief",role.position))
 	}
 
 	/*---------------------------------[models]------------------------------------*/
