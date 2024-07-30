@@ -46,6 +46,8 @@ export class EntityManager {
         const entity = this.entityFactory.createEntity(data.type);
         let render = entity.getComponent(UnitRenderComponent);
 
+        console.log("createEntity-----------",render.name)
+
         let modelType = herokv.GetModelType();
         let modelName = herokv.GetHeroName();
         let model = herokv.GetModel();

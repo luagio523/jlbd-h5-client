@@ -85,7 +85,11 @@ export class GameWorld   {
     private async initRole(evt: InitRoleEvent): Promise<void> {
         const data = EntityData.create( evt.name,evt.id, EntityType.Role);
         const role = await this.entityManager.createEntity(data);
+        this.ecs.entities.add(role);
         this.sceneManager.addEntity(role);
+        
+
+
         let uint = role.getComponent(UnitRenderComponent).unit;
         uint.setPosition(400, 400);
         

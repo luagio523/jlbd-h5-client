@@ -1,4 +1,6 @@
 
+import { ecsclass } from "../ecs/__private";
+ecsclass("TransferComponent")
 export class TransferComponent {
     /**
      * 传送到目标地图Id

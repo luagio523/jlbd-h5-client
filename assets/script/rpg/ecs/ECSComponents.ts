@@ -24,6 +24,8 @@ export class ECSComponents {
      * @param constructor
      */
     all<T extends ECSComponent>(constructor: Constructor<T>): T[] {
+
+
         const components = this.components.get(constructor.name);
         return components ? (components as T[]) : (EMPTY as T[]);
     }
@@ -50,6 +52,7 @@ export class ECSComponents {
      */
     add(component: ECSComponent): void {
         const name = component.name;
+
         if (typeof name !== "string" || name.length === 0) {
             throw new RangeError(
                 `[ECS] component '${component}' not set name by @ecsclass`

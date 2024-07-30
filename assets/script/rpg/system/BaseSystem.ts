@@ -3,7 +3,7 @@ import { ECSEntity } from "../ecs/ECSEntity";
 import { ECSSystem } from "../ecs/ECSSystem";
 import { Constructor } from "../ecs/__private";
 import { IEvent } from "../event/Event";
-import { EventListenerManager } from "../event/EventManager";
+import { EventManager } from "../event/EventManager";
 import { EventQueueManager } from "../event/EventQueueManager";
 
 export class BaseSystem extends ECSSystem{
@@ -13,11 +13,11 @@ export class BaseSystem extends ECSSystem{
     }
     /******************直接触发的事件*********************** */
     protected fireEvent(event: IEvent): void {
-        EventListenerManager.getInstance().dispatchEvent(event);
+        EventManager.getInstance().dispatchEvent(event);
     }
 
     protected listenEvent(eventType: string, listener: (event: IEvent) => void): void {
-        EventListenerManager.getInstance().registerListener(eventType, listener);
+        EventManager.getInstance().registerListener(eventType, listener);
     }
 
     /***********************事件队列 批量处理****************************** */
