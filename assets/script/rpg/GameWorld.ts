@@ -15,6 +15,7 @@ import { ActionOptions } from "./base/UnitAnimationState";
 import { ActType } from "./enum/Act";
 import { InputManager } from "./manager/InputManager";
 import { UIManager } from "./manager/UIManager";
+import { MovementSystem } from "./system/MovementSystem";
 const { ccclass, property } = _decorator;
 
 export class GameWorld   {
@@ -65,6 +66,7 @@ export class GameWorld   {
         // 将系统添加到 ECS 中
         this.ecs.systems
             .add(new RenderableSystem())
+            .add(new MovementSystem())
     }
 
     private initScene(): void {

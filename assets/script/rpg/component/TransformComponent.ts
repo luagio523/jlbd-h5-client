@@ -9,12 +9,12 @@ export class TransformComponent extends ECSComponent {
     targetPosition: Vec2;
     turnRate: number;
 
-    constructor(position: Vec2, rotation: number = 0, turnRate: number = 1) {
+    constructor() {
         super();
-        this.position = position;
-        this.rotation = rotation;
-        this.heading = new Vec2(0,1).rotate(rotation);
-        this.turnRate = turnRate;
+        this.position = Vec2.ZERO;
+        this.rotation = 0;
+        this.heading = new Vec2(0,1).rotate( this.rotation);
+        this.turnRate = 1;
     }
 
     setTargetPosition(target: Vec2): void {
