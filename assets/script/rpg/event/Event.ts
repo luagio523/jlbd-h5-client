@@ -76,6 +76,13 @@ export class ProjectileEvent implements IEvent {
 }
 
 
+export class TriggerAbilityEvent implements IEvent {
+    public readonly type = RPGEvent.TriggerAbilityEvent
+    constructor(
+        public readonly ability: BaseAbility,
+    ) { }
+}
+
 
 export class CastAbilityEvent implements IEvent {
     public readonly type = RPGEvent.CastAbilityEvent
@@ -159,6 +166,8 @@ export enum RPGEvent {
     Animation = "Animation",
     Projectile = "Projectile",
 
+    
+    TriggerAbilityEvent = "TriggerAbilityEvent",
     CastAbilityEvent = "CastAbilityEvent",
 
     AbilityPhaseStart = "AbilityPhaseStart",

@@ -17,6 +17,7 @@ export class Joystick extends FairyUIAdapter {
     private lastSentAngle: number = -1;
     private radiusSquared: number;
     private tween: any = null;
+    private onJoyStickMoveCallback: (angle: number, direction: Vec2) => void;
 
     public injectUI(ui: GComponent): void {
         super.injectUI(ui)
@@ -111,8 +112,16 @@ export class Joystick extends FairyUIAdapter {
         const angle = this.getCompressedAngle();
         if (angle !== this.lastSentAngle) {
             this.lastSentAngle = angle;
-            app.message.emit(Joystick.JOYSTICK_MOVE, { angle, direction: this.direction.clone() });
+
+            if(this.onJoyStickMoveCallback) {
+                this.onJoyStickMoveCallback(angle, this.direction.clone());
+            }
         }
+    }
+
+
+    public onJoyStickMove(callback: (angle: number, direction: Vec2) => void): void {
+        this.onJoyStickMoveCallback = callback;
     }
 
     private getCompressedAngle(): number {

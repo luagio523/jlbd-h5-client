@@ -1,5 +1,3 @@
-import { Vec2 } from "cc";
-import { AbilitySystem } from "../system/AbilitySystem";
 import { InputManager } from "./InputManager";
 import { AbilityIndicator } from "../indicator/AbilityIndicator";
 import { AbilityComponent } from "../component/AbilityComponent";
@@ -9,16 +7,19 @@ import { InputComponent } from "../component/InputComponent";
 import { AbilityIndicatorFactory } from "../factory/AbilityIndicatorFactory";
 import { EntityManager } from "./EntityManager";
 import { ECSEntity } from "../ecs/ECSEntity";
+import { EventManager } from "../event/EventManager";
+import { TriggerAbilityEvent } from "../event/Event";
 
 
 export class UIManager {
     private inputManager: InputManager;
     private entityManager: EntityManager;
     private abilityIndicator: AbilityIndicator | null = null;
-
+    private eventManger:EventManager;
     constructor() {
         this.inputManager = InputManager.getInstance();
         this.entityManager = EntityManager.getInstance();
+        this.eventManger = EventManager.getInstance();
         this.inputManager.addListener('joystick', this.handleJoystickInput);
     }
 
@@ -50,11 +51,9 @@ export class UIManager {
     }
 
 
-
-
-
     private  triggerAbility(entity: ECSEntity, ability: BaseAbility) {
-        //do something
+        ability.SetCaster(entity)
+        this.eventManger.dispatchEvent(new TriggerAbilityEvent(ability)) // 丢给abilitySystem处理
     }
 
     private startAbilityIndicator(ability: BaseAbility): void {
@@ -72,13 +71,7 @@ export class UIManager {
             this.inputManager.removeMouseListeners(this.abilityIndicator.handleInput);
             const ability = this.abilityIndicator.getAbility();
             const currentEntity = this.entityManager.getPlayerControlledEntity();
-            const abilityComponent = currentEntity.getComponent(AbilityComponent);
-            if (abilityComponent) {
-                const abilityIndex = abilityComponent.getAbilityIndex(ability);
-                if (abilityIndex !== -1) {
-                    this.triggerAbility(currentEntity, ability);
-                }
-            }
+            this.triggerAbility(currentEntity, ability);
         }
     }
 

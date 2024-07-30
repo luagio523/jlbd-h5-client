@@ -1,8 +1,6 @@
 import { BaseAbility } from "../ability/BaseAbility";
 import { AbilityComponent } from "../component/AbilityComponent";
-import { ECSEntity } from "../ecs/ECSEntity";
-import { AbilityBehavior } from "../enum/Type";
-import { AbilityEndEvent, AbilityPhaseInterruptedEvent, AbilityPhaseStartEvent, AbilityStartEvent, CastAbilityEvent, DelayedEvent } from "../event/Event";
+import { AbilityEndEvent, AbilityPhaseInterruptedEvent, AbilityPhaseStartEvent, AbilityStartEvent,  DelayedEvent, RPGEvent } from "../event/Event";
 import { BaseSystem } from "./BaseSystem";
 
 
@@ -10,7 +8,7 @@ export class AbilitySystem extends BaseSystem {
 
     public constructor() {
         super();
-        // this.listenEvent(Event.ApplyDamage,this.onApplyDamage.bind(this))
+        this.listenEvent(RPGEvent.TriggerAbilityEvent,this.triggerAbility.bind(this))
     }
 
 
@@ -114,22 +112,6 @@ export class AbilitySystem extends BaseSystem {
 
     
 
-    public tryActivateAbility(entity: ECSEntity, abilityIndex: number): void {
-        const abilityComponent = entity.getComponent(AbilityComponent);
-        if (!abilityComponent) return;
-    
-        const ability = abilityComponent.getAbility(abilityIndex);
-        if (ability && ability.CanBeExecuted()) {
-            if (ability.GetBehavior() & AbilityBehavior.ABILITY_BEHAVIOR_TOGGLE) {
-                ability.OnToggle();
-            } else if (ability.GetBehavior() & AbilityBehavior.ABILITY_BEHAVIOR_NO_TARGET) {
-                this.triggerAbility(ability);
-            } else {
-                this.startAbility(ability);
-            }
-        }
-    }
-    
 
 }
 

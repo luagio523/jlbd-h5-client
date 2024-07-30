@@ -1,3 +1,5 @@
+import { Vec2 } from "cc";
+
 export class InputManager {
     private static instance: InputManager;
     private listeners: Map<string, Set<(eventType: string, event: any) => void>> = new Map();
@@ -83,8 +85,8 @@ export class InputManager {
         }
     }
 
-    public updateJoystickState(x: number, y: number): void {
-        this.handleInput('joystick', { x, y });
+    public updateJoystickState(direction:Vec2,angel:number = 0): void {
+        this.handleInput('joystick', { direction, angel });
     }
 }
 
