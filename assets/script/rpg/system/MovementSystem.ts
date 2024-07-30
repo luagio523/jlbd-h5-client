@@ -20,7 +20,7 @@ export class MovementSystem extends BaseSystem {
     }
 
     update(deltaTime: number): void {
-        const entities = this.getEntitiesWithComponents(TransformComponent, MovableComponent);
+        const entities = this.getEntitiesWithComponents(TransformComponent, MovableComponent);//获取有这两种组件的实体列表
         
         for (const entity of entities) {
             const transform = entity.getComponent(TransformComponent);
@@ -36,7 +36,7 @@ export class MovementSystem extends BaseSystem {
                 this.handleJoystickMovement(entity, transform, input, movable.getSpeed(), deltaTime);
             } else if (pathfinding && pathfinding.getState() === PathfindingState.FOLLOWING_PATH) {
                 this.handlePathfindingMovement( transform, pathfinding, movable.getSpeed(), deltaTime);
-            } else if (attack && attack.getTarget()) {
+            } else if ( attack && attack.getTarget()) {
                 this.handleAttackMovement( transform, attack, movable.getSpeed(), deltaTime);
             }
             
