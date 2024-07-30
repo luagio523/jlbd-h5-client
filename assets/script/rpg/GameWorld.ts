@@ -14,6 +14,8 @@ import { EntityType } from "./enum/Type";
 import { UnitRenderComponent } from "./component/UnitRenderComponent";
 import { ActionOptions } from "./base/UnitAnimationState";
 import { ActType } from "./enum/Act";
+import app from "../App";
+import { Joystick } from "../modules/game/Joystick";
 const { ccclass, property } = _decorator;
 
 export class GameWorld   {
@@ -69,9 +71,9 @@ export class GameWorld   {
 
     private initEvent(): void {
         this.eventManager.registerListener(RPGEvent.InitRoleEvent, this.initRole.bind(this))
-
         this.eventManager.registerListener(RPGEvent.EnterMap, this.enterMap.bind(this))
     }
+
 
     private enterMap(data: EnterMapEvent): void {
         const mapId = data.mapId;
@@ -85,6 +87,7 @@ export class GameWorld   {
     private async initRole(evt: InitRoleEvent): Promise<void> {
         const data = EntityData.create( evt.name,evt.id, EntityType.Role);
         const role = await this.entityManager.createEntity(data); // 创建角色实体
+        this.entityManager.setPlayerControlledEntity(role);  // 设置玩家控制的实体
         this.ecs.entities.add(role);  // 将角色实体添加到 ECS 中
         this.sceneManager.addEntity(role);  // 将角色实体添加到场景中
 

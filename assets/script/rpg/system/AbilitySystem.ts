@@ -8,6 +8,11 @@ import { BaseSystem } from "./BaseSystem";
 
 export class AbilitySystem extends BaseSystem {
 
+    public constructor() {
+        super();
+        // this.listenEvent(Event.ApplyDamage,this.onApplyDamage.bind(this))
+    }
+
 
     update(deltaTime: number) {
         const abilityComponents = this.getComponents(AbilityComponent);
@@ -40,8 +45,6 @@ export class AbilitySystem extends BaseSystem {
     private triggerAbility(ability: BaseAbility) {
         const caster = ability.GetCaster();
         if (!caster || !ability.CanBeExecuted()) return;
-
-        this.enqueueEvent(new CastAbilityEvent(caster, ability));
 
         if (ability.OnAbilityPhaseStart()) {
             this.enqueueEvent(new AbilityPhaseStartEvent(caster, ability));
@@ -122,15 +125,11 @@ export class AbilitySystem extends BaseSystem {
             } else if (ability.GetBehavior() & AbilityBehavior.ABILITY_BEHAVIOR_NO_TARGET) {
                 this.triggerAbility(ability);
             } else {
-                this.startAbilityCast(ability);
+                this.startAbility(ability);
             }
         }
     }
     
-
-    private startAbilityCast(ability: BaseAbility): void {
-       //do something
-    }
 
 }
 

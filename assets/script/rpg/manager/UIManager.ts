@@ -7,19 +7,18 @@ import { AbilityBehavior } from "../enum/Type";
 import { BaseAbility } from "../ability/BaseAbility";
 import { InputComponent } from "../component/InputComponent";
 import { AbilityIndicatorFactory } from "../factory/AbilityIndicatorFactory";
-import { GameEntityManager } from "./EntityManager";
+import { EntityManager } from "./EntityManager";
+import { ECSEntity } from "../ecs/ECSEntity";
 
 
 export class UIManager {
-    private abilitySystem: AbilitySystem;
     private inputManager: InputManager;
-    private gameEntityManager: GameEntityManager;
+    private entityManager: EntityManager;
     private abilityIndicator: AbilityIndicator | null = null;
 
-    constructor(abilitySystem: AbilitySystem) {
-        this.abilitySystem = abilitySystem;
+    constructor() {
         this.inputManager = InputManager.getInstance();
-        this.gameEntityManager = GameEntityManager.getInstance();
+        this.entityManager = EntityManager.getInstance();
         this.inputManager.addListener('joystick', this.handleJoystickInput);
     }
 
@@ -34,20 +33,28 @@ export class UIManager {
     }
 
     private onAbilityButtonClicked(abilityIndex: number) {
-        const currentEntity =  this.gameEntityManager.getPlayerControlledEntity(); // 获取当前选中的实体
+        const currentEntity =  this.entityManager.getPlayerControlledEntity(); // 获取当前选中的实体
         const abilityComponent = currentEntity.getComponent(AbilityComponent);
         if (!abilityComponent) return;
 
         const ability = abilityComponent.getAbility(abilityIndex);
         if (ability && ability.CanBeExecuted()) {
             if (ability.GetBehavior() & AbilityBehavior.ABILITY_BEHAVIOR_TOGGLE) {
-                this.abilitySystem.tryActivateAbility(currentEntity, abilityIndex);
+                ability.OnToggle();
             } else if (ability.GetBehavior() & AbilityBehavior.ABILITY_BEHAVIOR_NO_TARGET) {
-                this.abilitySystem.tryActivateAbility(currentEntity, abilityIndex);
+                this.triggerAbility(currentEntity, ability);
             } else {
                 this.startAbilityIndicator(ability);
             }
         }
+    }
+
+
+
+
+
+    private  triggerAbility(entity: ECSEntity, ability: BaseAbility) {
+        //do something
     }
 
     private startAbilityIndicator(ability: BaseAbility): void {
@@ -64,19 +71,19 @@ export class UIManager {
         this.abilityIndicator.onConfirm = () => {
             this.inputManager.removeMouseListeners(this.abilityIndicator.handleInput);
             const ability = this.abilityIndicator.getAbility();
-            const currentEntity = this.gameEntityManager.getPlayerControlledEntity();
+            const currentEntity = this.entityManager.getPlayerControlledEntity();
             const abilityComponent = currentEntity.getComponent(AbilityComponent);
             if (abilityComponent) {
                 const abilityIndex = abilityComponent.getAbilityIndex(ability);
                 if (abilityIndex !== -1) {
-                    this.abilitySystem.tryActivateAbility(currentEntity, abilityIndex);
+                    this.triggerAbility(currentEntity, ability);
                 }
             }
         }
     }
 
     private handleJoystickInput = (eventType: string, event: any) => {
-        const currentEntity = this.gameEntityManager.getPlayerControlledEntity();
+        const currentEntity = this.entityManager.getPlayerControlledEntity();
         const inputComponent = currentEntity.getComponent(InputComponent);
         if (inputComponent) {
             inputComponent.setJoystickInput(event.x, event.y);

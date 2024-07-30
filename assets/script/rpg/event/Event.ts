@@ -78,7 +78,7 @@ export class ProjectileEvent implements IEvent {
 
 
 export class CastAbilityEvent implements IEvent {
-    public readonly type = RPGEvent.AbilityStart
+    public readonly type = RPGEvent.CastAbilityEvent
     constructor(
         public readonly caster: ECSEntity,
         public readonly ability: BaseAbility,
@@ -149,6 +149,9 @@ export class InitRoleEvent implements IEvent {
 }
 
 
+
+
+
 export enum RPGEvent {
     ApplyAttack = "ApplyAttack",
     ApplyDamage = "ApplyDamage",
@@ -156,13 +159,25 @@ export enum RPGEvent {
     Animation = "Animation",
     Projectile = "Projectile",
 
+    CastAbilityEvent = "CastAbilityEvent",
+
     AbilityPhaseStart = "AbilityPhaseStart",
     AbilityPhaseInterrupted = "AbilityPhaseInterrupted",
-    CastAbility = "CastAbility",
+   
     AbilityStart = "AbilityStart",
     AbilityEnd = "AbilityEnd",
+
+
     InitedMapEvent = "InitedMapEvent",
     EnterMap = "EnterMap",
 
     InitRoleEvent ="InitRoleEvent",
 }
+
+
+
+
+
+
+
+

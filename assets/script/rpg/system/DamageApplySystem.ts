@@ -1,5 +1,5 @@
 
-import {  ApplyDamageEvent, Event,IEvent } from "../event/Event";
+import {  ApplyDamageEvent, IEvent, RPGEvent } from "../event/Event";
 import { BaseSystem } from "./BaseSystem";
 
 //战斗状态管理 比如回合制
@@ -7,18 +7,18 @@ export class DamageApplySystem extends BaseSystem{
 
     public constructor(){
         super()
-        this.listenEvent(Event.ApplyDamage,this.onApplyDamage.bind(this))
+        this.listenEvent(RPGEvent.ApplyDamage,this.onApplyDamage.bind(this))
     }
 
 
     public udpate(dt:number){
-        let events = this.getEvents(Event.ApplyDamage)
+        let events = this.getEvents(RPGEvent.ApplyDamage)
 
         events.forEach(event => {
             this.onApplyDamage(event)
         });
 
-        this.removeEvents(Event.ApplyDamage)
+        this.removeEvents(RPGEvent.ApplyDamage)
     }
     
     private onApplyDamage(event: IEvent){

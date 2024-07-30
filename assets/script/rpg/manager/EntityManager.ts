@@ -59,7 +59,7 @@ export class EntityManager {
         let unitRenderer = await this.renderableManager.createCharacter(modelType  as AnimResourceType);
         render.initialize(unitRenderer,model,modelName,gender,frameRate);
 
- 
+        this.setPlayerControlledEntity(entity);
 
         return entity;
     }
