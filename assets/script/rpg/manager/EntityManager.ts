@@ -4,6 +4,7 @@
 
 import { AnimResourceType } from "../../core/animation/Type";
 import { ActionOptions } from "../base/UnitAnimationState";
+import { MovableComponent } from "../component/MovableComponent";
 import {  UnitRenderComponent } from "../component/UnitRenderComponent";
 import { EntityData } from "../data/EntityData";
 import { HeroKV } from "../data/kv/HeroKV";
@@ -45,19 +46,11 @@ export class EntityManager {
 
         const entity = this.entityFactory.createEntity(data.type);
         let render = entity.getComponent(UnitRenderComponent);
+        let unitRenderer = await this.renderableManager.createCharacter(herokv.GetModelType()  as AnimResourceType);
+        render.initialize(unitRenderer,herokv.GetModel(),herokv.GetHeroName(),herokv.GetGender(),herokv.GetFrameRate());
 
-        console.log("createEntity-----------",render.name)
-
-        let modelType = herokv.GetModelType();
-        let modelName = herokv.GetHeroName();
-        let model = herokv.GetModel();
-        let gender = herokv.GetGender();
-        let frameRate = herokv.GetFrameRate();
-
-        console.log("createEntity",modelType);
-
-        let unitRenderer = await this.renderableManager.createCharacter(modelType  as AnimResourceType);
-        render.initialize(unitRenderer,model,modelName,gender,frameRate);
+        let movable = entity.getComponent(MovableComponent);
+        movable.initialize(herokv.GetBaseMoveSpeed());
 
         this.setPlayerControlledEntity(entity);
 

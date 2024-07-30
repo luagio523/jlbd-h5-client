@@ -4,6 +4,7 @@ import { Unit } from "../render/unit/Unit";
 import { ActType } from "../enum/Act";
 import { ActionOptions } from "../base/UnitAnimationState";
 import { ecsclass } from "../ecs/__private";
+import { HeroKV } from "../data/kv/HeroKV";
 ecsclass("UnitRenderComponent")
 export class UnitRenderComponent extends ECSComponent {
     public unit: Unit = null;
@@ -13,7 +14,8 @@ export class UnitRenderComponent extends ECSComponent {
         this.unit = unit;
     }
 
-    public initialize(unit:Unit,model:string, modelName:string,gender:number,frameRate:number ): void {
+
+    public initialize(unit:Unit,model:string,modelName:string,gender:number,frameRate:number ): void {
         this.unit = unit;
         this.actionOptions  ={
             model: model,
@@ -25,6 +27,7 @@ export class UnitRenderComponent extends ECSComponent {
         }
     }
 
+    
     public getNode(): Node {
         return this.unit.getNode();
     }

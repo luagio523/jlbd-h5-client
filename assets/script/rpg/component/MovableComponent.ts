@@ -9,12 +9,16 @@ export class MovableComponent extends ECSComponent {
     private acceleration: number;
     private maxSpeed: number;
 
-    constructor(baseSpeed: number=0, maxSpeed: number=0) {
+    constructor() {
         super();
+        
+    }
+
+    public initialize(baseSpeed: number=0): void {
         this.baseSpeed = baseSpeed;
-        this.speed = baseSpeed;
+        this.speed = this.baseSpeed;
         this.acceleration = 0;
-        this.maxSpeed = maxSpeed;
+        this.maxSpeed = 522;
     }
 
     public getBaseSpeed(): number {
