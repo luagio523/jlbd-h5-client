@@ -134,7 +134,7 @@ export class EnterMapEvent implements IEvent {
     public readonly type = RPGEvent.EnterMap
     constructor(
         public readonly mapId: string,
-        public readonly lookAt: Vec2,
+        public readonly focus: Vec2,
     ) { }
 }
 

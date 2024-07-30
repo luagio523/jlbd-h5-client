@@ -9,7 +9,7 @@ import { RenderableSystem } from "./system/RenderableSystem";
 import { EventManager } from "./event/EventManager";
 import { MapDisplay } from "./map/MapDisplay";
 import MapManager from "./manager/MapManager";
-import { InitRoleEvent, RPGEvent } from "./event/Event";
+import { EnterMapEvent, InitRoleEvent, RPGEvent } from "./event/Event";
 import { EntityType } from "./enum/Type";
 import { UnitRenderComponent } from "./component/UnitRenderComponent";
 import { ActionOptions } from "./base/UnitAnimationState";
@@ -73,11 +73,11 @@ export class GameWorld   {
         this.eventManager.registerListener(RPGEvent.EnterMap, this.enterMap.bind(this))
     }
 
-    private enterMap(data: any): void {
-        const mapId = data.mapName;
-        const lookAt = data.lookAt;
+    private enterMap(data: EnterMapEvent): void {
+        const mapId = data.mapId;
+        const focus = data.focus;
         this.mapManager.enterMap(mapId).then(() => {
-            this.mapManager.setCameraFocus(lookAt);
+            this.mapManager.setCameraFocus(focus);
         });
     }
 
