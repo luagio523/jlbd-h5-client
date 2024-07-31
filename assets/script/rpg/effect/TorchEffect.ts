@@ -39,7 +39,7 @@ export class TorchEffect extends BaseEffect {
         await resources.load('torch-effect', Material, (err, material) => {
             if (!err) {
                 this.torchMaterial = material;
-                this.torchSprite.setSharedMaterial(0, this.torchMaterial); // 使用 setSharedMaterial
+                this.torchSprite.setSharedMaterial(this.torchMaterial,0); // 使用 setSharedMaterial
             }
         });
 
