@@ -53,8 +53,8 @@ export class MovementSystem extends BaseSystem {
         // 计算提议的位置
         const proposedPosition = transform.position.add(movement);
 
-        console.log("joystickDirection", input.joystickDirection, "movement", movement, "proposedPosition", proposedPosition)
-        console.log("speed", speed * deltaTime,speed)
+        // console.log("joystickDirection", input.joystickDirection, "movement", movement, "proposedPosition", proposedPosition)
+        // console.log("speed", speed * deltaTime,speed)
 
         let currentPosition = transform.position
         transform.position = proposedPosition

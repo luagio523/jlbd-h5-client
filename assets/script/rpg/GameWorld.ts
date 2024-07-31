@@ -48,7 +48,7 @@ export class GameWorld   {
         this.initECS();
         this.initEvent();
         this.initScene();
-        
+
         this.isInit = true
     }
 
@@ -99,6 +99,8 @@ export class GameWorld   {
         this.sceneManager.addEntity(role);  // 将角色实体添加到场景中
 
         let uint = role.getComponent(UnitRenderComponent).unit;
+
+        this.mapManager.setCameraTarget(uint.getNode());  // 设置摄像机跟随的实体
         
         // this.sceneManager.initialize(this.node);
         const actionOptions: ActionOptions = {

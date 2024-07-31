@@ -34,7 +34,7 @@ export class InputComponent extends ECSComponent {
             this.joystickDirection.y /= length;
         }
     
-        console.log("Joystick input direction:", this.joystickDirection);
+        // console.log("Joystick input direction:", this.joystickDirection);
     }
     
 }

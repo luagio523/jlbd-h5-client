@@ -129,10 +129,10 @@ export class GameMap {
      * 获取边界区域
      * @returns {Rect} 边界区域
      */
-    private getBoundaryArea(): Rect {
+    public getBoundaryArea(): Rect {
         if (!this.cachedBoundaryArea) {
             const visibleArea = this.getVisibleArea();
-            this.cachedBoundaryArea = this.calculateBoundaryArea(visibleArea);
+            this.calculateBoundaryArea(visibleArea);
         }
         return this.cachedBoundaryArea;
     }
@@ -142,7 +142,7 @@ export class GameMap {
      * @param {Size} screenSize - 屏幕大小
      * @returns {Rect} 计算后的边界区域
      */
-    private calculateBoundaryArea(screenSize: Size): Rect {
+    private calculateBoundaryArea(screenSize: Size): void {
         const halfScreenWidth = screenSize.width * 0.5;
         const halfScreenHeight = screenSize.height * 0.5;
         
@@ -150,13 +150,14 @@ export class GameMap {
         const minY = Math.max(halfScreenHeight, 0);
         const maxX = Math.min(this.maxWidth - halfScreenWidth - this.offset.x, this.maxWidth - this.offset.x);
         const maxY = Math.min(this.maxHeight - halfScreenHeight - this.offset.y, this.maxHeight - this.offset.y);
-     
-        return new Rect(
+
+        this.cachedBoundaryArea = new Rect(
             minX,
             minY,
             Math.max(maxX - minX, 0),
             Math.max(maxY - minY, 0)
         );
+       
     }
 
     /**
@@ -203,7 +204,7 @@ export class GameMap {
      */
     public updateVisibleArea(visibleArea: Size): void {
         this.cachedVisibleArea = visibleArea;
-        this.cachedBoundaryArea = this.calculateBoundaryArea(visibleArea);
+        this.calculateBoundaryArea(visibleArea);
     }
 
     /**

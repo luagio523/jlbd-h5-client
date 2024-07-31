@@ -68,6 +68,9 @@ export class MapDisplay extends Node {
      * @param position 世界坐标中的位置
      */
     public setCameraFocus(position: Vec2): void {
+        if(!position){
+            return ;
+        }
         if (this.cameraController) {
             console.log("set camera focus:", position);
             this.cameraController.node.setWorldPosition(new Vec3(position.x, position.y, this.cameraController.node.worldPosition.z));
@@ -107,15 +110,16 @@ export class MapDisplay extends Node {
      * @param force 强制重新渲染
      */
     public renderHDMap(force: boolean = false): void {
-        console.log("render hd map");
+        // console.log("render hd map");
         if (this.cameraController) {
-            const cameraPosition = this.cameraController.node.worldPosition;
-            console.log("render camera position:", cameraPosition);
+            const cameraPosition = this.cameraController.node.position;
+            // console.log("render camera position:", cameraPosition);
             this.mapVisualizer.renderHDMap(cameraPosition.x, cameraPosition.y, force);
         }
     }
 
     private onCameraMoved(position: Vec3): void {
+        // console.log("camera moved:", position);
         this.renderHDMap(false);
     }
 

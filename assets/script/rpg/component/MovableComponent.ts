@@ -38,7 +38,7 @@ export class MovableComponent extends ECSComponent {
 
     public updateSpeed(newSpeed: number): void {
         this.speed = newSpeed;
-        this.speedPerSecond = 10+this.speed / 100;
+        this.speedPerSecond = 75+this.speed / 100;
     }
 
     public accelerateSpeed( dt: number): void {

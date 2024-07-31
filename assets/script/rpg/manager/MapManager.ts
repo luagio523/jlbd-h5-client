@@ -106,6 +106,7 @@ export default class MapManager {
         if (this.camera) {
             // 根据需要调整相机属性
             // this.camera.orthoHeight = size.height / 2;
+            this.cameraController.setBoundaryArea(this.gameMap.getBoundaryArea()); //设置相机边界区域
         }
     }
 
@@ -122,6 +123,7 @@ export default class MapManager {
             this.tiledMap.tmxAsset = tiledMapAsset;
             
             this.gameMap.initWithTiledMap(mapID, this.tiledMap);
+            this.cameraController.setBoundaryArea(this.gameMap.getBoundaryArea()); //设置相机边界区域
             this.mapDisplay.setupMap();
 
             this.eventDispatcher.trigger(new InitedMapEvent());

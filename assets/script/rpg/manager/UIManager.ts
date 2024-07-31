@@ -79,6 +79,7 @@ export class UIManager {
 
     private handleJoystickInput = (eventType: string, angle: number) => {
         const currentEntity = this.entityManager.getPlayerControlledEntity();
+        if (!currentEntity) return;
         const inputComponent = currentEntity.getComponent(InputComponent);
         if (inputComponent) {
             inputComponent.setJoystickInput(angle);
