@@ -121,15 +121,16 @@ export class CameraController extends Component {
 
         if (!this.prevTargetPosition.equals(targetPosition)){ //目标位置发生变化
             this.prevTargetPosition.set(targetPosition);
-            // 检查目标是否超出死区, 超出则需要跟踪
+            // 检查目标是否超出死区, 超出则需要相机需要实时跟随
             if(Math.abs(targetPosition.x - this.targetPositionLastStop.x) > this.halfDeadZoneWidth || Math.abs(targetPosition.y - this.targetPositionLastStop.y) > this.halfDeadZoneHeight){
                 this.shouldCameraMove = true 
                 this.targetCameraPosition.x = misc.clampf(targetPosition.x, this.boundaryArea.xMin, this.boundaryArea.xMax);
                 this.targetCameraPosition.y = misc.clampf(targetPosition.y, this.boundaryArea.yMin, this.boundaryArea.yMax);
             }
         }
-        //         // 计算目标移动的距离
         if(this.shouldCameraMove){
+            this.targetCameraPosition.x = misc.clampf(targetPosition.x, this.boundaryArea.xMin, this.boundaryArea.xMax);
+                this.targetCameraPosition.y = misc.clampf(targetPosition.y, this.boundaryArea.yMin, this.boundaryArea.yMax);
             if (!this.prevCameraPosition.equals(this.targetCameraPosition)) {
                 let cameraPosition = new Vec2(this.node.position.x, this.node.position.y);
                 const smoothPosition = cameraPosition.lerp(new Vec2(this.targetCameraPosition.x, this.targetCameraPosition.y), this.smoothTime);
