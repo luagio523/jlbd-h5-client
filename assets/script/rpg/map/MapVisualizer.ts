@@ -57,24 +57,16 @@ export class MapVisualizer extends Node {
 		const visibleTiles = new Set<string>();
 		const screenSize = this.visibleArea;
 	
-		// 计算视口的左上角坐标
+		// 计算视口的左下角坐标
 		const viewportLeft =  Math.max(centerX - screenSize.width / 2, 0);
 		const viewportBottom = Math.max(centerY - screenSize.height / 2, 0);
 
-
-		// const viewportLeft = -centerX ;
-		// const viewportBottom = centerY ;
 	
 		// 计算起始和结束的图块索引
 		const startX = Math.floor(viewportLeft / this.imgSize);
 		const startY = Math.floor(viewportBottom / this.imgSize);
 		const endX = Math.min(Math.ceil((viewportLeft + screenSize.width) / this.imgSize), this.maxImageX);
 		const endY = Math.min(Math.ceil((viewportBottom + screenSize.height) / this.imgSize), this.maxImageY);
-
-		// getVisibleTiles -1370.2610054223696 750 0 2 -0 6
-		console.log("getVisibleTiles2",Math.ceil((viewportLeft + screenSize.width)),screenSize);
-
-		console.log("getVisibleTiles", centerX,screenSize.width / 2,viewportLeft,screenSize.width, viewportBottom, startX, startY, endX, endY,);
 	
 		for (let i = startX; i < endX; i++) {
 			for (let j = startY; j < endY; j++) {

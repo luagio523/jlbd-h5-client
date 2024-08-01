@@ -64,42 +64,30 @@ export class MapDisplay extends Node {
         return this.mapNode.getComponent(TiledMap);
     }
 
-    /**
-     * 设置相机关注点
-     * @param position 世界坐标中的位置
-     */
-    public setCameraFocus(position: Vec2): void {
-        if(!position){
-            return ;
-        }
-        this.focus = position;
-        if (this.cameraController) {
-            console.log("set camera focus:", position);
-            this.cameraController.setTargetPosition(new Vec3(position.x, position.y, 0)) //for test
-        }
-    }
+    // /**
+    //  * 设置相机关注点
+    //  * @param position 世界坐标中的位置
+    //  */
+    // public setCameraFocus(position: Vec2): void {
+    //     if(!position){
+    //         return ;
+    //     }
+    //     this.focus = position;
+    //     if (this.cameraController) {
+    //         console.log("set camera focus:", position);
+    //         this.cameraController.setTargetPosition(new Vec3(position.x, position.y, 0)) //for test
+    //     }
+    // }
 
     /**
      * 开启一张新图
      * @param position 初始视野点，可选，默认看向地图中心 
      */
-    public setupMap(position?: Vec2): void {
-        log("setup map:", this.gameMap.getFileName(), position);
+    public setupMap(): void {
+        log("setup map:", this.gameMap.getFileName());
         this.updateMap(this.gameMap.getFileName());
-        if (position) {
-            this.setCameraFocus(position);
-        } else {
-            this.centerViewOnMap();
-        }
     }
-
-    /**
-     * 注视世界地图中心
-     */
-    private centerViewOnMap(): void {
-        console.log("center view on map", this.gameMap.maxWidth / 2, this.gameMap.maxHeight / 2);
-        this.setCameraFocus(new Vec2(this.gameMap.maxWidth / 2, this.gameMap.maxHeight / 2));
-    }
+   
 
     private updateMap(mapName: string): void {
         this.thumbnail.clear();

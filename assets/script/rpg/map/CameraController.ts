@@ -4,9 +4,10 @@ const { ccclass, property } = _decorator;
 
 @ccclass('CameraController')
 export class CameraController extends Component {
-    @property(Node)
-    target: Node | null = null;
-
+    @property
+    private targets: Node[] = []; // 可以跟踪多个目标
+    @property
+    targetPosition:Vec3|null = null; //focus位置
     @property
     smoothTime: number = 0.1;
 
@@ -16,20 +17,25 @@ export class CameraController extends Component {
     @property
     deadZoneHeight: number = 100;
 
-    private camera: Camera | null = null;
-    private velocity: Vec3 = new Vec3();
-    private lastTargetPosition: Vec3 = new Vec3();
     public eventTarget: EventTarget = new EventTarget();
+
+    private camera: Camera | null = null;
+
     private mapSize: Size = new Size(0, 0);
     private viewportSize: Size = new Size(0, 0);
     private boundaryArea: Rect | null = null;
     private halfDeadZoneWidth: number = 0;
     private halfDeadZoneHeight: number = 0;
-    private lastCameraPosition: Vec3 = new Vec3();
-    private tempVec3: Vec3 = new Vec3();
+    
     private frameCount: number = 0;
 
-    private targets: Node[] = []; // 可以跟踪多个目标
+
+    private prevTargetPosition: Vec3 = new Vec3(Number.MAX_VALUE, Number.MAX_VALUE); //目标之前位置
+    private targetPositionLastStop: Vec3 = new Vec3(Number.MAX_VALUE, Number.MAX_VALUE);//目标上次停止移动位置
+
+    private prevCameraPosition: Vec2 = new Vec2();//相机之前位置
+    private targetCameraPosition: Vec2 = new Vec2();//相机目标位置
+    
 
     start() {
         this.camera = this.getComponent(Camera);
@@ -38,13 +44,9 @@ export class CameraController extends Component {
             return;
         }
 
-        if (this.target) {
-            this.lastTargetPosition.set(this.target.worldPosition);
-        }
-
         this.halfDeadZoneWidth = this.deadZoneWidth * 0.5;
         this.halfDeadZoneHeight = this.deadZoneHeight * 0.5;
-        this.lastCameraPosition.set(this.node.worldPosition);
+        
     }
 
     /**************************区域限制******************************** */
@@ -83,24 +85,23 @@ export class CameraController extends Component {
     }
 
     public setTargetPosition(position: Vec3): void {
-        if (this.target) {
-            this.target.setWorldPosition(position);
-        } else if (this.targets.length > 0) {
-            // 移动所有目标相同的偏移量
-            const offset = position.subtract(this.getTargetPosition());
-            this.targets.forEach(target => {
-                target.setWorldPosition(target.worldPosition.add(offset));
-            });
-        }
+        this.targetPosition = position;
     }
 
     public setTargets(targets: Node[]): void {
         this.targets = targets;
     }
 
+    public setTarget(target:Node):void{
+        this.targets = [target];
+    }
+
     private getTargetPosition(): Vec3 {
         if (this.targets.length === 0) {
-            return this.target ? this.target.position : this.node.position;
+            return this.targetPosition;
+        }
+        if (this.targets.length === 1){
+            return this.targets[0].position
         }
         const avgPos = new Vec3();
         this.targets.forEach(target => avgPos.add(target.position));
@@ -110,34 +111,48 @@ export class CameraController extends Component {
     public clearTargets(): void {
         this.targets = [];
     }
+    
 
     lateUpdate(dt: number) {
         if (!this.camera || !this.boundaryArea) return;
 
-        // this.frameCount++;
-        // if (this.frameCount % 20 !== 0) return; // 每两帧更新一次
+        this.frameCount++;
+        if (this.frameCount % 2 !== 0) return; // 每两帧更新一次
 
         const targetPosition = this.getTargetPosition();
-        let cameraPosition = this.node.position.clone();
 
-        const cameraX = misc.clampf(targetPosition.x, this.boundaryArea.xMin, this.boundaryArea.xMax);
-        const cameraY = misc.clampf(targetPosition.y, this.boundaryArea.yMin, this.boundaryArea.yMax);
-        const clampedTargetPosition = new Vec3(cameraX, cameraY, cameraPosition.z);
 
-        // Smoothly interpolate the camera position towards the target position
-        const smoothPosition = cameraPosition.lerp(clampedTargetPosition, this.smoothTime);
+        if (!this.prevTargetPosition.equals(targetPosition)){ //目标变化了
+            this.prevTargetPosition.set(targetPosition);
+             //         // 计算目标移动的距离
+            const delta = targetPosition.subtract(this.targetPositionLastStop);
+
+            console.log("delta",delta.x,delta.y)
+            
+            // 检查目标是否超出死区, 超出则需要跟踪
+            const isOutDeadZone = Math.abs(delta.x) > this.halfDeadZoneWidth || Math.abs(delta.y) > this.halfDeadZoneHeight;
     
-        // Set the camera's position
-        this.node.setPosition(smoothPosition);
-    
-        // Emit event if the camera position has changed
-        if (!this.lastCameraPosition.equals(smoothPosition)) {
-            this.eventTarget.emit('camera-moved', targetPosition);
-            this.lastCameraPosition.set(smoothPosition);
+            if(isOutDeadZone){
+                this.targetCameraPosition.x = misc.clampf(targetPosition.x, this.boundaryArea.xMin, this.boundaryArea.xMax);
+                this.targetCameraPosition.y = misc.clampf(targetPosition.y, this.boundaryArea.yMin, this.boundaryArea.yMax);
+            }
         }
+       
+
+        if (!this.prevCameraPosition.equals(this.targetCameraPosition)) {
+            let cameraPosition = new Vec2(this.node.position.x, this.node.position.y);
+            const smoothPosition = cameraPosition.lerp(this.targetCameraPosition, this.smoothTime);
+            this.node.setPosition(smoothPosition.x,smoothPosition.y);
+            this.eventTarget.emit('camera-moved', targetPosition);
+           
+            this.prevCameraPosition.set(smoothPosition);
+            console.log("相机位置",this.node.position)
+        }else{//相机已经跟随完毕，设置新停留位置
+            this.targetPositionLastStop.set(targetPosition); //设置 目标位置
+        }
+        
       
     }
-
    
 
     public onCameraMoved(callback: (position: Vec3) => void): void {
@@ -193,7 +208,7 @@ export class CameraController extends Component {
 //     private boundaryArea: Rect | null = null;
 //     private halfDeadZoneWidth: number = 0;
 //     private halfDeadZoneHeight: number = 0;
-//     private lastCameraPosition: Vec3 = new Vec3();
+//     private prevCameraPosition: Vec3 = new Vec3();
 //     private frameCount: number = 0;
 
 //     private targets: Node[] = []; // 可以跟踪多个目标
@@ -211,7 +226,7 @@ export class CameraController extends Component {
 
 //         this.halfDeadZoneWidth = this.deadZoneWidth * 0.5;
 //         this.halfDeadZoneHeight = this.deadZoneHeight * 0.5;
-//         this.lastCameraPosition.set(this.node.worldPosition);
+//         this.prevCameraPosition.set(this.node.worldPosition);
 //     }
 
 //     /**************************区域限制******************************** */
@@ -301,11 +316,11 @@ export class CameraController extends Component {
 
 //             this.node.setWorldPosition(targetPosition);
 
-//             const deltaCamera = this.node.worldPosition.subtract(this.lastCameraPosition);
+//             const deltaCamera = this.node.worldPosition.subtract(this.prevCameraPosition);
 
 //             if( Math.abs(deltaCamera.x) > 1 || Math.abs(deltaCamera.y) > 1){ // 相机移动超过1个像素，则触发事件
 //                 this.eventTarget.emit('camera-moved', this.node.worldPosition);
-//                 this.lastCameraPosition.set(this.node.worldPosition);
+//                 this.prevCameraPosition.set(this.node.worldPosition);
 //                 console.log('相机移动', this.node.worldPosition);
 //             }else{
 //                 // 表示相机位置没有变化，则不触发事件

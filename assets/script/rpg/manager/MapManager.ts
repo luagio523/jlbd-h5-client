@@ -81,7 +81,7 @@ export default class MapManager {
      */
     public setCameraTarget(targetNode: Node): void {
         if (this.cameraController) {
-            this.cameraController.target = targetNode;
+            this.cameraController.setTarget(targetNode) ;
         }
     }
     /**
@@ -89,8 +89,8 @@ export default class MapManager {
      * @param position 
      */
     public setCameraFocus(position: Vec2): void {
-        if (this.mapDisplay) {
-            this.mapDisplay.setCameraFocus(position);
+        if (this.cameraController) {
+            this.cameraController.setTargetPosition(new Vec3(position.x, position.y, 0));
         }
     }
 
