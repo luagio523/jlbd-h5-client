@@ -71,9 +71,7 @@ export default class MapManager {
         }
 
         this.cameraController = this.cameraNode.addComponent(CameraController);
-        this.cameraController.smoothTime = 0.3;
-        this.cameraController.deadZoneWidth = 100;
-        this.cameraController.deadZoneHeight = 100;
+        this.cameraController.setDeadZone(200,200)
     }
     /**
      * 设置相机跟踪目标
