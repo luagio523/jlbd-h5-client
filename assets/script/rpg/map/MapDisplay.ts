@@ -21,6 +21,7 @@ export class MapDisplay extends Node {
     private mapVisualizer: MapVisualizer;
     private mapNode: Node;
     private cameraController: CameraController | null = null;
+    private focus:Vec2 = new Vec2(0, 0);
 
     constructor() {
         super("MapDisplay");
@@ -71,9 +72,10 @@ export class MapDisplay extends Node {
         if(!position){
             return ;
         }
+        this.focus = position;
         if (this.cameraController) {
             console.log("set camera focus:", position);
-            this.cameraController.node.setWorldPosition(new Vec3(position.x, position.y, this.cameraController.node.worldPosition.z));
+            this.cameraController.setTargetPosition(new Vec3(position.x, position.y, 0)) //for test
         }
     }
 
@@ -112,14 +114,16 @@ export class MapDisplay extends Node {
     public renderHDMap(force: boolean = false): void {
         // console.log("render hd map");
         if (this.cameraController) {
-            const cameraPosition = this.cameraController.node.position;
+            // const cameraPosition = this.cameraController.node.position;
             // console.log("render camera position:", cameraPosition);
-            this.mapVisualizer.renderHDMap(cameraPosition.x, cameraPosition.y, force);
+            this.mapVisualizer.renderHDMap(this.focus.x, this.focus.y, force);
         }
     }
 
     private onCameraMoved(position: Vec3): void {
         // console.log("camera moved:", position);
+        this.focus.x = position.x;
+        this.focus.y = position.y;
         this.renderHDMap(false);
     }
 

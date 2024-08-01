@@ -1,4 +1,4 @@
-import { Component, Node, Vec3, _decorator, Camera, EventTarget, Size, Rect, misc } from 'cc';
+import { Component, Node, Vec3, _decorator, Camera, EventTarget, Size, Rect, misc, Vec2, tween } from 'cc';
 
 const { ccclass, property } = _decorator;
 
@@ -8,7 +8,7 @@ export class CameraController extends Component {
     target: Node | null = null;
 
     @property
-    smoothTime: number = 0.3;
+    smoothTime: number = 0.1;
 
     @property
     deadZoneWidth: number = 100;
@@ -114,78 +114,31 @@ export class CameraController extends Component {
     lateUpdate(dt: number) {
         if (!this.camera || !this.boundaryArea) return;
 
-        this.frameCount++;
-        if (this.frameCount % 20 !== 0) return; // 每两帧更新一次
+        // this.frameCount++;
+        // if (this.frameCount % 20 !== 0) return; // 每两帧更新一次
 
         const targetPosition = this.getTargetPosition();
-        const cameraPosition = this.node.position.clone();
+        let cameraPosition = this.node.position.clone();
 
-        // console.log('targetPosition', targetPosition.toString());
+        const cameraX = misc.clampf(targetPosition.x, this.boundaryArea.xMin, this.boundaryArea.xMax);
+        const cameraY = misc.clampf(targetPosition.y, this.boundaryArea.yMin, this.boundaryArea.yMax);
+        const clampedTargetPosition = new Vec3(cameraX, cameraY, cameraPosition.z);
 
-        // 计算目标移动的距离
-        // const delta = targetPosition.subtract(this.lastTargetPosition);
-        // this.lastTargetPosition.set(targetPosition);
-
-        cameraPosition.x = misc.clampf(targetPosition.x, this.boundaryArea.xMin, this.boundaryArea.xMax);
-        cameraPosition.y = misc.clampf(targetPosition.y, this.boundaryArea.yMin, this.boundaryArea.yMax);
-        this.node.setPosition(cameraPosition);
-
-        if (!this.lastCameraPosition.equals(cameraPosition)) {
-            console.log('cameraPosition', cameraPosition.toString());
-            console.log('targetPosition', targetPosition.toString());
-            this.eventTarget.emit('camera-moved', cameraPosition);
-            this.lastCameraPosition.set(cameraPosition);
+        // Smoothly interpolate the camera position towards the target position
+        const smoothPosition = cameraPosition.lerp(clampedTargetPosition, this.smoothTime);
+    
+        // Set the camera's position
+        this.node.setPosition(smoothPosition);
+    
+        // Emit event if the camera position has changed
+        if (!this.lastCameraPosition.equals(smoothPosition)) {
+            this.eventTarget.emit('camera-moved', targetPosition);
+            this.lastCameraPosition.set(smoothPosition);
         }
-
-        // // // 检查是否超出死区
-        // if (Math.abs(delta.x) > this.halfDeadZoneWidth || Math.abs(delta.y) > this.halfDeadZoneHeight) {
-        //     // 计算新的目标相机位置
-        //     // let targetPos = cameraPosition.add(delta);
-
-        //     // console.log('cameraPosition', delta.x,this.halfDeadZoneWidth,delta.y,this.halfDeadZoneHeight,cameraPosition.toString(),targetPos.toString())
-        //     let targetPos = new Vec3(targetPosition.x+667,targetPosition.y+375,cameraPosition.z);
-        //     // 限制相机位置在边界区域内
-        //     // targetPos.x = misc.clampf(targetPos.x, this.boundaryArea.xMin, this.boundaryArea.xMax);
-        //     // targetPos.y = misc.clampf(targetPos.y, this.boundaryArea.yMin, this.boundaryArea.yMax);
-        //     console.log('targetPos', targetPos.toString(),targetPosition.toString())
-        //     this.node.setWorldPosition(targetPos);
-
-        //     // // 使用 SmoothDamp 进行平滑移动
-        //     // const newX = this.smoothDamp(cameraPosition.x, targetPos.x, this.velocity.x, this.smoothTime, dt);
-        //     // const newY = this.smoothDamp(cameraPosition.y, targetPos.y, this.velocity.y, this.smoothTime, dt);
-
-        //     // // 更新相机位置
-        //     // this.tempVec3.set(newX, newY, cameraPosition.z);
-        //     // this.node.setWorldPosition(this.tempVec3);
-
-
-        //     // 只在相机实际移动时触发事件
-        //     if (!this.lastCameraPosition.equals(this.tempVec3)) {
-        //         this.eventTarget.emit('camera-moved', this.tempVec3);
-        //         this.lastCameraPosition.set(this.tempVec3);
-        //     }
-        // }
+      
     }
 
-    private smoothDamp(current: number, target: number, currentVelocity: number, smoothTime: number, dt: number): number {
-        smoothTime = Math.max(0.0001, smoothTime);
-        const omega = 2 / smoothTime;
-        const x = omega * dt;
-        const exp = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
-        let change = current - target;
-        const originalTo = target;
-        const maxChange = Number.MAX_VALUE * smoothTime;
-        change = misc.clampf(change, -maxChange, maxChange);
-        target = current - change;
-        const temp = (currentVelocity + omega * change) * dt;
-        currentVelocity = (currentVelocity - omega * temp) * exp;
-        let output = target + (change + temp) * exp;
-        if ((originalTo - current > 0) === (output > originalTo)) {
-            output = originalTo;
-            currentVelocity = (output - originalTo) / dt;
-        }
-        return output;
-    }
+   
 
     public onCameraMoved(callback: (position: Vec3) => void): void {
         this.eventTarget.on('camera-moved', callback);
