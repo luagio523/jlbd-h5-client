@@ -1,7 +1,7 @@
 // TaskManager.ts
-import { GameTask, Task, TaskStatus } from './Task';
+import { GameTask, Task, TaskStatus } from '../task/Task';
 import { EventDispatcher } from '../event/EventManager';
-import { ConditionFactory,  } from './Condition';
+import { ConditionFactory,  } from '../task/Condition';
 import { ConfigManager } from '../../core/common/config/ConfigManager';
 import { IEvent,  RPGEvent } from '../event/Event';
 

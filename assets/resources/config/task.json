@@ -21,7 +21,7 @@
         "title": "收集草药",
         "description": "收集10个草药",
         "type": "side",
-        "reward": {
+        "reward": { 
             "experience": 50,
             "gold": 20,
             "items": ["草药包"]
@@ -29,7 +29,7 @@
         "condition": {
             "type": "CollectItemsCondition",
             "required": ["草药"],
-            "amount": 10 
+            "amount": 10  
         },
         "nextTasks": []
     }
