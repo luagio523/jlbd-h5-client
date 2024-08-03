@@ -1,0 +1,26 @@
+[
+  {
+      "id": 100001,
+      "randomType": 2,
+      "itemGroups": [
+          {
+              "id": 100002,
+              "rate": 100  
+          },
+          {
+              "id": 100003,
+              "rate": 100  
+          }
+      ]
+  },
+  {
+      "id": 100004,
+      "randomType": 1,
+      "itemGroups": [
+          {
+              "id": 100005,
+              "rate": 100  
+          }
+      ]
+  }
+]
