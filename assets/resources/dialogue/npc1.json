@@ -1,0 +1,14 @@
+{
+    "id": "npc1",
+    "interactions": [
+        {
+          "id": "dialogue1",
+          "priority": 1,
+          "trigger": {
+            "condition": "IN_RANGE",
+            "value": 5
+          },
+          "segmentId": "segment1"
+        }
+    ]
+}

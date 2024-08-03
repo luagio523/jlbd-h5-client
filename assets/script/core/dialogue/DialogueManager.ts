@@ -8,7 +8,7 @@ const { ccclass } = _decorator;
 export class DialogueManager {
     private static instance: DialogueManager = null; // 单例实例
     private messageManager: MessageManager; // 消息管理器实例
-    private dialogueSegments: { [key: string]: any[] } = {}; // 存储对话段
+    private dialogueSegments: Map<string, any> = new Map<string, any>(); // 存储对话段
     private currentSegmentId: string | null = null; // 当前段落ID
     private currentDialogueIndex: number = 0; // 当前对话索引
 
@@ -24,10 +24,10 @@ export class DialogueManager {
         this.messageManager = MessageManager.getInstance();
     }
 
-    loadDialogueData(callback: () => void) {
-        resources.load("dialogues", JsonAsset, (err, asset) => {
+    private async load(segmentId: string, callback?: Function) {
+        resources.load(`dialogue/${segmentId}.json`, JsonAsset, (err, asset) => {
             if (!err) {
-                this.dialogueSegments = asset.json.dialogueSegments;
+                this.dialogueSegments[segmentId] = asset.json;
                 callback();
             } else {
                 console.error("Failed to load dialogues:", err);
@@ -36,14 +36,15 @@ export class DialogueManager {
     }
 
     startDialogue(segmentId: string) {
-        if (this.dialogueSegments[segmentId]) {
-            this.currentSegmentId = segmentId;
-            this.currentDialogueIndex = 0; // 重置对话索引
-            this.loadProgress(); // 加载上次的进度
-            this.nextStep();
-        } else {
-            console.error(`Segment ${segmentId} not found.`);
-        }
+        this.load(segmentId, () => {
+            if (this.dialogueSegments[segmentId]) {
+                this.currentSegmentId = segmentId;
+                this.currentDialogueIndex = 0; // 重置对话索引
+                this.nextStep();
+            } else {
+                console.error(`Segment ${segmentId} not found.`);
+            }
+        });
     }
 
     nextStep() {
@@ -53,7 +54,6 @@ export class DialogueManager {
             this.currentDialogueIndex++;
         } else {
             this.messageManager.emit(DialogueEvent.DialogueComplete, { segmentId: this.currentSegmentId });
-            this.saveProgress(); // 保存进度
         }
     }
 
@@ -67,18 +67,5 @@ export class DialogueManager {
         }
     }
 
-    saveProgress() {
-        const progress = {
-            segmentId: this.currentSegmentId,
-            dialogueIndex: this.currentDialogueIndex
-        };
-        StorageManager.getInstance().setItem("dialogueProgress", progress);
-    }
-
-    loadProgress() {
-        const progress = StorageManager.getInstance().getItem<any>("dialogueProgress");
-        if (progress && progress.segmentId === this.currentSegmentId) {
-            this.currentDialogueIndex = progress.dialogueIndex;
-        }
-    }
+   
 }

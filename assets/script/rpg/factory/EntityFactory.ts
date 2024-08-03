@@ -1,17 +1,30 @@
-import GameEntity from "../entity/Entity";
 import { EntityType } from "../enum/Type";
-import { UnitRenderComponent } from "../component/UnitRenderComponent";
-import { InputComponent } from "../component/InputComponent";
-import { TransformComponent } from "../component/TransformComponent";
-import { MovableComponent } from "../component/MovableComponent";
 
+import { ECSEntity } from "../ecs/ECSEntity";
+import { ComponentFactory } from "./ComponentFactory";
+
+
+// 创建一个对象来存储角色类型与所需组件的映射
+const requiredComponents = {
+    Role: [
+        "TransformComponent",
+        "MovableComponent",
+        "InputComponent",
+        "UnitRenderComponent"
+    ],
+    NPC: [
+        "TransformComponent",
+        "UnitRenderComponent",
+        "NPCInteractiveComponent"
+    ]
+};
 
 /**
  * 负责实体的创建、回收、添加组件等操作
  */
 export default class EntityFactory {
 	private static instance: EntityFactory;
-	private entityPools: Map<EntityType, GameEntity[]> = new Map();
+	private entityPools: Map<EntityType, ECSEntity[]> = new Map();
 
 	private constructor() {
 		// 初始化每种实体类型的对象池
@@ -27,50 +40,40 @@ export default class EntityFactory {
 		return EntityFactory.instance;
 	}
 
-	createEntity(type: EntityType = EntityType.Default): GameEntity {
+	getEntity(type: EntityType = EntityType.Default): ECSEntity {
 		const pool = this.entityPools.get(type);
+		let entity: ECSEntity;
 		if (pool && pool.length > 0) {
-			return pool.pop()!;
+			entity =  pool.pop()!;
 		} else {
-			const entity = new GameEntity();
-			entity.setType(type);
-			this.initializeEntity(entity, type);
-			return entity;
+			entity = this.createEntity(type);
 		}
+		return entity;
 	}
 
-	recycleEntity(entity: GameEntity): void {
-		const type = entity.getType();
-		entity.reset();
+	recycleEntity(entity: ECSEntity): void {
+		entity.setEnabled(false);
+		const type = entity.type as EntityType;
 		const pool = this.entityPools.get(type);
 		if (pool) {
 			pool.push(entity);
 		}
 	}
 
-	private initializeEntity(entity: GameEntity, type: EntityType): void {
-		// 根据实体类型初始化特定的组件或属性
-		switch (type) {
-			case EntityType.Role:
-				entity.addComponent(new MovableComponent());
-				entity.addComponent(new TransformComponent());
-				entity.addComponent(new InputComponent());
-				entity.addComponent(new UnitRenderComponent());
-				break;
-			case EntityType.Hero:
-				entity.addComponent(new UnitRenderComponent());
-				break;
-			case EntityType.Creep:
-				// 初始化小兵特有的组件
-				break;
-			case EntityType.Building:
-				// 初始化建筑特有的组件
-				break;
-			case EntityType.Item:
-				// 初始化物品特有的组件
-				break;
-			// 可以添加更多类型的初始化逻辑
-		}
+	private createEntity(type:EntityType): ECSEntity {
+		const entity = new ECSEntity();
+		this.initializeComponents(entity, type);
+		return entity;
 	}
+
+	private initializeComponents(entity: ECSEntity, type: EntityType):void{
+		requiredComponents[type].forEach(componentName => {
+            if (!entity.hasComponentByName(componentName)) {
+                entity.addComponent(ComponentFactory.getInstance().createComponent(componentName));
+            }
+        });
+	}
+
+	
 
 }

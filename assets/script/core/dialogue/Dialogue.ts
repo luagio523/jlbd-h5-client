@@ -33,6 +33,10 @@ export interface DialogueChoice {
 // 定义选择项的接口
 export interface ChoiceOption {
     text: string; // 选项文本
-    nextSegment: string; // 选择后跳转到的段落ID
+    action: Action; // 选项对应的行动
 }
-
+  
+interface Action {
+    type: string; // 行动类型，如 "task", "endDialogue", "information", "relationshipChange"
+    value: any; // 具体的值，如任务ID、信息文本等
+}

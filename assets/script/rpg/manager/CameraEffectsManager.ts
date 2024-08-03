@@ -34,6 +34,7 @@ export class CameraEffectsManager {
     public initFogOfWar(mapWidth: number, mapHeight: number): void {
         this.fogOfWar = new FogOfWar();
         this.fogOfWar.init(this.cameraNode, mapWidth, mapHeight);
+        console.log('init fog of war');
     }
 
     public revealFogArea(center: Vec3, radius: number): void {

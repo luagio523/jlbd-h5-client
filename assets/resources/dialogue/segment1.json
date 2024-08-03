@@ -1,0 +1,27 @@
+{
+    "segmentId": "segment1",
+    "dialogues": [
+        {
+            "type": "dialogue",
+            "speaker": "角色A",
+            "text": "你好！",
+            "avatar": "path/to/avatarA.png",
+            "background": "path/to/background1.png",
+            "position": "left"  
+        },
+        {
+            "type": "choice",
+            "question": "你想要做什么？",
+            "options": [
+                {
+                    "text": "去冒险",
+                    "action": {"type":"task","value":"startAdventure"}
+                },
+                {
+                    "text": "休息一下",
+                    "action": {"type":"endDialogue","value":{}}
+                }
+            ]
+        }
+    ]
+}

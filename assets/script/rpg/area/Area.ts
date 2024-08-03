@@ -1,7 +1,7 @@
 import { Vec2 } from "cc";
-import { Trigger } from "./Trigger";
 import { ECSEntity } from "../ecs/ECSEntity";
 import { ShapeUtil } from "../util/ShapeUtil";
+import { Trigger } from "../trigger/Trigger";
 
 export enum AreaType {
     SAFE,// 安全区域

@@ -43,6 +43,16 @@ export class GameMap {
         this.maxHeight = 0;
     }
 
+    public getMaxWidth(): number {
+        return this.maxWidth;
+    }
+
+    public getMaxHeight(): number {
+        return this.maxHeight;
+    }
+
+
+
     /**
      * 获取地图路径
      * @returns {string} 地图路径

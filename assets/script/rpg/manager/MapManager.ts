@@ -46,6 +46,9 @@ export default class MapManager {
 
         this.setupCamera(cameraNode);//设置相机
         CameraEffectsManager.getInstance().initialize(this.cameraController); //设置相机特效管理器
+
+        
+
         ColliderManager.getInstance().initialize(this.gameMap);
 
         let adaptionManager = AdaptionManager.getInstance(); //适配
@@ -122,6 +125,9 @@ export default class MapManager {
             
             this.gameMap.initWithTiledMap(mapID, this.tiledMap);
             this.cameraController.setBoundaryArea(this.gameMap.getBoundaryArea()); //设置相机边界区域
+
+            CameraEffectsManager.getInstance().initFogOfWar(this.gameMap.getMaxWidth(), this.gameMap.getMaxHeight()); //初始化雾效果
+
             this.mapDisplay.setupMap();
 
             this.eventDispatcher.trigger(new InitedMapEvent());

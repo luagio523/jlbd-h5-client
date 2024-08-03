@@ -109,14 +109,14 @@ export enum ClickBehavior {
 
 
 export enum EntityType {
-    Default,
-    Role,
-    Hero,
-    NPC,
-    Monster,
-    Creep, // 野怪
-    Building,
-    Item
+    Default = "Default",
+    Role = "Role",
+    Hero = "Hero",
+    NPC = "NPC",
+    Monster = "Monster",
+    Creep = "Creep", // 野怪
+    Building = "Building",
+    Item = "Item",
     // 可以根据需要添加更多实体类型
 }
 
