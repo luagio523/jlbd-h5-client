@@ -1,0 +1,44 @@
+[
+    {
+        "id": "config1",
+        "groups": [
+          {
+            "id": "group1",
+            "items": [
+              { "id": "item1", "name": "金币", "weight": 10, "type": "currency", "min": 300, "max": 700 },
+              { "id": "item2", "name": "经验", "weight": 20, "type": "experience", "min": 400, "max": 700 },
+              { "id": "item3", "name": "固定金币", "weight": 5, "type": "currency", "amount": 200 },
+              { "id": "item4", "name": "剑", "weight": 3, "type": "item", "amount": 1 },
+              { "id": "item5", "name": "材料", "weight": 15, "type": "material", "amount": 20 }
+            ],
+            "probability": 100,
+            "randomType": "independent"  
+          },
+          {
+            "id": "group2",
+            "items": [
+              { "id": "item6", "name": "金币", "weight": 10, "type": "currency", "min": 300, "max": 700 },
+              { "id": "item7", "name": "经验", "weight": 20, "type": "experience", "min": 400, "max": 700 },
+              { "id": "item8", "name": "固定金币", "weight": 5, "type": "currency", "amount": 200 },
+              { "id": "item9", "name": "剑", "weight": 3, "type": "item", "amount": 1 },
+              { "id": "item10", "name": "材料", "weight": 15, "type": "material", "amount": 20 }
+            ],
+            "probability": 100,
+            "randomType": "roundTable"  
+          },
+          {
+            "id": "group3",
+            "items": [
+              { "id": "item11", "name": "金币", "weight": 10, "type": "currency", "min": 300, "max": 700 },
+              { "id": "item12", "name": "经验", "weight": 20, "type": "experience", "min": 400, "max": 700 },
+              { "id": "item13", "name": "固定金币", "weight": 5, "type": "currency", "amount": 200 },
+              { "id": "item14", "name": "剑", "weight": 3, "type": "item", "amount": 1 },
+              { "id": "item15", "name": "材料", "weight": 15, "type": "material", "amount": 20 }
+            ],
+            "probability": 100,
+            "randomType": "independentMultiple"  
+          }
+        ]
+    }
+]
+  

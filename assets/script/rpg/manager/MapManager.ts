@@ -130,7 +130,7 @@ export default class MapManager {
 
             this.mapDisplay.setupMap();
 
-            this.eventDispatcher.trigger(new InitedMapEvent());
+            this.eventDispatcher.emit(new InitedMapEvent());
         } catch (err) {
             console.error("Error entering map:", err);
             throw err;
