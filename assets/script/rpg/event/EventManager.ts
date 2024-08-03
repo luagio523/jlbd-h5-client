@@ -57,15 +57,15 @@ export class EventDispatcher {
         this.eventManager = EventManager.getInstance();
     }
 
-    public addListener(eventType: string, listener: (event: IEvent) => void): void {
+    public on(eventType: string, listener: (event: IEvent) => void): void {
         this.eventManager.registerListener(eventType, listener);
     }
 
-    public removeListener(eventType: string, listener: (event: IEvent) => void): void {
+    public off(eventType: string, listener: (event: IEvent) => void): void {
         this.eventManager.unregisterListener(eventType, listener);
     }
 
-    public trigger(event: IEvent): void {
+    public emit(event: IEvent): void {
         this.eventManager.dispatchEvent(event);
     }
 

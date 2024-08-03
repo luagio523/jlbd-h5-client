@@ -29,8 +29,8 @@ export default class HeadUpDisplayMediator extends BaseMediator {
 		const cptHand = this.viewAdapter.findChild<GComponent>("cpt_hand");
 		this.joystick = new Joystick();
 		this.joystick.injectUI(cptHand)
-		this.joystick.onJoyStickMove((direction) => {
-			app.game.getGameWorld().inputManger.updateJoystickState(direction)
+		this.joystick.onJoyStickMove((angle) => {
+			app.game.getGameWorld().inputManger.updateJoystickState(angle)
 		})
 		this.viewAdapter.safeClick("btn_map",this.onBtnMapClick, this);
 

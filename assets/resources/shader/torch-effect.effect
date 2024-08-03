@@ -1,0 +1,50 @@
+CCEffect %{
+    techniques:
+    - name: opaque
+      passes:
+      - vert: vs
+        frag: fs
+        properties:
+            mainTexture: { value: white }
+            lightColor: { value: [1, 1, 1, 1] }
+            lightPosition: { value: [0, 0, 0] }
+            lightRadius: { value: 5.0 }
+}%
+
+CCProgram vs %{
+    precision highp float;
+    #include <cc-global>
+    
+    in vec4 a_position;
+    in vec2 a_uv0;
+
+    out vec2 v_uv0;
+
+    void main() {
+        gl_Position = cc_matProj * cc_matView * a_position;
+        v_uv0 = a_uv0;
+    }
+}%
+
+CCProgram fs %{
+    precision highp float;
+    #include <cc-global>
+
+    in vec2 v_uv0;
+    out vec4 o_color;
+
+    uniform sampler2D mainTexture;
+    uniform vec4 lightColor;
+    uniform vec3 lightPosition;
+    uniform float lightRadius;
+
+    void main() {
+        vec4 texColor = texture(mainTexture, v_uv0);
+        
+        // 计算光照效果
+        float dist = distance(gl_FragCoord.xy, lightPosition.xy);
+        float intensity = smoothstep(lightRadius, lightRadius - 10.0, dist);
+        
+        o_color = texColor * lightColor * intensity;
+    }
+}%

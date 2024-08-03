@@ -156,9 +156,19 @@ export class InitRoleEvent implements IEvent {
     ) { }
 }
 
+export class  CollectEvent implements IEvent {
+    public readonly type = RPGEvent.CollectEvent
+    constructor(
+        public readonly item: string,
+    ) { }
+}
 
-
-
+export class KillEvent implements IEvent {
+    public readonly type = RPGEvent.KillEvent
+    constructor(
+        public readonly monsterType: string,
+    ) { }
+}
 
 export enum RPGEvent {
     ApplyAttack = "ApplyAttack",
@@ -167,6 +177,8 @@ export enum RPGEvent {
     Animation = "Animation",
     Projectile = "Projectile",
 
+    CollectEvent = "CollectEvent",
+    KillEvent = "KillEvent",
     
     TriggerAbilityEvent = "TriggerAbilityEvent",
     CastAbilityEvent = "CastAbilityEvent",
