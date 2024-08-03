@@ -9,7 +9,7 @@ export class InteractionManager {
     private static instance: InteractionManager;
     private configManager: ConfigManager = ConfigManager.getInstance();
 
-    private constructor() {}
+    private constructor() { }
 
     public static getInstance(): InteractionManager {
         if (!this.instance) {
@@ -26,38 +26,37 @@ export class InteractionManager {
     }
 
     private parseInteractions(data: any): NPCInteraction[] {
-        return data.triggers.map(item =>{
-            new NPCInteraction(TriggerConditions[item.trigger.type](item.trigger.value),data.priority,item.segmentId);
+        return data.triggers.map(item => {
+            new NPCInteraction(TriggerConditions[item.trigger.type](item.trigger.value), data.priority, item.segmentId);
         });
     }
-    
 
-
-    checkInteractions(npc: ECSEntity,context:any) {
+    checkInteractions(npc: ECSEntity, context: any) {
         const component = npc.getComponent(NPCInteractiveComponent);
-
-        const validInteractions = component.interactions.filter(interaction => 
-            interaction.condition(npc, context)
-        );
-
-        // 根据优先级排序
-        validInteractions.sort((a, b) => b.priority - a.priority);
-
-        // 如果有有效的交互，触发第一个优先级最高的交互
-        if (validInteractions.length > 0) {
-            const highestPriorityInteraction = validInteractions[0];
-            this.startDialogue(highestPriorityInteraction.segmentId);
+        let highestPriorityInteraction: NPCInteraction | null = null;
+        for (const interaction of component.interactions) {
+            if (interaction.condition(npc, context)) {
+                // 如果找到有效的交互，检查优先级
+                if (!highestPriorityInteraction || interaction.priority > highestPriorityInteraction.priority) {
+                    highestPriorityInteraction = interaction;
+                }
+            }
         }
+        // 如果找到优先级最高的交互，触发它
+        if (highestPriorityInteraction) {
+            this.triggerInteraction(highestPriorityInteraction);
+        }
+
     }
 
 
-    private startDialogue(segmentId: string): void {
-        DialogueManager.getInstance().startDialogue(segmentId);
+    private triggerInteraction(interaction: NPCInteraction): void {
+        DialogueManager.getInstance().startDialogue(interaction.segmentId);
     }
 
 
     // handleInteraction(player) {
-        
+
     // }
 
     // isPlayerInteracting(npc, player) {
@@ -67,6 +66,6 @@ export class InteractionManager {
 
     // updateInteractions(deltaTime) {
     //     // 更新与交互相关的状态和行为
-        
+
     // }
 }

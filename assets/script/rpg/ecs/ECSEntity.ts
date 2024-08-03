@@ -13,6 +13,11 @@ let nextEntityId: number = 0;
  */
 export class ECSEntity {
     /**
+     * 实体类型
+     */
+    public type:number = 0;
+
+    /**
      * 实体 ID
      */
     readonly id: string;
@@ -40,12 +45,7 @@ export class ECSEntity {
         this.id = nextEntityId.toString();
     }
 
-    /**
-     * 实体类型
-     */
-    get type(): string {
-        return this.constructor.name;
-    }
+    
 
     /**
      * 返回实体可用状态

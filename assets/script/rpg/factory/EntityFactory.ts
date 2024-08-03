@@ -62,6 +62,7 @@ export default class EntityFactory {
 
 	private createEntity(type:EntityType): ECSEntity {
 		const entity = new ECSEntity();
+		entity.type = type;
 		this.initializeComponents(entity, type);
 		return entity;
 	}
