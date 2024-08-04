@@ -33,4 +33,33 @@ export class ProbabilityCalculator {
     private calculateC(P: number): number {
         return 0.0045 / (0.0045 + P);
     }
+
+
+
+
+    /**
+     * 从一组带权重的列表中选择一个带权重的组
+     * @param items 
+     * @param getRate 
+     * @param totalWeight 已经计算好的总权重(有些提前有缓存计算的)，如果没有提供，则会自动计算
+     * @returns 
+     */
+    public selectWeightedGroup<T>(items: T[], getRate: (item: T) => number, totalWeight?: number): T | null {
+        // 如果没有提供 totalWeight，则计算总权重
+        if (totalWeight === undefined) {
+            totalWeight = items.reduce((total, item) => total + getRate(item), 0);
+        }
+        
+        const random = Math.random() * totalWeight;
+        let cumulativeProbability = 0;
+
+        for (const item of items) {
+            cumulativeProbability += getRate(item);
+            if (random < cumulativeProbability) {
+                return item; // 返回选中的组
+            }
+        }
+
+        return null; // 如果没有选中任何组
+    }
 }
