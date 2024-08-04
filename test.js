@@ -27,8 +27,27 @@
 // executeCreateRole("createRoleView","heelo")
 
 
-console.log(1721962693426/1000 -1721962692303/1000 )
+// console.log(1721962693426/1000 -1721962692303/1000 )
 // pass time: 1721962692303
 // MovieClip.ts:98 =====x=x=x==x=x= 1721962693345
 // MovieClip.ts:98 =====x=x=x==x=x= 1721962693377
 // MovieClip.ts:98 =====x=x=x==x=x= 1721962693426
+
+
+
+function getFileNameWithoutExtension(path) {
+    // 1. 获取最后一个 '/' 之后的部分
+    const fileName = path.slice(path.lastIndexOf('/') + 1);
+    
+    // 2. 获取文件名和扩展名的最后一个 '.' 的索引
+    const dotIndex = fileName.lastIndexOf('.');
+    
+    // 3. 如果没有找到 '.', 返回文件名本身; 否则返回去掉扩展名的文件名
+    return dotIndex === -1 ? fileName : fileName.slice(0, dotIndex);
+}
+
+console.log(getFileNameWithoutExtension('e:/workplace/hope/jlbd-h5-client/test.js')); // 输出: test
+
+console.log(getFileNameWithoutExtension('test')); // 输出: test
+
+console.log(getFileNameWithoutExtension('test.json')); // 输出: test

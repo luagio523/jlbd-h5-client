@@ -30,7 +30,16 @@ export class ConfigManager extends Component {
      * @param path 
      * @returns 
      */
-    public async loadJSON(path: string,release:boolean = true): Promise<JsonAsset> {
+    public async loadJSON(path: string,release:boolean = true): Promise<any> {
+        let filename = this.getFileNameWithoutExtension(path);
+        if (this.configs.has(filename)) { //先从缓存读取,因为可能通过 zip 包加载过了。
+            const json =  this.configs.get(filename);
+            if (json && release){
+                this.releaseSingle(filename);
+            }
+            return json;
+        }
+
         path = this.getConfigPath(path);
         return new Promise((resolve, reject) => {
             resources.load(path, JsonAsset, (err, asset) => {
@@ -39,7 +48,7 @@ export class ConfigManager extends Component {
                     return;
                 }
                 this.dealWithAsset(asset,release);
-                resolve(asset);
+                resolve(asset.json);
             });
         });
     }
@@ -135,6 +144,17 @@ export class ConfigManager extends Component {
     private removeExtension(filename: string): string {
         const lastDotIndex = filename.lastIndexOf('.');
         return lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
+    }
+
+    private getFileNameWithoutExtension(path) {
+        // 1. 获取最后一个 '/' 之后的部分
+        const fileName = path.slice(path.lastIndexOf('/') + 1);
+        
+        // 2. 获取文件名和扩展名的最后一个 '.' 的索引
+        const dotIndex = fileName.lastIndexOf('.');
+        
+        // 3. 如果没有找到 '.', 返回文件名本身; 否则返回去掉扩展名的文件名
+        return dotIndex === -1 ? fileName : fileName.slice(0, dotIndex);
     }
 
     private dealWithAsset(asset: Asset,release:boolean = true): void {
