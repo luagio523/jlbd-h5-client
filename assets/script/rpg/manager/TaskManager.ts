@@ -84,9 +84,7 @@ export class TaskManager {
     }
 
     public async load(jsonPath: string): Promise<void> {
-        let jsonAsset = await ConfigManager.getInstance().loadJSON(jsonPath, true);
-
-        const tasksConfig = jsonAsset.json; // 获取 JSON 数据
+        const tasksConfig = await ConfigManager.getInstance().loadJSON(jsonPath, true);
 
          // 创建任务实例并添加到 taskMap
          tasksConfig.forEach((taskConfig: any) => {
