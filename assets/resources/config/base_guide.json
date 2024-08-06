@@ -1,0 +1,46 @@
+{
+    "isForced": false,
+    "steps": [
+      {
+        "id": "step1",
+        "trigger": {
+          "type": "LevelTrigger",
+          "level": 1
+        },
+        "action": {
+          "type": "SHOW_MESSAGE",
+          "data": {
+            "message": "Welcome to the game!",
+            "position": {"x": 100, "y": 100}
+          }
+        }
+      },
+      {
+        "id": "step2",
+        "trigger": {
+          "type": "QuestCompleteTrigger",
+          "questId": "tutorial_welcome"
+        },
+        "action": {
+          "type": "CLICK",
+          "data": {
+            "target": "Canvas/StartButton"
+          }
+        }
+      },
+      {
+        "id": "step3",
+        "trigger": {
+          "type": "QuestCompleteTrigger",
+          "questId": "tutorial_start"
+        },
+        "action": {
+          "type": "SWIPE",
+          "data": {
+            "start": {"x": 100, "y": 100},
+            "end": {"x": 300, "y": 300}
+          }
+        }
+      }
+    ]
+  }
