@@ -1,6 +1,6 @@
 import { ChannelType, ChatMessage, ChatContent, ChatMessageType } from "./Chat";
 import { ChatMessageProcessor } from "./ChatMessageProcessor";
-import { ChatDisplayInterface } from "./ChatDisplayInterface";
+import { IChatDisplay } from "./IChatDisplay";
 import { NormalChatContent } from "./ChatContent";
 
 export class ChatMessageManager {
@@ -8,14 +8,14 @@ export class ChatMessageManager {
     private messageCache: Map<ChannelType, ChatMessage[]> = new Map();
     private maxMessagesPerChannel: number = 50;
     private cleanupThreshold: number = 10;
-    private chatDisplay: ChatDisplayInterface;
+    private chatDisplay: IChatDisplay;
 
-    constructor(chatDisplay: ChatDisplayInterface) {
+    constructor(chatDisplay: IChatDisplay) {
         this.chatDisplay = chatDisplay;
         this.registerMessageType(ChatMessageType.NORMAL, NormalChatContent)
     }
 
-    registerMessageType(messageType: ChatMessageType, contentClass: new (messageType: ChatMessageType, text: string, fields: Record<string, string>) => ChatContent): void {
+    registerMessageType(messageType: ChatMessageType, contentClass: new ( text: string, fields: Record<string, string>) => ChatContent): void {
         this.processor.registerType(messageType,contentClass);
     }
 
@@ -32,7 +32,7 @@ export class ChatMessageManager {
 
     processMessage(message: ChatMessage) {
         const chatContent = this.processor.decode(message);
-        message.content = chatContent.toHtml();
+        message.content = chatContent.toDisplayString();
         this.addMessageToCache(message.channelType, message);
         if (message.channelType !== ChannelType.HUB) { 
             this.addMessageToCache(ChannelType.HUB, message);

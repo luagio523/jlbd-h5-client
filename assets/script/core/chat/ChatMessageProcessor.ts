@@ -1,7 +1,7 @@
 import { ChatMessage, ChatMessageType, ChatContent } from "./Chat";
 
 export class ChatMessageProcessor {
-    private typeMap: Map<ChatMessageType, new (messageType: ChatMessageType, text: string, fields: Record<string, string>) => ChatContent>;
+    private typeMap: Map<ChatMessageType, new (text: string, fields: Record<string, string>) => ChatContent>;
 
     constructor() {
         this.typeMap = new Map([
@@ -31,11 +31,11 @@ export class ChatMessageProcessor {
             throw new Error(`Unknown message type: ${data.messageType}`);
         }
 
-        return new ContentClass(data.messageType, data.text, data.fields);
+        return new ContentClass(data.text, data.fields);
     }
 
     // 添加一个方法来注册新的消息类型
-    registerType(type: ChatMessageType, contentClass: new (messageType: ChatMessageType, text: string, fields: Record<string, string>) => ChatContent) {
+    registerType(type: ChatMessageType, contentClass: new ( text: string, fields: Record<string, string>) => ChatContent) {
         this.typeMap.set(type, contentClass);
     }
 }

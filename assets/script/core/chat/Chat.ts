@@ -30,21 +30,19 @@ export interface ChatMessage {
  * 聊天内容
  */
 export abstract class ChatContent {
-    public messageType: ChatMessageType;
+    abstract messageType: ChatMessageType;
     public text: string;
     public fields: Record<string, string>;
 
     constructor(
-        messageType: ChatMessageType,
         text: string,
         fields: Record<string, string>
     ) {
-        this.messageType = messageType;
         this.text = text;
         this.fields = fields;
     }
 
-    abstract toHtml(): string;
+    abstract toDisplayString(): string;
 
     protected getField(key: string, defaultValue: string = ''): string {
         return this.fields[key] || defaultValue;

@@ -1,11 +1,12 @@
 import { ChatContent, ChatMessageType } from "./Chat";
 
 export class NormalChatContent extends ChatContent {
-    constructor(messageType: ChatMessageType, text: string, fields: Record<string, string>) {
-        super(messageType, text, fields);
+    messageType: ChatMessageType = ChatMessageType.NORMAL;
+    constructor(text: string, fields: Record<string, string>) {
+        super( text, fields);
     }
 
-    toHtml(): string {
+    toDisplayString(): string {
         return `<span class="normal-chat">${this.text}</span>`;
     }
 }

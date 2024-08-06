@@ -1,6 +1,6 @@
 import { ChatMessage } from "./Chat";
 
-export interface ChatDisplayInterface {
+export interface IChatDisplay {
     displayMessage(chatMessage: ChatMessage): void;
     getCurrentUserId(): string;
 }

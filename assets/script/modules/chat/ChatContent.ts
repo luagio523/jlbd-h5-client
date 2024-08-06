@@ -1,6 +1,7 @@
 import { ChatContent, ChatMessageType } from "../../core/chat/Chat";
 
 export class WorldChatContent extends ChatContent {
+    messageType = ChatMessageType.WORLD_CHAT;
     private static HTML_TEMPLATE = `
         {vipBadge}
         <span class="server">[{server}服]</span>
@@ -9,8 +10,8 @@ export class WorldChatContent extends ChatContent {
         <span class="text">{text}</span>
     `;
 
-    constructor(messageType: ChatMessageType, text: string, fields: Record<string, string>) {
-        super(messageType, text, fields);
+    constructor(text: string, fields: Record<string, string>) {
+        super( text, fields);
     }
 
     get vip(): boolean {
@@ -29,7 +30,7 @@ export class WorldChatContent extends ChatContent {
         return this.getField('name');
     }
 
-    toHtml(): string {
+    toDisplayString(): string {
         const vipBadge = this.vip ? '<span class="vip-badge">[VIP]</span>' : '';
 
         // 使用静态模板并替换占位符
