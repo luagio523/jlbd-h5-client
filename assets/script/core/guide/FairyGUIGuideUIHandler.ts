@@ -1,36 +1,50 @@
 // FairyGUIGuideUIHandler.ts
 
 import { Event, GComponent, GGraph, GObject, GTextField } from "fairygui-cc";
-import { BaseGuideUIHandler } from "./GuideUIHandler";
 import { Vec2 } from "cc";
+import { FairyUIAdapter } from "../ui/UIAdapter";
+import { GuideUIHandler } from "./GuideUIHandler";
+import { GuideAction, GuideActionType } from "./GuideAction";
 
-export class FairyGUIGuideUIHandler extends BaseGuideUIHandler {
-    private root: GComponent;
+export class FairyGUIGuideUIHandler extends FairyUIAdapter implements GuideUIHandler {
+    protected onStepComplete: () => void;
     private mask: GGraph | null = null;
     private messageNode: GTextField | null = null;
     private indicatorNode: GObject | null = null;
 
-    constructor(root: GComponent) {
-        super();
-        this.root = root;
+    
+    public injectUI(ui: GComponent): void {
+        super.injectUI(ui);
     }
 
+    
+    public showStep(action: GuideAction, onComplete: () => void): void {
+        this.clear();
+        this.onStepComplete = onComplete;
 
-    protected clearMask(): void {
-        if (this.mask) {
-            this.root.removeChild(this.mask);
-            this.mask.dispose();
-            this.mask = null;
+        switch (action.type) {
+            case GuideActionType.CLICK:
+                this.showClickIndicator(action.data.target);
+                break;
+            case GuideActionType.SWIPE:
+                this.showSwipeIndicator(action.data.start, action.data.end);
+                break;
         }
     }
 
-    protected showMessage(message: string, position: { x: number, y: number }): void {
-        this.messageNode = new GTextField();
-        this.messageNode.text = message;
-        this.messageNode.setPosition(position.x, position.y);
-        this.root.addChild(this.messageNode);
+    public endStep(): void {
+        if (this.onStepComplete) {
+            this.onStepComplete();
+            this.onStepComplete = null;
+        }
     }
 
+    public clear(): void {
+        this.clearIndicators();
+    }
+
+
+   
     protected showClickIndicator(target: string | { x: number, y: number }): void {
         // this.createMask(target); // 创建遮罩并挖孔
 
@@ -69,12 +83,12 @@ export class FairyGUIGuideUIHandler extends BaseGuideUIHandler {
     }
 
     protected setupClickListener(target: Vec2, onComplete: () => void): void {
-        this.root.onClick((event: Event) => {
-            const touchLoc = event.pos;
-            if (Math.sqrt((touchLoc.x - target.x) ** 2 + (touchLoc.y - target.y) ** 2) < 50) { // 假设点击区域半径为50
-                onComplete();
-            }
-        }, this);
+        // this.root.onClick((event: Event) => {
+        //     const touchLoc = event.pos;
+        //     if (Math.sqrt((touchLoc.x - target.x) ** 2 + (touchLoc.y - target.y) ** 2) < 50) { // 假设点击区域半径为50
+        //         onComplete();
+        //     }
+        // }, this);
     }
 
     protected setupSwipeListener(start: { x: number, y: number }, end: { x: number, y: number }, onComplete: () => void): void {

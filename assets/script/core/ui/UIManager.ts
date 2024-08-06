@@ -118,7 +118,7 @@ export class UIManager {
             log(`Close failed. Please check  uiId: ${uiId}`);
             return;
         }
-        this.layerManager.removeFromLayer(uiInstance, config.uiLayer);
+        this.removeUIFromLayer(uiInstance, config.uiLayer);
         mediator.onClose();
         if(destroy){
             this.destroy(uiId); 
@@ -163,9 +163,14 @@ export class UIManager {
         this.uiInstances.forEach((_, instanceId) => this.close(instanceId));
     }
 
-    private addUIToLayer(uiInstance: any, uiLayer: UILayer): void {
+    public addUIToLayer(uiInstance: any, uiLayer: UILayer): void {
         assert(!!this.layerManager, "Layer manager is not initialized");
         this.layerManager.addToLayer(uiInstance, uiLayer);
+    }
+
+    public removeUIFromLayer(uiInstance: any, uiLayer: UILayer): void {
+        assert(!!this.layerManager, "Layer manager is not initialized");
+        this.layerManager.removeFromLayer(uiInstance, uiLayer);
     }
 
     private async createUI(config: IUIConfig): Promise<any> {
