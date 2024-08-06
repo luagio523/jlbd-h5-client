@@ -51,7 +51,7 @@ export class Guide {
     private showStep(index: number): void {
         const step = this.steps[index];
         if(step.shouldTrigger()){
-            this.uiHandler.showStep(step.action, this.next.bind(this));
+            this.uiHandler.showIndicator(step.action, this.next.bind(this));
         }
     }
 }

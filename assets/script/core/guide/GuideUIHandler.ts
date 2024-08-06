@@ -3,8 +3,8 @@
 import { GuideAction, GuideActionType } from "./GuideAction";
 
 export interface GuideUIHandler {
-    showStep(action: GuideAction, onComplete: () => void): void;
-    endStep(): void;
+    showIndicator(action: GuideAction, onComplete: () => void): void;
+    end(): void;
     clear(): void;
 }
 
@@ -17,7 +17,7 @@ export interface GuideUIHandler {
 //     protected abstract showSwipeIndicator(start: { x: number, y: number }, end: { x: number, y: number }): void;
 //     protected abstract clearIndicators(): void;
 
-//     showStep(action: GuideAction, onComplete: () => void): void {
+//     async showStep(action: GuideAction, onComplete: () => void): Promise<void> {
 //         this.clear();
 //         this.onStepComplete = onComplete;
 
