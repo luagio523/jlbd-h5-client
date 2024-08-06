@@ -1,5 +1,6 @@
 {
     "isForced": false,
+    "postGuide":"task_guide_welcome",
     "steps": [
       {
         "id": "step1",
@@ -17,6 +18,7 @@
       },
       {
         "id": "step2",
+        "isSavePoint":true,
         "trigger": {
           "type": "QuestCompleteTrigger",
           "questId": "tutorial_welcome"
@@ -30,6 +32,7 @@
       },
       {
         "id": "step3",
+        
         "trigger": {
           "type": "QuestCompleteTrigger",
           "questId": "tutorial_start"
