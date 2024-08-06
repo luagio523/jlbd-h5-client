@@ -4,7 +4,6 @@ import { GuideAction, GuideActionType } from "./GuideAction";
 
 export interface GuideUIHandler {
     showIndicator(action: GuideAction, onComplete: () => void): void;
-    end(): void;
     clear(): void;
 }
 

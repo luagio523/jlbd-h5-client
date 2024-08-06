@@ -35,13 +35,7 @@ export class FairyGUIGuideUIHandler implements GuideUIHandler {
           
         }
     }
-
-    public end(): void {
-        if (this.onStepComplete) {
-            this.onStepComplete();
-            this.onStepComplete = null;
-        }
-    }
+    
 
     clear(): void {
     }
