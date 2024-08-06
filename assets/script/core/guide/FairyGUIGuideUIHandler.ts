@@ -11,12 +11,21 @@ export class FairyGUIGuideUIHandler implements GuideUIHandler {
     private messageNode: GTextField | null = null;
     private indicatorNode: GObject | null = null;
 
-    constructor(root: GComponent) {
+    constructor() {
         
+    }
+
+    /**
+     * 引导UI 可以包含所有的引导元素，比如提示信息，指示器，蒙版等
+     * @returns 
+     */
+    private async createGuideUI(): Promise<void> {
+        return ;
     }
 
 
     public async showIndicator(action: GuideAction, onComplete: () => void): Promise<void> {
+        await this.createGuideUI();
         this.clear();
         this.onStepComplete = onComplete;
 

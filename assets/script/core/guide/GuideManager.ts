@@ -15,7 +15,6 @@ export class GuideManager {
     public async loadGuide(id: string): Promise<void> {
         let config = await ConfigManager.getInstance().loadJSON( id )
 
-
         const steps = config.steps.map((stepData: any) => new GuideStep(stepData));
         const guide = new Guide(id, steps, config.isForced, this.uiHandler);
         this.guides.set(id, guide);
