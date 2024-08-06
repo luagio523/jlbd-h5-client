@@ -8,7 +8,7 @@
 import { oops } from "./core/Oops"
 import {  ITimerMgr, LinkListTimerMgr,HeapTimerMgr } from "./core/common/timer/TimerMgr"
 import  { ConfigManager } from "./core/common/config/ConfigManager"
-import { AdaptionManager } from "./core/common/Adaption/AdaptionManager"
+import { AdaptionManager } from "./core/common/adaption/AdaptionManager"
 import { Facade } from "./core/mvc/init"
 import SDKManager from "./core/common/sdk/SDKManager"
 import { StorageManager } from "./core/common/storage/StorageManager"

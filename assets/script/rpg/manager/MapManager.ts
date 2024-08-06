@@ -5,7 +5,7 @@ import { EnterMapEvent, InitedMapEvent } from "../event/Event";
 import app from "../../App";
 import { EventDispatcher } from "../event/EventManager";
 import { ColliderManager } from "./ColliderManager";
-import { AdaptionManager } from "../../core/common/Adaption/AdaptionManager";
+import { AdaptionManager } from "../../core/common/adaption/AdaptionManager";
 import { CameraController } from "../map/CameraController";
 import { CameraEffectsManager } from "./CameraEffectsManager";
 import { SLayerType, SceneManager } from "./SceneManager";

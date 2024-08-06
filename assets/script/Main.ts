@@ -4,7 +4,7 @@ import { DEBUG, JSB } from 'cc/env';
 import { Root } from './core/Root';
 import app from './App';
 import { GameManager } from './core/game/GameManager';
-import { UIPosition } from './core/common/Adaption/AdaptionManager';
+import { UIPosition } from './core/common/adaption/AdaptionManager';
 import { AudioManager } from './core/common/audio/AudioManager';
 import { modules } from './mvc/modules';
 import { UIManager } from './core/ui/UIManager';

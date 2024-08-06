@@ -6,7 +6,7 @@ import { GComponent } from "fairygui-cc";
 import { FairyGUIManager, FairyGuiResManager } from "./FairyGUIManager";
 import { ToastManager } from "./ToastManager";
 import { AlertManager, AlertOptions } from "./AlertManager";
-import { AdaptionManager,UIPosition } from "../common/Adaption/AdaptionManager"
+import { AdaptionManager,UIPosition } from "../common/adaption/AdaptionManager"
 
 // 
 export interface IViewMediator {
