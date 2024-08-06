@@ -18,7 +18,6 @@ export class GuideManager {
     }
 
 
-
     private async loadGuide(id: string): Promise<void> {
         if (this.guides.has(id)) return; // 如果已加载，则跳过
 
@@ -118,7 +117,7 @@ export class GuideManager {
 
         // 检查是否有后置引导
         if (postGuideId) {
-            this.startGuide(postGuideId);
+            this.startGuide(postGuideId); // 开始后置引导
         }
     }
 
@@ -133,6 +132,19 @@ export class GuideManager {
         if (guide) {
             guide.end();
         }
+    }
+
+    /**
+     * 
+     * @returns 
+     */
+    public tryTriggerGuides(): void {
+        if (this.currentGuide) return; // 如果有正在进行的引导，则跳过
+        this.guides.forEach(guide => {
+            if (!guide.isForced && guide.steps[guide.currentStepIndex].shouldTrigger()) {
+                guide.start();
+            }
+        });
     }
 
     destroy(): void {
