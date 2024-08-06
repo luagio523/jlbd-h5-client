@@ -42,6 +42,13 @@ _module_configs["Game"] = {
 }
 
 
+_module_configs["Chat"] = {
+	events : [
+				"Send_Chat_Msg",
+				],
+	views :  [],
+	models: ["Chat"],
+}
 
 // // //登陆
 // _module_configs["Login"] = {
