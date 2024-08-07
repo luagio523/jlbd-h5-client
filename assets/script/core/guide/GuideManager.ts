@@ -1,7 +1,9 @@
 import { ConfigManager } from '../common/config/ConfigManager';
+import { StorageManager } from '../common/storage/StorageManager';
 import { Guide } from './Guide';
 import { GuideStep } from './GuideStep';
 import { GuideUIHandler } from './GuideUIHandler';
+import { IGuideCondition } from './IGuideCondition';
 
 type StepCompletionCallback = (stepId: string) => void;
 type GuideCompletionCallback = (guideId: string) => void;
@@ -9,24 +11,53 @@ type GuideCompletionCallback = (guideId: string) => void;
 export class GuideManager {
     private guides: Map<string, Guide> = new Map();
     private uiHandler: GuideUIHandler;
+    private conditionHandler: IGuideCondition;
     private stepSubscriptions: Map<string, StepCompletionCallback[]> = new Map();
     private guideSubscriptions: Map<string, GuideCompletionCallback[]> = new Map();
     private currentGuide: Guide | null = null;
+    private storageManager: StorageManager = StorageManager.getInstance();
 
-    constructor(uiHandler: GuideUIHandler) {
+    constructor(uiHandler: GuideUIHandler, conditionHandler: IGuideCondition) {
         this.uiHandler = uiHandler;
+        this.conditionHandler = conditionHandler;
     }
 
+    public async load(guides:string[]): Promise<void> {
+        for (const guideName of guides) {
+            try {
+                const config = await ConfigManager.getInstance().loadJSON(guideName);
+                this.initGuide(config);
+            } catch (error) {
+                console.error(`Error loading guide ${guideName}:`, error);
+            }
+        }
+    }
 
-    private async loadGuide(id: string): Promise<void> {
+    private initGuide(config: any): void {
+        const id = config.id;
         if (this.guides.has(id)) return; // 如果已加载，则跳过
 
-        let config = await ConfigManager.getInstance().loadJSON(id);
-        const steps = config.steps.map((stepData: any) => new GuideStep(stepData));
+        // 检查引导是否已经完成
+        if (this.isGuideCompleted(id)) return;
+
+        const steps = config.steps.map((stepData: any) => {
+            // 为每个步骤获取触发函数
+            const condition = this.conditionHandler.getStepCondition(id, stepData.id);
+            
+            // 创建 GuideStep 实例，传入触发函数
+            return new GuideStep({
+                id: stepData.id,
+                action: stepData.action, // 假设 action 已经在配置中定义
+                condition: condition,
+                isForced: stepData.isForced || false
+            });
+        });
+
         const guide = new Guide(
             id, 
             steps, 
             config.isForced, 
+            config.savePoint || null,
             config.postGuide || null,
             this.uiHandler,
             this.onStepCompleted.bind(this),
@@ -36,34 +67,26 @@ export class GuideManager {
         this.guides.set(id, guide);
     }
 
-    public async startGuide(id: string, fromSavePoint: boolean = false): Promise<void> {
-        await this.loadGuide(id);
+    public async startGuide(id: string): Promise<void> {
         const guide = this.guides.get(id);
         if (guide) {
             this.currentGuide = guide;
-            if (fromSavePoint) {
-                // 从保存点恢复
-                const savedState = this.getSavedState(id);
-                if (savedState && savedState.guideId === id) {
-                    guide.setCurrentStep(savedState.stepId);
-                }
-            }
             guide.start();
         }
     }
 
+    
+
     private onSavePoint(guideId: string, stepId: string): void {
         // 在这里实现保存逻辑，例如将当前引导和步骤ID保存到本地存储
         console.log(`Save point reached for guide ${guideId} at step ${stepId}`);
-        localStorage.setItem(`guideState_${guideId}`, JSON.stringify({ guideId, stepId }));
+        this.storageManager.setItem(`guideState_${guideId}`, 1);
     }
 
-    private getSavedState(guideId: string): { guideId: string, stepId: string } | null {
+    private isGuideCompleted(guideId: string): boolean {
         // 从本地存储获取保存的状态
-        const savedState = localStorage.getItem(`guideState_${guideId}`);
-        return savedState ? JSON.parse(savedState) : null;
+        return this.storageManager.getItem<number>(`guideState_${guideId}`) === 1;
     }
-    
 
     subscribeToStep(stepId: string, callback: StepCompletionCallback): void {
         if (!this.stepSubscriptions.has(stepId)) {
@@ -112,6 +135,9 @@ export class GuideManager {
             callbacks.forEach(callback => callback(guideId));
         }
 
+        // 标记引导为已完成
+        this.storageManager.setItem(`guideState_${guideId}`, 1);
+
         // 清理当前引导
         this.currentGuide = null;
 
@@ -134,14 +160,11 @@ export class GuideManager {
         }
     }
 
-    /**
-     * 
-     * @returns 
-     */
     public tryTriggerGuides(): void {
         if (this.currentGuide) return; // 如果有正在进行的引导，则跳过
         this.guides.forEach(guide => {
             if (!guide.isForced && guide.steps[guide.currentStepIndex].shouldTrigger()) {
+                this.currentGuide = guide;
                 guide.start();
             }
         });
@@ -155,34 +178,3 @@ export class GuideManager {
         this.currentGuide = null;
     }
 }
-
-
-
-
-
-
-// // 创建 GuideManager 实例
-// const uiHandler = new CocosCreatorGuideUIHandler(someNode);
-// const guideManager = new GuideManager(uiHandler);
-
-// // 加载引导
-// guideManager.loadGuide('tutorial', tutorialSteps, false);
-
-// // 订阅特定步骤
-// guideManager.subscribeToStep('login_step', (stepId) => {
-//   console.log(`Step ${stepId} completed`);
-//   // 执行登录逻辑
-//   loginUser().then(() => {
-//     // 登录成功后，继续下一步引导
-//     guideManager.proceedToNextStep();
-//   });
-// });
-
-// // 开始引导
-// guideManager.startGuide('tutorial');
-
-// // 在适当的时候结束引导
-// guideManager.endGuide('tutorial');
-
-// // 清理
-// guideManager.destroy();

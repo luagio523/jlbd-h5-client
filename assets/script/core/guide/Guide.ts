@@ -7,6 +7,7 @@ export class Guide {
     currentStepIndex: number;
     isForced: boolean;
     postGuideId: string | null;
+    savePoint: string | null;
     private uiHandler: GuideUIHandler;
     private onStepCompleted: (stepId: string) => void;
     private onGuideCompleted: (guideId: string, postGuideId: string | null) => void;
@@ -16,6 +17,7 @@ export class Guide {
         id: string,
         steps: GuideStep[],
         isForced: boolean,
+        savePoint:string | null,
         postGuideId: string | null,
         uiHandler: GuideUIHandler,
         onStepCompleted: (stepId: string) => void,
@@ -26,6 +28,7 @@ export class Guide {
         this.steps = steps;
         this.currentStepIndex = 0;
         this.isForced = isForced;
+        this.savePoint = savePoint;
         this.postGuideId = postGuideId;
         this.uiHandler = uiHandler;
         this.onStepCompleted = onStepCompleted;
@@ -41,17 +44,14 @@ export class Guide {
         if (this.currentStepIndex < this.steps.length) {
             const currentStep = this.steps[this.currentStepIndex];
             if (currentStep.shouldTrigger()) {
-                if (currentStep.isSavePoint) {
-                    this.onSavePoint(this.id, currentStep.id);
-                }
+               
                 this.uiHandler.showIndicator(currentStep.action, () => {
                     this.onStepCompleted(currentStep.id);
                     this.currentStepIndex++;
                     this.showNextStep();
                 });
             } else {
-                this.currentStepIndex++;
-                this.showNextStep();
+              
             }
         } else {
             this.end();
@@ -60,6 +60,10 @@ export class Guide {
 
     end(): void {
         this.uiHandler.clear();
+        const currentStep = this.steps[this.currentStepIndex];
+        if (currentStep.id == this.savePoint) {
+            this.onSavePoint(this.id, currentStep.id);
+        }
         this.onGuideCompleted(this.id, this.postGuideId);
     }
 

@@ -1,13 +1,10 @@
 {
     "isForced": false,
+    "savePoint":"step2",
     "postGuide":"task_guide_welcome",
     "steps": [
       {
         "id": "step1",
-        "trigger": {
-          "type": "LevelTrigger",
-          "level": 1
-        },
         "action": {
           "type": "SHOW_MESSAGE",
           "data": {
@@ -18,11 +15,6 @@
       },
       {
         "id": "step2",
-        "isSavePoint":true,
-        "trigger": {
-          "type": "QuestCompleteTrigger",
-          "questId": "tutorial_welcome"
-        },
         "action": {
           "type": "CLICK",
           "data": {
@@ -32,11 +24,6 @@
       },
       {
         "id": "step3",
-        
-        "trigger": {
-          "type": "QuestCompleteTrigger",
-          "questId": "tutorial_start"
-        },
         "action": {
           "type": "SWIPE",
           "data": {
