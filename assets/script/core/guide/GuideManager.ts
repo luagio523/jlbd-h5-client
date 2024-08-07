@@ -3,13 +3,14 @@ import { StorageManager } from '../common/storage/StorageManager';
 import { Guide } from './Guide';
 import { GuideStep } from './GuideStep';
 import { GuideUIHandler } from './GuideUIHandler';
-import { IGuideCondition } from './IGuideCondition';
+import { IGuideCondition } from './GuideCondition';
 
 type StepCompletionCallback = (stepId: string) => void;
 type GuideCompletionCallback = (guideId: string) => void;
 
 export class GuideManager {
     private guides: Map<string, Guide> = new Map();
+    private completedGuides: Map<string, boolean> = new Map(); // 新增：完成状态的 用于支持服务器数据同步
     private uiHandler: GuideUIHandler;
     private conditionHandler: IGuideCondition;
     private stepSubscriptions: Map<string, StepCompletionCallback[]> = new Map();
@@ -20,6 +21,21 @@ export class GuideManager {
     constructor(uiHandler: GuideUIHandler, conditionHandler: IGuideCondition) {
         this.uiHandler = uiHandler;
         this.conditionHandler = conditionHandler;
+    }
+
+     // 新增：设置引导完成状态的方法
+     public setGuideCompletionStatus(guideId: string, isCompleted: boolean): void {
+        this.completedGuides.set(guideId, isCompleted);
+
+        // 标记引导为已完成
+        this.storageManager.setItem(`guideState_${guideId}`, 1);
+    }
+
+    // 新增：批量设置引导完成状态的方法
+    public setGuidesCompletionStatus(completionStatus: { [guideId: string]: boolean }): void {
+        Object.entries(completionStatus).forEach(([guideId, isCompleted]) => {
+            this.completedGuides.set(guideId, isCompleted);
+        });
     }
 
     public async load(guides:string[]): Promise<void> {
@@ -85,8 +101,12 @@ export class GuideManager {
 
     private isGuideCompleted(guideId: string): boolean {
         // 从本地存储获取保存的状态
+        if (this.completedGuides.size > 0) {
+            return this.completedGuides.get(guideId) || false;
+        }
         return this.storageManager.getItem<number>(`guideState_${guideId}`) === 1;
     }
+
 
     subscribeToStep(stepId: string, callback: StepCompletionCallback): void {
         if (!this.stepSubscriptions.has(stepId)) {
@@ -134,10 +154,8 @@ export class GuideManager {
         if (callbacks) {
             callbacks.forEach(callback => callback(guideId));
         }
-
-        // 标记引导为已完成
-        this.storageManager.setItem(`guideState_${guideId}`, 1);
-
+          // 标记引导为已完成
+        this.setGuideCompletionStatus(guideId, true);
         // 清理当前引导
         this.currentGuide = null;
 

@@ -1,7 +1,7 @@
 import { _decorator, Component, resources } from 'cc';
 import { ConfigManager } from '../../core/common/config/ConfigManager';
-import { DropGroup, DropItem, DropItemGroup, RandomType } from './Drop';
 import { ProbabilityCalculator } from '../calculator/ProbabilityCalculator';
+import { DropGroup, DropItem, DropItemGroup, RandomType } from '../drop/Drop';
 const { ccclass } = _decorator;
 
 export class DropManager {
