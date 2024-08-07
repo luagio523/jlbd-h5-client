@@ -7,7 +7,12 @@ import { IGuideCondition } from './GuideCondition';
 
 type StepCompletionCallback = (stepId: string) => void;
 type GuideCompletionCallback = (guideId: string) => void;
-
+/**
+ * 支持多个引导管理
+ * 1. 每个guide设置保存点后。执行完保存点所在step,则此次引导记录完成。其他步骤不影响。
+ * 未设置保存点时，默认最后一步引导记录完成。保存点适合于重要数据节点
+ * 2. 要求每个guide 唯一，每个step 唯一
+ */
 export class GuideManager {
     private guides: Map<string, Guide> = new Map();
     private completedGuides: Map<string, boolean> = new Map(); // 新增：完成状态的 用于支持服务器数据同步

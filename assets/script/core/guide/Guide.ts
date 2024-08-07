@@ -47,6 +47,9 @@ export class Guide {
                
                 this.uiHandler.showIndicator(currentStep.action, () => {
                     this.onStepCompleted(currentStep.id);
+                    if (currentStep.id == this.savePoint) { //有设置保存点
+                        this.onSavePoint(this.id, currentStep.id);
+                    }
                     this.currentStepIndex++;
                     this.showNextStep();
                 });
@@ -61,7 +64,7 @@ export class Guide {
     end(): void {
         this.uiHandler.clear();
         const currentStep = this.steps[this.currentStepIndex];
-        if (currentStep.id == this.savePoint) {
+        if ( !this.savePoint) { //没有设置保存点时，默认保存最后一步
             this.onSavePoint(this.id, currentStep.id);
         }
         this.onGuideCompleted(this.id, this.postGuideId);
